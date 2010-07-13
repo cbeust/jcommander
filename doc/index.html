@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>JCommander</title>
+
+      <link rel="stylesheet" href="testng.css" type="text/css" />
+      <link type="text/css" rel="stylesheet" href="http://beust.com/beust.css"  />
+      <script type="text/javascript" src="http://beust.com/prettify.js"></script>
+      <script type="text/javascript" src="http://testng.org/doc/banner.js"></script>
+
+      <script type="text/javascript" src="http://beust.com/scripts/shCore.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushJava.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushXml.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushBash.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushPlain.js"></script>
+      <link type="text/css" rel="stylesheet" href="http://beust.com/styles/shCore.css"/>
+      <link type="text/css" rel="stylesheet" href="http://beust.com/styles/shThemeCedric.css"/>
+      <script type="text/javascript">
+        SyntaxHighlighter.config.clipboardSwf = 'scripts/clipboard.swf';
+        SyntaxHighlighter.defaults['gutter'] = false;
+        SyntaxHighlighter.all();
+      </script>
+
+</head>
+
+<body>
+<table width="100%">
+  <tr>
+    <td align="center">
+<h1>JCommander</h1>
+<h2>Because life is too short to parse command line parameters</h2>
+    </td>
+  </tr>
+  <tr>
+    <td align="right">
+      Created: July 13th, 2010
+    </td>
+  </tr>
+  <tr><td align="right"><a href="mailto:cedric@beust.com">C&eacute;dric Beust</a></td></tr>
+</table>
+
+<h2>
+Overview
+</h2>
+
+JCommander is a very small Java framework that makes it trivial to parse command line parameters.
+<p>
+You annotate fields with descriptions of your options:
+
+<pre class="brush: java">
+import com.beust.jcommander.Parameter;
+
+public class JCommanderTest {
+  @Parameter
+  public List&lt;String&gt; parameters = Lists.newArrayList();
+
+  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
+  public Integer verbose = 1;
+
+  @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
+  public String groups;
+
+  @Parameter(names = "-debug", description = "Debug mode")
+  public boolean debug = false;
+}
+</pre>
+
+and then you simply ask JCommander to parse:
+
+<pre class="brush: java">
+JCommanderTest jct = new JCommanderTest();
+String[] argv = { "-log", "2", "-groups", "unit", "a", "b", "c" };
+new JCommander(jct, argv);
+
+Assert.assertEquals(jct.verbose.intValue(), 2);
+</pre>
+
+<h2>
+Types of options
+</h2>
+
+JCommander supports many types of options.
+
+<h4>Boolean</h4>
+
+When a <tt>Parameter</tt> annotation is found on a field of type <tt>boolean</tt> or <tt>Boolean</tt>, JCommander interprets it as an option with an <em>arity</em> of 0:
+
+<pre class="brush: java">
+@Parameter(names = "-debug", description = "Debug mode")
+public boolean debug = false;
+</pre>
+
+Such a parameter does not require any additional parameter on the command line and if it's detected during parsing, the corresponding field will be set to <tt>true</tt>.
+
+<h4>String, Integer, Long</h4>
+
+When a <tt>Parameter</tt> annotation is found on a field of type <tt>String</tt>, <tt>Integer</tt>, <tt>int</tt>, <tt>Long</tt> or <tt>long</tt>, JCommander will parse the following parameter and it will attempt to cast it to the right type:
+
+
+<pre class="brush: java">
+@Parameter(names = "-log", description = "Level of verbosity")
+public Integer verbose = 1;
+</pre>
+
+<pre class="brush: bash">
+java Main -log 3
+</pre>
+
+will cause the field <tt>verbose</tt> to receive the value 3, however:
+
+<pre class="brush: bash">
+java Main -log test
+</pre>
+
+will cause an exception to be thrown.
+
+<h4>Lists</h4>
+
+When a <tt>Parameter</tt> annotation is found on a field of type <tt>List</tt>, JCommander will interpret it as an option that can happen multiple times:
+
+<pre class="brush: java">
+@Parameter(names = "-hosts", description = "Level of verbosity")
+public List&lt;String&gt; hosts = new ArrayList&lt;String&gt;();
+</pre>
+
+will allow you to parse the following command line:
+
+<pre class="brush: bash">
+java Mail -host host1 -verbose -host host2
+</pre>
+
+When JCommander is done parsing the line above, the field <tt>hosts</tt> will contain the strings "host1" and "host2".
+
+<h4>Main parameter</h4>
+So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
+
+<pre class="brush: java">
+@Parameter(description = "Files")
+public List&lt;String&gt; files = new ArrayList&lt;String&gt;();
+
+@Parameter(names = "-debug", description = "Debugging level")
+public Integer verbose = 1;
+</pre>
+
+will allow you to parse:
+
+<pre class="brush: bash">
+java Main -debug file1 file2
+</pre>
+
+and the field <tt>files</tt> will receive the strings "file1" and "file2".
+
+<h2>@ syntax</h2>
+
+JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:
+
+<p>
+
+<h3 class="sourcetitle">/tmp/parameters</h3>
+<pre class="brush: bash">
+-verbose
+file1
+file2
+file3
+</pre>
+<pre class="brush: bash">
+java Main @/tmp/parameters
+</pre>
+
+<h2>Multiple option names</h2>
+
+You can specify more than one option name:
+
+<pre class="brush: java">
+
+  @Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
+  public String outputDirectory;
+
+</pre>
+
+will allow both following syntaxes:
+
+<pre class="brush: bash">
+java Main -d /tmp
+java Main --outputDirectory /tmp
+</pre>
+
+
+
+<h2>More examples</h2>
+
+TestNG uses JCommander to parse its command line, here is <a href="http://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">its definition file</a>.
+
+<h2>Download</h2>
+
+You can download JCommander from the following locations:
+
+<ul>
+  <li><a href="http://beust.com/jcommander/jcommander-1.0.0.SNAPSHOT.jar">Binary</a></li>
+  <li><a href="http://github.com/cbeust/jcommander">Source on github</a></li>
+</ul>
+
+<h2>TODO</h2>
+
+Some of the features I am considering adding:
+
+<ul>
+  <li>Support for arities >= 2 (syntaxes such as <tt>java Main -pair pair1 pair2</tt>)</li>.
+  <li>Type converters, to enable fields to have any type.
+</ul>
+
+
+</body>
+
+</html>
