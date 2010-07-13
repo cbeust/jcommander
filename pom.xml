@@ -8,7 +8,6 @@
   <name>jcommander</name>
   <url>http://maven.apache.org</url>
 
-  [...]
   <build>
     <plugins>
       <plugin>
