@@ -17,6 +17,7 @@
   </licenses>
   <scm>
     <url>http://github.com/cbeust/jcommander</url>
+    <connection>http://github.com/cbeust/jcommander</connection>
   </scm>
 
   <build>
