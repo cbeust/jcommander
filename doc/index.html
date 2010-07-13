@@ -125,7 +125,7 @@ public List&lt;String&gt; hosts = new ArrayList&lt;String&gt;();
 will allow you to parse the following command line:
 
 <pre class="brush: bash">
-java Mail -host host1 -verbose -host host2
+java Main -host host1 -verbose -host host2
 </pre>
 
 When JCommander is done parsing the line above, the field <tt>hosts</tt> will contain the strings "host1" and "host2".
@@ -184,6 +184,17 @@ java Main -d /tmp
 java Main --outputDirectory /tmp
 </pre>
 
+<h2>Usage</h2>
+
+You can invoke <tt>usage()</tt> on the <tt>JCommander</tt> instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
+
+<pre class="brush: bash">
+Usage:
+	-port			The port number
+	-debug			Debug mode
+	-src, --sources The source directory
+	-testclass		List of classes
+</pre>
 
 
 <h2>More examples</h2>
@@ -206,6 +217,7 @@ Some of the features I am considering adding:
 <ul>
   <li>Support for arities >= 2 (syntaxes such as <tt>java Main -pair pair1 pair2</tt>)</li>.
   <li>Type converters, to enable fields to have any type.
+  <li>HTML generation for <tt>usage()</tt>.
 </ul>
 
 

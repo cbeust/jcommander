@@ -27,4 +27,4 @@ and how you use it:
 
     Assert.assertEquals(jct.verbose.intValue(), 2);
 
-The full doc will soon be available at http://beust.com/jcommander
+The full doc is available at http://beust.com/jcommander
