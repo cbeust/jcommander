@@ -26,6 +26,5 @@ and how you use it:
     new JCommander(jct, argv);
 
     Assert.assertEquals(jct.verbose.intValue(), 2);
-}
 
 The full doc will soon be available at http://beust.com/jcommander
