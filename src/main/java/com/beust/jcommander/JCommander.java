@@ -21,7 +21,7 @@ public class JCommander {
     m_object = object;
   }
 
-  public JCommander(Object object, String[] args) {
+  public JCommander(Object object, String... args) {
     m_object = object;
     parse(args);
   }
@@ -29,7 +29,7 @@ public class JCommander {
   /**
    * Parse the command line parameters.
    */
-  public void parse(String[] args) {
+  public void parse(String... args) {
     createDescriptions();
     parseValues(expandArgs(args));
   }
