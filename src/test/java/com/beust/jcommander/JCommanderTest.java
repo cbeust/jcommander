@@ -6,6 +6,8 @@ import org.testng.collections.Lists;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class JCommanderTest {
   @Parameter
@@ -74,7 +76,34 @@ public class JCommanderTest {
     JCommander jc = new JCommander(jct, argv);
   }
 
+  private void i18n(Locale locale, String expectedString) {
+    ResourceBundle bundle = locale != null ? ResourceBundle.getBundle("MessageBundle", locale)
+        : null;
+
+    I18N i18n = new I18N();
+    String[] argv = { "-host", "localhost" };
+    JCommander jc = new JCommander(i18n, bundle, argv);
+
+    ParameterDescription pd = jc.getParameters().get(0);
+    Assert.assertEquals(pd.getDescription(), expectedString);
+  }
+
+  @Test
+  public void i18nNoLocale() {
+    i18n(null, "Host");
+  }
+
+  @Test
+  public void i18nUsLocale() {
+    i18n(new Locale("en", "US"), "Host");
+  }
+
+  @Test
+  public void i18nFrLocale() {
+    i18n(new Locale("fr", "FR"), "H™te");
+  }
+
   public static void main(String[] args) {
-    new JCommanderTest().repeatedArgs();
+    new JCommanderTest().i18nNoLocale();
   }
 }

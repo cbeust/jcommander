@@ -25,4 +25,9 @@ public @interface Parameter {
    * Whether this option is required.
    */
   boolean required() default false;
+
+  /**
+   * The key used to find the string in the message bundle.
+   */
+  String descriptionKey() default "";
 }

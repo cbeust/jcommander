@@ -5,10 +5,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.ResourceBundle;
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -47,10 +47,18 @@ public class JCommander {
   /**
    * A map of all the annotated fields.
    */
-  private Map<Field, Parameter> m_fields = Maps.newHashMap();
+  private Map<Field, ParameterDescription> m_fields = Maps.newHashMap();
+
+  private ResourceBundle m_bundle;
 
   public JCommander(Object object) {
     m_object = object;
+  }
+
+  public JCommander(Object object, ResourceBundle bundle, String... args) {
+    m_object = object;
+    m_bundle = bundle;
+    parse(args);
   }
 
   public JCommander(Object object, String... args) {
@@ -167,8 +175,8 @@ public class JCommander {
         } else {
           for (String name : p.names()) {
             p("Adding description for " + name);
-            ParameterDescription pd = new ParameterDescription(m_object, p, f);
-            m_fields.put(f, p);
+            ParameterDescription pd = new ParameterDescription(m_object, p, f, m_bundle);
+            m_fields.put(f, pd);
             m_descriptions.put(name, pd);
             if (p.required()) m_requiredFields.put(f, pd);
           }
@@ -238,12 +246,12 @@ public class JCommander {
    */
   public void usage() {
     System.out.println("Usage:");
-    for (Parameter p : m_fields.values()) {
+    for (ParameterDescription pd : m_fields.values()) {
       StringBuilder sb = new StringBuilder();
-      for (String n : p.names()) {
+      for (String n : pd.getParameter().names()) {
         sb.append(n).append(" ");
       }
-      System.out.println("\t" + sb.toString() + "\t" + p.description());
+      System.out.println("\t" + sb.toString() + "\t" + pd.getDescription());
     }
   }
 
@@ -252,8 +260,8 @@ public class JCommander {
    * target class. This can be used to display the usage() in a different
    * format (e.g. HTML).
    */
-  public Collection<Parameter> getParameters() {
-    return m_fields.values();
+  public List<ParameterDescription> getParameters() {
+    return new ArrayList(m_fields.values());
   }
 }
 
