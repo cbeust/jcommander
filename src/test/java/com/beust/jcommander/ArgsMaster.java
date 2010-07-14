@@ -8,5 +8,4 @@ package com.beust.jcommander;
 public class ArgsMaster {
   @Parameter(names = "-master")
   public String master;
-
 }

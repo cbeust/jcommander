@@ -96,7 +96,7 @@ public class JCommanderTest {
     ArgsMaster m = new ArgsMaster();
     ArgsSlave s = new ArgsSlave();
     String[] argv = { "-master", "master", "-slave", "slave" };
-    new JCommander(new Object[] {m , s}, argv);
+    new JCommander(new Object[] { m , s }, argv);
 
     Assert.assertEquals(m.master, "master");
     Assert.assertEquals(s.slave, "slave");

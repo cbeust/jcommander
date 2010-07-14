@@ -147,7 +147,44 @@ will allow you to parse:
 java Main -debug file1 file2
 </pre>
 
-and the field <tt>files</tt> will receive the strings "file1" and "file2".
+and the field <tt>files</tt> will receive the strings "file1" and
+"file2".
+
+<h2>Multiple descriptions</h2>
+
+You can spread the description of your parameters on more than one
+class. For example, you can define the following two classes:
+
+<p>
+
+<h3 class="sourcetitle">ArgsMaster.java</h3>
+<pre class="brush: java">
+public class ArgsMaster {
+  @Parameter(names = "-master")
+  public String master;
+}
+</pre>
+
+<h3 class="sourcetitle">ArgsSlave.java</h3>
+<pre class="brush: java">
+public class ArgsSlave {
+  @Parameter(names = "-slave")
+  public String slave;
+}
+</pre>
+
+and pass these two objects to JCommander:
+
+<pre class="brush: java">
+ArgsMaster m = new ArgsMaster();
+ArgsSlave s = new ArgsSlave();
+String[] argv = { "-master", "master", "-slave", "slave" };
+new JCommander(new Object[] { m , s }, argv);
+
+Assert.assertEquals(m.master, "master");
+Assert.assertEquals(s.slave, "slave");
+</pre>
+
 
 <h2>@ syntax</h2>
 

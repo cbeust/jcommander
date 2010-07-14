@@ -8,5 +8,4 @@ package com.beust.jcommander;
 public class ArgsSlave {
   @Parameter(names = "-slave")
   public String slave;
-
 }
