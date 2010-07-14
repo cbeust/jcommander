@@ -184,6 +184,29 @@ java Main -d /tmp
 java Main --outputDirectory /tmp
 </pre>
 
+<h2>Required and optional parameters</h2>
+
+If some of your parameters are mandatory, you can use the
+<tt>required</tt> attribute (which default to <tt>false</tt>):
+
+<pre class="brush: java">
+
+  @Parameter(names = "-host", required = true)
+  public String host;
+
+</pre>
+
+If this parameter is not specified, JCommander will throw an exception
+telling you which options are missing.
+
+<h2>Exception</h2>
+
+Whenever JCommander detects an error, it will throw a
+<tt>ParameterException</tt>. Note that this is a Runtime Exception,
+since your application is probably not initialized correctly at this
+point.
+
+
 <h2>Usage</h2>
 
 You can invoke <tt>usage()</tt> on the <tt>JCommander</tt> instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
