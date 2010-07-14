@@ -10,28 +10,15 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class JCommanderTest {
-  @Parameter
-  public List<String> parameters = Lists.newArrayList();
-
-  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity", required = true)
-  public Integer verbose = 1;
-
-  @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
-  public String groups;
-
-  @Parameter(names = "-debug", description = "Debug mode")
-  public boolean debug = false;
-
   @Test
   public void simpleArgs() {
-    JCommanderTest jct = new JCommanderTest();
+    Args1 args = new Args1();
     String[] argv = { "-log", "2", "-groups", "unit", "a", "b", "c" };
-    new JCommander(jct, argv);
+    new JCommander(args, argv);
 
-    System.out.println("Verbose:" + verbose);
-    Assert.assertEquals(jct.verbose.intValue(), 2);
-    Assert.assertEquals(jct.groups, "unit");
-    Assert.assertEquals(jct.parameters, Arrays.asList("a", "b", "c"));
+    Assert.assertEquals(args.verbose.intValue(), 2);
+    Assert.assertEquals(args.groups, "unit");
+    Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
   }
 
   /**
@@ -40,9 +27,9 @@ public class JCommanderTest {
    */
   @Test
   public void repeatedArgs() {
-    JCommanderTest jct = new JCommanderTest();
+    Args1 args = new Args1();
     String[] argv = { "-log", "2" };
-    JCommander jc = new JCommander(jct, argv);
+    JCommander jc = new JCommander(args, argv);
     Assert.assertEquals(jc.getParameters().size(), 3);
   }
 
@@ -51,9 +38,9 @@ public class JCommanderTest {
    */
   @Test(expectedExceptions = ParameterException.class)
   public void requiredFields1() {
-    JCommanderTest jct = new JCommanderTest();
+    Args1 args = new Args1();
     String[] argv = { "-debug" };
-    JCommander jc = new JCommander(jct, argv);
+    new JCommander(args, argv);
   }
 
   /**
@@ -61,9 +48,9 @@ public class JCommanderTest {
    */
   @Test
   public void requiredFields2() {
-    JCommanderTest jct = new JCommanderTest();
+    Args1 args = new Args1();
     String[] argv = { "-log", "2" };
-    JCommander jc = new JCommander(jct, argv);
+    new JCommander(args, argv);
   }
 
   /**
@@ -71,9 +58,9 @@ public class JCommanderTest {
    */
   @Test
   public void requiredFields3() {
-    JCommanderTest jct = new JCommanderTest();
+    Args1 args = new Args1();
     String[] argv = { "-verbose", "2" };
-    JCommander jc = new JCommander(jct, argv);
+    new JCommander(args, argv);
   }
 
   private void i18n(Locale locale, String expectedString) {
