@@ -229,12 +229,18 @@ public class JCommander {
           if (fieldType == boolean.class || fieldType == Boolean.class) {
             pd.addValue(Boolean.TRUE);
             m_requiredFields.remove(pd.getField());
-          } else if (i + 1 < args.length) {
-            pd.addValue(trim(args[i + 1]));
-            m_requiredFields.remove(pd.getField());
-            i++;
           } else {
-            throw new ParameterException("Parameter expected after " + args[i]);
+            int arity = pd.getParameter().arity();
+            int n = (arity != -1 ? arity : 1);  
+            if (i + n < args.length) {
+              for (int j = 1; j <= n; j++) {
+                pd.addValue(trim(args[i + j]));
+                m_requiredFields.remove(pd.getField());
+              }
+              i += n;
+            } else {
+              throw new ParameterException("Parameter expected after " + args[i]);
+            }
           }
         } else {
           throw new ParameterException("Unknown option: " + a);

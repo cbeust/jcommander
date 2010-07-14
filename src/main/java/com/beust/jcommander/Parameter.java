@@ -30,4 +30,10 @@ public @interface Parameter {
    * The key used to find the string in the message bundle.
    */
   String descriptionKey() default "";
+
+  /**
+   * How many parameter values this parameter will consume. For example,
+   * an arity of 2 will allow "-pair value1 value2".
+   */
+  int arity() default -1;
 }

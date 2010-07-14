@@ -102,9 +102,22 @@ public class JCommanderTest {
     Assert.assertEquals(s.slave, "slave");
   }
 
+  @Test
+  public void arity() {
+    ArgsArity args = new ArgsArity();
+    String[] argv = { "-pairs", "pair0", "pair1", "rest" };
+    new JCommander(args, argv);
+
+    Assert.assertEquals(args.pairs.size(), 2);
+    Assert.assertEquals(args.pairs.get(0), "pair0");
+    Assert.assertEquals(args.pairs.get(1), "pair1");
+    Assert.assertEquals(args.rest.size(), 1);
+    Assert.assertEquals(args.rest.get(0), "rest");
+  }
+
   public static void main(String[] args) {
 //    new JCommanderTest().multiObjects();
-    new JCommanderTest().i18nFrLocale();
+    new JCommanderTest().arity();
   }
   
   // check that
