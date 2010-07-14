@@ -83,6 +83,7 @@ public class JCommanderTest {
     I18N i18n = new I18N();
     String[] argv = { "-host", "localhost" };
     JCommander jc = new JCommander(i18n, bundle, argv);
+    jc.usage();
 
     ParameterDescription pd = jc.getParameters().get(0);
     Assert.assertEquals(pd.getDescription(), expectedString);
@@ -104,6 +105,6 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new JCommanderTest().i18nNoLocale();
+    new JCommanderTest().i18nFrLocale();
   }
 }
