@@ -203,6 +203,34 @@ file3
 java Main @/tmp/parameters
 </pre>
 
+<h2>Arities (multiple values for parameters)</h2>
+
+If some of your parameters require more than one value, such as the
+following example where two values are expected after <tt>-pairs</tt>:
+
+<pre class="brush: bash">
+java Main -pairs slave master foo.xml
+</pre>
+
+then you need to define your parameter with the <tt>arity</tt>
+attribute and make that parameter a <tt>List&lt;String&gt;</tt>:
+
+<pre class="brush: java">
+@Parameter(names = "-pairs", arity = 2, description = "Pairs")
+public List<String> pairs;
+</pre>
+
+You don't need to specify an arity for parameters of type
+<tt>boolean</tt> or <tt>Boolean</tt> (which have a default arity of 0)
+and of types <tt>String</tt>, <tt>Integer</tt>, <tt>int</tt>,
+<tt>Long</tt> and <tt>long</tt> (which have a default arity of 1).
+
+<p>
+Also, note that only <tt>List&lt;String&gt;</tt> is allowed for
+parameters that define an arity. You will have to convert these values
+yourself if the parameters you need are of type <tt>Integer</tt> or
+other (this limitation is due to Java's erasure).
+
 <h2>Multiple option names</h2>
 
 You can specify more than one option name:

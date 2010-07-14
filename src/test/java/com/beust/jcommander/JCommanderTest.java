@@ -111,8 +111,8 @@ public class JCommanderTest {
   }
 
   @Test
-  public void arity() {
-    ArgsArity args = new ArgsArity();
+  public void arityString() {
+    ArgsArityString args = new ArgsArityString();
     String[] argv = { "-pairs", "pair0", "pair1", "rest" };
     new JCommander(args, argv);
 
@@ -123,9 +123,16 @@ public class JCommanderTest {
     Assert.assertEquals(args.rest.get(0), "rest");
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void arityFail1() {
+    ArgsArityString args = new ArgsArityString();
+    String[] argv = { "-pairs", "pair0" };
+    new JCommander(args, argv);
+  }
+
   public static void main(String[] args) {
 //    new JCommanderTest().multiObjects();
-    new JCommanderTest().multiObjectsWithDuplicates();
+//    new JCommanderTest().arityInteger();
   }
   
   // check that

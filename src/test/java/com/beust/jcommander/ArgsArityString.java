@@ -7,7 +7,7 @@ import java.util.List;
  * 
  * @author cbeust
  */
-public class ArgsArity {
+public class ArgsArityString {
 
   @Parameter(names = "-pairs", arity = 2, description = "Pairs")
   public List<String> pairs;
