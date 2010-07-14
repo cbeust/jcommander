@@ -83,7 +83,7 @@ public class JCommanderTest {
     I18N i18n = new I18N();
     String[] argv = { "-host", "localhost" };
     JCommander jc = new JCommander(i18n, bundle, argv);
-    jc.usage();
+//    jc.usage();
 
     ParameterDescription pd = jc.getParameters().get(0);
     Assert.assertEquals(pd.getDescription(), expectedString);
