@@ -31,4 +31,20 @@ public class JCommanderTest {
     Assert.assertEquals(jct.groups, "unit");
     Assert.assertEquals(jct.parameters, Arrays.asList("a", "b", "c"));
   }
+
+  /**
+   * Make sure that if there are args with multiple names (e.g. "-log" and "-verbose"),
+   * the usage will only display it once.
+   */
+  @Test
+  public void repeatedArgs() {
+    JCommanderTest jct = new JCommanderTest();
+    String[] argv = { "-log", "2" };
+    JCommander jc = new JCommander(jct, argv);
+    Assert.assertEquals(jc.getParameters().size(), 3);
+  }
+
+  public static void main(String[] args) {
+    new JCommanderTest().repeatedArgs();
+  }
 }

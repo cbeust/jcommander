@@ -5,17 +5,39 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The main class for JCommander. It's responsible for parsing the object that contains
+ * all the annotated fields, parse the command line and assign the fields with the correct
+ * values and a few other helper methods, such as usage().
+ * 
+ * @author cbeust
+ *
+ */
 public class JCommander {
+  /**
+   * A map to look up parameter description per option name.
+   */
   private Map<String, ParameterDescription> m_descriptions;
+
+  /**
+   * The object that contains the fields annotated with @Parameter.
+   */
   private Object m_object;
 
-  /** This field will contain whatever command line parameter is not an option.
+  /**
+   * This field will contain whatever command line parameter is not an option.
    * It is expected to be a List<String>.
    */
   private Field m_mainParameterField;
+
+  /**
+   * A map of all the fields that describe an option.
+   */
+  private Map<Field, Parameter> m_fields = Maps.newHashMap();
 
   public JCommander(Object object) {
     m_object = object;
@@ -113,6 +135,9 @@ public class JCommander {
       Annotation annotation = f.getAnnotation(Parameter.class);
       if (annotation != null) {
         Parameter p = (Parameter) annotation;
+        if (p.names().length > 0) {
+          m_fields.put(f, p);
+        }
         if (p.names().length == 0) {
           p("Found main parameter:" + f);
           m_mainParameterField = f;
@@ -181,14 +206,27 @@ public class JCommander {
     }
   }
 
+  /**
+   * Display a the help on System.out.
+   */
   public void usage() {
     System.out.println("Usage:");
-    for (ParameterDescription pd : m_descriptions.values()) {
+    for (Parameter p : m_fields.values()) {
       StringBuilder sb = new StringBuilder();
-      for (String n : pd.getNames()) {
+      for (String n : p.names()) {
         sb.append(n).append(" ");
       }
-      System.out.println("\t" + sb.toString() + "\t" + pd.getDescription());
+      System.out.println("\t" + sb.toString() + "\t" + p.description());
     }
   }
+
+  /**
+   * @return a Collection of all the @Parameter annotations found on the
+   * target class. This can be used to display the usage() in a different
+   * format (e.g. HTML).
+   */
+  public Collection<Parameter> getParameters() {
+    return m_fields.values();
+  }
 }
+
