@@ -102,6 +102,14 @@ public class JCommanderTest {
     Assert.assertEquals(s.slave, "slave");
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void multiObjectsWithDuplicates() {
+    ArgsMaster m = new ArgsMaster();
+    ArgsSlave s = new ArgsSlaveBogus();
+    String[] argv = { "-master", "master", "-slave", "slave" };
+    new JCommander(new Object[] { m , s }, argv);
+  }
+
   @Test
   public void arity() {
     ArgsArity args = new ArgsArity();
@@ -117,11 +125,13 @@ public class JCommanderTest {
 
   public static void main(String[] args) {
 //    new JCommanderTest().multiObjects();
-    new JCommanderTest().arity();
+    new JCommanderTest().multiObjectsWithDuplicates();
   }
   
   // check that
   // - only one main parameter is present
   // - Long, Int
+  // - error if same parameter found on different classes
+  // - error cases in arities
   
 }

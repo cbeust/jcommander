@@ -201,6 +201,9 @@ public class JCommander {
             m_mainParameterObject = object;
           } else {
             for (String name : p.names()) {
+              if (m_descriptions.containsKey(name)) {
+                throw new ParameterException("Found the option " + name + " multiple times");
+              }
               p("Adding description for " + name);
               ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle);
               m_fields.put(f, pd);
