@@ -11,7 +11,7 @@ public class JCommanderTest {
   @Parameter
   public List<String> parameters = Lists.newArrayList();
 
-  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
+  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity", required = true)
   public Integer verbose = 1;
 
   @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
@@ -42,6 +42,36 @@ public class JCommanderTest {
     String[] argv = { "-log", "2" };
     JCommander jc = new JCommander(jct, argv);
     Assert.assertEquals(jc.getParameters().size(), 3);
+  }
+
+  /**
+   * Not specifying a required option should throw an exception.
+   */
+  @Test(expectedExceptions = ParameterException.class)
+  public void requiredFields1() {
+    JCommanderTest jct = new JCommanderTest();
+    String[] argv = { "-debug" };
+    JCommander jc = new JCommander(jct, argv);
+  }
+
+  /**
+   * Required options with multiple names should work with all names.
+   */
+  @Test
+  public void requiredFields2() {
+    JCommanderTest jct = new JCommanderTest();
+    String[] argv = { "-log", "2" };
+    JCommander jc = new JCommander(jct, argv);
+  }
+
+  /**
+   * Required options with multiple names should work with all names.
+   */
+  @Test
+  public void requiredFields3() {
+    JCommanderTest jct = new JCommanderTest();
+    String[] argv = { "-verbose", "2" };
+    JCommander jc = new JCommander(jct, argv);
   }
 
   public static void main(String[] args) {

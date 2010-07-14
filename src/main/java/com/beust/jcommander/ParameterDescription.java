@@ -25,6 +25,10 @@ public class ParameterDescription {
     return m_parameterAnnotation.description();
   }
 
+  public Parameter getParameter() {
+    return m_parameterAnnotation;
+  }
+
   public Field getField() {
     return m_field;
   }

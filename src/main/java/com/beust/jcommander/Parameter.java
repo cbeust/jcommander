@@ -9,7 +9,20 @@ import java.lang.annotation.Target;
 @Target({ FIELD })
 public @interface Parameter {
 
+  /**
+   * An array of allowed command line parameters (e.g. "-d", "--outputdir", etc...).
+   * If this attribute is omitted, the field it's annotating will receive all the
+   * unparsed options. There can only be at most one such annotation.
+   */
   String[] names() default {};
 
+  /**
+   * A description of this option.
+   */
   String description() default "";
+
+  /**
+   * Whether this option is required.
+   */
+  boolean required() default false;
 }

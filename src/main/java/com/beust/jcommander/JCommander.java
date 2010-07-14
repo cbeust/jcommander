@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -15,7 +16,6 @@ import java.util.Map;
  * values and a few other helper methods, such as usage().
  * 
  * @author cbeust
- *
  */
 public class JCommander {
   /**
@@ -35,7 +35,17 @@ public class JCommander {
   private Field m_mainParameterField;
 
   /**
-   * A map of all the fields that describe an option.
+   * A set of all the fields that are required. During the reflection phase,
+   * this field receives all the fields that are annotated with required=true
+   * and during the parsing phase, all the fields that are assigned a value
+   * are removed from it. At the end of the parsing phase, if it's not empty,
+   * then some required fields did not receive a value and an exception is
+   * thrown.
+   */
+  private Map<Field, ParameterDescription> m_requiredFields = Maps.newHashMap();
+
+  /**
+   * A map of all the annotated fields.
    */
   private Map<Field, Parameter> m_fields = Maps.newHashMap();
 
@@ -54,12 +64,28 @@ public class JCommander {
   public void parse(String... args) {
     createDescriptions();
     parseValues(expandArgs(args));
+    validateOptions();
   }
 
   /**
+   * Make sure that all the required parameters have received a value.
+   */
+  private void validateOptions() {
+    if (! m_requiredFields.isEmpty()) {
+      StringBuilder missingFields = new StringBuilder();
+      for (ParameterDescription pd : m_requiredFields.values()) {
+        missingFields.append(pd.getNames()[0]).append(" ");
+      }
+      throw new ParameterException("The following options are required: " + missingFields);
+    }
+    
+  }
+  
+  /**
    * Expand the command line parameters to take @ parameters into account.
    * When @ is encountered, the content of the file that follows is inserted
-   * in the command line
+   * in the command line.
+   * 
    * @param originalArgv the original command line parameters
    * @return the new and enriched command line parameters
    */
@@ -135,9 +161,6 @@ public class JCommander {
       Annotation annotation = f.getAnnotation(Parameter.class);
       if (annotation != null) {
         Parameter p = (Parameter) annotation;
-        if (p.names().length > 0) {
-          m_fields.put(f, p);
-        }
         if (p.names().length == 0) {
           p("Found main parameter:" + f);
           m_mainParameterField = f;
@@ -145,7 +168,9 @@ public class JCommander {
           for (String name : p.names()) {
             p("Adding description for " + name);
             ParameterDescription pd = new ParameterDescription(m_object, p, f);
+            m_fields.put(f, p);
             m_descriptions.put(name, pd);
+            if (p.required()) m_requiredFields.put(f, pd);
           }
         }
       }
@@ -167,8 +192,10 @@ public class JCommander {
           Class<?> fieldType = pd.getField().getType();
           if (fieldType == boolean.class || fieldType == Boolean.class) {
             pd.addValue(Boolean.TRUE);
+            m_requiredFields.remove(pd.getField());
           } else if (i + 1 < args.length) {
             pd.addValue(trim(args[i + 1]));
+            m_requiredFields.remove(pd.getField());
             i++;
           } else {
             throw new ParameterException("Parameter expected after " + args[i]);
