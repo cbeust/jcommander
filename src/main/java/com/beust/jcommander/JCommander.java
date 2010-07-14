@@ -33,7 +33,7 @@ public class JCommander {
    * This field will contain whatever command line parameter is not an option.
    * It is expected to be a List<String>.
    */
-  private Field m_mainParameterField;
+  private Field m_mainParameterField = null;
 
   /**
    * The object on which we found the main parameter field.
@@ -197,6 +197,10 @@ public class JCommander {
           Parameter p = (Parameter) annotation;
           if (p.names().length == 0) {
             p("Found main parameter:" + f);
+            if (m_mainParameterField != null) {
+              throw new ParameterException("Only one @Parameter with no names attribute is"
+                  + " allowed, found:" + m_mainParameterField + " and " + f);
+            }
             m_mainParameterField = f;
             m_mainParameterObject = object;
           } else {

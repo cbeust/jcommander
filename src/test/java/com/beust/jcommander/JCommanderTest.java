@@ -2,10 +2,8 @@ package com.beust.jcommander;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.testng.collections.Lists;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -13,9 +11,10 @@ public class JCommanderTest {
   @Test
   public void simpleArgs() {
     Args1 args = new Args1();
-    String[] argv = { "-log", "2", "-groups", "unit", "a", "b", "c" };
+    String[] argv = { "-debug", "-log", "2", "-groups", "unit", "a", "b", "c" };
     new JCommander(args, argv);
 
+    Assert.assertTrue(args.debug);
     Assert.assertEquals(args.verbose.intValue(), 2);
     Assert.assertEquals(args.groups, "unit");
     Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
@@ -130,15 +129,16 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void multipleUnparsedFail() {
+    ArgsMultipleUnparsed args = new ArgsMultipleUnparsed();
+    String[] argv = { };
+    new JCommander(args, argv);
+  }
+
   public static void main(String[] args) {
 //    new JCommanderTest().multiObjects();
-//    new JCommanderTest().arityInteger();
+    new JCommanderTest().multipleUnparsedFail();
   }
-  
-  // check that
-  // - only one main parameter is present
-  // - Long, Int
-  // - error if same parameter found on different classes
-  // - error cases in arities
   
 }
