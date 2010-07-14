@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -24,15 +25,20 @@ public class JCommander {
   private Map<String, ParameterDescription> m_descriptions;
 
   /**
-   * The object that contains the fields annotated with @Parameter.
+   * The objects that contain fields annotated with @Parameter.
    */
-  private Object m_object;
+  private List<Object> m_objects;
 
   /**
    * This field will contain whatever command line parameter is not an option.
    * It is expected to be a List<String>.
    */
   private Field m_mainParameterField;
+
+  /**
+   * The object on which we found the main parameter field.
+   */
+  private Object m_mainParameterObject;
 
   /**
    * A set of all the fields that are required. During the reflection phase,
@@ -52,18 +58,36 @@ public class JCommander {
   private ResourceBundle m_bundle;
 
   public JCommander(Object object) {
-    m_object = object;
+    init(object, null);
   }
 
   public JCommander(Object object, ResourceBundle bundle, String... args) {
-    m_object = object;
-    m_bundle = bundle;
+    init(object, bundle);
     parse(args);
   }
 
   public JCommander(Object object, String... args) {
-    m_object = object;
+    init(object, null);
     parse(args);
+  }
+
+  private void init(Object object, ResourceBundle bundle) {
+    m_bundle = bundle;
+    m_objects = Lists.newArrayList();
+    if (object instanceof Iterable) {
+      // Iterable
+      for (Object o : (Iterable) object) {
+        m_objects.add(o);
+      }
+    } else if (object.getClass().isArray()) {
+      // Array
+      for (Object o : (Object[]) object) {
+        m_objects.add(o);
+      }
+    } else {
+      // Single object
+      m_objects.add(object);
+    }
   }
 
   /**
@@ -162,23 +186,27 @@ public class JCommander {
 
   private void createDescriptions() {
     m_descriptions = Maps.newHashMap();
-    Class<?> cls = m_object.getClass();
-    for (Field f : cls.getDeclaredFields()) {
-      p("Field:" + f.getName());
-      f.setAccessible(true);
-      Annotation annotation = f.getAnnotation(Parameter.class);
-      if (annotation != null) {
-        Parameter p = (Parameter) annotation;
-        if (p.names().length == 0) {
-          p("Found main parameter:" + f);
-          m_mainParameterField = f;
-        } else {
-          for (String name : p.names()) {
-            p("Adding description for " + name);
-            ParameterDescription pd = new ParameterDescription(m_object, p, f, m_bundle);
-            m_fields.put(f, pd);
-            m_descriptions.put(name, pd);
-            if (p.required()) m_requiredFields.put(f, pd);
+
+    for (Object object : m_objects) {
+      Class<?> cls = object.getClass();
+      for (Field f : cls.getDeclaredFields()) {
+        p("Field:" + f.getName());
+        f.setAccessible(true);
+        Annotation annotation = f.getAnnotation(Parameter.class);
+        if (annotation != null) {
+          Parameter p = (Parameter) annotation;
+          if (p.names().length == 0) {
+            p("Found main parameter:" + f);
+            m_mainParameterField = f;
+            m_mainParameterObject = object;
+          } else {
+            for (String name : p.names()) {
+              p("Adding description for " + name);
+              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle);
+              m_fields.put(f, pd);
+              m_descriptions.put(name, pd);
+              if (p.required()) m_requiredFields.put(f, pd);
+            }
           }
         }
       }
@@ -222,6 +250,9 @@ public class JCommander {
     return s == null || "".equals(s);
   }
 
+  /**
+   * @return the field that's meant to receive all the parameters that are not options.
+   */
   private List<String> getMainParameter() {
     if (m_mainParameterField == null) {
       throw new ParameterException(
@@ -229,10 +260,10 @@ public class JCommander {
     }
 
     try {
-      List<String> result = (List<String>) m_mainParameterField.get(m_object);
+      List<String> result = (List<String>) m_mainParameterField.get(m_mainParameterObject);
       if (result == null) {
         result = Lists.newArrayList();
-        m_mainParameterField.set(m_object, result);
+        m_mainParameterField.set(m_mainParameterObject, result);
       }
       return result;
     }

@@ -91,7 +91,24 @@ public class JCommanderTest {
     i18n(new Locale("fr", "FR"), "H™te");
   }
 
+  @Test
+  public void multiObjects() {
+    ArgsMaster m = new ArgsMaster();
+    ArgsSlave s = new ArgsSlave();
+    String[] argv = { "-master", "master", "-slave", "slave" };
+    new JCommander(new Object[] {m , s}, argv);
+
+    Assert.assertEquals(m.master, "master");
+    Assert.assertEquals(s.slave, "slave");
+  }
+
   public static void main(String[] args) {
+//    new JCommanderTest().multiObjects();
     new JCommanderTest().i18nFrLocale();
   }
+  
+  // check that
+  // - only one main parameter is present
+  // - Long, Int
+  
 }
