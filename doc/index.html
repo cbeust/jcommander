@@ -38,9 +38,8 @@
   <tr><td align="right"><a href="mailto:cedric@beust.com">C&eacute;dric Beust</a></td></tr>
 </table>
 
-<h2>
-Overview
-</h2>
+
+<h2 id="Overview" />Overview</h2>
 
 JCommander is a very small Java framework that makes it trivial to parse command line parameters.
 <p>
@@ -74,9 +73,7 @@ new JCommander(jct, argv);
 Assert.assertEquals(jct.verbose.intValue(), 2);
 </pre>
 
-<h2>
-Types of options
-</h2>
+<h2 id="Types_of_options">Types of options</h2>
 
 JCommander supports many types of options.
 
@@ -118,7 +115,7 @@ will cause an exception to be thrown.
 When a <tt>Parameter</tt> annotation is found on a field of type <tt>List</tt>, JCommander will interpret it as an option that can occur multiple times:
 
 <pre class="brush: java">
-@Parameter(names = "-hosts", description = "Level of verbosity")
+@Parameter(names = "-host", description = "Level of verbosity")
 public List&lt;String&gt; hosts = new ArrayList&lt;String&gt;();
 </pre>
 
@@ -150,7 +147,7 @@ java Main -debug file1 file2
 and the field <tt>files</tt> will receive the strings "file1" and
 "file2".
 
-<h2>Multiple descriptions</h2>
+<h2 id="Multiple_descriptions">Multiple descriptions</h2>
 
 You can spread the description of your parameters on more than one
 class. For example, you can define the following two classes:
@@ -186,7 +183,7 @@ Assert.assertEquals(s.slave, "slave");
 </pre>
 
 
-<h2>@ syntax</h2>
+<h2 id="Syntax">@ syntax</h2>
 
 JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:
 
@@ -203,7 +200,7 @@ file3
 java Main @/tmp/parameters
 </pre>
 
-<h2>Arities (multiple values for parameters)</h2>
+<h2 id="Arities">Arities (multiple values for parameters)</h2>
 
 If some of your parameters require more than one value, such as the
 following example where two values are expected after <tt>-pairs</tt>:
@@ -231,7 +228,7 @@ parameters that define an arity. You will have to convert these values
 yourself if the parameters you need are of type <tt>Integer</tt> or
 other (this limitation is due to Java's erasure).
 
-<h2>Multiple option names</h2>
+<h2 id="Multiple_option_names">Multiple option names</h2>
 
 You can specify more than one option name:
 
@@ -249,7 +246,7 @@ java Main -d /tmp
 java Main --outputDirectory /tmp
 </pre>
 
-<h2>Required and optional parameters</h2>
+<h2 id="Required_and_optional">Required and optional parameters</h2>
 
 If some of your parameters are mandatory, you can use the
 <tt>required</tt> attribute (which default to <tt>false</tt>):
@@ -264,7 +261,7 @@ If some of your parameters are mandatory, you can use the
 If this parameter is not specified, JCommander will throw an exception
 telling you which options are missing.
 
-<h2>Exception</h2>
+<h2 id="Exceptions">Exception</h2>
 
 Whenever JCommander detects an error, it will throw a
 <tt>ParameterException</tt>. Note that this is a Runtime Exception,
@@ -272,7 +269,7 @@ since your application is probably not initialized correctly at this
 point.
 
 
-<h2>Usage</h2>
+<h2 id="Usage">Usage</h2>
 
 You can invoke <tt>usage()</tt> on the <tt>JCommander</tt> instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
 
@@ -284,7 +281,7 @@ Usage:
 	-testclass		List of classes
 </pre>
 
-<h2>Internationalization</h2>
+<h2 id="Internationalization">Internationalization</h2>
 
 You can internationalize the descriptions of your parameters. First,
 you use the <tt>descriptionKey</tt> attribute instead of
@@ -324,16 +321,15 @@ Usage:
 	-host 	H&ocirc;te
 </pre>
 
-<h2>More examples</h2>
+<h2 id="More_examples">More examples</h2>
 
 TestNG uses JCommander to parse its command line, here is <a href="http://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">its definition file</a>.
 
-<h2>Download</h2>
+<h2 id="Download">Download</h2>
 
 You can download JCommander from the following locations:
 
 <ul>
-  <li><a href="http://beust.com/jcommander/jcommander-1.0-SNAPSHOT.jar">Binary</a></li>
   <li><a href="http://github.com/cbeust/jcommander">Source on github</a></li>
 </ul>
 

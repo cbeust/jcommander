@@ -140,5 +140,7 @@ public class JCommanderTest {
 //    new JCommanderTest().multiObjects();
     new JCommanderTest().multipleUnparsedFail();
   }
-  
+
+  // Tests:
+  // required unparsed parameter
 }
