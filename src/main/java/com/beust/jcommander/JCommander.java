@@ -16,6 +16,11 @@ import java.util.ResourceBundle;
  * all the annotated fields, parse the command line and assign the fields with the correct
  * values and a few other helper methods, such as usage().
  * 
+ * The object(s) you pass in the constructor are expected to have one or more
+ * @Parameter annotations on them. You can pass either a single object, an array of objects 
+ * or an instance of Iterable. In the case of an array or Iterable, JCommander will collect
+ * the @Parameter annotations from all the objects passed in parameter.
+ * 
  * @author cbeust
  */
 public class JCommander {

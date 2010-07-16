@@ -136,6 +136,13 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
+  @Test
+  public void privateArgs() {
+    ArgsPrivate args = new ArgsPrivate();
+    new JCommander(args, "-verbose", "3");
+    Assert.assertEquals(args.getVerbose().intValue(), 3);
+  }
+
   public static void main(String[] args) {
 //    new JCommanderTest().multiObjects();
     new JCommanderTest().multipleUnparsedFail();

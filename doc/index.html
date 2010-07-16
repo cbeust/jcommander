@@ -147,6 +147,28 @@ java Main -debug file1 file2
 and the field <tt>files</tt> will receive the strings "file1" and
 "file2".
 
+<h2 id="Private_parameters">Private parameters</h2>
+
+Parameters can be private:
+
+<pre class="brush: java">
+public class ArgsPrivate {
+  @Parameter(names = "-verbose")
+  private Integer verbose = 1;
+
+  public Integer getVerbose() {
+    return verbose;
+  }
+}
+</pre>
+
+<pre class="brush: java">
+ArgsPrivate args = new ArgsPrivate();
+new JCommander(args, "-verbose", "3");
+Assert.assertEquals(args.getVerbose().intValue(), 3);
+</pre>
+
+
 <h2 id="Multiple_descriptions">Multiple descriptions</h2>
 
 You can spread the description of your parameters on more than one
