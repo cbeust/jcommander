@@ -124,7 +124,8 @@ public class ParameterDescription {
       converter = converterClass.newInstance();
       Object convertedValue = converter.convert(value);
       if (arity) {
-        List l = (List) m_field.get(m_object);
+        @SuppressWarnings("unchecked")
+		List<Object> l = (List<Object>) m_field.get(m_object);
         if (l == null) {
           l = Lists.newArrayList();
           m_field.set(m_object, l);

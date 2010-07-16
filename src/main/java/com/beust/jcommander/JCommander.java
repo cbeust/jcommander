@@ -88,7 +88,7 @@ public class JCommander {
     m_objects = Lists.newArrayList();
     if (object instanceof Iterable) {
       // Iterable
-      for (Object o : (Iterable) object) {
+      for (Object o : (Iterable<?>) object) {
         m_objects.add(o);
       }
     } else if (object.getClass().isArray()) {
@@ -188,12 +188,10 @@ public class JCommander {
     if (result.startsWith("\"")) {
       if (result.endsWith("\"")) {
           return result.substring(1, result.length() - 1);
-      } else {
-          return result.substring(1);
       }
-    } else {
-      return result;
+      return result.substring(1);
     }
+    return result;
   }
 
   private void createDescriptions() {
@@ -296,6 +294,7 @@ public class JCommander {
     }
 
     try {
+      @SuppressWarnings("unchecked")
       List<String> result = (List<String>) m_mainParameterField.get(m_mainParameterObject);
       if (result == null) {
         result = Lists.newArrayList();
@@ -328,7 +327,7 @@ public class JCommander {
    * format (e.g. HTML).
    */
   public List<ParameterDescription> getParameters() {
-    return new ArrayList(m_fields.values());
+    return new ArrayList<ParameterDescription>(m_fields.values());
   }
 }
 
