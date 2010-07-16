@@ -1,5 +1,8 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
+
 import java.io.BufferedReader;
 import java.io.Console;
 import java.io.FileReader;

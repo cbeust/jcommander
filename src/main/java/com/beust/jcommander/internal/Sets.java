@@ -1,4 +1,4 @@
-package com.beust.jcommander;
+package com.beust.jcommander.internal;
 
 import java.util.HashSet;
 import java.util.Set;
