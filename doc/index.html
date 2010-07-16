@@ -324,15 +324,19 @@ Usage:
 
 <h2 id="Internationalization">Internationalization</h2>
 
-You can internationalize the descriptions of your parameters. First,
-you use the <tt>descriptionKey</tt> attribute instead of
-<tt>description</tt>. This <tt>descriptionKey</tt> is the key to the
-string into your message bundle:
+You can internationalize the descriptions of your parameters.
+
+<p>
+
+First you use the <tt>@ResourceBundle</tt> annotation at the top of your class to define the name of your message bundle, and then you use the <tt>descriptionKey</tt> attribute instead of <tt>description</tt> on all the <tt>@Parameters</tt> that require translations. This <tt>descriptionKey</tt> is the key to the string into your message bundle:
 
 <h3 class="sourcetitle">I18N.java</h3>
 <pre class="brush:java">
-@Parameter(names = "-host", descriptionKey = "host")
-String hostName;
+@ResourceBundle("MessageBundle")
+public class ArgsI18N2 {
+  @Parameter(names = "-host", description = "Host", descriptionKey = "host")
+  String hostName;
+}
 </pre>
 
 Your bundle needs to define this key:
@@ -344,23 +348,7 @@ Your bundle needs to define this key:
 host: H&ocirc;te
 </pre>
 
-Then you pass the <tt>Locale</tt> when you initialize the JCommander
-object:
-
-<pre class="brush: java">
-Locale locale = new Locale("fr", "FR");
-ResourceBundle bundle = ResourceBundle.getBundle("MessageBundle", locale);
-I18N i18n = new I18N();
-String[] argv = { "-host", "localhost" };
-JCommander jc = new JCommander(i18n, bundle, argv);
-jc.usage();
-</pre>
-will display:
-
-<pre class="brush: bash">
-Usage:
-	-host 	H&ocirc;te
-</pre>
+JCommander will then use the default locale to resolve your descriptions.
 
 <h2 id="More_examples">More examples</h2>
 
