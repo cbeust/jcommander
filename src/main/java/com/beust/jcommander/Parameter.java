@@ -36,4 +36,10 @@ public @interface Parameter {
    * an arity of 2 will allow "-pair value1 value2".
    */
   int arity() default -1;
+
+  /**
+   * If true, this parameter is a password and it will be prompted on the console
+   * (if available).
+   */
+  boolean password() default false;
 }

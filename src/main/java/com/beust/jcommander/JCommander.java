@@ -1,12 +1,12 @@
 package com.beust.jcommander;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -237,21 +237,32 @@ public class JCommander {
       if (a.startsWith("-")) {
         ParameterDescription pd = m_descriptions.get(a);
         if (pd != null) {
-          Class<?> fieldType = pd.getField().getType();
-          if (fieldType == boolean.class || fieldType == Boolean.class) {
-            pd.addValue(Boolean.TRUE);
-            m_requiredFields.remove(pd.getField());
+          if (pd.getParameter().password()) {
+            Console console = System.console();
+            if (console == null) {
+              throw new ParameterException("No console is available to get parameter "
+                  + pd.getNames()[0]);
+            }
+            System.out.print("Value for " + pd.getNames()[0] + " (" + pd.getDescription() + "):");
+            char[] password = console.readPassword();
+            pd.addValue(new String(password));
           } else {
-            int arity = pd.getParameter().arity();
-            int n = (arity != -1 ? arity : 1);  
-            if (i + n < args.length) {
-              for (int j = 1; j <= n; j++) {
-                pd.addValue(trim(args[i + j]));
-                m_requiredFields.remove(pd.getField());
-              }
-              i += n;
+            Class<?> fieldType = pd.getField().getType();
+            if (fieldType == boolean.class || fieldType == Boolean.class) {
+              pd.addValue(Boolean.TRUE);
+              m_requiredFields.remove(pd.getField());
             } else {
-              throw new ParameterException(arity + " parameters expected after " + args[i]);
+              int arity = pd.getParameter().arity();
+              int n = (arity != -1 ? arity : 1);  
+              if (i + n < args.length) {
+                for (int j = 1; j <= n; j++) {
+                  pd.addValue(trim(args[i + j]));
+                  m_requiredFields.remove(pd.getField());
+                }
+                i += n;
+              } else {
+                throw new ParameterException(arity + " parameters expected after " + args[i]);
+              }
             }
           }
         } else {

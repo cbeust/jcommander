@@ -144,8 +144,12 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
+    ArgsPassword a = new ArgsPassword();
+    new JCommander(a, "-password");
+    System.out.println("Received:" + a.password);
+//    Assert.assertEquals(args.getVerbose().intValue(), 3);
 //    new JCommanderTest().multiObjects();
-    new JCommanderTest().multipleUnparsedFail();
+//    new JCommanderTest().multipleUnparsedFail();
   }
 
   // Tests:
