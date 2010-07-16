@@ -87,7 +87,7 @@ public class JCommanderTest {
 
   @Test
   public void i18nFrLocale() {
-    i18n1("MessageBundle", new Locale("fr", "FR"), "H™te");
+    i18n1("MessageBundle", new Locale("fr", "FR"), "HÃ´te");
   }
 
   @Test
@@ -97,7 +97,7 @@ public class JCommanderTest {
     Locale.setDefault(new Locale("fr", "FR"));
     JCommander jc = new JCommander(i18n, argv);
     ParameterDescription pd = jc.getParameters().get(0);
-    Assert.assertEquals(pd.getDescription(), "H™te");
+    Assert.assertEquals(pd.getDescription(), "HÃ´te");
   }
 
   @Test
