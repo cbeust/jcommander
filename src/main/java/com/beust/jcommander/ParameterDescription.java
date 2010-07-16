@@ -1,14 +1,41 @@
 package com.beust.jcommander;
 
 
+import com.beust.jcommander.converters.BooleanConverter;
+import com.beust.jcommander.converters.IntegerConverter;
+import com.beust.jcommander.converters.LongConverter;
+import com.beust.jcommander.converters.NoConverter;
+import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 public class ParameterDescription {
+  /**
+   * A map of converters per class.
+   */
+  private static Map<Class<?>, Class<? extends IStringConverter>> m_classConverters
+      = new HashMap() {{
+    put(String.class, StringConverter.class);
+    put(Integer.class, IntegerConverter.class);
+    put(int.class, IntegerConverter.class);
+    put(Long.class, LongConverter.class);
+    put(long.class, LongConverter.class);
+    put(Boolean.class, BooleanConverter.class);
+    put(boolean.class, BooleanConverter.class);
+  }};
+
+  /**
+   * A map of converters per field. Will take precedence over the class converter map.
+   */
+  private Map<Field, IStringConverter> m_fieldConverters = Maps.newHashMap();
+
   private Object m_object;
   private Parameter m_parameterAnnotation;
   private Field m_field;
@@ -56,35 +83,48 @@ public class ParameterDescription {
     return fieldType.equals(List.class) || fieldType.equals(Set.class);
   }
 
-  public void addValue(Object value) {
+  /**
+   * Add the specified value to the field. First look up any field converter, then
+   * any type converter, and if we can't find any, throw an exception.
+   */
+  public void addValue(String value) {
+    boolean arity = false;
     if (m_added && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + getNames()[0] + " once.");
     }
+    Class<? extends IStringConverter> converterClass = m_parameterAnnotation.converter();
+    if (converterClass == NoConverter.class) {
+      converterClass = m_classConverters.get(m_field.getType());
+    }
+    if (converterClass == null && m_parameterAnnotation.arity() >= 2) {
+      converterClass = StringConverter.class;
+      arity = true;
+    }
+    if (converterClass == null) {
+      throw new ParameterException("Don't know how to convert " + value
+          + " to type " + m_field.getType() + " (field: " + m_field.getName() + ")");
+    }
 
     m_added = true;
+    IStringConverter converter;
     try {
-      Class<?> fieldType = m_field.getType();
-      if (fieldType.equals(String.class)) {
-        m_field.set(m_object, value);
-      } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
-        m_field.set(m_object, Integer.parseInt(value.toString()));
-      } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
-        m_field.set(m_object, Long.parseLong(value.toString()));
-      } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-        m_field.set(m_object, Float.parseFloat(value.toString()));
-      } else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)) {
-        m_field.set(m_object, value);
-      } else if (isMultiOption()) {
+      converter = converterClass.newInstance();
+      Object convertedValue = converter.convert(value);
+      if (arity) {
         List l = (List) m_field.get(m_object);
         if (l == null) {
           l = Lists.newArrayList();
           m_field.set(m_object, l);
         }
-        l.add(value);
+        l.add(convertedValue);
+      } else {
+        m_field.set(m_object, convertedValue);
       }
-    } catch (IllegalArgumentException e) {
+    } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (IllegalArgumentException e) {
       e.printStackTrace();
     }
   }

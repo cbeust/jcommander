@@ -1,5 +1,8 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.converters.IntegerConverter;
+import com.beust.jcommander.converters.LongConverter;
+import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 
@@ -10,6 +13,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -252,7 +256,7 @@ public class JCommander {
           } else {
             Class<?> fieldType = pd.getField().getType();
             if (fieldType == boolean.class || fieldType == Boolean.class) {
-              pd.addValue(Boolean.TRUE);
+              pd.addValue("true");
               m_requiredFields.remove(pd.getField());
             } else {
               int arity = pd.getParameter().arity();

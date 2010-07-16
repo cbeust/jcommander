@@ -143,12 +143,23 @@ public class JCommanderTest {
     Assert.assertEquals(args.getVerbose().intValue(), 3);
   }
 
+  @Test
+  public void converterArgs() {
+    ArgsConverter args = new ArgsConverter();
+    String fileName = "a";
+    new JCommander(args, "-file", "/tmp/" + fileName, "-days", "Tuesday,Thursday");
+    Assert.assertEquals(args.file.getName(), fileName);
+    Assert.assertEquals(args.days.size(), 2);
+    Assert.assertEquals(args.days.get(0), "Tuesday");
+    Assert.assertEquals(args.days.get(1), "Thursday");
+  }
+
   public static void main(String[] args) {
-    ArgsPassword a = new ArgsPassword();
-    new JCommander(a, "-password");
-    System.out.println("Received:" + a.password);
+//    ArgsPassword a = new ArgsPassword();
+//    new JCommander(a, "-password");
+//    System.out.println("Received:" + a.password);
 //    Assert.assertEquals(args.getVerbose().intValue(), 3);
-//    new JCommanderTest().multiObjects();
+    new JCommanderTest().converterArgs();
 //    new JCommanderTest().multipleUnparsedFail();
   }
 

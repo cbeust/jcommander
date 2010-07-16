@@ -2,6 +2,8 @@ package com.beust.jcommander;
 
 import static java.lang.annotation.ElementType.FIELD;
 
+import com.beust.jcommander.converters.NoConverter;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -42,4 +44,6 @@ public @interface Parameter {
    * (if available).
    */
   boolean password() default false;
+
+  Class<? extends IStringConverter> converter() default NoConverter.class;
 }
