@@ -36,7 +36,7 @@ public class JCommanderTest {
    * Not specifying a required option should throw an exception.
    */
   @Test(expectedExceptions = ParameterException.class)
-  public void requiredFields1() {
+  public void requiredFields1Fail() {
     Args1 args = new Args1();
     String[] argv = { "-debug" };
     new JCommander(args, argv);
@@ -62,11 +62,11 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
-  private void i18n(Locale locale, String expectedString) {
-    ResourceBundle bundle = locale != null ? ResourceBundle.getBundle("MessageBundle", locale)
+  private void i18n1(String bundleName, Locale locale, String expectedString) {
+    ResourceBundle bundle = locale != null ? ResourceBundle.getBundle(bundleName, locale)
         : null;
 
-    I18N i18n = new I18N();
+    ArgsI18N1 i18n = new ArgsI18N1();
     String[] argv = { "-host", "localhost" };
     JCommander jc = new JCommander(i18n, bundle, argv);
 //    jc.usage();
@@ -77,17 +77,27 @@ public class JCommanderTest {
 
   @Test
   public void i18nNoLocale() {
-    i18n(null, "Host");
+    i18n1("MessageBundle", null, "Host");
   }
 
   @Test
   public void i18nUsLocale() {
-    i18n(new Locale("en", "US"), "Host");
+    i18n1("MessageBundle", new Locale("en", "US"), "Host");
   }
 
   @Test
   public void i18nFrLocale() {
-    i18n(new Locale("fr", "FR"), "H™te");
+    i18n1("MessageBundle", new Locale("fr", "FR"), "H™te");
+  }
+
+  @Test
+  public void i18nWithResourceAnnotation() {
+    ArgsI18N2 i18n = new ArgsI18N2();
+    String[] argv = { "-host", "localhost" };
+    Locale.setDefault(new Locale("fr", "FR"));
+    JCommander jc = new JCommander(i18n, argv);
+    ParameterDescription pd = jc.getParameters().get(0);
+    Assert.assertEquals(pd.getDescription(), "H™te");
   }
 
   @Test
@@ -102,7 +112,7 @@ public class JCommanderTest {
   }
 
   @Test(expectedExceptions = ParameterException.class)
-  public void multiObjectsWithDuplicates() {
+  public void multiObjectsWithDuplicatesFail() {
     ArgsMaster m = new ArgsMaster();
     ArgsSlave s = new ArgsSlaveBogus();
     String[] argv = { "-master", "master", "-slave", "slave" };
@@ -123,7 +133,7 @@ public class JCommanderTest {
   }
 
   @Test(expectedExceptions = ParameterException.class)
-  public void arityFail1() {
+  public void arity1Fail() {
     ArgsArityString args = new ArgsArityString();
     String[] argv = { "-pairs", "pair0" };
     new JCommander(args, argv);
@@ -159,7 +169,7 @@ public class JCommanderTest {
 //    new JCommander(a, "-password");
 //    System.out.println("Received:" + a.password);
 //    Assert.assertEquals(args.getVerbose().intValue(), 3);
-    new JCommanderTest().converterArgs();
+    new JCommanderTest().i18nWithResourceAnnotation();
 //    new JCommanderTest().multipleUnparsedFail();
   }
 

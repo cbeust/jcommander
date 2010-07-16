@@ -12,6 +12,7 @@ import com.beust.jcommander.internal.Maps;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -54,11 +55,23 @@ public class ParameterDescription {
     m_parameterAnnotation = annotation;
     m_field = field;
     m_bundle = bundle;
+    if (m_bundle == null) {
+      com.beust.jcommander.ResourceBundle a
+          = object.getClass().getAnnotation(com.beust.jcommander.ResourceBundle.class);
+      if (a != null) {
+        m_bundle = ResourceBundle.getBundle(a.value(), Locale.getDefault());
+      }
+    }
 
-    if (m_bundle != null) {
-      m_description = m_bundle.getString(annotation.descriptionKey());
-    } else {
-      m_description = annotation.description();
+    m_description = annotation.description();
+    if (! "".equals(annotation.descriptionKey())) {
+      if (m_bundle != null) {
+        m_description = m_bundle.getString(annotation.descriptionKey());
+      } else {
+//        System.out.println("Warning: field " + object.getClass() + "." + field.getName()
+//            + " has a descriptionKey but no bundle was defined with @ResourceBundle, using " +
+//            "default description:'" + m_description + "'");
+      }
     }
   }
 
