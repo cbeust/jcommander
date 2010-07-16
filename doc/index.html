@@ -127,6 +127,25 @@ java Main -host host1 -verbose -host host2
 
 When JCommander is done parsing the line above, the field <tt>hosts</tt> will contain the strings "host1" and "host2".
 
+<h4>Password</h4>
+
+If one of your parameters is a password or some other value that you do not wish to appear in your history or in clear, you can declare it of type <tt>password</tt> and JCommander will then ask you to enter it in the console:
+
+<pre class="brush: java">
+public class ArgsPassword {
+  @Parameter(names = "-password", description = "Connection password", password = true)
+  public String password;
+}
+</pre>
+
+When you run your program, you will get the following prompt:
+
+<pre class="brush: bash">
+Value for -password (Connection password):
+</pre>
+
+You will need to type the value at this point before JCommander resumes.
+
 <h4>Main parameter</h4>
 So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
 
