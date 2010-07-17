@@ -24,7 +24,15 @@
     <developer>
       <name>Cedric Beust</name>
     </developer>
- </developers>
+  </developers>
+
+  <distributionManagement>
+    <repository>
+      <id>snapshot-repository</id>
+      <name>Sonatype snapshot repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </distributionManagement>
 
   <build>
     <plugins>
