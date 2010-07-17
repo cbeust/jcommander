@@ -32,11 +32,6 @@ public class ParameterDescription {
     put(boolean.class, BooleanConverter.class);
   }};
 
-  /**
-   * A map of converters per field. Will take precedence over the class converter map.
-   */
-  private Map<Field, IStringConverter> m_fieldConverters = Maps.newHashMap();
-
   private Object m_object;
   private Parameter m_parameterAnnotation;
   private Field m_field;
