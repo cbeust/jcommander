@@ -52,6 +52,17 @@
         <version>2.3.1</version>
         <configuration>
           <source>1.5</source>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
+      <!-- Resource handling -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.1</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
 
@@ -61,7 +72,6 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.7</version>
       </plugin>
-
 
       <!-- Signing with gpg -->
       <plugin>
