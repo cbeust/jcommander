@@ -96,6 +96,7 @@ public class ParameterDescription {
    * any type converter, and if we can't find any, throw an exception.
    */
   public void addValue(String value) {
+    log("Adding value:" + value + " to parameter:" + m_field);
     boolean arity = false;
     if (m_added && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + getNames()[0] + " once.");
@@ -135,6 +136,12 @@ public class ParameterDescription {
       e.printStackTrace();
     } catch (IllegalArgumentException e) {
       e.printStackTrace();
+    }
+  }
+
+  private void log(String string) {
+    if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
+      System.out.println("[ParameterDescription] " + string);
     }
   }
 }

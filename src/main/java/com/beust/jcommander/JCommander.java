@@ -27,6 +27,8 @@ import java.util.ResourceBundle;
  * @author cbeust
  */
 public class JCommander {
+  public static final String DEBUG_PROPERTY = "jcommander.debug";
+
   /**
    * A map to look up parameter description per option name.
    */
@@ -233,8 +235,11 @@ public class JCommander {
   }
 
   private void parseValues(String[] args) {
+//    log("Parsing args" + join(args, " ");
+
     for (int i = 0; i < args.length; i++) {
       String a = trim(args[i]);
+      log("Parsing arg:" + a);
       if (a.startsWith("-")) {
         ParameterDescription pd = m_descriptions.get(a);
         if (pd != null) {
@@ -328,6 +333,12 @@ public class JCommander {
    */
   public List<ParameterDescription> getParameters() {
     return new ArrayList<ParameterDescription>(m_fields.values());
+  }
+
+  private void log(String string) {
+    if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
+      System.out.println("[JCommander] " + string);
+    }
   }
 }
 
