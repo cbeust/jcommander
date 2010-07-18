@@ -26,19 +26,16 @@
     </developer>
   </developers>
 
-  <distributionManagement>
-    <repository>
-      <id>snapshot-repository</id>
-      <name>Sonatype snapshot repository</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
-  </distributionManagement>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>3</version>
+  </parent>
 
   <build>
     <plugins>
 
       <!-- Bundle sources -->
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>

@@ -164,12 +164,18 @@ public class JCommanderTest {
     Assert.assertEquals(args.days.get(1), "Thursday");
   }
 
+  public void booleanArity() {
+    ArgsBooleanArity args = new ArgsBooleanArity();
+    new JCommander(args, "-debug", "true");
+    Assert.assertEquals(args.debug, Boolean.TRUE);
+  }
+
   public static void main(String[] args) {
 //    ArgsPassword a = new ArgsPassword();
 //    new JCommander(a, "-password");
 //    System.out.println("Received:" + a.password);
 //    Assert.assertEquals(args.getVerbose().intValue(), 3);
-    new JCommanderTest().i18nWithResourceAnnotation();
+    new JCommanderTest().converterArgs();
 //    new JCommanderTest().multipleUnparsedFail();
   }
 

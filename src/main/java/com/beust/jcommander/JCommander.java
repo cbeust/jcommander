@@ -1,8 +1,5 @@
 package com.beust.jcommander;
 
-import com.beust.jcommander.converters.IntegerConverter;
-import com.beust.jcommander.converters.LongConverter;
-import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 
@@ -13,7 +10,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -253,7 +249,8 @@ public class JCommander {
             pd.addValue(new String(password));
           } else {
             Class<?> fieldType = pd.getField().getType();
-            if (fieldType == boolean.class || fieldType == Boolean.class) {
+            if ((fieldType == boolean.class || fieldType == Boolean.class)
+                && pd.getParameter().arity() == -1) {
               pd.addValue("true");
               m_requiredFields.remove(pd.getField());
             } else {
@@ -275,7 +272,7 @@ public class JCommander {
         }
       }
       else {
-        if (! isStringEmpty(args[i])) getMainParameter().add(args[i]);
+        if (! isStringEmpty(args[i])) getMainParameter(args[i]).add(args[i]);
       }
     }
   }
@@ -286,11 +283,14 @@ public class JCommander {
 
   /**
    * @return the field that's meant to receive all the parameters that are not options.
+   * 
+   * @param arg the arg that we're about to add (only passed here to ouput a meaningful
+   * error message).
    */
-  private List<String> getMainParameter() {
+  private List<String> getMainParameter(String arg) {
     if (m_mainParameterField == null) {
       throw new ParameterException(
-          "Non option parameters were found but no main parameter was defined");
+          "Was passed main parameter '" + arg + "' but no main parameter was defined");
     }
 
     try {
