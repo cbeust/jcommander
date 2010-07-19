@@ -1,3 +1,4 @@
-# https://oss.sonatype.org/index.html
+# UI : https://oss.sonatype.org/index.html
+# Wiki: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
 
 release:clean release:prepare
