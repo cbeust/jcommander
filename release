@@ -1,4 +1,6 @@
 # UI : https://oss.sonatype.org/index.html
 # Wiki: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+#
+# deploy without tagging: mvn deploy -DperformRelease
 
 release:clean release:prepare
