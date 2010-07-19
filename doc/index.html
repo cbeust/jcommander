@@ -75,7 +75,7 @@ Assert.assertEquals(jct.verbose.intValue(), 2);
 
 <h2 id="Types_of_options">Types of options</h2>
 
-JCommander supports many types of options.
+The fields representing your parameters can be of any type. Basic types (<tt>Integer</tt>, <tt>Boolean</tt/>., etc...) are supported by default and you can write type converters to support any other type (<tt>File</tt>, etc...).
 
 <h4>Boolean</h4>
 
@@ -91,7 +91,6 @@ Such a parameter does not require any additional parameter on the command line a
 <h4>String, Integer, Long</h4>
 
 When a <tt>Parameter</tt> annotation is found on a field of type <tt>String</tt>, <tt>Integer</tt>, <tt>int</tt>, <tt>Long</tt> or <tt>long</tt>, JCommander will parse the following parameter and it will attempt to cast it to the right type:
-
 
 <pre class="brush: java">
 @Parameter(names = "-log", description = "Level of verbosity")
@@ -145,6 +144,36 @@ Value for -password (Connection password):
 </pre>
 
 You will need to type the value at this point before JCommander resumes.
+
+<h4>Custom types</h4>
+
+By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types, such as files, host names, lists, etc... To achieve this, you can write a type converter by implementing the following interface:
+
+<pre class="brush: java">
+public interface IStringConverter&lt;T&gt; {
+  T convert(String value);
+}
+</pre>
+
+For example, here is a converter that turns a string into a <tt>File</tt>:
+
+<pre class="brush: java">
+public class FileConverter implements IStringConverter&lt;File&gt; {
+  @Override
+  public File convert(String value) {
+    return new File(value);
+  }
+}
+</pre>
+
+Then, all you need to do is declare your field with the correct type and specify the converter as an attribute:
+
+<pre class="brush: java">
+@Parameter(names = "-file", converter = FileConverter.class)
+File file;
+</pre>
+
+JCommander ships with a few common converters (e.g. one that turns a comma separated list into a <tt>List&lt;String&gt;)</tt>.
 
 <h4>Main parameter</h4>
 So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
