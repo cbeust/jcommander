@@ -45,21 +45,21 @@ public class JCommanderTest {
   /**
    * Required options with multiple names should work with all names.
    */
-  @Test
-  public void requiredFields2() {
+  private void multipleNames(String option) {
     Args1 args = new Args1();
-    String[] argv = { "-log", "2" };
+    String[] argv = { option, "2" };
     new JCommander(args, argv);
+    Assert.assertEquals(args.verbose.intValue(), 2);
+  }
+  
+  @Test
+  public void multipleNames1() {
+    multipleNames("-log");
   }
 
-  /**
-   * Required options with multiple names should work with all names.
-   */
   @Test
-  public void requiredFields3() {
-    Args1 args = new Args1();
-    String[] argv = { "-verbose", "2" };
-    new JCommander(args, argv);
+  public void multipleNames2() {
+    multipleNames("-verbose");
   }
 
   private void i18n1(String bundleName, Locale locale, String expectedString) {
@@ -175,8 +175,12 @@ public class JCommanderTest {
 //    new JCommander(a, "-password");
 //    System.out.println("Received:" + a.password);
 //    Assert.assertEquals(args.getVerbose().intValue(), 3);
-    new JCommanderTest().converterArgs();
+//    new JCommanderTest().i18nWithResourceAnnotation();
 //    new JCommanderTest().multipleUnparsedFail();
+    ArgsI18N2 i18n = new ArgsI18N2();
+    String[] argv = { "-host", "localhost" };
+    JCommander jc = new JCommander(i18n, argv);
+    jc.usage();
   }
 
   // Tests:
