@@ -192,9 +192,9 @@ public class JCommanderTest {
 //    Assert.assertEquals(args.getVerbose().intValue(), 3);
 //    new JCommanderTest().i18nWithResourceAnnotation();
 //    new JCommanderTest().multipleUnparsedFail();
-    ArgsI18N2 i18n = new ArgsI18N2();
-    String[] argv = { "-host", "localhost" };
-    JCommander jc = new JCommander(i18n, argv);
+    Object a1 = new CommandLineArgs();
+    String[] argv = { "-log", "3" };
+    JCommander jc = new JCommander(a1, argv);
     jc.usage();
   }
 

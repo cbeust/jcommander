@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -116,7 +118,7 @@ public class JCommander {
     if (! m_requiredFields.isEmpty()) {
       StringBuilder missingFields = new StringBuilder();
       for (ParameterDescription pd : m_requiredFields.values()) {
-        missingFields.append(pd.getNames()[0]).append(" ");
+        missingFields.append(pd.getNames()).append(" ");
       }
       throw new ParameterException("The following options are required: " + missingFields);
     }
@@ -246,10 +248,9 @@ public class JCommander {
           if (pd.getParameter().password()) {
             Console console = System.console();
             if (console == null) {
-              throw new ParameterException("No console is available to get parameter "
-                  + pd.getNames()[0]);
+              throw new ParameterException("No console is available to get parameter " + a);
             }
-            System.out.print("Value for " + pd.getNames()[0] + " (" + pd.getDescription() + "):");
+            System.out.print("Value for " + a + " (" + pd.getDescription() + "):");
             char[] password = console.readPassword();
             pd.addValue(new String(password));
           } else {
@@ -317,12 +318,29 @@ public class JCommander {
    */
   public void usage() {
     System.out.println("Usage:");
+    int longestName = 0;
+    List<ParameterDescription> sorted = Lists.newArrayList();
     for (ParameterDescription pd : m_fields.values()) {
-      StringBuilder sb = new StringBuilder();
-      for (String n : pd.getParameter().names()) {
-        sb.append(n).append(" ");
+      sorted.add(pd);
+      int length = pd.getNames().length();
+      if (length > longestName) {
+        longestName = length;
       }
-      System.out.println("\t" + sb.toString() + "\t" + pd.getDescription());
+    }
+    int target = longestName %8 != 0 ? (((longestName + 8) / 8) * 8): longestName;
+    Collections.sort(sorted, new Comparator<ParameterDescription>() {
+      @Override
+      public int compare(ParameterDescription arg0, ParameterDescription arg1) {
+        return arg0.getNames().compareTo(arg1.getNames());
+      }
+    });
+    
+    for (ParameterDescription pd : sorted) {
+      int l = target - pd.getNames().length();
+      int tabCount = l / 8 + (l % 8 == 0 ? 0 : 1);
+      StringBuilder tabs = new StringBuilder();
+      for (int i = 0; i < tabCount; i++) tabs.append("\t");
+      System.out.println("\t" + pd.getNames() + tabs + pd.getDescription());
     }
   }
 

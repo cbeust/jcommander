@@ -70,12 +70,17 @@ public class ParameterDescription {
     }
   }
 
-  public String[] getNames() {
-    return m_parameterAnnotation.names();
-  }
-
   public String getDescription() {
     return m_description;
+  }
+
+  public String getNames() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < m_parameterAnnotation.names().length; i++) {
+      if (i > 0) sb.append(", ");
+      sb.append(m_parameterAnnotation.names()[i]);
+    }
+    return sb.toString();
   }
 
   public Parameter getParameter() {
@@ -99,7 +104,8 @@ public class ParameterDescription {
     log("Adding value:" + value + " to parameter:" + m_field);
     boolean arity = false;
     if (m_added && ! isMultiOption()) {
-      throw new ParameterException("Can only specify option " + getNames()[0] + " once.");
+      throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
+          + " once.");
     }
     Class<? extends IStringConverter> converterClass = m_parameterAnnotation.converter();
     if (converterClass == NoConverter.class) {
