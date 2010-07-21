@@ -10,7 +10,7 @@ public class IntegerConverter implements IStringConverter<Integer> {
     try {
       return Integer.parseInt(value);
     } catch(NumberFormatException ex) {
-      throw new ParameterException(ex);
+      throw new ParameterException("Couldn't convert \"" + value + "\" to an integer");
     }
   }
 

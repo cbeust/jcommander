@@ -100,13 +100,14 @@ public class JCommander {
       // Single object
       m_objects.add(object);
     }
+
+    createDescriptions();
   }
 
   /**
    * Parse the command line parameters.
    */
   public void parse(String... args) {
-    createDescriptions();
     parseValues(expandArgs(args));
     validateOptions();
   }

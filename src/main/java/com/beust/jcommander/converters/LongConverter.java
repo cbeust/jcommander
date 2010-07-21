@@ -10,7 +10,7 @@ public class LongConverter implements IStringConverter<Long> {
     try {
       return Long.parseLong(value);
     } catch(NumberFormatException ex) {
-      throw new ParameterException(ex);
+      throw new ParameterException("Couldn't convert \"" + value + "\" to a long");
     }
   }
 
