@@ -45,5 +45,13 @@ public @interface Parameter {
    */
   boolean password() default false;
 
+  /**
+   * The string converter to use for this field.
+   */
   Class<? extends IStringConverter> converter() default NoConverter.class;
+
+  /**
+   * If true, this parameter won't appear in the usage().
+   */
+  boolean hidden() default false;
 }

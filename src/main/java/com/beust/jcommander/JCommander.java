@@ -321,10 +321,12 @@ public class JCommander {
     int longestName = 0;
     List<ParameterDescription> sorted = Lists.newArrayList();
     for (ParameterDescription pd : m_fields.values()) {
-      sorted.add(pd);
-      int length = pd.getNames().length();
-      if (length > longestName) {
-        longestName = length;
+      if (! pd.getParameter().hidden()) {
+        sorted.add(pd);
+        int length = pd.getNames().length();
+        if (length > longestName) {
+          longestName = length;
+        }
       }
     }
     int target = longestName %8 != 0 ? (((longestName + 8) / 8) * 8): longestName;
