@@ -17,4 +17,6 @@ public class Args1 {
   @Parameter(names = "-debug", description = "Debug mode")
   public boolean debug = false;
 
+  @Parameter(names = "-long", description = "A long number")
+  public long l;
 }

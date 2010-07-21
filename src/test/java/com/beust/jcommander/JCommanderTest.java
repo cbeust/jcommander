@@ -29,7 +29,7 @@ public class JCommanderTest {
     Args1 args = new Args1();
     String[] argv = { "-log", "2" };
     JCommander jc = new JCommander(args, argv);
-    Assert.assertEquals(jc.getParameters().size(), 3);
+    Assert.assertEquals(jc.getParameters().size(), 4);
   }
 
   /**
@@ -168,6 +168,21 @@ public class JCommanderTest {
     ArgsBooleanArity args = new ArgsBooleanArity();
     new JCommander(args, "-debug", "true");
     Assert.assertEquals(args.debug, Boolean.TRUE);
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void badParameterShouldThrowParameter1Exception() {
+    Args1 args = new Args1();
+    String[] argv = { "-log", "foo" };
+    new JCommander(args, argv);
+  }
+
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void badParameterShouldThrowParameter2Exception() {
+    Args1 args = new Args1();
+    String[] argv = { "-long", "foo" };
+    new JCommander(args, argv);
   }
 
   public static void main(String[] args) {
