@@ -194,7 +194,7 @@ public class JCommanderTest {
 //    new JCommanderTest().multipleUnparsedFail();
     Object a1 = new Args1();
     String[] argv = new String[] { "-log", "foo" };
-    JCommander jc = new JCommander(a1, argv);
+    JCommander jc = new JCommander(a1);
     jc.usage();
   }
 
