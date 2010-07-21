@@ -351,6 +351,15 @@ Usage:
 	-testclass		List of classes
 </pre>
 
+<h2 id="Hiding">Hiding paramters</h2>
+
+If you don't want certain parameters to appear in the usage, you can mark them as "hidden":
+
+<pre class="brush: java">
+@Parameter(names = "-debug", description = "Debug mode", hidden = true)
+public boolean debug = false;
+</pre>
+
 <h2 id="Internationalization">Internationalization</h2>
 
 You can internationalize the descriptions of your parameters.
