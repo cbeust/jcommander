@@ -53,6 +53,11 @@ public class JCommander {
   private Object m_mainParameterObject;
 
   /**
+   * The annotation found on the main parameter field.
+   */
+  private Parameter m_mainParameterAnnotation;
+
+  /**
    * A set of all the fields that are required. During the reflection phase,
    * this field receives all the fields that are annotated with required=true
    * and during the parsing phase, all the fields that are assigned a value
@@ -216,6 +221,7 @@ public class JCommander {
             }
             m_mainParameterField = f;
             m_mainParameterObject = object;
+            m_mainParameterAnnotation = p;
           } else {
             for (String name : p.names()) {
               if (m_descriptions.containsKey(name)) {
@@ -326,7 +332,12 @@ public class JCommander {
    * Display a the help on System.out.
    */
   public void usage() {
-    System.out.println("Usage:");
+    StringBuilder sb = new StringBuilder("Usage: <main class> [options]");
+    if (m_mainParameterAnnotation != null) {
+      sb.append(" " + m_mainParameterAnnotation.description());
+    }
+    sb.append("\n  Options:");
+    System.out.println(sb.toString());
 
     // Will contain the size of the longest option name
     int longestName = 0;
@@ -358,7 +369,7 @@ public class JCommander {
       int tabCount = l / 8 + (l % 8 == 0 ? 0 : 1);
       StringBuilder tabs = new StringBuilder();
       for (int i = 0; i < tabCount; i++) tabs.append("\t");
-      System.out.println("\t" + pd.getNames() + tabs + pd.getDescription());
+      System.out.println("    " + pd.getNames() + tabs + pd.getDescription());
     }
   }
 

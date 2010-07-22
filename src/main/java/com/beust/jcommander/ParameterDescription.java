@@ -11,7 +11,7 @@ import com.beust.jcommander.internal.Lists;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.TypeVariable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -104,7 +104,7 @@ public class ParameterDescription {
    */
   public void addValue(String value) {
     log("Adding value:" + value + " to parameter:" + m_field);
-    boolean arity = false;
+    boolean isCollection = false;
     if (m_added && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
           + " once.");
@@ -115,7 +115,11 @@ public class ParameterDescription {
     }
     if (converterClass == null && m_parameterAnnotation.arity() >= 2) {
       converterClass = StringConverter.class;
-      arity = true;
+      isCollection = true;
+    }
+    if (converterClass == null && Collection.class.isAssignableFrom(m_field.getType())) {
+      converterClass = StringConverter.class;
+      isCollection = true;
     }
     if (converterClass == null) {
       throw new ParameterException("Don't know how to convert " + value
@@ -127,7 +131,7 @@ public class ParameterDescription {
     try {
       converter = instantiateConverter(converterClass);
       Object convertedValue = converter.convert(value);
-      if (arity) {
+      if (isCollection) {
         @SuppressWarnings("unchecked")
         List<Object> l = (List<Object>) m_field.get(m_object);
         if (l == null) {

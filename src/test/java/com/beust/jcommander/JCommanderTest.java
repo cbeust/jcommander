@@ -185,6 +185,17 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
+  @Test
+  public void listParameters() {
+    Args2 a = new Args2();
+    String[] argv = {"-log", "2", "-groups", "unit", "a", "b", "c", "-host", "host2"};
+    new JCommander(a, argv);
+    Assert.assertEquals(a.verbose.intValue(), 2);
+    Assert.assertEquals(a.groups, "unit");
+    Assert.assertEquals(a.hosts, Arrays.asList("host2"));
+    Assert.assertEquals(a.parameters, Arrays.asList("a", "b", "c"));
+  }
+ 
   public static void main(String[] args) {
 //    ArgsPassword a = new ArgsPassword();
 //    new JCommander(a, "-password");
@@ -192,12 +203,15 @@ public class JCommanderTest {
 //    Assert.assertEquals(args.getVerbose().intValue(), 3);
 //    new JCommanderTest().i18nWithResourceAnnotation();
 //    new JCommanderTest().multipleUnparsedFail();
-    Object a1 = new CommandLineArgs2();
+    Args2 a = new Args2();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };
-    String[] argv = null; // new String[] { "-I", "t" };
-    JCommander jc = new JCommander(a1);
-    jc.usage();
+    String[] argv = {"-log", "2", "-groups", "unit", "a", "b", "c", "-host", "host2"};
+    JCommander jc = new JCommander(a, argv);
+    Assert.assertEquals(a.verbose.intValue(), 2);
+    Assert.assertEquals(a.groups, "unit");
+    Assert.assertEquals(a.hosts, Arrays.asList("host2"));
+    Assert.assertEquals(a.parameters, Arrays.asList("a", "b", "c"));
   }
 
   // Tests:
