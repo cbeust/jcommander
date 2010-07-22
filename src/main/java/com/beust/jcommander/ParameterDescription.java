@@ -7,9 +7,11 @@ import com.beust.jcommander.converters.LongConverter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +23,7 @@ public class ParameterDescription {
   /**
    * A map of converters per class.
    */
-  private static Map<Class<?>, Class<? extends IStringConverter>> m_classConverters
+  private static Map<Class<?>, Class<? extends IStringConverter<?>>> m_classConverters
       = new HashMap() {{
     put(String.class, StringConverter.class);
     put(Integer.class, IntegerConverter.class);
@@ -107,7 +109,7 @@ public class ParameterDescription {
       throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
           + " once.");
     }
-    Class<? extends IStringConverter> converterClass = m_parameterAnnotation.converter();
+    Class<? extends IStringConverter<?>> converterClass = m_parameterAnnotation.converter();
     if (converterClass == NoConverter.class) {
       converterClass = m_classConverters.get(m_field.getType());
     }
@@ -121,9 +123,9 @@ public class ParameterDescription {
     }
 
     m_added = true;
-    IStringConverter converter;
+    IStringConverter<?> converter;
     try {
-      converter = converterClass.newInstance();
+      converter = instantiateConverter(converterClass);
       Object convertedValue = converter.convert(value);
       if (arity) {
         @SuppressWarnings("unchecked")
@@ -136,6 +138,8 @@ public class ParameterDescription {
       } else {
         m_field.set(m_object, convertedValue);
       }
+    } catch (InvocationTargetException e) {
+      e.printStackTrace();
     } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {
@@ -143,6 +147,30 @@ public class ParameterDescription {
     } catch (IllegalArgumentException e) {
       e.printStackTrace();
     }
+  }
+
+  private IStringConverter<?> instantiateConverter(
+      Class<? extends IStringConverter<?>> converterClass)
+      throws IllegalArgumentException, InstantiationException, IllegalAccessException,
+      InvocationTargetException {
+    Constructor<IStringConverter<?>> ctor = null;
+    Constructor<IStringConverter<?>> stringCtor = null;
+    Constructor<IStringConverter<?>>[] ctors
+        = (Constructor<IStringConverter<?>>[]) converterClass.getDeclaredConstructors();
+    for (Constructor<IStringConverter<?>> c : ctors) {
+      Class<?>[] types = c.getParameterTypes();
+      if (types.length == 1 && types[0].equals(String.class)) {
+        stringCtor = c;
+      } else if (types.length == 0) {
+        ctor = c;
+      }
+    }
+
+    IStringConverter<?> result = stringCtor != null
+        ? stringCtor.newInstance(m_parameterAnnotation.names()[0])
+        : ctor.newInstance();
+
+        return result;
   }
 
   private void log(String string) {

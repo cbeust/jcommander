@@ -5,7 +5,7 @@ import com.beust.jcommander.converters.FileConverter;
 import java.io.File;
 
 public class CommandLineArgs2 {
-  @Parameter(names = { "-v", "--verbose" }, description = "print verbose log messages.")
+  @Parameter(names = { "-v", "--verbose" }, description = "print verbose log messages.", arity = 1)
   public boolean verbose = false;
 
   @Parameter(names = { "-h", "--help" }, description = "show this help.")
@@ -18,7 +18,7 @@ public class CommandLineArgs2 {
   public boolean flushLicensed = false;
 
   @Parameter(names = { "-I", "--index-file" }, description = "indexes the given file.")
-  public String indexFile;
+  public Long indexFile;
 
   @Parameter(names = { "-b", "--bonjour" }, description = "enable Bonjour.")
   public boolean enableBonjour = false;

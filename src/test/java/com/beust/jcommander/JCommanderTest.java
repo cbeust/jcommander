@@ -193,8 +193,10 @@ public class JCommanderTest {
 //    new JCommanderTest().i18nWithResourceAnnotation();
 //    new JCommanderTest().multipleUnparsedFail();
     Object a1 = new CommandLineArgs2();
-    String[] argv = new String[] { "-log", "foo" };
-    JCommander jc = new JCommander(a1);
+//    String[] argv = new String[] { "-n", "foo" };
+//    String[] argv = new String[] { "-v", "t" };
+    String[] argv = new String[] { "-I", "t" };
+    JCommander jc = new JCommander(a1, argv);
     jc.usage();
   }
 

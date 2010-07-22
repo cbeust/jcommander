@@ -48,7 +48,7 @@ public @interface Parameter {
   /**
    * The string converter to use for this field.
    */
-  Class<? extends IStringConverter> converter() default NoConverter.class;
+  Class<? extends IStringConverter<?>> converter() default NoConverter.class;
 
   /**
    * If true, this parameter won't appear in the usage().
