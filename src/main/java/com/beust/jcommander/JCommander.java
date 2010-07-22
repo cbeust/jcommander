@@ -270,7 +270,7 @@ public class JCommander {
                 }
                 i += n;
               } else {
-                throw new ParameterException(arity + " parameters expected after " + args[i]);
+                throw new ParameterException(n + " parameters expected after " + args[i]);
               }
             }
           }
