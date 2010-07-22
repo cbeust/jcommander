@@ -153,7 +153,7 @@ public class JCommander {
 
   /**
    * Reads the file specified by filename and returns the file content as a string.
-   * End of lines are replaced by a space
+   * End of lines are replaced by a space.
    * 
    * @param fileName the command line filename
    * @return the file content as a string.
@@ -181,8 +181,7 @@ public class JCommander {
   }
 
   /**
-   * @param string
-   * @return
+   * Remove spaces at both ends and handle double quotes.
    */
   private static String trim(String string) {
     String result = string.trim();
@@ -195,6 +194,9 @@ public class JCommander {
     return result;
   }
 
+  /**
+   * Create the ParameterDescriptions for all the @Parameter found.
+   */
   private void createDescriptions() {
     m_descriptions = Maps.newHashMap();
 
@@ -231,22 +233,20 @@ public class JCommander {
     }
   }
 
-  private void p(String string) {
-    if (false) {
-      System.out.println("[JCommander] " + string);
-    }
-  }
-
+  /**
+   * Main method that parses the values and initializes the fields accordingly.
+   */
   private void parseValues(String[] args) {
-//    log("Parsing args" + join(args, " ");
-
     for (int i = 0; i < args.length; i++) {
       String a = trim(args[i]);
-      log("Parsing arg:" + a);
+      p("Parsing arg:" + a);
       if (a.startsWith("-")) {
         ParameterDescription pd = m_descriptions.get(a);
         if (pd != null) {
           if (pd.getParameter().password()) {
+            //
+            // Password option, use the Console to retrieve the password
+            //
             Console console = System.console();
             if (console == null) {
               throw new ParameterException("No console is available to get parameter " + a);
@@ -255,12 +255,20 @@ public class JCommander {
             char[] password = console.readPassword();
             pd.addValue(new String(password));
           } else {
+            //
+            // Regular option
+            //
             Class<?> fieldType = pd.getField().getType();
+            
+            // Boolean, set to true as soon as we see it, unless it specified
+            // an arity of 1, in which case we need to read the next value
             if ((fieldType == boolean.class || fieldType == Boolean.class)
                 && pd.getParameter().arity() == -1) {
               pd.addValue("true");
               m_requiredFields.remove(pd.getField());
             } else {
+              // Regular parameter, use the arity to tell use how many values
+              // we need to consume
               int arity = pd.getParameter().arity();
               int n = (arity != -1 ? arity : 1);  
               if (i + n < args.length) {
@@ -319,17 +327,23 @@ public class JCommander {
    */
   public void usage() {
     System.out.println("Usage:");
+
+    // Will contain the size of the longest option name
     int longestName = 0;
     List<ParameterDescription> sorted = Lists.newArrayList();
     for (ParameterDescription pd : m_fields.values()) {
       if (! pd.getParameter().hidden()) {
         sorted.add(pd);
+        // +1 to have an extra space between the name and the description
         int length = pd.getNames().length() + 1;
         if (length > longestName) {
           longestName = length;
         }
       }
     }
+
+    // Calculate the tab stop at which all the descriptions should be
+    // aligned based on the longest option name found.
     int target = longestName %8 != 0 ? (((longestName + 8) / 8) * 8): longestName;
     Collections.sort(sorted, new Comparator<ParameterDescription>() {
       @Override
@@ -337,7 +351,8 @@ public class JCommander {
         return arg0.getNames().compareTo(arg1.getNames());
       }
     });
-    
+
+    // Display all the names and descriptions at the right tab position
     for (ParameterDescription pd : sorted) {
       int l = target - pd.getNames().length();
       int tabCount = l / 8 + (l % 8 == 0 ? 0 : 1);
@@ -356,7 +371,7 @@ public class JCommander {
     return new ArrayList<ParameterDescription>(m_fields.values());
   }
 
-  private void log(String string) {
+  private void p(String string) {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
       System.out.println("[JCommander] " + string);
     }

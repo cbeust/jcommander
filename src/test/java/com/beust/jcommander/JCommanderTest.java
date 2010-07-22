@@ -195,8 +195,8 @@ public class JCommanderTest {
     Object a1 = new CommandLineArgs2();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };
-    String[] argv = new String[] { "-I", "t" };
-    JCommander jc = new JCommander(a1, argv);
+    String[] argv = null; // new String[] { "-I", "t" };
+    JCommander jc = new JCommander(a1);
     jc.usage();
   }
 
