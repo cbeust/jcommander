@@ -192,7 +192,7 @@ public class JCommanderTest {
 //    Assert.assertEquals(args.getVerbose().intValue(), 3);
 //    new JCommanderTest().i18nWithResourceAnnotation();
 //    new JCommanderTest().multipleUnparsedFail();
-    Object a1 = new Args1();
+    Object a1 = new CommandLineArgs2();
     String[] argv = new String[] { "-log", "foo" };
     JCommander jc = new JCommander(a1);
     jc.usage();

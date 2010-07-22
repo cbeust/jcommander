@@ -324,7 +324,7 @@ public class JCommander {
     for (ParameterDescription pd : m_fields.values()) {
       if (! pd.getParameter().hidden()) {
         sorted.add(pd);
-        int length = pd.getNames().length();
+        int length = pd.getNames().length() + 1;
         if (length > longestName) {
           longestName = length;
         }
