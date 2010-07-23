@@ -215,6 +215,33 @@ new JCommander(args, "-verbose", "3");
 Assert.assertEquals(args.getVerbose().intValue(), 3);
 </pre>
 
+<h2 id="Separators">Parameter separators</h2>
+
+By default, parameters are separated by spaces, but you can change this setting to allow different separators:
+
+<pre class="brush: bash">
+java Main -log:3
+</pre>
+
+or
+
+<pre class="brush: bash">
+java Main -level=42
+</pre>
+
+You define the separator with the <tt>@Parameters</tt> annotation:
+
+<pre class="brush: java">
+@Parameters(separators = "=")
+public class SeparatorEqual {
+  @Parameter(names = "-level")
+  public Integer level = 2;
+}
+</pre>
+
+
+
+
 
 <h2 id="Multiple_descriptions">Multiple descriptions</h2>
 
@@ -365,11 +392,11 @@ You can internationalize the descriptions of your parameters.
 
 <p>
 
-First you use the <tt>@ResourceBundle</tt> annotation at the top of your class to define the name of your message bundle, and then you use the <tt>descriptionKey</tt> attribute instead of <tt>description</tt> on all the <tt>@Parameters</tt> that require translations. This <tt>descriptionKey</tt> is the key to the string into your message bundle:
+First you use the <tt>@Parameters</tt> annotation at the top of your class to define the name of your message bundle, and then you use the <tt>descriptionKey</tt> attribute instead of <tt>description</tt> on all the <tt>@Parameters</tt> that require translations. This <tt>descriptionKey</tt> is the key to the string into your message bundle:
 
 <h3 class="sourcetitle">I18N.java</h3>
 <pre class="brush:java">
-@ResourceBundle("MessageBundle")
+@Parameters(resourceBundle = "MessageBundle")
 public class ArgsI18N2 {
   @Parameter(names = "-host", description = "Host", descriptionKey = "host")
   String hostName;
