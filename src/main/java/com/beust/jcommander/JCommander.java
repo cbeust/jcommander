@@ -166,7 +166,7 @@ public class JCommander {
       if (arg.startsWith("-")) {
         String sep = getSeparatorFor(arg);
         if (! " ".equals(sep)) {
-          String[] sp = arg.split(sep);
+          String[] sp = arg.split("[" + sep + "]");
           for (String ssp : sp) {
             vResult2.add(ssp);
           }

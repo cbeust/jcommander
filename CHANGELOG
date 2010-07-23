@@ -2,8 +2,11 @@
 
 Usage is now aligned and alphabetically sorted
 Added the hidden attribute
+Added support for different separators than " " (e.g. "=").
+Deprecated @ResourceBundle, replaced with @Parameters
 
 1.1
+2010/08/15
 
 Better internationalization
 Password support

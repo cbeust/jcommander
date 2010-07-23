@@ -1,7 +1,7 @@
 package com.beust.jcommander;
 
 @Parameters(separators = "=")
-public class Separator {
+public class SeparatorEqual {
 
   @Parameter(names = "-log")
   public Integer log = 2;

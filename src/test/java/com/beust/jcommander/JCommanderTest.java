@@ -205,15 +205,42 @@ public class JCommanderTest {
   }
 
   @Test
-  public void separatorTest() {
-    Separator s = new Separator();
+  public void separatorEqual() {
+    SeparatorEqual s = new SeparatorEqual();
     String[] argv = { "-log=3" };
     new JCommander(s, argv);
     Assert.assertEquals(s.log.intValue(), 3);
   }
 
+  @Test
+  public void separatorColon() {
+    SeparatorColon s = new SeparatorColon();
+    String[] argv = { "-verbose:true" };
+    new JCommander(s, argv);
+    Assert.assertTrue(s.verbose);
+  }
+
+  @Test
+  public void separatorBoth() {
+    SeparatorColon s = new SeparatorColon();
+    SeparatorEqual s2 = new SeparatorEqual();
+    String[] argv = { "-verbose:true", "-log=3" };
+    new JCommander(new Object[] { s, s2 }, argv);
+    Assert.assertTrue(s.verbose);
+    Assert.assertEquals(s2.log.intValue(), 3);
+  }
+
+  @Test
+  public void separatorMixed1() {
+    SeparatorMixed s = new SeparatorMixed();
+    String[] argv = { "-long:1", "-level=42" };
+    new JCommander(s, argv);
+    Assert.assertEquals(s.l.longValue(), 1l);
+    Assert.assertEquals(s.level.intValue(), 42);
+  }
+
   public static void main(String[] args) {
-    new JCommanderTest().separatorTest();
+    new JCommanderTest().separatorMixed1();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };
