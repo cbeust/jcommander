@@ -90,14 +90,22 @@ public class JCommanderTest {
     i18n1("MessageBundle", new Locale("fr", "FR"), "Hôte");
   }
 
-  @Test
-  public void i18nWithResourceAnnotation() {
-    ArgsI18N2 i18n = new ArgsI18N2();
+  private void i18n2(Object i18n) {
     String[] argv = { "-host", "localhost" };
     Locale.setDefault(new Locale("fr", "FR"));
     JCommander jc = new JCommander(i18n, argv);
     ParameterDescription pd = jc.getParameters().get(0);
     Assert.assertEquals(pd.getDescription(), "Hôte");
+  }
+
+  @Test
+  public void i18nWithResourceAnnotation() {
+    i18n2(new ArgsI18N2());
+  }
+
+  @Test
+  public void i18nWithResourceAnnotationNew() {
+    i18n2(new ArgsI18N2New());
   }
 
   @Test

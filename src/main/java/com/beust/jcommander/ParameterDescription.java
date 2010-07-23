@@ -47,17 +47,35 @@ public class ParameterDescription {
     init(object, annotation, field, bundle);
   }
 
+  /**
+   * Find the resource bundle in the annotations.
+   * @return
+   */
+  private ResourceBundle findResourceBundle(Object o) {
+    ResourceBundle result = null;
+
+    Parameters p = o.getClass().getAnnotation(Parameters.class);
+    if (p != null) {
+      result = ResourceBundle.getBundle(p.resourceBundle(), Locale.getDefault());
+    }
+    else {
+      com.beust.jcommander.ResourceBundle a = o.getClass().getAnnotation(
+          com.beust.jcommander.ResourceBundle.class);
+      if (a != null) {
+        result = ResourceBundle.getBundle(a.value(), Locale.getDefault());
+      }
+    }
+
+    return result;
+  }
+
   private void init(Object object, Parameter annotation, Field field, ResourceBundle bundle) {
     m_object = object;
     m_parameterAnnotation = annotation;
     m_field = field;
     m_bundle = bundle;
     if (m_bundle == null) {
-      com.beust.jcommander.ResourceBundle a
-          = object.getClass().getAnnotation(com.beust.jcommander.ResourceBundle.class);
-      if (a != null) {
-        m_bundle = ResourceBundle.getBundle(a.value(), Locale.getDefault());
-      }
+      m_bundle = findResourceBundle(object);
     }
 
     m_description = annotation.description();

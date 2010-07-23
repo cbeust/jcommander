@@ -183,7 +183,7 @@ So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attr
 public List&lt;String&gt; files = new ArrayList&lt;String&gt;();
 
 @Parameter(names = "-debug", description = "Debugging level")
-public Integer verbose = 1;
+public Integer debug = 1;
 </pre>
 
 will allow you to parse:
@@ -192,8 +192,7 @@ will allow you to parse:
 java Main -debug file1 file2
 </pre>
 
-and the field <tt>files</tt> will receive the strings "file1" and
-"file2".
+and the field <tt>files</tt> will receive the strings "file1" and "file2".
 
 <h2 id="Private_parameters">Private parameters</h2>
 
