@@ -203,23 +203,23 @@ public class JCommanderTest {
     Assert.assertEquals(a.hosts, Arrays.asList("host2"));
     Assert.assertEquals(a.parameters, Arrays.asList("a", "b", "c"));
   }
- 
+
+  @Test
+  public void separatorTest() {
+    Separator s = new Separator();
+    String[] argv = { "-log=3" };
+    new JCommander(s, argv);
+    Assert.assertEquals(s.log.intValue(), 3);
+  }
+
   public static void main(String[] args) {
-//    ArgsPassword a = new ArgsPassword();
-//    new JCommander(a, "-password");
-//    System.out.println("Received:" + a.password);
-//    Assert.assertEquals(args.getVerbose().intValue(), 3);
-//    new JCommanderTest().i18nWithResourceAnnotation();
-//    new JCommanderTest().multipleUnparsedFail();
-    Args2 a = new Args2();
+    new JCommanderTest().separatorTest();
+//    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };
-    String[] argv = {"-log", "2", "-groups", "unit", "a", "b", "c", "-host", "host2"};
-    JCommander jc = new JCommander(a, argv);
-    Assert.assertEquals(a.verbose.intValue(), 2);
-    Assert.assertEquals(a.groups, "unit");
-    Assert.assertEquals(a.hosts, Arrays.asList("host2"));
-    Assert.assertEquals(a.parameters, Arrays.asList("a", "b", "c"));
+//    String[] argv = { "-log=10" };
+//    JCommander jc = new JCommander(a, argv);
+//    Assert.assertEquals(a.log.intValue(), 10);
   }
 
   // Tests:

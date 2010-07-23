@@ -139,21 +139,64 @@ public class JCommander {
    * @param originalArgv the original command line parameters
    * @return the new and enriched command line parameters
    */
-  private static String[] expandArgs(String[] originalArgv) {
-    List<String> vResult = Lists.newArrayList();
-    
+  private String[] expandArgs(String[] originalArgv) {
+    List<String> vResult1 = Lists.newArrayList();
+
+    //
+    // Expand @
+    //
     for (String arg : originalArgv) {
 
       if (arg.startsWith("@")) {
         String fileName = arg.substring(1);
-        vResult.addAll(readFile(fileName));
+        vResult1.addAll(readFile(fileName));
       }
       else {
-        vResult.add(arg);
+        vResult1.add(arg);
       }
     }
-    
-    return vResult.toArray(new String[vResult.size()]);
+
+    //
+    // Expand separators
+    //
+    List<String> vResult2 = Lists.newArrayList();
+    for (int i = 0; i < vResult1.size(); i++) {
+      String arg = vResult1.get(i);
+      // TODO: make sure it's really an option and not that it starts with "-"
+      if (arg.startsWith("-")) {
+        String sep = getSeparatorFor(arg);
+        if (! " ".equals(sep)) {
+          String[] sp = arg.split(sep);
+          for (String ssp : sp) {
+            vResult2.add(ssp);
+          }
+        } else {
+          vResult2.add(arg);
+        }
+      } else {
+        vResult2.add(arg);
+      }
+    }
+
+    return vResult2.toArray(new String[vResult2.size()]);
+  }
+
+  private ParameterDescription getDescriptionFor(String arg) {
+    for (ParameterDescription p : m_descriptions.values()) {
+      for (String n : p.getParameter().names()) {
+        if (arg.startsWith(n)) {
+          return p;
+        }
+      }
+    }
+    throw new ParameterException("Couldn't find a description for " + arg);
+  }
+
+  private String getSeparatorFor(String arg) {
+    ParameterDescription pd = getDescriptionFor(arg);
+    Parameters p = pd.getObject().getClass().getAnnotation(Parameters.class);
+    if (p != null) return p.separators();
+    else return " ";
   }
 
   /**

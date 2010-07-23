@@ -55,18 +55,21 @@ public class ParameterDescription {
     ResourceBundle result = null;
 
     Parameters p = o.getClass().getAnnotation(Parameters.class);
-    if (p != null) {
+    if (p != null && ! isEmpty(p.resourceBundle())) {
       result = ResourceBundle.getBundle(p.resourceBundle(), Locale.getDefault());
-    }
-    else {
+    } else {
       com.beust.jcommander.ResourceBundle a = o.getClass().getAnnotation(
           com.beust.jcommander.ResourceBundle.class);
-      if (a != null) {
+      if (a != null && ! isEmpty(a.value())) {
         result = ResourceBundle.getBundle(a.value(), Locale.getDefault());
       }
     }
 
     return result;
+  }
+
+  private boolean isEmpty(String s) {
+    return s == null || "".equals(s);
   }
 
   private void init(Object object, Parameter annotation, Field field, ResourceBundle bundle) {
@@ -92,6 +95,10 @@ public class ParameterDescription {
 
   public String getDescription() {
     return m_description;
+  }
+
+  public Object getObject() {
+    return m_object;
   }
 
   public String getNames() {
