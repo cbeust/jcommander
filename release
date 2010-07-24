@@ -3,4 +3,4 @@
 #
 # deploy without tagging: mvn deploy -DperformRelease
 
-release:clean release:prepare
+mvn release:clean release:prepare
