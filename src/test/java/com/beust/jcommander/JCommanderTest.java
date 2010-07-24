@@ -1,6 +1,7 @@
 package com.beust.jcommander;
 
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -239,8 +240,24 @@ public class JCommanderTest {
     Assert.assertEquals(s.level.intValue(), 42);
   }
 
+  @DataProvider
+  public static Object[][] f() {
+    return new Integer[][] {
+      new Integer[] { 3, 5, 1 },
+      new Integer[] { 3, 8, 1 },
+      new Integer[] { 3, 12, 2 },
+      new Integer[] { 8, 12, 2 },
+      new Integer[] { 9, 10, 1 },
+    };
+  }
+
   public static void main(String[] args) {
-    new JCommanderTest().separatorMixed1();
+//    for (Object[] p : f()) {
+//      int tc = JCommander.getTabCount((Integer) p[0], (Integer) p[1]);
+//      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
+//    }
+//    new JCommanderTest().formatting();
+    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };

@@ -388,30 +388,27 @@ public class JCommander {
     for (ParameterDescription pd : m_fields.values()) {
       if (! pd.getParameter().hidden()) {
         sorted.add(pd);
-        // +1 to have an extra space between the name and the description
-        int length = pd.getNames().length() + 1;
+        // + to have an extra space between the name and the description
+        int length = pd.getNames().length() + 2;
         if (length > longestName) {
           longestName = length;
         }
       }
     }
 
-    // Calculate the tab stop at which all the descriptions should be
-    // aligned based on the longest option name found.
-    int target = longestName %8 != 0 ? (((longestName + 8) / 8) * 8): longestName;
     Collections.sort(sorted, new Comparator<ParameterDescription>() {
       @Override
       public int compare(ParameterDescription arg0, ParameterDescription arg1) {
-        return arg0.getNames().compareTo(arg1.getNames());
+        return arg0.getNames().toLowerCase().compareTo(arg1.getNames().toLowerCase());
       }
     });
 
     // Display all the names and descriptions at the right tab position
     for (ParameterDescription pd : sorted) {
-      int l = target - pd.getNames().length();
-      int tabCount = l / 8 + (l % 8 == 0 ? 0 : 1);
+      int l = pd.getNames().length();
+      int spaceCount = longestName - l;
       StringBuilder tabs = new StringBuilder();
-      for (int i = 0; i < tabCount; i++) tabs.append("\t");
+      for (int i = 0; i < spaceCount; i++) tabs.append(" ");
       System.out.println("    " + pd.getNames() + tabs + pd.getDescription());
     }
   }

@@ -3,8 +3,12 @@ package com.beust.jcommander;
 import com.beust.jcommander.converters.FileConverter;
 
 import java.io.File;
+import java.util.List;
 
 public class CommandLineArgs2 {
+  @Parameter(description = "list of files")
+  List<String> list;
+
   @Parameter(names = { "-v", "--verbose" }, description = "print verbose log messages.", arity = 1)
   public boolean verbose = false;
 
