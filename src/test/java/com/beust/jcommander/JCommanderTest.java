@@ -208,9 +208,10 @@ public class JCommanderTest {
   @Test
   public void separatorEqual() {
     SeparatorEqual s = new SeparatorEqual();
-    String[] argv = { "-log=3" };
+    String[] argv = { "-log=3", "--longoption=10" };
     new JCommander(s, argv);
     Assert.assertEquals(s.log.intValue(), 3);
+    Assert.assertEquals(s.longOption.intValue(), 10);
   }
 
   @Test
