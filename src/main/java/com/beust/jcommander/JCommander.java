@@ -290,7 +290,7 @@ public class JCommander {
     String def = m_defaultProvider.getDefaultValueFor(optionName);
     if (def != null) {
       p("Initializing " + optionName + " with default value:" + def);
-      pd.addValue(def, false /* don't mark as assigned */);
+      pd.addValue(def, true /* default */);
     }
   }
 

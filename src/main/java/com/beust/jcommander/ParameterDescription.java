@@ -124,7 +124,7 @@ public class ParameterDescription {
   }
 
   public void addValue(String value) {
-    addValue(value, true /* mark as assigned */);
+    addValue(value, false /* not default */);
   }
 
   /**
@@ -133,8 +133,9 @@ public class ParameterDescription {
    * 
    * @param markAdded if true, mark this parameter as assigned
    */
-  public void addValue(String value, boolean markAssigned) {
-    log("Adding value:" + value + " to parameter:" + m_field);
+  public void addValue(String value, boolean isDefault) {
+    log("Adding " + (isDefault ? "default " : "") + "value:" + value
+        + " to parameter:" + m_field.getName());
     boolean isCollection = false;
     if (m_assigned && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
@@ -157,7 +158,7 @@ public class ParameterDescription {
           + " to type " + m_field.getType() + " (field: " + m_field.getName() + ")");
     }
 
-    if (markAssigned) m_assigned = true;
+    if (! isDefault) m_assigned = true;
 
     IStringConverter<?> converter;
     try {

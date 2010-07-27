@@ -1,5 +1,7 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider;
+
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -253,16 +255,20 @@ public class JCommanderTest {
   }
 
   private ArgsDefault defaultProvider(String... args) {
-    ArgsDefault a = new ArgsDefault();
-    JCommander jc = new JCommander(a);
-    jc.setDefaultProvider(new IDefaultProvider() {
+    return defaultProvider(new IDefaultProvider() {
 
       @Override
       public String getDefaultValueFor(String optionName) {
         return "-debug".equals(optionName) ? "false" : "42";
       }
       
-    });
+    }, args);
+  }
+
+  private ArgsDefault defaultProvider(IDefaultProvider provider, String... args) {
+    ArgsDefault a = new ArgsDefault();
+    JCommander jc = new JCommander(a);
+    jc.setDefaultProvider(provider);
 
     jc.parse(args);
     return a;
@@ -304,12 +310,21 @@ public class JCommanderTest {
     Assert.assertEquals(a.log.intValue(), 19);
   }
 
+  @Test
+  public void propertyFileDefaultProvider1() {
+    ArgsDefault a = defaultProvider(new PropertyFileDefaultProvider(), "f");
+
+    Assert.assertEquals(a.groups, "unit");
+    Assert.assertEquals(a.level, 17);
+    Assert.assertEquals(a.log.intValue(), 18);
+  }
+
   public static void main(String[] args) {
 //    for (Object[] p : f()) {
 //      int tc = JCommander.getTabCount((Integer) p[0], (Integer) p[1]);
 //      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
 //    }
-    new JCommanderTest().defaultProvider2();
+    new JCommanderTest().propertyFileDefaultProvider1();
 //    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
