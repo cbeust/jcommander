@@ -186,6 +186,12 @@ public class ParameterDescription {
     }
   }
 
+  public boolean isNumber() {
+    Class<?> type = m_field.getType();
+    return type.equals(Integer.class) || type.equals(int.class)
+        || type.equals(Long.class) || type.equals(long.class);
+  }
+
   private IStringConverter<?> instantiateConverter(
       Class<? extends IStringConverter<?>> converterClass)
       throws IllegalArgumentException, InstantiationException, IllegalAccessException,
