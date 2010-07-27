@@ -252,13 +252,33 @@ public class JCommanderTest {
     };
   }
 
+  @Test
+  public void defaultProvider1() {
+    ArgsDefault a = new ArgsDefault();
+    JCommander jc = new JCommander(a);
+    jc.setDefaultProvider(new IDefaultProvider() {
+
+      @Override
+      public String getDefaultValueFor(String optionName) {
+        return "-debug".equals(optionName) ? "false" : "42";
+      }
+      
+    });
+
+    jc.parse("f");
+
+    Assert.assertEquals(a.groups, "42");
+    Assert.assertEquals(a.l, 42);
+    Assert.assertEquals(a.log.intValue(), 42);
+  }
+
   public static void main(String[] args) {
 //    for (Object[] p : f()) {
 //      int tc = JCommander.getTabCount((Integer) p[0], (Integer) p[1]);
 //      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
 //    }
-//    new JCommanderTest().formatting();
-    new JCommander(new CommandLineArgs2()).usage();
+    new JCommanderTest().defaultProvider1();
+//    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };

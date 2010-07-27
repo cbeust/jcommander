@@ -74,6 +74,8 @@ public class JCommander {
 
   private ResourceBundle m_bundle;
 
+  private IDefaultProvider m_defaultProvider;
+
   public JCommander(Object object) {
     init(object, null);
   }
@@ -189,7 +191,7 @@ public class JCommander {
         }
       }
     }
-    throw new ParameterException("Couldn't find a description for " + arg);
+    throw new ParameterException("Unknown parameter: " + arg);
   }
 
   private String getSeparatorFor(String arg) {
@@ -206,7 +208,7 @@ public class JCommander {
    * @param fileName the command line filename
    * @return the file content as a string.
    */
-  public static List<String> readFile(String fileName) {
+  private static List<String> readFile(String fileName) {
     List<String> result = Lists.newArrayList();
 
     try {
@@ -274,11 +276,21 @@ public class JCommander {
               ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle);
               m_fields.put(f, pd);
               m_descriptions.put(name, pd);
+
               if (p.required()) m_requiredFields.put(f, pd);
             }
           }
         }
       }
+    }
+  }
+
+  private void initializeDefaultValue(ParameterDescription pd) {
+    String optionName = pd.getParameter().names()[0];
+    String def = m_defaultProvider.getDefaultValueFor(optionName);
+    if (def != null) {
+      p("Initializing " + optionName + " with default value:" + def);
+      pd.addValue(def);
     }
   }
 
@@ -425,6 +437,18 @@ public class JCommander {
   private void p(String string) {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
       System.out.println("[JCommander] " + string);
+    }
+  }
+
+  /**
+   * Define the default provider for this instance.
+   */
+  public void setDefaultProvider(IDefaultProvider defaultProvider) {
+    m_defaultProvider = defaultProvider;
+    if (m_defaultProvider != null) {
+      for (ParameterDescription pd : m_descriptions.values()) {
+        initializeDefaultValue(pd);
+      }
     }
   }
 }
