@@ -254,77 +254,12 @@ public class JCommanderTest {
     };
   }
 
-  private ArgsDefault defaultProvider(String... args) {
-    return defaultProvider(new IDefaultProvider() {
-
-      @Override
-      public String getDefaultValueFor(String optionName) {
-        return "-debug".equals(optionName) ? "false" : "42";
-      }
-      
-    }, args);
-  }
-
-  private ArgsDefault defaultProvider(IDefaultProvider provider, String... args) {
-    ArgsDefault a = new ArgsDefault();
-    JCommander jc = new JCommander(a);
-    jc.setDefaultProvider(provider);
-
-    jc.parse(args);
-    return a;
-  }
-
-  @Test
-  public void defaultProvider1() {
-    ArgsDefault a = defaultProvider("f");
-
-    Assert.assertEquals(a.groups, "42");
-    Assert.assertEquals(a.level, 42);
-    Assert.assertEquals(a.log.intValue(), 42);
-  }
-
-  @Test
-  public void defaultProvider2() {
-    ArgsDefault a = defaultProvider("-groups", "foo", "f");
-
-    Assert.assertEquals(a.groups, "foo");
-    Assert.assertEquals(a.level, 42);
-    Assert.assertEquals(a.log.intValue(), 42);
-  }
-
-  @Test
-  public void defaultProvider3() {
-    ArgsDefault a = defaultProvider("-groups", "foo", "-level", "13", "f");
-
-    Assert.assertEquals(a.groups, "foo");
-    Assert.assertEquals(a.level, 13);
-    Assert.assertEquals(a.log.intValue(), 42);
-  }
-
-  @Test
-  public void defaultProvider4() {
-    ArgsDefault a = defaultProvider("-log", "19", "-groups", "foo", "-level", "13", "f");
-
-    Assert.assertEquals(a.groups, "foo");
-    Assert.assertEquals(a.level, 13);
-    Assert.assertEquals(a.log.intValue(), 19);
-  }
-
-  @Test
-  public void propertyFileDefaultProvider1() {
-    ArgsDefault a = defaultProvider(new PropertyFileDefaultProvider(), "f");
-
-    Assert.assertEquals(a.groups, "unit");
-    Assert.assertEquals(a.level, 17);
-    Assert.assertEquals(a.log.intValue(), 18);
-  }
-
   public static void main(String[] args) {
 //    for (Object[] p : f()) {
 //      int tc = JCommander.getTabCount((Integer) p[0], (Integer) p[1]);
 //      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
 //    }
-    new JCommanderTest().propertyFileDefaultProvider1();
+    new DefaultProviderTest().propertyFileDefaultProvider1();
 //    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };

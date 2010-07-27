@@ -1,4 +1,10 @@
+1.4
+
+Added IDefaultProvider
+Added PropertyFileDefaultProvider
+
 1.2
+2010/08/25
 
 Usage is now aligned and alphabetically sorted
 Added the hidden attribute
