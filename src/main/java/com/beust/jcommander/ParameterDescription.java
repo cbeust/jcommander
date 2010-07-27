@@ -38,7 +38,7 @@ public class ParameterDescription {
   private Parameter m_parameterAnnotation;
   private Field m_field;
   /** Keep track of whether a value was added to flag an error */
-  private boolean m_added = false;
+  private boolean m_assigned = false;
   private ResourceBundle m_bundle;
   private String m_description;
 
@@ -123,14 +123,20 @@ public class ParameterDescription {
     return fieldType.equals(List.class) || fieldType.equals(Set.class);
   }
 
+  public void addValue(String value) {
+    addValue(value, true /* mark as assigned */);
+  }
+
   /**
    * Add the specified value to the field. First look up any field converter, then
    * any type converter, and if we can't find any, throw an exception.
+   * 
+   * @param markAdded if true, mark this parameter as assigned
    */
-  public void addValue(String value) {
+  public void addValue(String value, boolean markAssigned) {
     log("Adding value:" + value + " to parameter:" + m_field);
     boolean isCollection = false;
-    if (m_added && ! isMultiOption()) {
+    if (m_assigned && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
           + " once.");
     }
@@ -151,7 +157,8 @@ public class ParameterDescription {
           + " to type " + m_field.getType() + " (field: " + m_field.getName() + ")");
     }
 
-    m_added = true;
+    if (markAssigned) m_assigned = true;
+
     IStringConverter<?> converter;
     try {
       converter = instantiateConverter(converterClass);

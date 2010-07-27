@@ -252,8 +252,7 @@ public class JCommanderTest {
     };
   }
 
-  @Test
-  public void defaultProvider1() {
+  private ArgsDefault defaultProvider(String... args) {
     ArgsDefault a = new ArgsDefault();
     JCommander jc = new JCommander(a);
     jc.setDefaultProvider(new IDefaultProvider() {
@@ -265,11 +264,44 @@ public class JCommanderTest {
       
     });
 
-    jc.parse("f");
+    jc.parse(args);
+    return a;
+  }
+
+  @Test
+  public void defaultProvider1() {
+    ArgsDefault a = defaultProvider("f");
 
     Assert.assertEquals(a.groups, "42");
-    Assert.assertEquals(a.l, 42);
+    Assert.assertEquals(a.level, 42);
     Assert.assertEquals(a.log.intValue(), 42);
+  }
+
+  @Test
+  public void defaultProvider2() {
+    ArgsDefault a = defaultProvider("-groups", "foo", "f");
+
+    Assert.assertEquals(a.groups, "foo");
+    Assert.assertEquals(a.level, 42);
+    Assert.assertEquals(a.log.intValue(), 42);
+  }
+
+  @Test
+  public void defaultProvider3() {
+    ArgsDefault a = defaultProvider("-groups", "foo", "-level", "13", "f");
+
+    Assert.assertEquals(a.groups, "foo");
+    Assert.assertEquals(a.level, 13);
+    Assert.assertEquals(a.log.intValue(), 42);
+  }
+
+  @Test
+  public void defaultProvider4() {
+    ArgsDefault a = defaultProvider("-log", "19", "-groups", "foo", "-level", "13", "f");
+
+    Assert.assertEquals(a.groups, "foo");
+    Assert.assertEquals(a.level, 13);
+    Assert.assertEquals(a.log.intValue(), 19);
   }
 
   public static void main(String[] args) {
@@ -277,7 +309,7 @@ public class JCommanderTest {
 //      int tc = JCommander.getTabCount((Integer) p[0], (Integer) p[1]);
 //      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
 //    }
-    new JCommanderTest().defaultProvider1();
+    new JCommanderTest().defaultProvider2();
 //    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
