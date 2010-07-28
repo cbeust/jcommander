@@ -126,10 +126,23 @@ public class JCommander {
    * Parse the command line parameters.
    */
   public void parse(String... args) {
+    StringBuilder sb = new StringBuilder("Parsing \"");
+    sb.append(join(args).append("\"\n  with:").append(join(m_objects.toArray())));
+    p(sb.toString());
+
     createDescriptions();
     initializeDefaultValues();
     parseValues(expandArgs(args));
     validateOptions();
+  }
+
+  private StringBuilder join(Object[] args) {
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < args.length; i++) {
+      if (i > 0) result.append(" ");
+      result.append(args[i]);
+    }
+    return result;
   }
 
   private void initializeDefaultValues() {
@@ -185,12 +198,13 @@ public class JCommander {
     List<String> vResult2 = Lists.newArrayList();
     for (int i = 0; i < vResult1.size(); i++) {
       String arg = vResult1.get(i);
+      String[] v1 = vResult1.toArray(new String[0]);
       // TODO: make sure it's really an option and not that it starts with "-"
       if ("--".equals(arg)) {
         vResult2.add(arg);
         vResult2.add(vResult1.get(++i));
-      } else if (isOption(arg)) {
-        String sep = getSeparatorFor(arg);
+      } else if (isOption(v1, arg)) {
+        String sep = getSeparatorFor(v1, arg);
         if (! " ".equals(sep)) {
           String[] sp = arg.split("[" + sep + "]");
           for (String ssp : sp) {
@@ -207,35 +221,61 @@ public class JCommander {
     return vResult2.toArray(new String[vResult2.size()]);
   }
 
-  private boolean isOption(String arg) {
+  private boolean isOption(String[] args, String arg) {
     if ("--".equals(arg)) return false;
 
-    String prefixes = getOptionPrefixes();
+    String prefixes = getOptionPrefixes(args, arg);
     return prefixes.indexOf(arg.charAt(0)) >= 0;
   }
 
-  private ParameterDescription getDescriptionFor(String arg) {
-    for (ParameterDescription p : m_descriptions.values()) {
-      for (String n : p.getParameter().names()) {
-        if (arg.startsWith(n)) {
-          return p;
-        }
-      }
+  private ParameterDescription getPrefixDescriptionFor(String arg) {
+    for (Map.Entry<String, ParameterDescription> es : m_descriptions.entrySet()) {
+      if (arg.startsWith(es.getKey())) return es.getValue();
     }
+
+    return null;
+  }
+
+  /**
+   * If arg is an option, we can look it up directly, but if it's a value,
+   * we need to find the description for the option that precedes it.
+   */
+  private ParameterDescription getDescriptionFor(String[] args, String arg) {
+    ParameterDescription result = getPrefixDescriptionFor(arg);
+    if (result != null) return result;
+
+    for (String a : args) {
+      ParameterDescription pd = getPrefixDescriptionFor(arg);
+      if (pd != null) result = pd;
+      if (a.equals(arg)) return result;
+    }
+
     throw new ParameterException("Unknown parameter: " + arg);
   }
 
-  private String getSeparatorFor(String arg) {
-    ParameterDescription pd = getDescriptionFor(arg);
-    Parameters p = pd.getObject().getClass().getAnnotation(Parameters.class);
-    if (p != null) return p.separators();
-    else return " ";
+  private String getSeparatorFor(String[] args, String arg) {
+    ParameterDescription pd = getDescriptionFor(args, arg);
+
+    // Could be null if only main parameters were passed
+    if (pd != null) {
+      Parameters p = pd.getObject().getClass().getAnnotation(Parameters.class);
+      if (p != null) return p.separators();
+    }
+
+    return " ";
   }
 
-  private String getOptionPrefixes() {
-    Parameters p = m_objects.get(0).getClass().getAnnotation(Parameters.class);
-    if (p != null) return p.optionPrefixes();
-    else return Parameters.DEFAULT_OPTION_PREFIXES;
+  private String getOptionPrefixes(String[] args, String arg) {
+    ParameterDescription pd = getDescriptionFor(args, arg);
+
+    // Could be null if only main parameters were passed
+    if (pd != null) {
+      Parameters p = pd.getObject().getClass()
+          .getAnnotation(Parameters.class);
+      if (p != null) return p.optionPrefixes();
+    }
+
+    return Parameters.DEFAULT_OPTION_PREFIXES;
   }
 
   /**
@@ -340,7 +380,7 @@ public class JCommander {
       p("Parsing arg:" + a);
 //      ParameterDescription previousDescription = null;
 
-      if (isOption(a)) {
+      if (isOption(args, a)) {
           ParameterDescription pd = m_descriptions.get(a);
 //        ParameterDescription pd = null;
 //

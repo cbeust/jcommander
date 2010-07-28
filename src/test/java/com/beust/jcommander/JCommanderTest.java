@@ -290,13 +290,9 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-//    for (Object[] p : f()) {
-//      int tc = JCommander.getTabCount((Integer) p[0], (Integer) p[1]);
-//      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
-//    }
-//    new DefaultProviderTest().propertyFileDefaultProvider1();
+    new JCommanderTest().separatorBoth();
+//    new DefaultProviderTest().defaultProvider1();
 //    new JCommander(new Args1(), "foo");
-    new JCommanderTest().converterArgs();
 //    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
