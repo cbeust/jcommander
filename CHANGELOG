@@ -1,9 +1,10 @@
 1.4
 
+Added string converter factories
 Added IDefaultProvider
 Added PropertyFileDefaultProvider
 Usage is now showing required parameters and default value
-Added "--"
+Support for values that look like parameters ("-integer -3", "/file /tmp/a")
 
 1.2
 2010/08/25

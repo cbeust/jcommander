@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -199,11 +198,7 @@ public class JCommander {
     for (int i = 0; i < vResult1.size(); i++) {
       String arg = vResult1.get(i);
       String[] v1 = vResult1.toArray(new String[0]);
-      // TODO: make sure it's really an option and not that it starts with "-"
-      if ("--".equals(arg)) {
-        vResult2.add(arg);
-        vResult2.add(vResult1.get(++i));
-      } else if (isOption(v1, arg)) {
+      if (isOption(v1, arg)) {
         String sep = getSeparatorFor(v1, arg);
         if (! " ".equals(sep)) {
           String[] sp = arg.split("[" + sep + "]");
@@ -222,8 +217,6 @@ public class JCommander {
   }
 
   private boolean isOption(String[] args, String arg) {
-    if ("--".equals(arg)) return false;
-
     String prefixes = getOptionPrefixes(args, arg);
     return prefixes.indexOf(arg.charAt(0)) >= 0;
   }
@@ -378,34 +371,9 @@ public class JCommander {
     for (int i = 0; i < args.length; i++) {
       String a = trim(args[i]);
       p("Parsing arg:" + a);
-//      ParameterDescription previousDescription = null;
 
       if (isOption(args, a)) {
-          ParameterDescription pd = m_descriptions.get(a);
-//        ParameterDescription pd = null;
-//
-//        if ("--".equals(a)) {
-//          pd = previousDescription;
-//          i++;
-//        } else {
-//        }
-//        previousDescription = pd;
-
-        // If we don't find any description, see if the previous parameter is an int
-        // or a long, and if it is, check to see if the current arg can be parsed
-        // into a negative integer
-//        if (pd == null && pd.isNumber()) {
-//          try {
-//            Long l = Long.parseLong(a);
-//            pd = previousDescription;
-//            i--;
-//          }
-//          catch(NumberFormatException ex) {
-//            // Do nothing, we'll fall through and throw a parameter exception
-//          }
-//        }
-//
-//        previousDescription = pd;
+        ParameterDescription pd = m_descriptions.get(a);
 
         if (pd != null) {
           if (pd.getParameter().password()) {

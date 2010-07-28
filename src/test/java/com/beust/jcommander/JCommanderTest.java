@@ -267,10 +267,18 @@ public class JCommanderTest {
   @Test
   public void dashDash() {
     SlashSeparator a = new SlashSeparator();
-    String[] argv = { "/verbose", "/file", "--", "/tmp/a" };
+    String[] argv = { "/verbose", "/file", "/tmp/a" };
     new JCommander(a, argv);
     Assert.assertTrue(a.verbose);
     Assert.assertEquals(a.file, "/tmp/a");
+  }
+
+  @Test
+  public void negativeNumber() {
+    Args1 a = new Args1();
+    String[] argv = { "-verbose", "-3" };
+    new JCommander(a, argv);
+    Assert.assertEquals(a.verbose.intValue(), -3);
   }
 
   @Test
@@ -290,7 +298,7 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new JCommanderTest().separatorBoth();
+    new JCommanderTest().negativeNumber();
 //    new DefaultProviderTest().defaultProvider1();
 //    new JCommander(new Args1(), "foo");
 //    new JCommander(new CommandLineArgs2()).usage();
