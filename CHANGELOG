@@ -5,6 +5,7 @@ Added IDefaultProvider
 Added PropertyFileDefaultProvider
 Usage is now showing required parameters and default value
 Support for values that look like parameters ("-integer -3", "/file /tmp/a")
+Added @Parameters(optionPrefixes) to allow for different prefixes than "-"
 
 1.2
 2010/08/25
