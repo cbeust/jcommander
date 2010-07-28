@@ -274,9 +274,9 @@ public class JCommanderTest {
 //      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
 //    }
 //    new DefaultProviderTest().propertyFileDefaultProvider1();
-//    new JCommander(new Args1()).usage();
-    new JCommanderTest().negativeNumbers();
-//    new JCommander(new CommandLineArgs2()).usage();
+//    new JCommander(new Args1(), "foo");
+//    new JCommanderTest().negativeNumbers();
+    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };

@@ -455,15 +455,27 @@ public class JCommander {
     });
 
     // Display all the names and descriptions at the right tab position
+    StringBuilder out = new StringBuilder();
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
       StringBuilder tabs = new StringBuilder();
       for (int i = 0; i < spaceCount; i++) tabs.append(" ");
-      System.out.println("  "
+      out.append("  "
           + (pd.getParameter().required() ? "* " : "  ")
           + pd.getNames() + tabs + pd.getDescription());
+      try {
+        Object def = pd.getField().get(pd.getObject());
+        if (def != null) out.append(" (default: " + def + ")");
+      } catch (IllegalArgumentException e) {
+        // ignore
+      } catch (IllegalAccessException e) {
+        // ignore
+      }
+      out.append("\n");
     }
+
+    System.out.println(out);
   }
 
   /**
