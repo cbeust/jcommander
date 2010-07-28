@@ -272,29 +272,6 @@ public class JCommanderTest {
     Assert.assertEquals(a.l, -4);
   }
 
-  private static final Map<Class, Class<? extends IStringConverter<?>>> MAP = new HashMap() {{
-    put(File.class, FileConverter.class);
-  }};
-
-  private static final IStringConverterFactory CONVERTER_FACTORY = new IStringConverterFactory() {
-
-    @Override
-    public Class<? extends IStringConverter<?>> getConverter(Class forType) {
-      return MAP.get(forType);
-    }
-    
-  };
-
-  @Test
-  public void converterFactory() {
-    ArgsConverterFactory a = new ArgsConverterFactory();
-    JCommander jc = new JCommander(a);
-    jc.addConverterFactory(CONVERTER_FACTORY);
-    jc.parse("-file", "/tmp/a");
-
-    Assert.assertEquals(a.file.getName(), "a");
-  }
-
   @Test
   public void requiredMainParameters() {
     //

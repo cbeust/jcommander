@@ -3,10 +3,12 @@ package com.beust.jcommander.internal;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.IStringConverterFactory;
 import com.beust.jcommander.converters.BooleanConverter;
+import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.converters.IntegerConverter;
 import com.beust.jcommander.converters.LongConverter;
 import com.beust.jcommander.converters.StringConverter;
 
+import java.io.File;
 import java.util.Map;
 
 public class DefaultConverterFactory implements IStringConverterFactory {
@@ -24,6 +26,7 @@ public class DefaultConverterFactory implements IStringConverterFactory {
     m_classConverters.put(long.class, LongConverter.class);
     m_classConverters.put(Boolean.class, BooleanConverter.class);
     m_classConverters.put(boolean.class, BooleanConverter.class);
+    m_classConverters.put(File.class, FileConverter.class);
   }
 
   public Class<? extends IStringConverter<?>> getConverter(Class forType) {

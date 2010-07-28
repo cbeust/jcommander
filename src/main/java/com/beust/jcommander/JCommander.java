@@ -84,7 +84,7 @@ public class JCommander {
   /**
    * The factories used to look up string converters.
    */
-  private List<IStringConverterFactory> m_converterFactories = new ArrayList() {{
+  private static List<IStringConverterFactory> CONVERTER_FACTORIES = new ArrayList() {{
     add(new DefaultConverterFactory());
   }};
 
@@ -522,11 +522,11 @@ public class JCommander {
   }
 
   public void addConverterFactory(IStringConverterFactory converterFactory) {
-    m_converterFactories.add(converterFactory);
+    CONVERTER_FACTORIES.add(converterFactory);
   }
 
   public Class<? extends IStringConverter<Object>> findConverter(Class<?> cls) {
-    for (IStringConverterFactory f : m_converterFactories) {
+    for (IStringConverterFactory f : CONVERTER_FACTORIES) {
       Class<? extends IStringConverter<Object>> result = f.getConverter(cls);
       if (result != null) return result;
     }
