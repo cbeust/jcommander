@@ -421,7 +421,9 @@ public class JCommander {
       int spaceCount = longestName - l;
       StringBuilder tabs = new StringBuilder();
       for (int i = 0; i < spaceCount; i++) tabs.append(" ");
-      System.out.println("    " + pd.getNames() + tabs + pd.getDescription());
+      System.out.println("  "
+          + (pd.getParameter().required() ? "* " : "  ")
+          + pd.getNames() + tabs + pd.getDescription());
     }
   }
 

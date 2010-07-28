@@ -259,8 +259,8 @@ public class JCommanderTest {
 //      int tc = JCommander.getTabCount((Integer) p[0], (Integer) p[1]);
 //      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
 //    }
-    new DefaultProviderTest().propertyFileDefaultProvider1();
-//    new JCommander(new CommandLineArgs2()).usage();
+//    new DefaultProviderTest().propertyFileDefaultProvider1();
+    new JCommander(new Args1()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };
