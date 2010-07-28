@@ -265,7 +265,7 @@ public class JCommanderTest {
   }
 
   @Test
-  public void dashDash() {
+  public void slashParameters() {
     SlashSeparator a = new SlashSeparator();
     String[] argv = { "/verbose", "/file", "/tmp/a" };
     new JCommander(a, argv);
