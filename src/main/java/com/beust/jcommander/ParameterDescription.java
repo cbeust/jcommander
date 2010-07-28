@@ -1,9 +1,6 @@
 package com.beust.jcommander;
 
 
-import com.beust.jcommander.converters.BooleanConverter;
-import com.beust.jcommander.converters.IntegerConverter;
-import com.beust.jcommander.converters.LongConverter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.Lists;
@@ -12,10 +9,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 

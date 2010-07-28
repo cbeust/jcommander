@@ -8,5 +8,5 @@ package com.beust.jcommander;
  * @author cbeust
  */
 public interface IStringConverterFactory {
-  <T> Class<? extends IStringConverter<T>> getConverter(Class forType);
+  <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType);
 }
