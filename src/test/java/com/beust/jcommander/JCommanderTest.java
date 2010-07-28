@@ -1,5 +1,22 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.args.Args1;
+import com.beust.jcommander.args.Args2;
+import com.beust.jcommander.args.ArgsArityString;
+import com.beust.jcommander.args.ArgsBooleanArity;
+import com.beust.jcommander.args.ArgsConverter;
+import com.beust.jcommander.args.ArgsConverterFactory;
+import com.beust.jcommander.args.ArgsI18N1;
+import com.beust.jcommander.args.ArgsI18N2;
+import com.beust.jcommander.args.ArgsI18N2New;
+import com.beust.jcommander.args.ArgsMaster;
+import com.beust.jcommander.args.ArgsMultipleUnparsed;
+import com.beust.jcommander.args.ArgsPrivate;
+import com.beust.jcommander.args.ArgsSlave;
+import com.beust.jcommander.args.ArgsSlaveBogus;
+import com.beust.jcommander.args.SeparatorColon;
+import com.beust.jcommander.args.SeparatorEqual;
+import com.beust.jcommander.args.SeparatorMixed;
 import com.beust.jcommander.converters.FileConverter;
 
 import org.testng.Assert;

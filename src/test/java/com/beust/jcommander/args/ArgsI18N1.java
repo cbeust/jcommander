@@ -1,4 +1,6 @@
-package com.beust.jcommander;
+package com.beust.jcommander.args;
+
+import com.beust.jcommander.Parameter;
 
 public class ArgsI18N1 {
 

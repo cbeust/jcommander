@@ -1,5 +1,6 @@
-package com.beust.jcommander;
+package com.beust.jcommander.args;
 
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.CommaSeparatedConverter;
 import com.beust.jcommander.converters.FileConverter;
 
@@ -9,8 +10,8 @@ import java.util.List;
 public class ArgsConverter {
 
   @Parameter(names = "-file", converter = FileConverter.class)
-  File file;
+  public File file;
 
   @Parameter(names = "-days", converter = CommaSeparatedConverter.class)
-  List<String> days;
+  public List<String> days;
 }

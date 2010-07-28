@@ -1,15 +1,17 @@
-package com.beust.jcommander;
+package com.beust.jcommander.args;
+
+import com.beust.jcommander.Parameter;
 
 import org.testng.collections.Lists;
 
 import java.util.List;
 
-public class Args1 {
+public class ArgsDefault {
   @Parameter
   public List<String> parameters = Lists.newArrayList();
 
-  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity", required = true)
-  public Integer verbose = 1;
+  @Parameter(names = "-log", description = "Level of verbosity")
+  public Integer log = 1;
 
   @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
   public String groups;
@@ -17,6 +19,7 @@ public class Args1 {
   @Parameter(names = "-debug", description = "Debug mode")
   public boolean debug = false;
 
-  @Parameter(names = "-long", description = "A long number")
-  public long l;
+  @Parameter(names = "-level", description = "A long number")
+  public long level;
+
 }

@@ -1,4 +1,7 @@
-package com.beust.jcommander;
+package com.beust.jcommander.args;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 
 @Parameters(resourceBundle = "MessageBundle")
 public class ArgsI18N2New {

@@ -1,5 +1,6 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.args.ArgsDefault;
 import com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider;
 
 import org.testng.Assert;

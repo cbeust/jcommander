@@ -1,5 +1,6 @@
-package com.beust.jcommander;
+package com.beust.jcommander.args;
 
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.internal.Lists;
 
 import java.util.List;
