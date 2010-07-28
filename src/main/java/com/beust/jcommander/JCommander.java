@@ -165,15 +165,20 @@ public class JCommander {
     for (int i = 0; i < vResult1.size(); i++) {
       String arg = vResult1.get(i);
       // TODO: make sure it's really an option and not that it starts with "-"
-      if (arg.startsWith("-")) {
-        String sep = getSeparatorFor(arg);
-        if (! " ".equals(sep)) {
-          String[] sp = arg.split("[" + sep + "]");
-          for (String ssp : sp) {
-            vResult2.add(ssp);
-          }
-        } else {
+      if (isOption(arg)) {
+        if ("--".equals(arg)) {
           vResult2.add(arg);
+          vResult2.add(vResult1.get(++i));
+        } else {
+          String sep = getSeparatorFor(arg);
+          if (! " ".equals(sep)) {
+            String[] sp = arg.split("[" + sep + "]");
+            for (String ssp : sp) {
+              vResult2.add(ssp);
+            }
+          } else {
+            vResult2.add(arg);
+          }
         }
       } else {
         vResult2.add(arg);
@@ -181,6 +186,10 @@ public class JCommander {
     }
 
     return vResult2.toArray(new String[vResult2.size()]);
+  }
+
+  private boolean isOption(String arg) {
+    return arg.startsWith("-");
   }
 
   private ParameterDescription getDescriptionFor(String arg) {
@@ -301,8 +310,35 @@ public class JCommander {
     for (int i = 0; i < args.length; i++) {
       String a = trim(args[i]);
       p("Parsing arg:" + a);
-      if (a.startsWith("-")) {
-        ParameterDescription pd = m_descriptions.get(a);
+//      ParameterDescription previousDescription = null;
+
+      if (isOption(a)) {
+          ParameterDescription pd = m_descriptions.get(a);
+//        ParameterDescription pd = null;
+//
+//        if ("--".equals(a)) {
+//          pd = previousDescription;
+//          i++;
+//        } else {
+//        }
+//        previousDescription = pd;
+
+        // If we don't find any description, see if the previous parameter is an int
+        // or a long, and if it is, check to see if the current arg can be parsed
+        // into a negative integer
+//        if (pd == null && pd.isNumber()) {
+//          try {
+//            Long l = Long.parseLong(a);
+//            pd = previousDescription;
+//            i--;
+//          }
+//          catch(NumberFormatException ex) {
+//            // Do nothing, we'll fall through and throw a parameter exception
+//          }
+//        }
+//
+//        previousDescription = pd;
+
         if (pd != null) {
           if (pd.getParameter().password()) {
             //
@@ -331,13 +367,16 @@ public class JCommander {
               // Regular parameter, use the arity to tell use how many values
               // we need to consume
               int arity = pd.getParameter().arity();
-              int n = (arity != -1 ? arity : 1);  
+              int n = (arity != -1 ? arity : 1);
+
+              int offset = "--".equals(args[i + 1]) ? 1 : 0;
+
               if (i + n < args.length) {
                 for (int j = 1; j <= n; j++) {
-                  pd.addValue(trim(args[i + j]));
+                  pd.addValue(trim(args[i + j + offset]));
                   m_requiredFields.remove(pd.getField());
                 }
-                i += n;
+                i += n + offset;
               } else {
                 throw new ParameterException(n + " parameters expected after " + args[i]);
               }

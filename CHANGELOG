@@ -3,6 +3,7 @@
 Added IDefaultProvider
 Added PropertyFileDefaultProvider
 Showing required parameters in the usage
+Added "--"
 
 1.2
 2010/08/25

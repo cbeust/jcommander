@@ -243,6 +243,20 @@ public class JCommanderTest {
     Assert.assertEquals(s.level.intValue(), 42);
   }
 
+  @Test
+  public void negativeNumbers() {
+    Args1 a = new Args1();
+    String[] argv = { "-verbose", "--", "-3", "-long", "--", "-4" };
+    new JCommander(a, argv);
+    Assert.assertEquals(a.verbose.intValue(), -3);
+    Assert.assertEquals(a.l, -4);
+  }
+
+  @Test
+  public void requiredMainParameters() {
+    //
+  }
+
   @DataProvider
   public static Object[][] f() {
     return new Integer[][] {
@@ -260,7 +274,9 @@ public class JCommanderTest {
 //      Assert.assertEquals(tc, ((Integer) p[2]).intValue());
 //    }
 //    new DefaultProviderTest().propertyFileDefaultProvider1();
-    new JCommander(new Args1()).usage();
+//    new JCommander(new Args1()).usage();
+    new JCommanderTest().negativeNumbers();
+//    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };
