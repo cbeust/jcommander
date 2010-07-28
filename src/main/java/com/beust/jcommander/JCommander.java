@@ -1,5 +1,6 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.internal.DefaultConverterFactory;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -74,7 +76,17 @@ public class JCommander {
 
   private ResourceBundle m_bundle;
 
+  /**
+   * A default provider returns default values for the parameters.
+   */
   private IDefaultProvider m_defaultProvider;
+
+  /**
+   * The factories used to look up string converters.
+   */
+  private List<IStringConverterFactory> m_converterFactories = new ArrayList() {{
+    add(new DefaultConverterFactory());
+  }};
 
   public JCommander(Object object) {
     init(object, null);
@@ -108,15 +120,24 @@ public class JCommander {
       m_objects.add(object);
     }
 
-    createDescriptions();
   }
 
   /**
    * Parse the command line parameters.
    */
   public void parse(String... args) {
+    createDescriptions();
+    initializeDefaultValues();
     parseValues(expandArgs(args));
     validateOptions();
+  }
+
+  private void initializeDefaultValues() {
+    if (m_defaultProvider != null) {
+      for (ParameterDescription pd : m_descriptions.values()) {
+        initializeDefaultValue(pd);
+      }
+    }
   }
 
   /**
@@ -282,7 +303,7 @@ public class JCommander {
                 throw new ParameterException("Found the option " + name + " multiple times");
               }
               p("Adding description for " + name);
-              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle);
+              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle, this);
               m_fields.put(f, pd);
               m_descriptions.put(name, pd);
 
@@ -498,11 +519,19 @@ public class JCommander {
    */
   public void setDefaultProvider(IDefaultProvider defaultProvider) {
     m_defaultProvider = defaultProvider;
-    if (m_defaultProvider != null) {
-      for (ParameterDescription pd : m_descriptions.values()) {
-        initializeDefaultValue(pd);
-      }
+  }
+
+  public void addConverterFactory(IStringConverterFactory converterFactory) {
+    m_converterFactories.add(converterFactory);
+  }
+
+  public Class<? extends IStringConverter<Object>> findConverter(Class<?> cls) {
+    for (IStringConverterFactory f : m_converterFactories) {
+      Class<? extends IStringConverter<Object>> result = f.getConverter(cls);
+      if (result != null) return result;
     }
+
+    return null;
   }
 }
 

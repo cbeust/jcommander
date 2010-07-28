@@ -20,20 +20,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 public class ParameterDescription {
-  /**
-   * A map of converters per class.
-   */
-  private static Map<Class<?>, Class<? extends IStringConverter<?>>> m_classConverters
-      = new HashMap() {{
-    put(String.class, StringConverter.class);
-    put(Integer.class, IntegerConverter.class);
-    put(int.class, IntegerConverter.class);
-    put(Long.class, LongConverter.class);
-    put(long.class, LongConverter.class);
-    put(Boolean.class, BooleanConverter.class);
-    put(boolean.class, BooleanConverter.class);
-  }};
-
   private Object m_object;
   private Parameter m_parameterAnnotation;
   private Field m_field;
@@ -41,10 +27,11 @@ public class ParameterDescription {
   private boolean m_assigned = false;
   private ResourceBundle m_bundle;
   private String m_description;
+  private JCommander m_jCommander;
 
   public ParameterDescription(Object object, Parameter annotation, Field field,
-      ResourceBundle bundle) {
-    init(object, annotation, field, bundle);
+      ResourceBundle bundle, JCommander jc) {
+    init(object, annotation, field, bundle, jc);
   }
 
   /**
@@ -72,7 +59,8 @@ public class ParameterDescription {
     return s == null || "".equals(s);
   }
 
-  private void init(Object object, Parameter annotation, Field field, ResourceBundle bundle) {
+  private void init(Object object, Parameter annotation, Field field, ResourceBundle bundle,
+      JCommander jCommander) {
     m_object = object;
     m_parameterAnnotation = annotation;
     m_field = field;
@@ -80,6 +68,7 @@ public class ParameterDescription {
     if (m_bundle == null) {
       m_bundle = findResourceBundle(object);
     }
+    m_jCommander = jCommander;
 
     m_description = annotation.description();
     if (! "".equals(annotation.descriptionKey())) {
@@ -141,28 +130,45 @@ public class ParameterDescription {
       throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
           + " once.");
     }
-    Class<? extends IStringConverter<?>> converterClass = m_parameterAnnotation.converter();
+
+    Class<?> type = m_field.getType();
+    Class<? extends IStringConverter<?>> converterClass = null;
+
+    //
+    // Try to find a converter on the annotation
+    //
+    converterClass = m_parameterAnnotation.converter();
     if (converterClass == NoConverter.class) {
-      converterClass = m_classConverters.get(m_field.getType());
+      converterClass = m_jCommander.findConverter(type);
     }
     if (converterClass == null && m_parameterAnnotation.arity() >= 2) {
       converterClass = StringConverter.class;
       isCollection = true;
     }
-    if (converterClass == null && Collection.class.isAssignableFrom(m_field.getType())) {
+    if (converterClass == null && Collection.class.isAssignableFrom(type)) {
       converterClass = StringConverter.class;
       isCollection = true;
     }
+
+    //
+//    //
+//    // Try to find a converter in the factory
+//    //
+//    IStringConverter<?> converter = null;
+//    if (converterClass == null && m_converterFactories != null) {
+//      // Mmmh, javac requires a cast here
+//      converter = (IStringConverter) m_converterFactories.getConverter(type);
+//    }
+
     if (converterClass == null) {
       throw new ParameterException("Don't know how to convert " + value
-          + " to type " + m_field.getType() + " (field: " + m_field.getName() + ")");
+          + " to type " + type + " (field: " + m_field.getName() + ")");
     }
 
     if (! isDefault) m_assigned = true;
 
-    IStringConverter<?> converter;
     try {
-      converter = instantiateConverter(converterClass);
+      IStringConverter<?> converter = instantiateConverter(converterClass);
       Object convertedValue = converter.convert(value);
       if (isCollection) {
         @SuppressWarnings("unchecked")

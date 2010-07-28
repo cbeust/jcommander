@@ -1,13 +1,16 @@
 package com.beust.jcommander;
 
-import com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider;
+import com.beust.jcommander.converters.FileConverter;
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class JCommanderTest {
@@ -252,6 +255,29 @@ public class JCommanderTest {
     Assert.assertEquals(a.l, -4);
   }
 
+  private static final Map<Class, Class<? extends IStringConverter<?>>> MAP = new HashMap() {{
+    put(File.class, FileConverter.class);
+  }};
+
+  private static final IStringConverterFactory CONVERTER_FACTORY = new IStringConverterFactory() {
+
+    @Override
+    public Class<? extends IStringConverter<?>> getConverter(Class forType) {
+      return MAP.get(forType);
+    }
+    
+  };
+
+  @Test
+  public void converterFactory() {
+    ArgsConverterFactory a = new ArgsConverterFactory();
+    JCommander jc = new JCommander(a);
+    jc.addConverterFactory(CONVERTER_FACTORY);
+    jc.parse("-file", "/tmp/a");
+
+    Assert.assertEquals(a.file.getName(), "a");
+  }
+
   @Test
   public void requiredMainParameters() {
     //
@@ -275,8 +301,8 @@ public class JCommanderTest {
 //    }
 //    new DefaultProviderTest().propertyFileDefaultProvider1();
 //    new JCommander(new Args1(), "foo");
-//    new JCommanderTest().negativeNumbers();
-    new JCommander(new CommandLineArgs2()).usage();
+    new DefaultProviderTest().defaultProvider1();
+//    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };
