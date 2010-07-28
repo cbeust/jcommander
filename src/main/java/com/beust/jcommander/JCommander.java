@@ -186,20 +186,18 @@ public class JCommander {
     for (int i = 0; i < vResult1.size(); i++) {
       String arg = vResult1.get(i);
       // TODO: make sure it's really an option and not that it starts with "-"
-      if (isOption(arg)) {
-        if ("--".equals(arg)) {
-          vResult2.add(arg);
-          vResult2.add(vResult1.get(++i));
-        } else {
-          String sep = getSeparatorFor(arg);
-          if (! " ".equals(sep)) {
-            String[] sp = arg.split("[" + sep + "]");
-            for (String ssp : sp) {
-              vResult2.add(ssp);
-            }
-          } else {
-            vResult2.add(arg);
+      if ("--".equals(arg)) {
+        vResult2.add(arg);
+        vResult2.add(vResult1.get(++i));
+      } else if (isOption(arg)) {
+        String sep = getSeparatorFor(arg);
+        if (! " ".equals(sep)) {
+          String[] sp = arg.split("[" + sep + "]");
+          for (String ssp : sp) {
+            vResult2.add(ssp);
           }
+        } else {
+          vResult2.add(arg);
         }
       } else {
         vResult2.add(arg);
@@ -210,7 +208,10 @@ public class JCommander {
   }
 
   private boolean isOption(String arg) {
-    return arg.startsWith("-");
+    if ("--".equals(arg)) return false;
+
+    String prefixes = getOptionPrefixes();
+    return prefixes.indexOf(arg.charAt(0)) >= 0;
   }
 
   private ParameterDescription getDescriptionFor(String arg) {
@@ -229,6 +230,12 @@ public class JCommander {
     Parameters p = pd.getObject().getClass().getAnnotation(Parameters.class);
     if (p != null) return p.separators();
     else return " ";
+  }
+
+  private String getOptionPrefixes() {
+    Parameters p = m_objects.get(0).getClass().getAnnotation(Parameters.class);
+    if (p != null) return p.optionPrefixes();
+    else return Parameters.DEFAULT_OPTION_PREFIXES;
   }
 
   /**

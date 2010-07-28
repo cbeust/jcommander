@@ -17,6 +17,7 @@ import com.beust.jcommander.args.ArgsSlaveBogus;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
+import com.beust.jcommander.args.SlashSeparator;
 import com.beust.jcommander.converters.FileConverter;
 
 import org.testng.Assert;
@@ -264,12 +265,12 @@ public class JCommanderTest {
   }
 
   @Test
-  public void negativeNumbers() {
-    Args1 a = new Args1();
-    String[] argv = { "-verbose", "--", "-3", "-long", "--", "-4" };
+  public void dashDash() {
+    SlashSeparator a = new SlashSeparator();
+    String[] argv = { "/verbose", "/file", "--", "/tmp/a" };
     new JCommander(a, argv);
-    Assert.assertEquals(a.verbose.intValue(), -3);
-    Assert.assertEquals(a.l, -4);
+    Assert.assertTrue(a.verbose);
+    Assert.assertEquals(a.file, "/tmp/a");
   }
 
   @Test
@@ -295,7 +296,7 @@ public class JCommanderTest {
 //    }
 //    new DefaultProviderTest().propertyFileDefaultProvider1();
 //    new JCommander(new Args1(), "foo");
-    new DefaultProviderTest().defaultProvider1();
+    new JCommanderTest().converterArgs();
 //    new JCommander(new CommandLineArgs2()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
