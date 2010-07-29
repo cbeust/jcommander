@@ -464,6 +464,8 @@ public class JCommander {
    * Display a the help on System.out.
    */
   public void usage() {
+    if (m_descriptions == null) createDescriptions();
+
     StringBuilder sb = new StringBuilder("Usage: <main class> [options]");
     if (m_mainParameterAnnotation != null) {
       sb.append(" " + m_mainParameterAnnotation.description());

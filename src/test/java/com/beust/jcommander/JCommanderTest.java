@@ -5,7 +5,6 @@ import com.beust.jcommander.args.Args2;
 import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
 import com.beust.jcommander.args.ArgsConverter;
-import com.beust.jcommander.args.ArgsConverterFactory;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
@@ -18,17 +17,14 @@ import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
 import com.beust.jcommander.args.SlashSeparator;
-import com.beust.jcommander.converters.FileConverter;
 
 import org.testng.Assert;
+import org.testng.CommandLineArgs;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class JCommanderTest {
@@ -298,10 +294,10 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new JCommanderTest().negativeNumber();
+//    new JCommanderTest().negativeNumber();
 //    new DefaultProviderTest().defaultProvider1();
 //    new JCommander(new Args1(), "foo");
-//    new JCommander(new CommandLineArgs2()).usage();
+    new JCommander(new Args1()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };

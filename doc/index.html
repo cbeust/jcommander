@@ -145,7 +145,9 @@ Value for -password (Connection password):
 
 You will need to type the value at this point before JCommander resumes.
 
-<h4>Custom types</h4>
+<h2 id="Custom_types">Custom types</h2>
+
+<h3>By annotation</h3>
 
 By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types, such as files, host names, lists, etc... To achieve this, you can write a type converter by implementing the following interface:
 
@@ -175,7 +177,84 @@ File file;
 
 JCommander ships with a few common converters (e.g. one that turns a comma separated list into a <tt>List&lt;String&gt;)</tt>.
 
-<h4>Main parameter</h4>
+<h3>By factory</h3>
+
+If the custom types you use appear multiple times in your application, having to specify the converter in each annotation can become tedious. To address this, you can use an <tt>IStringConverterFactory</tt>:
+
+<pre class="brush: java">
+public interface IStringConverterFactory {
+  &lt;T&gt; Class&lt;? extends IStringConverter&lt;T&gt;&gt; getConverter(Class&lt;T&gt; forType);
+}
+</pre>
+
+For example, suppose you need to parse a string representing a host and a port:
+
+<pre class="brush: bash">
+java App -target example.com:8080
+</pre>
+
+You define the holder class :
+
+<pre class="brush: java">
+public class HostPort {
+  public String host;
+  public Integer port;
+}
+</pre>
+
+and the string converter to create instances of this class:
+
+<pre class="brush: java">
+class HostPortConverter implements IStringConverter&lt;HostPort&gt; {
+  @Override
+  public HostPort convert(String value) {
+    HostPort result = new HostPort();
+    String[] s = value.split(":");
+    result.host = s[0];
+    result.port = Integer.parseInt(s[1]);
+
+    return result;
+  }
+}
+</pre>
+
+The factory is straightforward:
+
+<pre class="brush: java">
+public class Factory implements IStringConverterFactory {
+  public Class<? extends IStringConverter<?>> getConverter(Class forType) {
+    if (forType.equals(HostPort.class)) return HostPortConverter.class;
+    else return null;
+  }
+</pre>
+
+You can now use the type <tt>HostPort</tt> as a parameter without any <tt>converterClass</tt> attribute:
+
+<pre class="brush: java">
+public class ArgsConverterFactory {
+  @Parameter(names = "-hostport")
+  public HostPort hostPort;
+}
+</pre>
+
+
+All you need to do is add the factory to your JCommander object:
+
+<pre class="brush: java">
+  ArgsConverterFactory a = new ArgsConverterFactory();
+  JCommander jc = new JCommander(a);
+  jc.addConverterFactory(new Factory());
+  jc.parse("-hostport", "example.com:8080");
+
+  Assert.assertEquals(a.hostPort.host, "example.com");
+  Assert.assertEquals(a.hostPort.port.intValue(), 8080);
+</pre>
+
+
+Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
+
+
+<h2 id="Main_parameter">Main parameter</h2>
 So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
 
 <pre class="brush: java">
@@ -357,6 +436,49 @@ If some of your parameters are mandatory, you can use the
 If this parameter is not specified, JCommander will throw an exception
 telling you which options are missing.
 
+<h2 id="Default_values">Default values</h2>
+
+The most common way to specify a default value for your parameters is to initialize the field at declaration time:
+
+<pre class="brush: java">
+private Integer logLevel = 3;
+</pre>
+
+For more complicated cases, you might want to be able to reuse identical default values across several main classes or be able to specify these default values in a centralized location such as a .properties or an XML fie. In this case, you can use an <tt>IDefaultProvider</tt>
+
+<pre class="brush: java">
+public interface IDefaultProvider {
+  /**
+   * @param optionName The name of the option as specified in the names() attribute
+   * of the @Parameter option (e.g. "-file").
+   * 
+   * @return the default value for this option.
+   */
+  String getDefaultValueFor(String optionName);
+}
+</pre>
+
+By passing an implementation of this interface to your <tt>JCommander</tt> object, you can now control which default value will be used for your options. Note that the value returned by this method will then be passed to a string converter, if any is applicable, thereby allowing you to specify default values for any types you need.
+
+<p>
+
+For example, here is a default provider that will assign a default value of 42 for all your parameters except "-debug":
+
+<pre class="brush: java">
+private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
+  @Override
+  public String getDefaultValueFor(String optionName) {
+    return "-debug".equals(optionName) ? "false" : "42";
+  }
+};
+
+// ...
+
+JCommander jc = new JCommander(new Args());
+jc.setDefaultProvider(DEFAULT_PROVIDER);
+</pre>
+
+
 <h2 id="Exceptions">Exception</h2>
 
 Whenever JCommander detects an error, it will throw a
@@ -370,12 +492,16 @@ point.
 You can invoke <tt>usage()</tt> on the <tt>JCommander</tt> instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
 
 <pre class="brush: bash">
-Usage:
-	-port			The port number
-	-debug			Debug mode
-	-src, --sources The source directory
-	-testclass		List of classes
+
+Usage: &lt;main class&gt; [options] 
+  Options:
+    -debug          Debug mode (default: false)
+    -groups         Comma-separated list of group names to be run
+  * -log, -verbose  Level of verbosity (default: 1)
+    -long           A long number (default: 0)
 </pre>
+
+Options preceded by an asterisk are required.
 
 <h2 id="Hiding">Hiding parameters</h2>
 
