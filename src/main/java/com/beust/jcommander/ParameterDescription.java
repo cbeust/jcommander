@@ -120,51 +120,41 @@ public class ParameterDescription {
   public void addValue(String value, boolean isDefault) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_field.getName());
-    boolean isCollection = false;
     if (m_assigned && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
           + " once.");
     }
 
     Class<?> type = m_field.getType();
-    Class<? extends IStringConverter<?>> converterClass = null;
-
-    //
-    // Try to find a converter on the annotation
-    //
-    converterClass = m_parameterAnnotation.converter();
-    if (converterClass == NoConverter.class) {
-      converterClass = m_jCommander.findConverter(type);
-    }
-    if (converterClass == null && m_parameterAnnotation.arity() >= 2) {
-      converterClass = StringConverter.class;
-      isCollection = true;
-    }
-    if (converterClass == null && Collection.class.isAssignableFrom(type)) {
-      converterClass = StringConverter.class;
-      isCollection = true;
-    }
-
-    //
+//    Class<? extends IStringConverter<?>> converterClass = null;
+//
 //    //
-//    // Try to find a converter in the factory
+//    // Try to find a converter on the annotation
 //    //
-//    IStringConverter<?> converter = null;
-//    if (converterClass == null && m_converterFactories != null) {
-//      // Mmmh, javac requires a cast here
-//      converter = (IStringConverter) m_converterFactories.getConverter(type);
+//    converterClass = m_parameterAnnotation.converter();
+//    if (converterClass == NoConverter.class) {
+//      converterClass = m_jCommander.findConverter(type);
+//    }
+//    if (converterClass == null && m_parameterAnnotation.arity() >= 2) {
+//      converterClass = StringConverter.class;
+//      isCollection = true;
+//    }
+//    if (converterClass == null && Collection.class.isAssignableFrom(type)) {
+//      converterClass = StringConverter.class;
+//      isCollection = true;
+//    }
+//
+//    if (converterClass == null) {
+//      throw new ParameterException("Don't know how to convert " + value
+//          + " to type " + type + " (field: " + m_field.getName() + ")");
 //    }
 
-    if (converterClass == null) {
-      throw new ParameterException("Don't know how to convert " + value
-          + " to type " + type + " (field: " + m_field.getName() + ")");
-    }
-
     if (! isDefault) m_assigned = true;
+    Object convertedValue = m_jCommander.convertValue(this, value);
+    boolean isCollection = Collection.class.isAssignableFrom(type);
+    boolean isMainParameter = m_parameterAnnotation.names().length == 0;
 
     try {
-      IStringConverter<?> converter = instantiateConverter(converterClass);
-      Object convertedValue = converter.convert(value);
       if (isCollection) {
         @SuppressWarnings("unchecked")
         List<Object> l = (List<Object>) m_field.get(m_object);
@@ -172,18 +162,19 @@ public class ParameterDescription {
           l = Lists.newArrayList();
           m_field.set(m_object, l);
         }
-        l.add(convertedValue);
+        if (convertedValue instanceof Collection) {
+          l.addAll((Collection) convertedValue);
+        } else { // if (isMainParameter || m_parameterAnnotation.arity() > 1) {
+          l.add(convertedValue);
+//        } else {
+//          l.
+        }
       } else {
         m_field.set(m_object, convertedValue);
       }
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (IllegalArgumentException e) {
-      e.printStackTrace();
+    }
+    catch(IllegalAccessException ex) {
+      ex.printStackTrace();
     }
   }
 
@@ -191,30 +182,6 @@ public class ParameterDescription {
     Class<?> type = m_field.getType();
     return type.equals(Integer.class) || type.equals(int.class)
         || type.equals(Long.class) || type.equals(long.class);
-  }
-
-  private IStringConverter<?> instantiateConverter(
-      Class<? extends IStringConverter<?>> converterClass)
-      throws IllegalArgumentException, InstantiationException, IllegalAccessException,
-      InvocationTargetException {
-    Constructor<IStringConverter<?>> ctor = null;
-    Constructor<IStringConverter<?>> stringCtor = null;
-    Constructor<IStringConverter<?>>[] ctors
-        = (Constructor<IStringConverter<?>>[]) converterClass.getDeclaredConstructors();
-    for (Constructor<IStringConverter<?>> c : ctors) {
-      Class<?>[] types = c.getParameterTypes();
-      if (types.length == 1 && types[0].equals(String.class)) {
-        stringCtor = c;
-      } else if (types.length == 0) {
-        ctor = c;
-      }
-    }
-
-    IStringConverter<?> result = stringCtor != null
-        ? stringCtor.newInstance(m_parameterAnnotation.names()[0])
-        : ctor.newInstance();
-
-        return result;
   }
 
   private void p(String string) {

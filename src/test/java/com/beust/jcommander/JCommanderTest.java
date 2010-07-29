@@ -8,6 +8,7 @@ import com.beust.jcommander.args.ArgsConverter;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
+import com.beust.jcommander.args.ArgsMainParameter;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
 import com.beust.jcommander.args.ArgsPrivate;
@@ -293,10 +294,13 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-//    new JCommanderTest().negativeNumber();
+    new JCommanderTest().listParameters();
+    new JCommanderTest().converterArgs();
 //    new DefaultProviderTest().defaultProvider1();
-//    new JCommander(new Args1(), "foo");
-    new JCommander(new Args1()).usage();
+//    ArgsMainParameter a = new ArgsMainParameter();
+//    new JCommander(a, "ex1:10", "ex2:20");
+//    System.out.println(a.parameters.get(0).host);
+//    new JCommander(new Args1()).usage();
 //    Separator a = new Separator();
 //    String[] argv = new String[] { "-n", "foo" };
 //    String[] argv = new String[] { "-v", "t" };

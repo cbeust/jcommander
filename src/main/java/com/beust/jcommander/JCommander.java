@@ -1,5 +1,7 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.converters.NoConverter;
+import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.DefaultConverterFactory;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
@@ -9,8 +11,12 @@ import java.io.Console;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -97,6 +103,7 @@ public class JCommander {
     init(object, bundle);
     parse(args);
   }
+
 
   public JCommander(Object object, String... args) {
     init(object, null);
@@ -425,7 +432,17 @@ public class JCommander {
         }
       }
       else {
-        if (! isStringEmpty(args[i])) getMainParameter(args[i]).add(args[i]);
+        if (! isStringEmpty(args[i])) {
+          List mp = getMainParameter(args[i]);
+          Object value = args[i];
+
+          if (m_mainParameterField.getGenericType() instanceof ParameterizedType) {
+            ParameterizedType p = (ParameterizedType) m_mainParameterField.getGenericType();
+            System.out.println("Generic type:" + p.getActualTypeArguments()[0]);
+          }
+
+          mp.add(value);
+        }
       }
     }
   }
@@ -440,7 +457,7 @@ public class JCommander {
    * @param arg the arg that we're about to add (only passed here to ouput a meaningful
    * error message).
    */
-  private List<String> getMainParameter(String arg) {
+  private List<?> getMainParameter(String arg) {
     if (m_mainParameterField == null) {
       throw new ParameterException(
           "Was passed main parameter '" + arg + "' but no main parameter was defined");
@@ -448,7 +465,7 @@ public class JCommander {
 
     try {
       @SuppressWarnings("unchecked")
-      List<String> result = (List<String>) m_mainParameterField.get(m_mainParameterObject);
+      List<?> result = (List<?>) m_mainParameterField.get(m_mainParameterObject);
       if (result == null) {
         result = Lists.newArrayList();
         m_mainParameterField.set(m_mainParameterObject, result);
@@ -551,6 +568,86 @@ public class JCommander {
     }
 
     return null;
+  }
+
+  public Object convertValue(ParameterDescription pd, String value) {
+    Parameter annotation = pd.getParameter();
+    Class<?> type = pd.getField().getType();
+    Class<? extends IStringConverter<?>> converterClass = annotation.converter();
+
+    //
+    // Try to find a converter on the annotation
+    //
+    boolean isCollection = false;
+
+    if (converterClass == null || converterClass == NoConverter.class) {
+      converterClass = findConverter(type);
+    }
+    if (converterClass == null) {
+      converterClass = StringConverter.class;
+      isCollection = true;
+    }
+    if (converterClass == null && Collection.class.isAssignableFrom(type)) {
+      converterClass = StringConverter.class;
+      isCollection = true;
+    }
+
+    //
+//    //
+//    // Try to find a converter in the factory
+//    //
+//    IStringConverter<?> converter = null;
+//    if (converterClass == null && m_converterFactories != null) {
+//      // Mmmh, javac requires a cast here
+//      converter = (IStringConverter) m_converterFactories.getConverter(type);
+//    }
+
+    if (converterClass == null) {
+      throw new ParameterException("Don't know how to convert " + value
+          + " to type " + type + " (field: " + pd.getField().getName() + ")");
+    }
+
+    IStringConverter<?> converter;
+    Object result = null;
+    try {
+      String optionName = annotation.names()[0];
+      converter = instantiateConverter(optionName, converterClass);
+      result = converter.convert(value);
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (InstantiationException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (InvocationTargetException e) {
+      e.printStackTrace();
+    }
+
+    return result;
+  }
+
+  private IStringConverter<?> instantiateConverter(String optionName,
+      Class<? extends IStringConverter<?>> converterClass)
+      throws IllegalArgumentException, InstantiationException, IllegalAccessException,
+      InvocationTargetException {
+    Constructor<IStringConverter<?>> ctor = null;
+    Constructor<IStringConverter<?>> stringCtor = null;
+    Constructor<IStringConverter<?>>[] ctors
+        = (Constructor<IStringConverter<?>>[]) converterClass.getDeclaredConstructors();
+    for (Constructor<IStringConverter<?>> c : ctors) {
+      Class<?>[] types = c.getParameterTypes();
+      if (types.length == 1 && types[0].equals(String.class)) {
+        stringCtor = c;
+      } else if (types.length == 0) {
+        ctor = c;
+      }
+    }
+
+    IStringConverter<?> result = stringCtor != null
+        ? stringCtor.newInstance(optionName)
+        : ctor.newInstance();
+
+        return result;
   }
 }
 
