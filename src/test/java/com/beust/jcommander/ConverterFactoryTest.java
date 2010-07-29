@@ -1,6 +1,7 @@
 package com.beust.jcommander;
 
 import com.beust.jcommander.args.ArgsConverterFactory;
+import com.beust.jcommander.args.ArgsMainParameter;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -36,6 +37,18 @@ public class ConverterFactoryTest {
 
     Assert.assertEquals(a.hostPort.host, "example.com");
     Assert.assertEquals(a.hostPort.port.intValue(), 8080);
+  }
+
+  @Test
+  public void mainWithHostPortParameters() {
+    ArgsMainParameter a = new ArgsMainParameter();
+    JCommander jc = new JCommander(a);
+    jc.addConverterFactory(CONVERTER_FACTORY);
+    jc.parse("a.com:10", "b.com:20");
+    Assert.assertEquals(a.parameters.get(0).host, "a.com");
+    Assert.assertEquals(a.parameters.get(0).port.intValue(), 10);
+    Assert.assertEquals(a.parameters.get(1).host, "b.com");
+    Assert.assertEquals(a.parameters.get(1).port.intValue(), 20);
   }
 
 }

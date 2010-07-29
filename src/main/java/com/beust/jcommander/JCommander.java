@@ -15,6 +15,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -434,14 +435,18 @@ public class JCommander {
       else {
         if (! isStringEmpty(args[i])) {
           List mp = getMainParameter(args[i]);
-          Object value = args[i];
+          String value = args[i];
+          Object convertedValue = value;
 
           if (m_mainParameterField.getGenericType() instanceof ParameterizedType) {
             ParameterizedType p = (ParameterizedType) m_mainParameterField.getGenericType();
-            System.out.println("Generic type:" + p.getActualTypeArguments()[0]);
+            Type cls = p.getActualTypeArguments()[0];
+            if (cls instanceof Class) {
+              convertedValue = convertValue(m_mainParameterField, (Class) cls, value);
+            }
           }
 
-          mp.add(value);
+          mp.add(convertedValue);
         }
       }
     }
@@ -571,25 +576,29 @@ public class JCommander {
   }
 
   public Object convertValue(ParameterDescription pd, String value) {
-    Parameter annotation = pd.getParameter();
-    Class<?> type = pd.getField().getType();
+    return convertValue(pd.getField(), pd.getField().getType(), value);
+  }
+
+  /**
+   * @param type The class of the field
+   * @param annotation The annotation
+   * @param value The value to convert
+   */
+  public Object convertValue(Field field, Class type, String value) {
+    Parameter annotation = field.getAnnotation(Parameter.class);
     Class<? extends IStringConverter<?>> converterClass = annotation.converter();
 
     //
     // Try to find a converter on the annotation
     //
-    boolean isCollection = false;
-
     if (converterClass == null || converterClass == NoConverter.class) {
       converterClass = findConverter(type);
     }
     if (converterClass == null) {
       converterClass = StringConverter.class;
-      isCollection = true;
     }
     if (converterClass == null && Collection.class.isAssignableFrom(type)) {
       converterClass = StringConverter.class;
-      isCollection = true;
     }
 
     //
@@ -604,13 +613,14 @@ public class JCommander {
 
     if (converterClass == null) {
       throw new ParameterException("Don't know how to convert " + value
-          + " to type " + type + " (field: " + pd.getField().getName() + ")");
+          + " to type " + type + " (field: " + field.getName() + ")");
     }
 
     IStringConverter<?> converter;
     Object result = null;
     try {
-      String optionName = annotation.names()[0];
+      String[] names = annotation.names();
+      String optionName = names.length > 0 ? names[0] : "[Main class]";
       converter = instantiateConverter(optionName, converterClass);
       result = converter.convert(value);
     } catch (IllegalArgumentException e) {
