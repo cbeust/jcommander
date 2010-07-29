@@ -118,7 +118,7 @@ public class ParameterDescription {
    * @param markAdded if true, mark this parameter as assigned
    */
   public void addValue(String value, boolean isDefault) {
-    log("Adding " + (isDefault ? "default " : "") + "value:" + value
+    p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_field.getName());
     boolean isCollection = false;
     if (m_assigned && ! isMultiOption()) {
@@ -217,7 +217,7 @@ public class ParameterDescription {
         return result;
   }
 
-  private void log(String string) {
+  private void p(String string) {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
       System.out.println("[ParameterDescription] " + string);
     }
