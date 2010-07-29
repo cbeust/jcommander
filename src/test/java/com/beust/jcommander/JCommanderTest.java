@@ -19,7 +19,6 @@ import com.beust.jcommander.args.SeparatorMixed;
 import com.beust.jcommander.args.SlashSeparator;
 
 import org.testng.Assert;
-import org.testng.CommandLineArgs;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
