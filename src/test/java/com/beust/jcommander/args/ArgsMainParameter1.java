@@ -12,7 +12,12 @@ import java.util.List;
  * 
  * @author cbeust
  */
-public class ArgsMainParameter {
+public class ArgsMainParameter1 implements IHostPorts {
   @Parameter
   public List<HostPort> parameters = Lists.newArrayList();
+
+  @Override
+  public List<HostPort> getHostPorts() {
+    return parameters;
+  }
 }

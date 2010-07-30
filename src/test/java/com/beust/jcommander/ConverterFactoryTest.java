@@ -1,7 +1,9 @@
 package com.beust.jcommander;
 
 import com.beust.jcommander.args.ArgsConverterFactory;
-import com.beust.jcommander.args.ArgsMainParameter;
+import com.beust.jcommander.args.ArgsMainParameter1;
+import com.beust.jcommander.args.ArgsMainParameter2;
+import com.beust.jcommander.args.IHostPorts;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -29,7 +31,7 @@ public class ConverterFactoryTest {
   };
 
   @Test
-  public void converterFactory() {
+  public void parameterWithHostPortParameters() {
     ArgsConverterFactory a = new ArgsConverterFactory();
     JCommander jc = new JCommander(a);
     jc.addConverterFactory(CONVERTER_FACTORY);
@@ -39,29 +41,29 @@ public class ConverterFactoryTest {
     Assert.assertEquals(a.hostPort.port.intValue(), 8080);
   }
 
-  @Test
-  public void mainWithHostPortParameters() {
-    ArgsMainParameter a = new ArgsMainParameter();
+  /**
+   * Test that main parameters can be used with string converters,
+   * either with a factory or from the annotation.
+   */
+  private void mainWithHostPortParameters(IStringConverterFactory f, IHostPorts a) {
     JCommander jc = new JCommander(a);
-    jc.addConverterFactory(CONVERTER_FACTORY);
+    if (f != null) jc.addConverterFactory(f);
     jc.parse("a.com:10", "b.com:20");
-    Assert.assertEquals(a.parameters.get(0).host, "a.com");
-    Assert.assertEquals(a.parameters.get(0).port.intValue(), 10);
-    Assert.assertEquals(a.parameters.get(1).host, "b.com");
-    Assert.assertEquals(a.parameters.get(1).port.intValue(), 20);
+    Assert.assertEquals(a.getHostPorts().get(0).host, "a.com");
+    Assert.assertEquals(a.getHostPorts().get(0).port.intValue(), 10);
+    Assert.assertEquals(a.getHostPorts().get(1).host, "b.com");
+    Assert.assertEquals(a.getHostPorts().get(1).port.intValue(), 20);
+  }
+
+  @Test
+  public void mainWithoutFactory() {
+    mainWithHostPortParameters(null, new ArgsMainParameter1());
+  }
+
+  @Test
+  public void mainWithFactory() {
+    mainWithHostPortParameters(CONVERTER_FACTORY, new ArgsMainParameter2());
   }
 
 }
 
-class HostPortConverter implements IStringConverter<HostPort> {
-
-  @Override
-  public HostPort convert(String value) {
-    HostPort result = new HostPort();
-    String[] s = value.split(":");
-    result.host = s[0];
-    result.port = Integer.parseInt(s[1]);
-
-    return result;
-  }
-}

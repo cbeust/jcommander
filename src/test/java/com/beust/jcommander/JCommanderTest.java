@@ -8,7 +8,7 @@ import com.beust.jcommander.args.ArgsConverter;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
-import com.beust.jcommander.args.ArgsMainParameter;
+import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
 import com.beust.jcommander.args.ArgsPrivate;
@@ -294,7 +294,7 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new ConverterFactoryTest().mainWithHostPortParameters();
+//    new ConverterFactoryTest().mainWithHostPortParameters();
 //    new DefaultProviderTest().defaultProvider1();
 //    ArgsMainParameter a = new ArgsMainParameter();
 //    new JCommander(a, "ex1:10", "ex2:20");

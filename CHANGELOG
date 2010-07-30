@@ -1,3 +1,7 @@
+1.5
+
+Added support for converters for main parameters (e.g. List<HostPort>).
+
 1.4
 2010/08/28
 
