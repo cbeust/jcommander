@@ -88,6 +88,16 @@ public class JCommander {
   private IDefaultProvider m_defaultProvider;
 
   /**
+   * List of commands and their instance.
+   */
+  private Map<String, Object> m_commands = Maps.newHashMap();
+
+  /**
+   * The name of the command after the parsing has run.
+   */
+  private String m_parsedCommand;
+
+  /**
    * The factories used to look up string converters.
    */
   private static List<IStringConverterFactory> CONVERTER_FACTORIES = Lists.newArrayList();
@@ -331,6 +341,12 @@ public class JCommander {
     m_descriptions = Maps.newHashMap();
 
     for (Object object : m_objects) {
+      addDescription(object);
+    }
+  }
+
+  private void addDescription(Object object) {
+    {
       Class<?> cls = object.getClass();
       for (Field f : cls.getDeclaredFields()) {
         p("Field:" + f.getName());
@@ -378,11 +394,20 @@ public class JCommander {
    * Main method that parses the values and initializes the fields accordingly.
    */
   private void parseValues(String[] args) {
-    for (int i = 0; i < args.length; i++) {
-      String a = trim(args[i]);
+    // This boolean becomes true if we encounter a command, which indicates we need
+    // to stop parsing (the parsing of the command will be done in a sub JCommander
+    // object)
+    boolean commandParsed = false;
+    int i = 0;
+    while (i < args.length && ! commandParsed) {
+      String arg = args[i];
+      String a = trim(arg);
       p("Parsing arg:" + a);
 
       if (isOption(args, a)) {
+        //
+        // Option
+        //
         ParameterDescription pd = m_descriptions.get(a);
 
         if (pd != null) {
@@ -424,7 +449,7 @@ public class JCommander {
                 }
                 i += n + offset;
               } else {
-                throw new ParameterException(n + " parameters expected after " + args[i]);
+                throw new ParameterException(n + " parameters expected after " + arg);
               }
             }
           }
@@ -433,23 +458,51 @@ public class JCommander {
         }
       }
       else {
-        if (! isStringEmpty(args[i])) {
-          List mp = getMainParameter(args[i]);
-          String value = args[i];
-          Object convertedValue = value;
-
-          if (m_mainParameterField.getGenericType() instanceof ParameterizedType) {
-            ParameterizedType p = (ParameterizedType) m_mainParameterField.getGenericType();
-            Type cls = p.getActualTypeArguments()[0];
-            if (cls instanceof Class) {
-              convertedValue = convertValue(m_mainParameterField, (Class) cls, value);
+        //
+        // Main parameter
+        //
+        if (! isStringEmpty(arg)) {
+          if (m_commands.isEmpty()) {
+            //
+            // Regular (non-command) parsing
+            //
+            List mp = getMainParameter(arg);
+            String value = arg;
+            Object convertedValue = value;
+ 
+            if (m_mainParameterField.getGenericType() instanceof ParameterizedType) {
+              ParameterizedType p = (ParameterizedType) m_mainParameterField.getGenericType();
+              Type cls = p.getActualTypeArguments()[0];
+              if (cls instanceof Class) {
+                convertedValue = convertValue(m_mainParameterField, (Class) cls, value);
+              }
             }
+ 
+            mp.add(convertedValue);
           }
-
-          mp.add(convertedValue);
+          else {
+            //
+            // Command parsing
+            //
+            Object o = m_commands.get(arg);
+            if (o == null) throw new ParameterException("Expected a command, got " + arg);
+            m_parsedCommand = arg;
+            JCommander jc = new JCommander(o);
+            jc.parse(subArray(args, i + 1));
+            commandParsed = true;
+          }
         }
       }
+      i++;
     }
+  }
+
+  private String[] subArray(String[] args, int index) {
+    int l = args.length - index;
+    String[] result = new String[l];
+    System.arraycopy(args, index, result, 0, l);
+
+    return result;
   }
 
   private static boolean isStringEmpty(String s) {
@@ -659,5 +712,17 @@ public class JCommander {
 
         return result;
   }
+
+  /**
+   * Add a command object.
+   */
+  public void addCommand(String string, Object object) {
+    m_commands.put(string, object);
+  }
+
+  public String getParsedCommand() {
+    return m_parsedCommand;
+  }
+
 }
 

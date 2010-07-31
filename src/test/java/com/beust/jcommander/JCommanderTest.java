@@ -8,12 +8,14 @@ import com.beust.jcommander.args.ArgsConverter;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
-import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
 import com.beust.jcommander.args.ArgsPrivate;
 import com.beust.jcommander.args.ArgsSlave;
 import com.beust.jcommander.args.ArgsSlaveBogus;
+import com.beust.jcommander.args.CommandAdd;
+import com.beust.jcommander.args.CommandCommit;
+import com.beust.jcommander.args.CommandMain;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
@@ -278,6 +280,38 @@ public class JCommanderTest {
   }
 
   @Test
+  public void commandTest1() {
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+    CommandAdd add = new CommandAdd();
+    jc.addCommand("add", add);
+    CommandCommit commit = new CommandCommit();
+    jc.addCommand("commit", commit);
+    jc.parse("add", "-i", "A.java");
+
+    Assert.assertEquals(jc.getParsedCommand(), "add");
+    Assert.assertEquals(add.interactive.booleanValue(), true);
+    Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+  }
+
+  @Test
+  public void commandTest2() {
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+    CommandAdd add = new CommandAdd();
+    jc.addCommand("add", add);
+    CommandCommit commit = new CommandCommit();
+    jc.addCommand("commit", commit);
+    jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
+
+    Assert.assertTrue(cm.verbose);
+    Assert.assertEquals(jc.getParsedCommand(), "commit");
+    Assert.assertTrue(commit.amend);
+    Assert.assertEquals(commit.author, "cbeust");
+    Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+  }
+
+  @Test
   public void requiredMainParameters() {
     //
   }
@@ -294,6 +328,7 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
+    new JCommanderTest().commandTest2();
 //    new ConverterFactoryTest().mainWithHostPortParameters();
 //    new DefaultProviderTest().defaultProvider1();
 //    ArgsMainParameter a = new ArgsMainParameter();
