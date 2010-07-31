@@ -487,6 +487,11 @@ public class JCommander {
             Object o = m_commands.get(arg);
             if (o == null) throw new ParameterException("Expected a command, got " + arg);
             m_parsedCommand = arg;
+
+            // Found a valid command, create a new JCommander object with its
+            // description object and ask it to parse the remainder of the arguments.
+            // Setting the boolean commandParsed to true will force the current
+            // loop to end.
             JCommander jc = new JCommander(o);
             jc.parse(subArray(args, i + 1));
             commandParsed = true;
