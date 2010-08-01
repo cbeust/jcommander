@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CommandAdd {
 
-  @Parameter
+  @Parameter(description = "Add file contents to the index")
   public List<String> patterns;
 
   @Parameter(names = "-i")

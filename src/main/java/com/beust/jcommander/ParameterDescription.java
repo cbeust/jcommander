@@ -1,13 +1,9 @@
 package com.beust.jcommander;
 
 
-import com.beust.jcommander.converters.NoConverter;
-import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.Lists;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -112,6 +108,13 @@ public class ParameterDescription {
   }
 
   /**
+   * @return true if this parameter received a value during the parsing phase.
+   */
+  public boolean wasAssigned() {
+    return m_assigned;
+  }
+
+  /**
    * Add the specified value to the field. First look up any field converter, then
    * any type converter, and if we can't find any, throw an exception.
    * 
@@ -126,28 +129,6 @@ public class ParameterDescription {
     }
 
     Class<?> type = m_field.getType();
-//    Class<? extends IStringConverter<?>> converterClass = null;
-//
-//    //
-//    // Try to find a converter on the annotation
-//    //
-//    converterClass = m_parameterAnnotation.converter();
-//    if (converterClass == NoConverter.class) {
-//      converterClass = m_jCommander.findConverter(type);
-//    }
-//    if (converterClass == null && m_parameterAnnotation.arity() >= 2) {
-//      converterClass = StringConverter.class;
-//      isCollection = true;
-//    }
-//    if (converterClass == null && Collection.class.isAssignableFrom(type)) {
-//      converterClass = StringConverter.class;
-//      isCollection = true;
-//    }
-//
-//    if (converterClass == null) {
-//      throw new ParameterException("Don't know how to convert " + value
-//          + " to type " + type + " (field: " + m_field.getName() + ")");
-//    }
 
     if (! isDefault) m_assigned = true;
     Object convertedValue = m_jCommander.convertValue(this, value);
@@ -188,5 +169,10 @@ public class ParameterDescription {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
       System.out.println("[ParameterDescription] " + string);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "[ParameterDescription " + m_field.getName() + "]";
   }
 }

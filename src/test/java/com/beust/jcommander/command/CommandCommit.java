@@ -8,7 +8,7 @@ import java.util.List;
 @Parameters(separators = "=")
 public class CommandCommit {
 
-  @Parameter
+  @Parameter(description = "Record changes to the repository")
   public List<String> files;
 
   @Parameter(names = "--amend", description = "Amend")

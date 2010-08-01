@@ -294,7 +294,7 @@ public class JCommanderTest {
 
   public static void main(String[] args) {
 //    new JCommanderTest().commandTest2();
-//    new ConverterFactoryTest().mainWithHostPortParameters();
+//    new CommandTest().commandTest2();
 //    new DefaultProviderTest().defaultProvider1();
 //    ArgsMainParameter a = new ArgsMainParameter();
 //    new JCommander(a, "ex1:10", "ex2:20");

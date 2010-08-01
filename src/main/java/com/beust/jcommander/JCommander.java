@@ -97,6 +97,8 @@ public class JCommander {
    */
   private String m_parsedCommand;
 
+  private String m_programName;
+
   /**
    * The factories used to look up string converters.
    */
@@ -540,20 +542,68 @@ public class JCommander {
     }
   }
 
+  private String getMainParameterDescription() {
+    if (m_descriptions == null) createDescriptions();
+    return m_mainParameterAnnotation != null ? m_mainParameterAnnotation.description()
+        : null;
+  }
+
+  private int longestName(Collection<?> objects) {
+    int result = 0;
+    for (Object o : objects) {
+      int l = o.toString().length();
+      if (l > result) result = l;
+    }
+
+    return result;
+  }
+
+  public void usage(String commandName) {
+    Object o = m_commands.get(commandName);
+    Object object;
+    try {
+      // Create a new object since o might have received values
+      // and might therefore display default values that are incorrect.
+      object = o.getClass().newInstance();
+      JCommander jc = new JCommander(object);
+      jc.setProgramName(commandName);
+      jc.usage();
+    } catch (InstantiationException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Set the program name (used only in the usage).
+   */
+  public void setProgramName(String name) {
+    m_programName = name;
+  }
+
   /**
    * Display a the help on System.out.
    */
   public void usage() {
     if (m_descriptions == null) createDescriptions();
+    boolean hasCommands = ! m_commands.isEmpty();
 
-    StringBuilder sb = new StringBuilder("Usage: <main class> [options]");
+    //
+    // First line of the usage
+    //
+    String programName = m_programName != null ? m_programName : "<main class>";
+    StringBuilder sb = new StringBuilder("Usage: " + programName + " [options]");
+    if (hasCommands) sb.append(" [command] [command options]");
     if (m_mainParameterAnnotation != null) {
       sb.append(" " + m_mainParameterAnnotation.description());
     }
     sb.append("\n  Options:");
     System.out.println(sb.toString());
 
-    // Will contain the size of the longest option name
+    // 
+    // Align the descriptions at the "longestName" column
+    //
     int longestName = 0;
     List<ParameterDescription> sorted = Lists.newArrayList();
     for (ParameterDescription pd : m_fields.values()) {
@@ -567,6 +617,9 @@ public class JCommander {
       }
     }
 
+    //
+    // Sort the options
+    //
     Collections.sort(sorted, new Comparator<ParameterDescription>() {
       @Override
       public int compare(ParameterDescription arg0, ParameterDescription arg1) {
@@ -574,25 +627,42 @@ public class JCommander {
       }
     });
 
-    // Display all the names and descriptions at the right tab position
+    //
+    // Display all the names and descriptions
+    //
     StringBuilder out = new StringBuilder();
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
-      StringBuilder tabs = new StringBuilder();
-      for (int i = 0; i < spaceCount; i++) tabs.append(" ");
       out.append("  "
           + (pd.getParameter().required() ? "* " : "  ")
-          + pd.getNames() + tabs + pd.getDescription());
+          + pd.getNames() + s(spaceCount) + pd.getDescription());
       try {
-        Object def = pd.getField().get(pd.getObject());
-        if (def != null) out.append(" (default: " + def + ")");
+        if (! pd.wasAssigned()) {
+          Object def = pd.getField().get(pd.getObject());
+          if (def != null) out.append(" (default: " + def + ")");
+        }
       } catch (IllegalArgumentException e) {
         // ignore
       } catch (IllegalAccessException e) {
         // ignore
       }
       out.append("\n");
+    }
+
+    //
+    // If commands were specified, show them as well
+    //
+    if (hasCommands) {
+      out.append("  Commands:\n");
+      int ln = longestName(m_commands.keySet()) + 3;
+      for (Map.Entry<String, Object> commands : m_commands.entrySet()) {
+        String name = commands.getKey();
+        int spaceCount  = ln - name.length();
+        Object o = commands.getValue();
+        JCommander jc = new JCommander(o);
+        out.append("    " + name + s(spaceCount) + jc.getMainParameterDescription() + "\n");
+      }
     }
 
     System.out.println(out);
@@ -729,5 +799,16 @@ public class JCommander {
     return m_parsedCommand;
   }
 
+  /**
+   * @return n spaces
+   */
+  private String s(int count) {
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < count; i++) {
+      result.append(" ");
+    }
+
+    return result.toString();
+  }
 }
 
