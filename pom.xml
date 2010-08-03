@@ -126,4 +126,46 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <profiles>
+    
+    <!-- 
+        Do a license check by running       : mvn -P license license:check  
+        UPdate the license check by running : mvn -P license license:format  
+      -->
+    <profile>
+      <id>license</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila.maven-license-plugin</groupId>
+            <artifactId>maven-license-plugin</artifactId>
+            <version>1.7.0</version>
+            <configuration>
+              <quiet>false</quiet>
+              <header>src/main/license/license-header.txt</header>
+              <includes>
+                  <include>src/**</include>
+                  <include>pom.xml</include>
+              </includes>
+              <excludes>
+                <exclude>**/.git/**</exclude>
+                <!-- ignore files produced during a build -->
+                <exclude>**/target/**</exclude>
+              </excludes>
+              <useDefaultExcludes>false</useDefaultExcludes>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>        
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+    
 </project>
