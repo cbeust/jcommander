@@ -8,6 +8,7 @@ import com.beust.jcommander.args.ArgsConverter;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
+import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
 import com.beust.jcommander.args.ArgsPrivate;
@@ -266,6 +267,15 @@ public class JCommanderTest {
     new JCommander(a, argv);
     Assert.assertTrue(a.verbose);
     Assert.assertEquals(a.file, "/tmp/a");
+  }
+
+  @Test
+  public void inheritance() {
+    ArgsInherited args = new ArgsInherited();
+    String[] argv = { "-log", "3", "-child", "2" };
+    new JCommander(args, argv);
+    Assert.assertEquals(args.child.intValue(), 2);
+    Assert.assertEquals(args.log.intValue(), 3);
   }
 
   @Test

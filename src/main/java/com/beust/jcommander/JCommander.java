@@ -348,10 +348,11 @@ public class JCommander {
   }
 
   private void addDescription(Object object) {
-    {
-      Class<?> cls = object.getClass();
+    Class<?> cls = object.getClass();
+
+    while (!Object.class.equals(cls)) {
       for (Field f : cls.getDeclaredFields()) {
-        p("Field:" + f.getName());
+        p("Field:" + cls.getSimpleName() + "." + f.getName());
         f.setAccessible(true);
         Annotation annotation = f.getAnnotation(Parameter.class);
         if (annotation != null) {
@@ -380,6 +381,8 @@ public class JCommander {
           }
         }
       }
+      // Traverse the super class until we find Object.class
+      cls = cls.getSuperclass();
     }
   }
 
