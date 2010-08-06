@@ -50,9 +50,11 @@ public class CommandTest {
     CommandCommit commit = new CommandCommit();
     jc.addCommand("commit", commit);
     jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
-//    jc.usage();
-//    jc.usage("add");
-//    jc.usage("commit");
+
+    jc.setProgramName("TestCommander");
+    jc.usage();
+    jc.usage("add");
+    jc.usage("commit");
 
     Assert.assertTrue(cm.verbose);
     Assert.assertEquals(jc.getParsedCommand(), "commit");
@@ -61,4 +63,7 @@ public class CommandTest {
     Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
   }
 
+  public static void main(String[] args) {
+    new CommandTest().commandTest2();
+  }
 }

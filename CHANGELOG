@@ -1,5 +1,6 @@
 1.5
 
+Added overloaded versions of usage() with StringBuilders
 Added inheritance support (Guillaume Sauthier)
 Added support for commands (e.g. "main add --author=cbeust Foo.java")
 Added support for converters for main parameters (e.g. List<HostPort>).

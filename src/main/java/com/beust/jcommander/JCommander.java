@@ -579,7 +579,26 @@ public class JCommander {
     return result;
   }
 
+  /**
+   * Set the program name (used only in the usage).
+   */
+  public void setProgramName(String name) {
+    m_programName = name;
+  }
+
+  /**
+   * Display the usage for this command.
+   */
   public void usage(String commandName) {
+    StringBuilder sb = new StringBuilder();
+    usage(commandName, sb);
+    System.out.println(sb.toString());
+  }
+
+  /**
+   * Store the help for the command in the passed string builder.
+   */
+  public void usage(String commandName, StringBuilder out) {
     Object o = m_commands.get(commandName);
     Object object;
     try {
@@ -597,16 +616,18 @@ public class JCommander {
   }
 
   /**
-   * Set the program name (used only in the usage).
-   */
-  public void setProgramName(String name) {
-    m_programName = name;
-  }
-
-  /**
    * Display a the help on System.out.
    */
   public void usage() {
+    StringBuilder sb = new StringBuilder();
+    usage(sb);
+    System.out.println(sb.toString());
+  }
+
+  /**
+   * Store the help in the passed string builder.
+   */
+  public void usage(StringBuilder out) {
     if (m_descriptions == null) createDescriptions();
     boolean hasCommands = ! m_commands.isEmpty();
 
@@ -614,13 +635,12 @@ public class JCommander {
     // First line of the usage
     //
     String programName = m_programName != null ? m_programName : "<main class>";
-    StringBuilder sb = new StringBuilder("Usage: " + programName + " [options]");
-    if (hasCommands) sb.append(" [command] [command options]");
+    out.append("Usage: " + programName + " [options]");
+    if (hasCommands) out.append(" [command] [command options]");
     if (m_mainParameterAnnotation != null) {
-      sb.append(" " + m_mainParameterAnnotation.description());
+      out.append(" " + m_mainParameterAnnotation.description());
     }
-    sb.append("\n  Options:");
-    System.out.println(sb.toString());
+    out.append("\n  Options:");
 
     // 
     // Align the descriptions at the "longestName" column
@@ -651,7 +671,6 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    StringBuilder out = new StringBuilder();
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
@@ -685,8 +704,6 @@ public class JCommander {
         out.append("    " + name + s(spaceCount) + jc.getMainParameterDescription() + "\n");
       }
     }
-
-    System.out.println(out);
   }
 
   /**
