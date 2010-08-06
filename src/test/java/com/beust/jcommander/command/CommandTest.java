@@ -51,10 +51,10 @@ public class CommandTest {
     jc.addCommand("commit", commit);
     jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
 
-    jc.setProgramName("TestCommander");
-    jc.usage();
-    jc.usage("add");
-    jc.usage("commit");
+//    jc.setProgramName("TestCommander");
+//    jc.usage();
+//    jc.usage("add");
+//    jc.usage("commit");
 
     Assert.assertTrue(cm.verbose);
     Assert.assertEquals(jc.getParsedCommand(), "commit");
