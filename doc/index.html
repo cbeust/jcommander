@@ -478,6 +478,61 @@ JCommander jc = new JCommander(new Args());
 jc.setDefaultProvider(DEFAULT_PROVIDER);
 </pre>
 
+<h2 id="Complex">More complex syntaxes</h2>
+
+Complex tools such as <tt>git</tt> or <tt>svn</tt> understand a whole set of commands, each of which with their own specific syntax:
+
+<pre class="brush: plain">
+  git commit --amend -m "Bug fix"
+</pre>
+
+Words such as "commit" above are called "commands" in JCommander, and you can specify them by creating one arg object per command:
+
+<pre class="brush: java">
+@Parameters(separators = "=")
+public class CommandCommit {
+
+  @Parameter(description = "Record changes to the repository")
+  public List&lt;String&gt; files;
+
+  @Parameter(names = "--amend", description = "Amend")
+  public Boolean amend = false;
+
+  @Parameter(names = "--author")
+  public String author;
+}
+</pre>
+
+<pre class="brush: java">
+public class CommandAdd {
+
+  @Parameter(description = "Add file contents to the index")
+  public List&lt;String&gt; patterns;
+
+  @Parameter(names = "-i")
+  public Boolean interactive = false;
+}
+</pre>
+
+Then you register these commands with your JCommander object. After the parsing phase, you call <tt>getParsedCommand()</tt> on your JCommander object, and based on the command that is returned, you know which arg object to inspect (you can still use a main arg object if you want to support options before the first command appears on the command line):
+
+<pre class="brush: java">
+CommandMain cm = new CommandMain();
+JCommander jc = new JCommander(cm);
+
+CommandAdd add = new CommandAdd();
+jc.addCommand("add", add);
+CommandCommit commit = new CommandCommit();
+jc.addCommand("commit", commit);
+
+jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
+
+Assert.assertTrue(cm.verbose);
+Assert.assertEquals(jc.getParsedCommand(), "commit");
+Assert.assertTrue(commit.amend);
+Assert.assertEquals(commit.author, "cbeust");
+Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+</pre>
 
 <h2 id="Exceptions">Exception</h2>
 
