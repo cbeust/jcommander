@@ -126,12 +126,12 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <profiles>
     
-    <!-- 
-        Do a license check by running       : mvn -P license license:check  
-        UPdate the license check by running : mvn -P license license:format  
+    <!--
+        Do a license check by running       : mvn -P license license:check
+        UPdate the license check by running : mvn -P license license:format
       -->
     <profile>
       <id>license</id>
@@ -161,11 +161,11 @@
                   <goal>check</goal>
                 </goals>
               </execution>
-            </executions>        
+            </executions>
           </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
-    
+
 </project>
