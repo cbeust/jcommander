@@ -38,8 +38,13 @@
   <tr><td align="right"><a href="mailto:cedric@beust.com">C&eacute;dric Beust</a></td></tr>
 </table>
 
+<h2>Table of contents</h2>
+<div id="table-of-contents">
+</div>
 
-<h2 id="Overview" />Overview</h2>
+
+
+<h2><a class="section" name="Overview">Overview</a></h2>
 
 JCommander is a very small Java framework that makes it trivial to parse command line parameters.
 <p>
@@ -73,7 +78,7 @@ new JCommander(jct, argv);
 Assert.assertEquals(jct.verbose.intValue(), 2);
 </pre>
 
-<h2 id="Types_of_options">Types of options</h2>
+<h2><a class="section" name="Types_of_options">Types of options</a></h2>
 
 The fields representing your parameters can be of any type. Basic types (<tt>Integer</tt>, <tt>Boolean</tt/>., etc...) are supported by default and you can write type converters to support any other type (<tt>File</tt>, etc...).
 
@@ -145,7 +150,7 @@ Value for -password (Connection password):
 
 You will need to type the value at this point before JCommander resumes.
 
-<h2 id="Custom_types">Custom types</h2>
+<h2><a class="section" name="Custom_types">Custom types</a></h2>
 
 <h3>By annotation</h3>
 
@@ -254,7 +259,7 @@ All you need to do is add the factory to your JCommander object:
 Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
 
 
-<h2 id="Main_parameter">Main parameter</h2>
+<h2><a class="section" name="Main_parameter">Main parameter</a></h2>
 So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
 
 <pre class="brush: java">
@@ -273,7 +278,7 @@ java Main -debug file1 file2
 
 and the field <tt>files</tt> will receive the strings "file1" and "file2".
 
-<h2 id="Private_parameters">Private parameters</h2>
+<h2><a class="section" name="Private_parameters">Private parameters</a></h2>
 
 Parameters can be private:
 
@@ -294,7 +299,7 @@ new JCommander(args, "-verbose", "3");
 Assert.assertEquals(args.getVerbose().intValue(), 3);
 </pre>
 
-<h2 id="Separators">Parameter separators</h2>
+<h2><a class="section" name="Separators">Parameter separators</a></h2>
 
 By default, parameters are separated by spaces, but you can change this setting to allow different separators:
 
@@ -322,7 +327,7 @@ public class SeparatorEqual {
 
 
 
-<h2 id="Multiple_descriptions">Multiple descriptions</h2>
+<h2><a class="section" name="Multiple_descriptions">Multiple descriptions</a></h2>
 
 You can spread the description of your parameters on more than one
 class. For example, you can define the following two classes:
@@ -358,7 +363,7 @@ Assert.assertEquals(s.slave, "slave");
 </pre>
 
 
-<h2 id="Syntax">@ syntax</h2>
+<h2><a class="section" name="Syntax">@ syntax</a></h2>
 
 JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:
 
@@ -375,7 +380,7 @@ file3
 java Main @/tmp/parameters
 </pre>
 
-<h2 id="Arities">Arities (multiple values for parameters)</h2>
+<h2><a class="section" name="Arities">Arities (multiple values for parameters)</a></h2>
 
 If some of your parameters require more than one value, such as the
 following example where two values are expected after <tt>-pairs</tt>:
@@ -403,7 +408,7 @@ parameters that define an arity. You will have to convert these values
 yourself if the parameters you need are of type <tt>Integer</tt> or
 other (this limitation is due to Java's erasure).
 
-<h2 id="Multiple_option_names">Multiple option names</h2>
+<h2><a class="section" name="Multiple_option_names">Multiple option names</a></h2>
 
 You can specify more than one option name:
 
@@ -421,7 +426,7 @@ java Main -d /tmp
 java Main --outputDirectory /tmp
 </pre>
 
-<h2 id="Required_and_optional">Required and optional parameters</h2>
+<h2><a class="section" name="Required_and_optional">Required and optional parameters</a></h2>
 
 If some of your parameters are mandatory, you can use the
 <tt>required</tt> attribute (which default to <tt>false</tt>):
@@ -436,7 +441,7 @@ If some of your parameters are mandatory, you can use the
 If this parameter is not specified, JCommander will throw an exception
 telling you which options are missing.
 
-<h2 id="Default_values">Default values</h2>
+<h2><a class="section" name="Default_values">Default values</a></h2>
 
 The most common way to specify a default value for your parameters is to initialize the field at declaration time:
 
@@ -478,7 +483,7 @@ JCommander jc = new JCommander(new Args());
 jc.setDefaultProvider(DEFAULT_PROVIDER);
 </pre>
 
-<h2 id="Complex">More complex syntaxes</h2>
+<h2><a class="section" name="Complex">More complex syntaxes</a></h2>
 
 Complex tools such as <tt>git</tt> or <tt>svn</tt> understand a whole set of commands, each of which with their own specific syntax:
 
@@ -534,7 +539,7 @@ Assert.assertEquals(commit.author, "cbeust");
 Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
 </pre>
 
-<h2 id="Exceptions">Exception</h2>
+<h2><a class="section" name="Exceptions">Exception</a></h2>
 
 Whenever JCommander detects an error, it will throw a
 <tt>ParameterException</tt>. Note that this is a Runtime Exception,
@@ -542,7 +547,7 @@ since your application is probably not initialized correctly at this
 point.
 
 
-<h2 id="Usage">Usage</h2>
+<h2><a class="section" name="Usage">Usage</a></h2>
 
 You can invoke <tt>usage()</tt> on the <tt>JCommander</tt> instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
 
@@ -557,7 +562,7 @@ Usage: &lt;main class&gt; [options]
 
 Options preceded by an asterisk are required.
 
-<h2 id="Hiding">Hiding parameters</h2>
+<h2><a class="section" name="Hiding">Hiding parameters</a></h2>
 
 If you don't want certain parameters to appear in the usage, you can mark them as "hidden":
 
@@ -566,7 +571,7 @@ If you don't want certain parameters to appear in the usage, you can mark them a
 public boolean debug = false;
 </pre>
 
-<h2 id="Internationalization">Internationalization</h2>
+<h2><a class="section" name="Internationalization">Internationalization</a></h2>
 
 You can internationalize the descriptions of your parameters.
 
@@ -594,11 +599,11 @@ host: H&ocirc;te
 
 JCommander will then use the default locale to resolve your descriptions.
 
-<h2 id="More_examples">More examples</h2>
+<h2><a class="section" name="More_examples">More examples</a></h2>
 
 TestNG uses JCommander to parse its command line, here is <a href="http://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">its definition file</a>.
 
-<h2 id="Download">Download</h2>
+<h2><a class="section" name="Download">Download</a></h2>
 
 You can download JCommander from the following locations:
 
@@ -621,5 +626,7 @@ You can download JCommander from the following locations:
 </ul>
 
 </body>
+
+<script type="text/javascript" src="http://beust.com/toc.js"></script>
 
 </html>

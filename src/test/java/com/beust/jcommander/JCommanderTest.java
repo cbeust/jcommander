@@ -30,6 +30,7 @@ import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
 import com.beust.jcommander.args.ArgsPrivate;
+import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
 import com.beust.jcommander.args.ArgsSlaveBogus;
 import com.beust.jcommander.args.SeparatorColon;
@@ -304,9 +305,11 @@ public class JCommanderTest {
     Assert.assertEquals(a.verbose.intValue(), -3);
   }
 
-  @Test
+  @Test(expectedExceptions = ParameterException.class)
   public void requiredMainParameters() {
-    //
+    ArgsRequired a = new ArgsRequired();
+    String[] argv = {};
+    new JCommander(a, argv);
   }
 
   @DataProvider
@@ -321,7 +324,7 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-//    new JCommanderTest().commandTest2();
+    new JCommanderTest().requiredMainParameters();
 //    new CommandTest().commandTest2();
 //    new DefaultProviderTest().defaultProvider1();
 //    ArgsMainParameter a = new ArgsMainParameter();

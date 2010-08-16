@@ -83,6 +83,8 @@ public class JCommander {
    */
   private Parameter m_mainParameterAnnotation;
 
+  private ParameterDescription m_mainParameterDescription;
+
   /**
    * A set of all the fields that are required. During the reflection phase,
    * this field receives all the fields that are annotated with required=true
@@ -203,7 +205,14 @@ public class JCommander {
       }
       throw new ParameterException("The following options are required: " + missingFields);
     }
-    
+
+    if (m_mainParameterDescription != null) {
+      if (m_mainParameterDescription.getParameter().required() &&
+          !m_mainParameterDescription.wasAssigned()) {
+        throw new ParameterException("Main parameters are required (\""
+            + m_mainParameterDescription.getDescription() + "\")");
+      }
+    }
   }
   
   /**
@@ -384,6 +393,7 @@ public class JCommander {
             m_mainParameterField = f;
             m_mainParameterObject = object;
             m_mainParameterAnnotation = p;
+            m_mainParameterDescription = new ParameterDescription(object, p, f, m_bundle, this);
           } else {
             for (String name : p.names()) {
               if (m_descriptions.containsKey(name)) {

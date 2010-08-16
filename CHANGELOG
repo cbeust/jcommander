@@ -1,12 +1,17 @@
-1.5
+1.6
 
-Added overloaded versions of usage() with StringBuilders
-Added inheritance support (Guillaume Sauthier)
-Added support for commands (e.g. "main add --author=cbeust Foo.java")
-Added support for converters for main parameters (e.g. List<HostPort>).
+Added: now throwing an exception if required main parameters are not supplied
+
+1.5
+2010/08/15
+
+Added: overloaded versions of usage() with StringBuilders
+Added: inheritance support (Guillaume Sauthier)
+Added: support for commands (e.g. "main add --author=cbeust Foo.java")
+Added: support for converters for main parameters (e.g. List<HostPort>).
 
 1.4
-2010/08/28
+2010/07/28
 
 Added string converter factories
 Added IDefaultProvider
@@ -16,7 +21,7 @@ Support for values that look like parameters ("-integer -3", "/file /tmp/a")
 Added @Parameters(optionPrefixes) to allow for different prefixes than "-"
 
 1.2
-2010/08/25
+2010/07/25
 
 Usage is now aligned and alphabetically sorted
 Added the hidden attribute
