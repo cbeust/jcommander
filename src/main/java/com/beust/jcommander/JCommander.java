@@ -650,6 +650,7 @@ public class JCommander {
     String programName = m_programName != null ? m_programName : "<main class>";
     out.append("Usage: " + programName + " [options]");
     if (hasCommands) out.append(" [command] [command options]");
+    out.append("\n");
     if (m_mainParameterAnnotation != null) {
       out.append(" " + m_mainParameterAnnotation.description());
     }
