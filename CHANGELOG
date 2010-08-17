@@ -1,6 +1,7 @@
 1.6
 
 Added: now throwing an exception if required main parameters are not supplied
+Fixed: usage() was changing default values after two runs (jstrachan)
 
 1.5
 2010/08/15

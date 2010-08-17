@@ -312,6 +312,19 @@ public class JCommanderTest {
     new JCommander(a, argv);
   }
 
+  @Test
+  public void usageShouldNotChange() {
+    JCommander jc = new JCommander(new Args1(), new String[]{"-log", "1"});
+    StringBuilder sb = new StringBuilder();
+    jc.usage(sb);
+    String expected = sb.toString();
+    jc = new JCommander(new Args1(), new String[]{"-debug", "-log", "2", "-long", "5"});
+    sb = new StringBuilder();
+    jc.usage(sb);
+    String actual = sb.toString();
+    Assert.assertEquals(actual, expected);
+  }
+
   @DataProvider
   public static Object[][] f() {
     return new Integer[][] {
