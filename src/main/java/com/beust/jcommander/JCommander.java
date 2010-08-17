@@ -110,7 +110,7 @@ public class JCommander {
   /**
    * List of commands and their instance.
    */
-  private Map<String, Object> m_commands = Maps.newHashMap();
+  private Map<String, JCommander> m_commands = Maps.newHashMap();
 
   /**
    * The name of the command after the parsing has run.
@@ -518,15 +518,13 @@ public class JCommander {
             //
             // Command parsing
             //
-            Object o = m_commands.get(arg);
-            if (o == null) throw new ParameterException("Expected a command, got " + arg);
+            JCommander jc = m_commands.get(arg);
+            if (jc == null) throw new ParameterException("Expected a command, got " + arg);
             m_parsedCommand = arg;
 
-            // Found a valid command, create a new JCommander object with its
-            // description object and ask it to parse the remainder of the arguments.
+            // Found a valid command, ask it to parse the remainder of the arguments.
             // Setting the boolean commandParsed to true will force the current
             // loop to end.
-            JCommander jc = new JCommander(o);
             jc.parse(subArray(args, i + 1));
             commandParsed = true;
           }
@@ -610,20 +608,13 @@ public class JCommander {
    * Store the help for the command in the passed string builder.
    */
   public void usage(String commandName, StringBuilder out) {
-    Object o = m_commands.get(commandName);
-    Object object;
-    try {
-      // Create a new object since o might have received values
-      // and might therefore display default values that are incorrect.
-      object = o.getClass().newInstance();
-      JCommander jc = new JCommander(object);
-      jc.setProgramName(commandName);
-      jc.usage();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
+    JCommander jc = m_commands.get(commandName);
+    String description = jc.getMainParameterDescription();
+    if (description != null) {
+      out.append(description);
+      out.append("\n");
     }
+    jc.usage(out);
   }
 
   /**
@@ -688,17 +679,8 @@ public class JCommander {
       out.append("  "
           + (pd.getParameter().required() ? "* " : "  ")
           + pd.getNames() + s(spaceCount) + pd.getDescription());
-      try {
-        if (! pd.isAssigned()) {
-          Object def = pd.getField().get(pd.getObject());
-          if (def != null) out.append(" (default: " + def + ")");
-        }
-      } catch (IllegalArgumentException e) {
-        // ignore
-      } catch (IllegalAccessException e) {
-        // ignore
-      }
-      out.append("\n");
+      Object def = pd.getDefault();
+      if (def != null) out.append(" (default: " + def + ")");      out.append("\n");
     }
 
     //
@@ -707,11 +689,10 @@ public class JCommander {
     if (hasCommands) {
       out.append("  Commands:\n");
       int ln = longestName(m_commands.keySet()) + 3;
-      for (Map.Entry<String, Object> commands : m_commands.entrySet()) {
+      for (Map.Entry<String, JCommander> commands : m_commands.entrySet()) {
         String name = commands.getKey();
         int spaceCount  = ln - name.length();
-        Object o = commands.getValue();
-        JCommander jc = new JCommander(o);
+        JCommander jc = commands.getValue();
         out.append("    " + name + s(spaceCount) + jc.getMainParameterDescription() + "\n");
       }
     }
@@ -840,8 +821,10 @@ public class JCommander {
   /**
    * Add a command object.
    */
-  public void addCommand(String string, Object object) {
-    m_commands.put(string, object);
+  public void addCommand(String name, Object object) {
+    JCommander jc = new JCommander(object);
+    jc.setProgramName(name);
+    m_commands.put(name, jc);
   }
 
   public String getParsedCommand() {
