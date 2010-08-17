@@ -128,8 +128,13 @@ public class ParameterDescription {
   /**
    * @return true if this parameter received a value during the parsing phase.
    */
-  public boolean wasAssigned() {
+  public boolean isAssigned() {
     return m_assigned;
+  }
+
+
+  public void setAssigned(boolean b) {
+    m_assigned = true;
   }
 
   /**

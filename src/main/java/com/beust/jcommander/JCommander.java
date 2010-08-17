@@ -208,7 +208,7 @@ public class JCommander {
 
     if (m_mainParameterDescription != null) {
       if (m_mainParameterDescription.getParameter().required() &&
-          !m_mainParameterDescription.wasAssigned()) {
+          !m_mainParameterDescription.isAssigned()) {
         throw new ParameterException("Main parameters are required (\""
             + m_mainParameterDescription.getDescription() + "\")");
       }
@@ -511,6 +511,7 @@ public class JCommander {
               }
             }
  
+            m_mainParameterDescription.setAssigned(true);
             mp.add(convertedValue);
           }
           else {
@@ -688,7 +689,7 @@ public class JCommander {
           + (pd.getParameter().required() ? "* " : "  ")
           + pd.getNames() + s(spaceCount) + pd.getDescription());
       try {
-        if (! pd.wasAssigned()) {
+        if (! pd.isAssigned()) {
           Object def = pd.getField().get(pd.getObject());
           if (def != null) out.append(" (default: " + def + ")");
         }
