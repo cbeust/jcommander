@@ -22,6 +22,11 @@ import com.beust.jcommander.IStringConverter;
 
 import java.io.File;
 
+/**
+ * Convert a string into a file.
+ * 
+ * @author cbeust
+ */
 public class FileConverter implements IStringConverter<File> {
 
   @Override

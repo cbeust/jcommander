@@ -20,6 +20,11 @@ package com.beust.jcommander.converters;
 
 import com.beust.jcommander.IStringConverter;
 
+/**
+ * Default converter for strings.
+ * 
+ * @author cbeust
+ */
 public class StringConverter implements IStringConverter<String> {
 
   @Override

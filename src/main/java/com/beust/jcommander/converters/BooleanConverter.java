@@ -20,6 +20,11 @@ package com.beust.jcommander.converters;
 
 import com.beust.jcommander.ParameterException;
 
+/**
+ * Converts a string to a boolean.
+ * 
+ * @author cbeust
+ */
 public class BooleanConverter extends BaseConverter<Boolean> {
 
   public BooleanConverter(String optionName) {

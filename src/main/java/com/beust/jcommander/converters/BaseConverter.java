@@ -20,6 +20,11 @@ package com.beust.jcommander.converters;
 
 import com.beust.jcommander.IStringConverter;
 
+/**
+ * Base class for converters that stores the name of the option.
+ * 
+ * @author cbeust
+ */
 abstract public class BaseConverter<T> implements IStringConverter<T> {
 
   private String m_optionName;

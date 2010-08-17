@@ -20,6 +20,11 @@ package com.beust.jcommander.converters;
 
 import com.beust.jcommander.IStringConverter;
 
+/**
+ * Default value for a converter when none is specified.
+ * 
+ * @author cbeust
+ */
 public class NoConverter implements IStringConverter<String> {
 
   @Override

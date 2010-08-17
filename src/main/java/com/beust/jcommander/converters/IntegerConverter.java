@@ -20,6 +20,11 @@ package com.beust.jcommander.converters;
 
 import com.beust.jcommander.ParameterException;
 
+/**
+ * Convert a string to an integer.
+ * 
+ * @author cbeust
+ */
 public class IntegerConverter extends BaseConverter<Integer> {
 
   public IntegerConverter(String optionName) {

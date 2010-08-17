@@ -23,6 +23,11 @@ import com.beust.jcommander.IStringConverter;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Convert a string of comma separated words into a list of string.
+ * 
+ * @author cbeust
+ */
 public class CommaSeparatedConverter implements IStringConverter<List<String>> {
 
   @Override

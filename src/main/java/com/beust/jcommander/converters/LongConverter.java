@@ -20,6 +20,11 @@ package com.beust.jcommander.converters;
 
 import com.beust.jcommander.ParameterException;
 
+/**
+ * Convert a string to a long.
+ * 
+ * @author cbeust
+ */
 public class LongConverter extends BaseConverter<Long> {
 
   public LongConverter(String optionName) {

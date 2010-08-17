@@ -128,16 +128,27 @@ public class JCommander {
     CONVERTER_FACTORIES.add(new DefaultConverterFactory());
   };
 
+  /**
+   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   */
   public JCommander(Object object) {
     init(object, null);
   }
 
+  /**
+   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   * @param bundle The bundle to use for the descriptions. Can be null.
+   * @param args The arguments to parse (optional).
+   */
   public JCommander(Object object, ResourceBundle bundle, String... args) {
     init(object, bundle);
     parse(args);
   }
 
-
+  /**
+   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   * @param args The arguments to parse (optional).
+   */
   public JCommander(Object object, String... args) {
     init(object, null);
     parse(args);
