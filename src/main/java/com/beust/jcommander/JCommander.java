@@ -619,13 +619,25 @@ public class JCommander {
    * Store the help for the command in the passed string builder.
    */
   public void usage(String commandName, StringBuilder out) {
-    JCommander jc = m_commands.get(commandName);
-    String description = jc.getMainParameterDescription();
+    String description = getCommandDescription(commandName);
+
     if (description != null) {
       out.append(description);
       out.append("\n");
     }
-    jc.usage(out);
+    usage(out);
+  }
+
+  /**
+   * @return the description of the command.
+   */
+  public String getCommandDescription(String commandName) {
+    JCommander jc = m_commands.get(commandName);
+    Parameters p = jc.getObjects().get(0).getClass().getAnnotation(Parameters.class);
+    String result = jc.getMainParameterDescription();
+    if (p != null) result = p.commandDescription();
+
+    return result;
   }
 
   /**
@@ -652,9 +664,9 @@ public class JCommander {
     if (hasCommands) out.append(" [command] [command options]");
     out.append("\n");
     if (m_mainParameterAnnotation != null) {
-      out.append(" " + m_mainParameterAnnotation.description());
+      out.append(" " + m_mainParameterAnnotation.description() + "\n");
     }
-    out.append("\n  Options:");
+    out.append("  Options:");
 
     // 
     // Align the descriptions at the "longestName" column
@@ -700,12 +712,13 @@ public class JCommander {
     //
     if (hasCommands) {
       out.append("  Commands:\n");
+      // The magic value 3 is the number of spaces between the name of the option
+      // and its description
       int ln = longestName(m_commands.keySet()) + 3;
       for (Map.Entry<String, JCommander> commands : m_commands.entrySet()) {
         String name = commands.getKey();
         int spaceCount  = ln - name.length();
-        JCommander jc = commands.getValue();
-        out.append("    " + name + s(spaceCount) + jc.getMainParameterDescription() + "\n");
+        out.append("    " + name + s(spaceCount) + getCommandDescription(name) + "\n");
       }
     }
   }
@@ -853,6 +866,14 @@ public class JCommander {
     }
 
     return result.toString();
+  }
+
+  /**
+   * @return the objects that JCommander will fill with the result of
+   * parsing the command line.
+   */
+  public List<Object> getObjects() {
+    return m_objects;
   }
 }
 

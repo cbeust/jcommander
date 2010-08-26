@@ -48,4 +48,11 @@ public @interface Parameters {
    * What characters an option starts with.
    */
   String optionPrefixes() default DEFAULT_OPTION_PREFIXES;
+
+  /**
+   * If this class was added to {@link JCommander} as a command {@see JCommander#addCommand},
+   * then this string will be displayed in the description when @{link JCommander#usage} is
+   * invoked.
+   */
+  String commandDescription() default "";
 }

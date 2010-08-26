@@ -22,6 +22,6 @@ import com.beust.jcommander.Parameter;
 
 public class CommandMain {
 
-  @Parameter(names = "-v")
+  @Parameter(names = "-v", description = "Verbose mode")
   public Boolean verbose = false;
 }

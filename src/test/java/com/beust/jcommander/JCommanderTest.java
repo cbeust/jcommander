@@ -37,6 +37,9 @@ import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
 import com.beust.jcommander.args.SlashSeparator;
+import com.beust.jcommander.command.CommandAdd;
+import com.beust.jcommander.command.CommandCommit;
+import com.beust.jcommander.command.CommandMain;
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -337,8 +340,16 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new JCommanderTest().requiredMainParameters();
-//    new CommandTest().commandTest2();
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+    CommandAdd add = new CommandAdd();
+    jc.addCommand("add", add);
+    CommandCommit commit = new CommandCommit();
+    jc.addCommand("commit", commit);
+    jc.usage();
+
+//    new JCommanderTest().requiredMainParameters();
+//    new CommandTest().commandTest1();
 //    new DefaultProviderTest().defaultProvider1();
 //    ArgsMainParameter a = new ArgsMainParameter();
 //    new JCommander(a, "ex1:10", "ex2:20");

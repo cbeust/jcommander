@@ -23,10 +23,10 @@ import com.beust.jcommander.Parameters;
 
 import java.util.List;
 
-@Parameters(separators = "=")
+@Parameters(separators = "=", commandDescription = "Record changes to the repository")
 public class CommandCommit {
 
-  @Parameter(description = "Record changes to the repository")
+  @Parameter(description = "List of files")
   public List<String> files;
 
   @Parameter(names = "--amend", description = "Amend")
