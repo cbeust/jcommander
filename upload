@@ -1,0 +1,3 @@
+scp doc/index.html  target/jcommander-1.6.jar beust.com@beust.com:w/jcommander
+scp -r target/site/apidocs beust.com@beust.com:w/jcommander
+
