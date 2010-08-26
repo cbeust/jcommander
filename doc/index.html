@@ -483,7 +483,7 @@ JCommander jc = new JCommander(new Args());
 jc.setDefaultProvider(DEFAULT_PROVIDER);
 </pre>
 
-<h2><a class="section" name="Complex">More complex syntaxes</a></h2>
+<h2><a class="section" name="Complex">More complex syntaxes (commands)</a></h2>
 
 Complex tools such as <tt>git</tt> or <tt>svn</tt> understand a whole set of commands, each of which with their own specific syntax:
 
@@ -494,10 +494,10 @@ Complex tools such as <tt>git</tt> or <tt>svn</tt> understand a whole set of com
 Words such as "commit" above are called "commands" in JCommander, and you can specify them by creating one arg object per command:
 
 <pre class="brush: java">
-@Parameters(separators = "=")
+@Parameters(separators = "=", commandDescription = "Record changes to the repository")
 public class CommandCommit {
 
-  @Parameter(description = "Record changes to the repository")
+  @Parameter(description = "The list of files to commit")
   public List&lt;String&gt; files;
 
   @Parameter(names = "--amend", description = "Amend")
@@ -509,9 +509,10 @@ public class CommandCommit {
 </pre>
 
 <pre class="brush: java">
+@Parameters(commandDescription = "Add file contents to the index")
 public class CommandAdd {
 
-  @Parameter(description = "Add file contents to the index")
+  @Parameter(description = "File patterns to add to the index")
   public List&lt;String&gt; patterns;
 
   @Parameter(names = "-i")
