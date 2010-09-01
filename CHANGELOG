@@ -1,4 +1,9 @@
+1.7
+
+Fixed: Minor bug in the command display (Marc Ende)
+
 1.6
+2010/08/28
 
 Added: @Parameters(commandDescription = "command description")
 Added: now throwing an exception if required main parameters are not supplied
