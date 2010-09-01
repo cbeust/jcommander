@@ -2,7 +2,7 @@
 # Wiki: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
 #
 # deploy without tagging: mvn deploy -DperformRelease
-# mvn release:clean release:prepare release:perform
+# mvn release:clean javadoc:javadoc release:prepare release:perform
 
 mvn release:perform
 
