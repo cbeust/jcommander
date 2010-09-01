@@ -620,12 +620,12 @@ public class JCommander {
    */
   public void usage(String commandName, StringBuilder out) {
     String description = getCommandDescription(commandName);
-
+    JCommander jc = m_commands.get(commandName);
     if (description != null) {
       out.append(description);
       out.append("\n");
     }
-    usage(out);
+    jc.usage(out);
   }
 
   /**
