@@ -1,5 +1,6 @@
 1.7
 
+Added: Command usages are now shown in the order they were added to the JCommander object
 Fixed: Minor bug in the command display (Marc Ende)
 
 1.6

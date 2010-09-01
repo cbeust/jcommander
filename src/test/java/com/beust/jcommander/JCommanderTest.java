@@ -46,7 +46,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class JCommanderTest {
@@ -328,6 +330,31 @@ public class JCommanderTest {
     Assert.assertEquals(actual, expected);
   }
 
+  private void verifyCommandOrdering(String[] commandNames, Object[] commands) {
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+
+    for (int i = 0; i < commands.length; i++) {
+      jc.addCommand(commandNames[i], commands[i]);
+    }
+
+    Map<String, JCommander> c = jc.getCommands();
+    Assert.assertEquals(c.size(), commands.length);
+
+    Iterator<String> it = c.keySet().iterator();
+    for (int i = 0; i < commands.length; i++) {
+      Assert.assertEquals(it.next(), commandNames[i]);
+    }
+  }
+
+  @Test
+  public void commandsShouldBeShownInOrderOfInsertion() {
+    verifyCommandOrdering(new String[] { "add", "commit" },
+        new Object[] { new CommandAdd(), new CommandCommit() });
+    verifyCommandOrdering(new String[] { "commit", "add" },
+        new Object[] { new CommandCommit(), new CommandAdd() });
+  }
+
   @DataProvider
   public static Object[][] f() {
     return new Integer[][] {
@@ -340,13 +367,14 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    CommandMain cm = new CommandMain();
-    JCommander jc = new JCommander(cm);
-    CommandAdd add = new CommandAdd();
-    jc.addCommand("add", add);
-    CommandCommit commit = new CommandCommit();
-    jc.addCommand("commit", commit);
-    jc.usage();
+    new JCommanderTest().commandsShouldBeShownInOrderOfInsertion();
+//    CommandMain cm = new CommandMain();
+//    JCommander jc = new JCommander(cm);
+//    CommandAdd add = new CommandAdd();
+//    jc.addCommand("add", add);
+//    CommandCommit commit = new CommandCommit();
+//    jc.addCommand("commit", commit);
+//    jc.usage();
 
 //    new JCommanderTest().requiredMainParameters();
 //    new CommandTest().commandTest1();

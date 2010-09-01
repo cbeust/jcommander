@@ -110,7 +110,7 @@ public class JCommander {
   /**
    * List of commands and their instance.
    */
-  private Map<String, JCommander> m_commands = Maps.newHashMap();
+  private Map<String, JCommander> m_commands = Maps.newLinkedHashMap();
 
   /**
    * The name of the command after the parsing has run.
@@ -850,6 +850,10 @@ public class JCommander {
     JCommander jc = new JCommander(object);
     jc.setProgramName(name);
     m_commands.put(name, jc);
+  }
+
+  public Map<String, JCommander> getCommands() {
+    return m_commands;
   }
 
   public String getParsedCommand() {
