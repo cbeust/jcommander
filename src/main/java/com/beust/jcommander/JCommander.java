@@ -459,6 +459,7 @@ public class JCommander {
             //
             // Password option, use the Console to retrieve the password
             //
+            checkJdk6();
             Console console = System.console();
             if (console == null) {
               throw new ParameterException("No console is available to get parameter " + a);
@@ -542,6 +543,17 @@ public class JCommander {
         }
       }
       i++;
+    }
+  }
+
+  /**
+   * Aborts if we're not using Java 6.
+   */
+  private void checkJdk6() {
+    try {
+      getClass().getClassLoader().loadClass("java.io.Console");
+    } catch (ClassNotFoundException e) {
+      throw new ParameterException("The password option is only available with Java 6.");
     }
   }
 
