@@ -25,13 +25,13 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -459,13 +459,7 @@ public class JCommander {
             //
             // Password option, use the Console to retrieve the password
             //
-            checkJdk6();
-            Console console = System.console();
-            if (console == null) {
-              throw new ParameterException("No console is available to get parameter " + a);
-            }
-            System.out.print("Value for " + a + " (" + pd.getDescription() + "):");
-            char[] password = console.readPassword();
+            char[] password = readPassword(pd.getDescription());
             pd.addValue(new String(password));
           } else {
             //
@@ -547,12 +541,18 @@ public class JCommander {
   }
 
   /**
-   * Aborts if we're not using Java 6.
+   * Invoke Console.readPassword through reflection to avoid depending
+   * on Java 6.
    */
-  private void checkJdk6() {
+  private char[] readPassword(String description) {
     try {
-      getClass().getClassLoader().loadClass("java.io.Console");
-    } catch (ClassNotFoundException e) {
+      Method consoleMethod = System.class.getDeclaredMethod("console", new Class<?>[0]);
+      Object console = consoleMethod.invoke(null, new Object[0]); 
+      Method readPassword = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
+      System.out.print(description + ": ");
+      return (char[]) readPassword.invoke(console, new Object[0]);
+    } catch (Throwable t) {
+      t.printStackTrace();
       throw new ParameterException("The password option is only available with Java 6.");
     }
   }

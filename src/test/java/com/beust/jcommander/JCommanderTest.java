@@ -29,6 +29,7 @@ import com.beust.jcommander.args.ArgsI18N2New;
 import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
+import com.beust.jcommander.args.ArgsPassword;
 import com.beust.jcommander.args.ArgsPrivate;
 import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
@@ -367,7 +368,11 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new JCommanderTest().commandsShouldBeShownInOrderOfInsertion();
+    ArgsPassword a = new ArgsPassword();
+    JCommander jc = new JCommander(a);
+    jc.parse("-password");
+    System.out.println("Password:" + a.password);
+//    new JCommanderTest().commandsShouldBeShownInOrderOfInsertion();
 //    CommandMain cm = new CommandMain();
 //    JCommander jc = new JCommander(cm);
 //    CommandAdd add = new CommandAdd();
