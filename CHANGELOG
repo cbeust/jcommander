@@ -1,4 +1,5 @@
 1.7
+2010/09/06
 
 Added: Command usages are now shown in the order they were added to the JCommander object
 Fixed: JCommander now compatible with Java 5
