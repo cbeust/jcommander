@@ -27,6 +27,7 @@ import com.beust.jcommander.internal.Maps;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -545,15 +546,30 @@ public class JCommander {
    * on Java 6.
    */
   private char[] readPassword(String description) {
+    System.out.print(description + ": ");
     try {
       Method consoleMethod = System.class.getDeclaredMethod("console", new Class<?>[0]);
       Object console = consoleMethod.invoke(null, new Object[0]); 
       Method readPassword = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
-      System.out.print(description + ": ");
       return (char[]) readPassword.invoke(console, new Object[0]);
     } catch (Throwable t) {
-      t.printStackTrace();
-      throw new ParameterException("The password option is only available with Java 6.");
+      return readLine(description);
+    }
+  }
+
+  /**
+   * Read a line from stdin (used when java.io.Console is not available)
+   */
+  private char[] readLine(String description) {
+    try {
+      InputStreamReader isr = new InputStreamReader(System.in);
+      BufferedReader in = new BufferedReader(isr);
+      String result = in.readLine();
+      in.close();
+      isr.close();
+      return result.toCharArray();
+    } catch (IOException e) {
+      throw new ParameterException(e);
     }
   }
 
