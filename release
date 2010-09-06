@@ -4,5 +4,5 @@
 # deploy without tagging: mvn deploy -DperformRelease
 # mvn release:clean javadoc:javadoc release:prepare release:perform
 
-mvn release:perform
+mvn release:perform -P sign
 

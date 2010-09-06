@@ -174,10 +174,10 @@
     <!-- Signing with gpg -->
     <!--
     Sign the artifacts by calling
-    mvn -P sign-artifacts [..]
+    mvn -P sign [..]
     -->
     <profile>
-      <id>sign-artifacts</id>
+      <id>sign</id>
       <build>
         <plugins>
           <plugin>
