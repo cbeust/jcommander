@@ -694,7 +694,7 @@ public class JCommander {
     if (m_mainParameterAnnotation != null) {
       out.append(" " + m_mainParameterAnnotation.description() + "\n");
     }
-    out.append("  Options:");
+    out.append("  Options:\n");
 
     // 
     // Align the descriptions at the "longestName" column
@@ -732,7 +732,8 @@ public class JCommander {
           + (pd.getParameter().required() ? "* " : "  ")
           + pd.getNames() + s(spaceCount) + pd.getDescription());
       Object def = pd.getDefault();
-      if (def != null) out.append(" (default: " + def + ")");      out.append("\n");
+      if (def != null) out.append(" (default: " + def + ")");
+      out.append("\n");
     }
 
     //
