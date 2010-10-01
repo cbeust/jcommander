@@ -1,3 +1,7 @@
+Current
+
+Fixed: JCommander would sometimes just print a stack trace and continue, now rethrowing.
+
 1.7
 2010/09/06
 

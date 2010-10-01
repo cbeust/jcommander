@@ -835,14 +835,12 @@ public class JCommander {
       String optionName = names.length > 0 ? names[0] : "[Main class]";
       converter = instantiateConverter(optionName, converterClass);
       result = converter.convert(value);
-    } catch (IllegalArgumentException e) {
-      e.printStackTrace();
     } catch (InstantiationException e) {
-      e.printStackTrace();
+      throw new ParameterException(e);
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      throw new ParameterException(e);
     } catch (InvocationTargetException e) {
-      e.printStackTrace();
+      throw new ParameterException(e);
     }
 
     return result;
