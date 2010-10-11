@@ -480,16 +480,20 @@ public class JCommander {
               int arity = pd.getParameter().arity();
               int n = (arity != -1 ? arity : 1);
 
-              int offset = "--".equals(args[i + 1]) ? 1 : 0;
+              if (i < args.length - 1) {
+                int offset = "--".equals(args[i + 1]) ? 1 : 0;
 
-              if (i + n < args.length) {
-                for (int j = 1; j <= n; j++) {
-                  pd.addValue(trim(args[i + j + offset]));
-                  m_requiredFields.remove(pd.getField());
+                if (i + n < args.length) {
+                  for (int j = 1; j <= n; j++) {
+                    pd.addValue(trim(args[i + j + offset]));
+                    m_requiredFields.remove(pd.getField());
+                  }
+                  i += n + offset;
+                } else {
+                  throw new ParameterException(n + " parameters expected after " + arg);
                 }
-                i += n + offset;
               } else {
-                throw new ParameterException(n + " parameters expected after " + arg);
+                throw new ParameterException("Expected a value after parameter " + arg);
               }
             }
           }

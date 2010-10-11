@@ -18,6 +18,10 @@
 
 package com.beust.jcommander;
 
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args2;
 import com.beust.jcommander.args.ArgsArityString;
@@ -34,6 +38,7 @@ import com.beust.jcommander.args.ArgsPrivate;
 import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
 import com.beust.jcommander.args.ArgsSlaveBogus;
+import com.beust.jcommander.args.Arity1;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
@@ -41,10 +46,6 @@ import com.beust.jcommander.args.SlashSeparator;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
-
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -186,7 +187,7 @@ public class JCommanderTest {
   }
 
   @Test(expectedExceptions = ParameterException.class)
-  public void arity1Fail() {
+  public void arity2Fail() {
     ArgsArityString args = new ArgsArityString();
     String[] argv = { "-pairs", "pair0" };
     new JCommander(args, argv);
@@ -367,11 +368,48 @@ public class JCommanderTest {
     };
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void arity1Fail() {
+    final Arity1 arguments = new Arity1();
+    final JCommander jCommander = new JCommander(arguments);
+    final String[] commands = {
+        "-inspect"
+    };
+    jCommander.parse(commands);
+    System.out.println("Inspect:" + arguments.inspect);
+    Assert.assertTrue(arguments.inspect);
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void arity1Success1() {
+    final Arity1 arguments = new Arity1();
+    final JCommander jCommander = new JCommander(arguments);
+    final String[] commands = {
+        "-inspect", "true"
+    };
+    jCommander.parse(commands);
+    System.out.println("Inspect:" + arguments.inspect);
+    Assert.assertTrue(arguments.inspect);
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void arity1Success2() {
+    final Arity1 arguments = new Arity1();
+    final JCommander jCommander = new JCommander(arguments);
+    final String[] commands = {
+        "-inspect", "false"
+    };
+    jCommander.parse(commands);
+    System.out.println("Inspect:" + arguments.inspect);
+    Assert.assertFalse(arguments.inspect);
+  }
+
   public static void main(String[] args) {
-    ArgsPassword a = new ArgsPassword();
-    JCommander jc = new JCommander(a);
-    jc.parse("-password");
-    System.out.println("Password:" + a.password);
+//    new JCommanderTest().arity1();
+//    ArgsPassword a = new ArgsPassword();
+//    JCommander jc = new JCommander(a);
+//    jc.parse("-password");
+//    System.out.println("Password:" + a.password);
 //    new JCommanderTest().commandsShouldBeShownInOrderOfInsertion();
 //    CommandMain cm = new CommandMain();
 //    JCommander jc = new JCommander(cm);
