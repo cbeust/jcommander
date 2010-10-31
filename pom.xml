@@ -137,6 +137,11 @@
             <goals>
               <goal>manifest</goal>
             </goals>
+            <configuration>
+              <instructions>
+                <_versionpolicy>$(@)</_versionpolicy>
+              </instructions>
+            </configuration>
           </execution>
         </executions>
       </plugin>
