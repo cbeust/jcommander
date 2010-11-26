@@ -490,7 +490,7 @@ public class JCommander {
                   }
                   i += n + offset;
                 } else {
-                  throw new ParameterException(n + " parameters expected after " + arg);
+                  throw new ParameterException("Expected " + n + " values after " + arg);
                 }
               } else {
                 throw new ParameterException("Expected a value after parameter " + arg);
