@@ -185,17 +185,13 @@
   </build>
 
   <dependencies>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-<!-- 
-      <version>5.12.1</version>
-      <version>5.11</version>
-      <classifier>jdk15</classifier>
- -->
-       <version>5.14.1</version>
-      <scope>test</scope>
-    </dependency>
+  	<dependency>
+  		<groupId>org.testng</groupId>
+  		<artifactId>testng</artifactId>
+  		<version>5.14.2</version>
+  		<type>jar</type>
+  		<scope>test</scope>
+  	</dependency>
   </dependencies>
 
   <profiles>
