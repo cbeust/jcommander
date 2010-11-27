@@ -688,6 +688,10 @@ public class JCommander {
     System.out.println(sb.toString());
   }
 
+  private String cleanUpNames(String names) {
+    return names.replace("-", "").replace(" ", "").toLowerCase();
+  }
+
   /**
    * Store the help in the passed string builder.
    */
@@ -729,7 +733,7 @@ public class JCommander {
     Collections.sort(sorted, new Comparator<ParameterDescription>() {
       @Override
       public int compare(ParameterDescription arg0, ParameterDescription arg1) {
-        return arg0.getNames().toLowerCase().compareTo(arg1.getNames().toLowerCase());
+        return cleanUpNames(arg0.getNames()).compareTo(cleanUpNames(arg1.getNames()));
       }
     });
 

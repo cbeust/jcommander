@@ -20,6 +20,7 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args2;
+import com.beust.jcommander.args.Args3;
 import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
 import com.beust.jcommander.args.ArgsBooleanArity0;
@@ -423,8 +424,11 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new JCommanderTest().booleanArity0();
-    new JCommanderTest().booleanArity1();
+//    new JCommanderTest().booleanArity0();
+//    new JCommanderTest().booleanArity1();
+    Args3 a = new Args3();
+    JCommander jc = new JCommander(a);
+    jc.usage();
 //    ArgsPassword a = new ArgsPassword();
 //    JCommander jc = new JCommander(a);
 //    jc.parse("-password");

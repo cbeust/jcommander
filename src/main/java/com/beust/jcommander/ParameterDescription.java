@@ -111,9 +111,11 @@ public class ParameterDescription {
 
   public String getNames() {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < m_parameterAnnotation.names().length; i++) {
+    String[] names = m_parameterAnnotation.names();
+    for (int i = 0; i < names.length; i++) {
       if (i > 0) sb.append(", ");
-      sb.append(m_parameterAnnotation.names()[i]);
+      if (names.length == 1 && names[i].startsWith("--")) sb.append("    ");
+      sb.append(names[i]);
     }
     return sb.toString();
   }
