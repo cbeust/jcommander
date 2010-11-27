@@ -743,9 +743,11 @@ public class JCommander {
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
+      int start = out.length();
       out.append("  "
           + (pd.getParameter().required() ? "* " : "  ")
-          + pd.getNames() + s(spaceCount) + pd.getDescription());
+          + pd.getNames() + s(spaceCount));
+      wrapDescription(out, out.length() - start, pd.getDescription());
       Object def = pd.getDefault();
       if (def != null) out.append(" (default: " + def + ")");
       out.append("\n");
@@ -765,6 +767,30 @@ public class JCommander {
         out.append("    " + name + s(spaceCount) + getCommandDescription(name) + "\n");
       }
     }
+  }
+
+  private void wrapDescription(StringBuilder out, int indent, String description) {
+    int max = 79;
+    String[] words = description.split(" ");
+    int current = indent;
+    int i = 0;
+    while (i < words.length) {
+      String word = words[i];
+      if (word.length() > max || current + word.length() <= max) {
+        out.append(word).append(" ");
+        current += word.length() + 1;
+        i++;
+      } else {
+        out.append("\n").append(spaces(indent));
+        current = indent;
+      }
+    }
+  }
+
+  private String spaces(int indent) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < indent; i++) sb.append(" ");
+    return sb.toString();
   }
 
   /**
