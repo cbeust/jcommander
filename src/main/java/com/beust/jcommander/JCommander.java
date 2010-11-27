@@ -480,7 +480,14 @@ public class JCommander {
               int arity = pd.getParameter().arity();
               int n = (arity != -1 ? arity : 1);
 
-              if (i < args.length - 1) {
+              // Special case for boolean parameters of arity 0
+              if (n == 0 &&
+                  (Boolean.class.isAssignableFrom(fieldType)
+                      || boolean.class.isAssignableFrom(fieldType))) {
+                pd.addValue("true");
+                m_requiredFields.remove(pd.getField());
+              }
+              else if (i < args.length - 1) {
                 int offset = "--".equals(args[i + 1]) ? 1 : 0;
 
                 if (i + n < args.length) {

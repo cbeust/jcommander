@@ -18,14 +18,11 @@
 
 package com.beust.jcommander;
 
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args2;
 import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
+import com.beust.jcommander.args.ArgsBooleanArity0;
 import com.beust.jcommander.args.ArgsConverter;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
@@ -33,7 +30,6 @@ import com.beust.jcommander.args.ArgsI18N2New;
 import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
-import com.beust.jcommander.args.ArgsPassword;
 import com.beust.jcommander.args.ArgsPrivate;
 import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
@@ -46,6 +42,10 @@ import com.beust.jcommander.args.SlashSeparator;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
+
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -218,10 +218,28 @@ public class JCommanderTest {
     Assert.assertEquals(args.days.get(1), "Thursday");
   }
 
-  public void booleanArity() {
+  private void argsBoolean1(String[] params, Boolean expected) {
     ArgsBooleanArity args = new ArgsBooleanArity();
-    new JCommander(args, "-debug", "true");
-    Assert.assertEquals(args.debug, Boolean.TRUE);
+    new JCommander(args, params);
+    Assert.assertEquals(args.debug, expected);
+  }
+
+  private void argsBoolean0(String[] params, Boolean expected) {
+    ArgsBooleanArity0 args = new ArgsBooleanArity0();
+    new JCommander(args, params);
+    Assert.assertEquals(args.debug, expected);
+  }
+
+  @Test
+  public void booleanArity1() {
+    argsBoolean1(new String[] {}, Boolean.FALSE);
+    argsBoolean1(new String[] { "-debug", "true" }, Boolean.TRUE);
+  }
+
+  @Test
+  public void booleanArity0() {
+    argsBoolean0(new String[] {}, Boolean.FALSE);
+    argsBoolean0(new String[] { "-debug"}, Boolean.TRUE);
   }
 
   @Test(expectedExceptions = ParameterException.class)
@@ -405,7 +423,8 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-    new JCommanderTest().arity1Success2();
+    new JCommanderTest().booleanArity0();
+    new JCommanderTest().booleanArity1();
 //    ArgsPassword a = new ArgsPassword();
 //    JCommander jc = new JCommander(a);
 //    jc.parse("-password");

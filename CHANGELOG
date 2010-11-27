@@ -1,5 +1,6 @@
 Current
 
+Added: Boolean parameters with arity 0 (e.g. "foo -debug")
 Fixed: JCommander would sometimes just print a stack trace and continue, now rethrowing.
 
 1.7
