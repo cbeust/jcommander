@@ -38,6 +38,8 @@ public class ParameterDescription {
   private String m_description;
   private JCommander m_jCommander;
   private Object m_default;
+  /** Longest of the names(), used to present usage() alphabetically */
+  private String m_longestName = "";
 
   public ParameterDescription(Object object, Parameter annotation, Field field,
       ResourceBundle bundle, JCommander jc) {
@@ -91,11 +93,19 @@ public class ParameterDescription {
       }
     }
 
+    for (String name : annotation.names()) {
+      if (name.length() > m_longestName.length()) m_longestName = name;
+    }
+
     try {
       m_default = m_field.get(m_object);
     } catch (Exception e) {
-   }
- }
+    }
+  }
+
+  public String getLongestName() {
+    return m_longestName;
+  }
 
   public Object getDefault() {
    return m_default;

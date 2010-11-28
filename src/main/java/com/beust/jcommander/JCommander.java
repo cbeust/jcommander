@@ -732,8 +732,8 @@ public class JCommander {
     //
     Collections.sort(sorted, new Comparator<ParameterDescription>() {
       @Override
-      public int compare(ParameterDescription arg0, ParameterDescription arg1) {
-        return cleanUpNames(arg0.getNames()).compareTo(cleanUpNames(arg1.getNames()));
+      public int compare(ParameterDescription p0, ParameterDescription p1) {
+        return p0.getLongestName().compareTo(p1.getLongestName());
       }
     });
 
