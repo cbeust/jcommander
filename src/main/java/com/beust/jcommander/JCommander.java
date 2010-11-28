@@ -747,9 +747,10 @@ public class JCommander {
       out.append("  "
           + (pd.getParameter().required() ? "* " : "  ")
           + pd.getNames() + s(spaceCount));
-      wrapDescription(out, out.length() - start, pd.getDescription());
+      int indent = out.length() - start;
+      wrapDescription(out, indent, pd.getDescription());
       Object def = pd.getDefault();
-      if (def != null) out.append(" (default: " + def + ")");
+      if (def != null) out.append("\n" + spaces(indent + 1)).append("Default: " + def);
       out.append("\n");
     }
 
@@ -757,7 +758,7 @@ public class JCommander {
     // If commands were specified, show them as well
     //
     if (hasCommands) {
-      out.append("\n  Commands:\n");
+      out.append("  Commands:\n");
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       int ln = longestName(m_commands.keySet()) + 3;
