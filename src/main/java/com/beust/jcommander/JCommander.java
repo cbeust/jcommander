@@ -757,7 +757,7 @@ public class JCommander {
     // If commands were specified, show them as well
     //
     if (hasCommands) {
-      out.append("  Commands:\n");
+      out.append("\n  Commands:\n");
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       int ln = longestName(m_commands.keySet()) + 3;
@@ -777,7 +777,7 @@ public class JCommander {
     while (i < words.length) {
       String word = words[i];
       if (word.length() > max || current + word.length() <= max) {
-        out.append(word).append(" ");
+        out.append(" ").append(word);
         current += word.length() + 1;
         i++;
       } else {
