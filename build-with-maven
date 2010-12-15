@@ -1,2 +1,7 @@
-mvn source:jar javadoc:jar repository:bundle-create -P sign
+mvn clean source:jar javadoc:jar repository:bundle-create -P sign
+
+echo "To deploy to the snapshot repository: mvn deploy"
+echo "To deploy to the release directory: mvn release:clean release:prepare release:perform"
+echo "Nexus UI:  https://oss.sonatype.org/index.html"
+echo "Wiki: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide"
 
