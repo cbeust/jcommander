@@ -31,7 +31,6 @@ public class LongConverter extends BaseConverter<Long> {
     super(optionName);
   }
 
-  @Override
   public Long convert(String value) {
     try {
       return Long.parseLong(value);

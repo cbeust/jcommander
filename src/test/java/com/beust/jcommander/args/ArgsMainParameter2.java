@@ -35,7 +35,6 @@ public class ArgsMainParameter2 implements IHostPorts {
   @Parameter(converter = HostPortConverter.class)
   public List<HostPort> parameters = Lists.newArrayList();
 
-  @Override
   public List<HostPort> getHostPorts() {
     return parameters;
   }

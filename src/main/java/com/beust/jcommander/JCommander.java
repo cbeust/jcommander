@@ -486,8 +486,7 @@ public class JCommander {
                       || boolean.class.isAssignableFrom(fieldType))) {
                 pd.addValue("true");
                 m_requiredFields.remove(pd.getField());
-              }
-              else if (i < args.length - 1) {
+              } else if (i < args.length - 1) {
                 int offset = "--".equals(args[i + 1]) ? 1 : 0;
 
                 if (i + n < args.length) {
@@ -731,7 +730,6 @@ public class JCommander {
     // Sort the options
     //
     Collections.sort(sorted, new Comparator<ParameterDescription>() {
-      @Override
       public int compare(ParameterDescription p0, ParameterDescription p1) {
         return p0.getLongestName().compareTo(p1.getLongestName());
       }

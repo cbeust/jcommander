@@ -237,7 +237,8 @@ public class JCommanderTest {
     argsBoolean1(new String[] { "-debug", "true" }, Boolean.TRUE);
   }
 
-  @Test
+  @Test(enabled = false,
+      description = "Disabled because of JCommander -> TestNG -> JCommander dependency")
   public void booleanArity0() {
     argsBoolean0(new String[] {}, Boolean.FALSE);
     argsBoolean0(new String[] { "-debug"}, Boolean.TRUE);
@@ -424,11 +425,11 @@ public class JCommanderTest {
   }
 
   public static void main(String[] args) {
-//    new JCommanderTest().booleanArity0();
+    new JCommanderTest().booleanArity0();
 //    new JCommanderTest().booleanArity1();
-    ArgsLongDescription a = new ArgsLongDescription();
-    JCommander jc = new JCommander(a);
-    jc.usage();
+//    ArgsLongDescription a = new ArgsLongDescription();
+//    JCommander jc = new JCommander(a);
+//    jc.usage();
 //    ArgsPassword a = new ArgsPassword();
 //    JCommander jc = new JCommander(a);
 //    jc.parse("-password");
