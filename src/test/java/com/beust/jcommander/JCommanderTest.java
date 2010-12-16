@@ -54,8 +54,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+@Test
 public class JCommanderTest {
-  @Test
   public void simpleArgs() {
     Args1 args = new Args1();
     String[] argv = { "-debug", "-log", "2", "-groups", "unit", "a", "b", "c" };
@@ -71,7 +71,6 @@ public class JCommanderTest {
    * Make sure that if there are args with multiple names (e.g. "-log" and "-verbose"),
    * the usage will only display it once.
    */
-  @Test
   public void repeatedArgs() {
     Args1 args = new Args1();
     String[] argv = { "-log", "2" };
@@ -99,12 +98,10 @@ public class JCommanderTest {
     Assert.assertEquals(args.verbose.intValue(), 2);
   }
   
-  @Test
   public void multipleNames1() {
     multipleNames("-log");
   }
 
-  @Test
   public void multipleNames2() {
     multipleNames("-verbose");
   }
@@ -122,17 +119,14 @@ public class JCommanderTest {
     Assert.assertEquals(pd.getDescription(), expectedString);
   }
 
-  @Test
   public void i18nNoLocale() {
     i18n1("MessageBundle", null, "Host");
   }
 
-  @Test
   public void i18nUsLocale() {
     i18n1("MessageBundle", new Locale("en", "US"), "Host");
   }
 
-  @Test
   public void i18nFrLocale() {
     i18n1("MessageBundle", new Locale("fr", "FR"), "Hôte");
   }
@@ -145,17 +139,14 @@ public class JCommanderTest {
     Assert.assertEquals(pd.getDescription(), "Hôte");
   }
 
-  @Test
   public void i18nWithResourceAnnotation() {
     i18n2(new ArgsI18N2());
   }
 
-  @Test
   public void i18nWithResourceAnnotationNew() {
     i18n2(new ArgsI18N2New());
   }
 
-  @Test
   public void multiObjects() {
     ArgsMaster m = new ArgsMaster();
     ArgsSlave s = new ArgsSlave();
@@ -174,7 +165,6 @@ public class JCommanderTest {
     new JCommander(new Object[] { m , s }, argv);
   }
 
-  @Test
   public void arityString() {
     ArgsArityString args = new ArgsArityString();
     String[] argv = { "-pairs", "pair0", "pair1", "rest" };
@@ -201,14 +191,12 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
-  @Test
   public void privateArgs() {
     ArgsPrivate args = new ArgsPrivate();
     new JCommander(args, "-verbose", "3");
     Assert.assertEquals(args.getVerbose().intValue(), 3);
   }
 
-  @Test
   public void converterArgs() {
     ArgsConverter args = new ArgsConverter();
     String fileName = "a";
@@ -231,14 +219,11 @@ public class JCommanderTest {
     Assert.assertEquals(args.debug, expected);
   }
 
-  @Test
   public void booleanArity1() {
     argsBoolean1(new String[] {}, Boolean.FALSE);
     argsBoolean1(new String[] { "-debug", "true" }, Boolean.TRUE);
   }
 
-  @Test(enabled = false,
-      description = "Disabled because of JCommander -> TestNG -> JCommander dependency")
   public void booleanArity0() {
     argsBoolean0(new String[] {}, Boolean.FALSE);
     argsBoolean0(new String[] { "-debug"}, Boolean.TRUE);
@@ -251,7 +236,6 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
-
   @Test(expectedExceptions = ParameterException.class)
   public void badParameterShouldThrowParameter2Exception() {
     Args1 args = new Args1();
@@ -259,7 +243,6 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
-  @Test
   public void listParameters() {
     Args2 a = new Args2();
     String[] argv = {"-log", "2", "-groups", "unit", "a", "b", "c", "-host", "host2"};
@@ -270,7 +253,6 @@ public class JCommanderTest {
     Assert.assertEquals(a.parameters, Arrays.asList("a", "b", "c"));
   }
 
-  @Test
   public void separatorEqual() {
     SeparatorEqual s = new SeparatorEqual();
     String[] argv = { "-log=3", "--longoption=10" };
@@ -279,7 +261,6 @@ public class JCommanderTest {
     Assert.assertEquals(s.longOption.intValue(), 10);
   }
 
-  @Test
   public void separatorColon() {
     SeparatorColon s = new SeparatorColon();
     String[] argv = { "-verbose:true" };
@@ -287,7 +268,6 @@ public class JCommanderTest {
     Assert.assertTrue(s.verbose);
   }
 
-  @Test
   public void separatorBoth() {
     SeparatorColon s = new SeparatorColon();
     SeparatorEqual s2 = new SeparatorEqual();
@@ -297,7 +277,6 @@ public class JCommanderTest {
     Assert.assertEquals(s2.log.intValue(), 3);
   }
 
-  @Test
   public void separatorMixed1() {
     SeparatorMixed s = new SeparatorMixed();
     String[] argv = { "-long:1", "-level=42" };
@@ -306,7 +285,6 @@ public class JCommanderTest {
     Assert.assertEquals(s.level.intValue(), 42);
   }
 
-  @Test
   public void slashParameters() {
     SlashSeparator a = new SlashSeparator();
     String[] argv = { "/verbose", "/file", "/tmp/a" };
@@ -315,7 +293,6 @@ public class JCommanderTest {
     Assert.assertEquals(a.file, "/tmp/a");
   }
 
-  @Test
   public void inheritance() {
     ArgsInherited args = new ArgsInherited();
     String[] argv = { "-log", "3", "-child", "2" };
@@ -324,7 +301,6 @@ public class JCommanderTest {
     Assert.assertEquals(args.log.intValue(), 3);
   }
 
-  @Test
   public void negativeNumber() {
     Args1 a = new Args1();
     String[] argv = { "-verbose", "-3" };
@@ -339,7 +315,6 @@ public class JCommanderTest {
     new JCommander(a, argv);
   }
 
-  @Test
   public void usageShouldNotChange() {
     JCommander jc = new JCommander(new Args1(), new String[]{"-log", "1"});
     StringBuilder sb = new StringBuilder();
@@ -369,7 +344,6 @@ public class JCommanderTest {
     }
   }
 
-  @Test
   public void commandsShouldBeShownInOrderOfInsertion() {
     verifyCommandOrdering(new String[] { "add", "commit" },
         new Object[] { new CommandAdd(), new CommandCommit() });
@@ -388,7 +362,7 @@ public class JCommanderTest {
     };
   }
 
-//  @Test(expectedExceptions = ParameterException.class)
+  @Test(expectedExceptions = ParameterException.class)
   public void arity1Fail() {
     final Arity1 arguments = new Arity1();
     final JCommander jCommander = new JCommander(arguments);
@@ -396,11 +370,8 @@ public class JCommanderTest {
         "-inspect"
     };
     jCommander.parse(commands);
-    System.out.println("Inspect:" + arguments.inspect);
-    Assert.assertTrue(arguments.inspect);
   }
 
-//  @Test(expectedExceptions = ParameterException.class)
   public void arity1Success1() {
     final Arity1 arguments = new Arity1();
     final JCommander jCommander = new JCommander(arguments);
@@ -408,11 +379,9 @@ public class JCommanderTest {
         "-inspect", "true"
     };
     jCommander.parse(commands);
-    System.out.println("Inspect:" + arguments.inspect);
     Assert.assertTrue(arguments.inspect);
   }
 
-//  @Test(expectedExceptions = ParameterException.class)
   public void arity1Success2() {
     final Arity1 arguments = new Arity1();
     final JCommander jCommander = new JCommander(arguments);
@@ -420,12 +389,11 @@ public class JCommanderTest {
         "-inspect", "false"
     };
     jCommander.parse(commands);
-    System.out.println("Inspect:" + arguments.inspect);
     Assert.assertFalse(arguments.inspect);
   }
 
-  public static void main(String[] args) {
-    new JCommanderTest().booleanArity0();
+//  public static void main(String[] args) {
+//    new JCommanderTest().arity1Fail();
 //    new JCommanderTest().booleanArity1();
 //    ArgsLongDescription a = new ArgsLongDescription();
 //    JCommander jc = new JCommander(a);
@@ -456,7 +424,7 @@ public class JCommanderTest {
 //    String[] argv = { "-log=10" };
 //    JCommander jc = new JCommander(a, argv);
 //    Assert.assertEquals(a.log.intValue(), 10);
-  }
+//  }
 
   // Tests:
   // required unparsed parameter
