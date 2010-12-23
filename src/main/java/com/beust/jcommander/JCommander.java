@@ -183,7 +183,7 @@ public class JCommander {
     sb.append(join(args).append("\"\n  with:").append(join(m_objects.toArray())));
     p(sb.toString());
 
-    createDescriptions();
+    if (m_descriptions == null) createDescriptions();
     initializeDefaultValues();
     parseValues(expandArgs(args));
     validateOptions();

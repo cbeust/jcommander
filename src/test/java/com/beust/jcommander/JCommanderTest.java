@@ -29,6 +29,7 @@ import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
 import com.beust.jcommander.args.ArgsInherited;
+import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
 import com.beust.jcommander.args.ArgsPrivate;
@@ -313,6 +314,15 @@ public class JCommanderTest {
     ArgsRequired a = new ArgsRequired();
     String[] argv = {};
     new JCommander(a, argv);
+  }
+
+  @Test
+  public void noParseConstructor() {
+    JCommander jCommander = new JCommander(new ArgsMainParameter1());
+    jCommander.usage();
+    // Before fix, this parse would throw an exception, because it calls createDescription, which
+    // was already called by usage(), and can only be called once.
+    jCommander.parse();
   }
 
   public void usageShouldNotChange() {
