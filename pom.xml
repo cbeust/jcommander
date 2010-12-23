@@ -169,7 +169,8 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>${project.version}</version>
-          </dependency>
+            <version>1.13</version>
+           </dependency>
         </dependencies>
       </plugin>
 -->
@@ -190,7 +191,7 @@
   	<dependency>
   		<groupId>org.testng</groupId>
   		<artifactId>testng</artifactId>
-  		<version>5.14.4</version>
+  		<version>5.14.6</version>
   		<type>jar</type>
   		<scope>test</scope>
   	</dependency>
