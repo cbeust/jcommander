@@ -149,15 +149,22 @@ public class JCommanderTest {
     i18n2(new ArgsI18N2New());
   }
 
+  public void noParseConstructor() {
+    JCommander jCommander = new JCommander(new ArgsMainParameter1());
+    jCommander.usage();
+    // Before fix, this parse would throw an exception, because it calls createDescription, which
+    // was already called by usage(), and can only be called once.
+    jCommander.parse();
+  }
+
   /**
    * Test a use case where there are required parameters, but you still want
    * to interrogate the options which are specified.
    */
-  @Test
   public void usageWithRequiredArgsAndResourceBundle() {
-    System.out.println("In the test");
     ArgsHelp argsHelp = new ArgsHelp();
-    JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()}, java.util.ResourceBundle.getBundle("MessageBundle"));
+    JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()},
+        java.util.ResourceBundle.getBundle("MessageBundle"));
     // Should be able to display usage without triggering validation
     jc.usage();
     try {
@@ -335,15 +342,6 @@ public class JCommanderTest {
     ArgsRequired a = new ArgsRequired();
     String[] argv = {};
     new JCommander(a, argv);
-  }
-
-  @Test
-  public void noParseConstructor() {
-    JCommander jCommander = new JCommander(new ArgsMainParameter1());
-    jCommander.usage();
-    // Before fix, this parse would throw an exception, because it calls createDescription, which
-    // was already called by usage(), and can only be called once.
-    jCommander.parse();
   }
 
   public void usageShouldNotChange() {
