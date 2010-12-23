@@ -1,6 +1,7 @@
 Current
 
 Added: Boolean parameters with arity 0 (e.g. "foo -debug")
+Added: Added a constructor that takes a Bundle only, https://github.com/cbeust/jcommander/pull/47 (Russell Egan)
 Fixed: JCommander would sometimes just print a stack trace and continue, now rethrowing.
 
 1.7
