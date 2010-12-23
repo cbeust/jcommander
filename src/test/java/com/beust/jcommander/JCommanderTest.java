@@ -20,6 +20,7 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args2;
+import com.beust.jcommander.args.ArgsHelp;
 import com.beust.jcommander.args.ArgsLongDescription;
 import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
@@ -146,6 +147,26 @@ public class JCommanderTest {
 
   public void i18nWithResourceAnnotationNew() {
     i18n2(new ArgsI18N2New());
+  }
+
+  /**
+   * Test a use case where there are required parameters, but you still want
+   * to interrogate the options which are specified.
+   */
+  @Test
+  public void usageWithRequiredArgsAndResourceBundle() {
+    System.out.println("In the test");
+    ArgsHelp argsHelp = new ArgsHelp();
+    JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()}, java.util.ResourceBundle.getBundle("MessageBundle"));
+    // Should be able to display usage without triggering validation
+    jc.usage();
+    try {
+      jc.parse("-h");
+      Assert.fail("Should have thrown a required parameter exception");
+    } catch (ParameterException e) {
+      Assert.assertTrue(e.getMessage().contains("are required"));
+    }
+    Assert.assertTrue(argsHelp.help);
   }
 
   public void multiObjects() {

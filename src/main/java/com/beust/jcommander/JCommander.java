@@ -139,6 +139,14 @@ public class JCommander {
   /**
    * @param object The arg object expected to contain {@link @Parameter} annotations.
    * @param bundle The bundle to use for the descriptions. Can be null.
+   */
+  public JCommander(Object object, ResourceBundle bundle) {
+      init(object, bundle);
+  }
+
+  /**
+   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   * @param bundle The bundle to use for the descriptions. Can be null.
    * @param args The arguments to parse (optional).
    */
   public JCommander(Object object, ResourceBundle bundle, String... args) {
