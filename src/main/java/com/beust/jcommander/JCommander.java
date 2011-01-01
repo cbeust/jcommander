@@ -66,7 +66,7 @@ public class JCommander {
   /**
    * The objects that contain fields annotated with @Parameter.
    */
-  private List<Object> m_objects;
+  private List<Object> m_objects = Lists.newArrayList();
 
   /**
    * This field will contain whatever command line parameter is not an option.
@@ -130,10 +130,16 @@ public class JCommander {
   };
 
   /**
+   * Creates a new un-configured JCommander object. 
+   */
+  public JCommander() {
+  }
+
+  /**
    * @param object The arg object expected to contain {@link @Parameter} annotations.
    */
   public JCommander(Object object) {
-    init(object, null);
+    addObject(object);
   }
 
   /**
@@ -141,7 +147,8 @@ public class JCommander {
    * @param bundle The bundle to use for the descriptions. Can be null.
    */
   public JCommander(Object object, ResourceBundle bundle) {
-      init(object, bundle);
+    addObject(object);
+    setDescriptionsBundle(bundle);
   }
 
   /**
@@ -150,7 +157,8 @@ public class JCommander {
    * @param args The arguments to parse (optional).
    */
   public JCommander(Object object, ResourceBundle bundle, String... args) {
-    init(object, bundle);
+    addObject(object);
+    setDescriptionsBundle(bundle);
     parse(args);
   }
 
@@ -159,13 +167,20 @@ public class JCommander {
    * @param args The arguments to parse (optional).
    */
   public JCommander(Object object, String... args) {
-    init(object, null);
+    addObject(object);
     parse(args);
   }
 
-  private void init(Object object, ResourceBundle bundle) {
-    m_bundle = bundle;
-    m_objects = Lists.newArrayList();
+  /**
+   * Adds the provided arg object to the set of objects that this commander
+   * will parse arguments into. 
+   *
+   * @param object The arg object expected to contain {@link Parameter} 
+   * annotations. If <code>object</code> is an array or is {@link Iterable}, 
+   * the child objects will be added instead.
+   */
+  // declared final since this is invoked from constructors
+  public final void addObject(Object object) {
     if (object instanceof Iterable) {
       // Iterable
       for (Object o : (Iterable<?>) object) {
@@ -180,7 +195,15 @@ public class JCommander {
       // Single object
       m_objects.add(object);
     }
+  }
 
+  /**
+   * Sets the {@link ResourceBundle} to use for looking up descriptions.
+   * Set this to <code>null</code> to use description text directly.
+   */
+  // declared final since this is invoked from constructors
+  public final void setDescriptionsBundle(ResourceBundle bundle) {
+    m_bundle = bundle;
   }
 
   /**
