@@ -49,9 +49,9 @@ import java.util.ResourceBundle;
  * values and a few other helper methods, such as usage().
  * 
  * The object(s) you pass in the constructor are expected to have one or more
- * @Parameter annotations on them. You can pass either a single object, an array of objects 
+ * \@Parameter annotations on them. You can pass either a single object, an array of objects 
  * or an instance of Iterable. In the case of an array or Iterable, JCommander will collect
- * the @Parameter annotations from all the objects passed in parameter.
+ * the \@Parameter annotations from all the objects passed in parameter.
  * 
  * @author cbeust
  */
@@ -136,14 +136,14 @@ public class JCommander {
   }
 
   /**
-   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   * @param object The arg object expected to contain {@link Parameter} annotations.
    */
   public JCommander(Object object) {
     addObject(object);
   }
 
   /**
-   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   * @param object The arg object expected to contain {@link Parameter} annotations.
    * @param bundle The bundle to use for the descriptions. Can be null.
    */
   public JCommander(Object object, ResourceBundle bundle) {
@@ -152,7 +152,7 @@ public class JCommander {
   }
 
   /**
-   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   * @param object The arg object expected to contain {@link Parameter} annotations.
    * @param bundle The bundle to use for the descriptions. Can be null.
    * @param args The arguments to parse (optional).
    */
@@ -163,7 +163,7 @@ public class JCommander {
   }
 
   /**
-   * @param object The arg object expected to contain {@link @Parameter} annotations.
+   * @param object The arg object expected to contain {@link Parameter} annotations.
    * @param args The arguments to parse (optional).
    */
   public JCommander(Object object, String... args) {
@@ -407,7 +407,7 @@ public class JCommander {
   }
 
   /**
-   * Create the ParameterDescriptions for all the @Parameter found.
+   * Create the ParameterDescriptions for all the \@Parameter found.
    */
   private void createDescriptions() {
     m_descriptions = Maps.newHashMap();
@@ -718,10 +718,6 @@ public class JCommander {
     System.out.println(sb.toString());
   }
 
-  private String cleanUpNames(String names) {
-    return names.replace("-", "").replace(" ", "").toLowerCase();
-  }
-
   /**
    * Store the help in the passed string builder.
    */
@@ -824,7 +820,7 @@ public class JCommander {
   }
 
   /**
-   * @return a Collection of all the @Parameter annotations found on the
+   * @return a Collection of all the \@Parameter annotations found on the
    * target class. This can be used to display the usage() in a different
    * format (e.g. HTML).
    */
@@ -863,8 +859,8 @@ public class JCommander {
   }
 
   /**
-   * @param type The class of the field
-   * @param annotation The annotation
+   * @param field The field
+   * @param type The type of the actual parameter
    * @param value The value to convert
    */
   public Object convertValue(Field field, Class type, String value) {

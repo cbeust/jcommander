@@ -24,7 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * @deprecated, use @Parameters
+ * @deprecated use @Parameters
  * 
  * @author cbeust
  */
