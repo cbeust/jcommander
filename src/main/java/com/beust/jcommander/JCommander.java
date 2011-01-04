@@ -130,7 +130,7 @@ public class JCommander {
   };
 
   /**
-   * Creates a new un-configured JCommander object. 
+   * Creates a new un-configured JCommander object.
    */
   public JCommander() {
   }
@@ -173,10 +173,10 @@ public class JCommander {
 
   /**
    * Adds the provided arg object to the set of objects that this commander
-   * will parse arguments into. 
+   * will parse arguments into.
    *
-   * @param object The arg object expected to contain {@link Parameter} 
-   * annotations. If <code>object</code> is an array or is {@link Iterable}, 
+   * @param object The arg object expected to contain {@link Parameter}
+   * annotations. If <code>object</code> is an array or is {@link Iterable},
    * the child objects will be added instead.
    */
   // declared final since this is invoked from constructors
