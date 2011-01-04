@@ -159,21 +159,24 @@
       </plugin>
 
       <!-- Tests -->
-<!-- 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.7</version>
+        <version>2.7.1</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
         <dependencies>
           <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>${project.version}</version>
+<!--
             <version>1.13</version>
+-->
            </dependency>
         </dependencies>
       </plugin>
--->
 
       <!-- Generating Javadoc -->
       <plugin>

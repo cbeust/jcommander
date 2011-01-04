@@ -20,12 +20,11 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args2;
-import com.beust.jcommander.args.ArgsHelp;
-import com.beust.jcommander.args.ArgsLongDescription;
 import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
 import com.beust.jcommander.args.ArgsBooleanArity0;
 import com.beust.jcommander.args.ArgsConverter;
+import com.beust.jcommander.args.ArgsHelp;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
@@ -151,7 +150,7 @@ public class JCommanderTest {
 
   public void noParseConstructor() {
     JCommander jCommander = new JCommander(new ArgsMainParameter1());
-    jCommander.usage();
+    jCommander.usage(new StringBuilder());
     // Before fix, this parse would throw an exception, because it calls createDescription, which
     // was already called by usage(), and can only be called once.
     jCommander.parse();
@@ -166,7 +165,7 @@ public class JCommanderTest {
     JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()},
         java.util.ResourceBundle.getBundle("MessageBundle"));
     // Should be able to display usage without triggering validation
-    jc.usage();
+    jc.usage(new StringBuilder());
     try {
       jc.parse("-h");
       Assert.fail("Should have thrown a required parameter exception");

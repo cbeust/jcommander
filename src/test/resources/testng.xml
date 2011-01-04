@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+  
+<suite name="JCommander">
+
+  <test name="JCommander tests">
+    <classes>
+      <class name="com.beust.jcommander.command.CommandTest" />
+      <class name="com.beust.jcommander.ConverterFactoryTest" />
+      <class name="com.beust.jcommander.DefaultProviderTest" />
+      <class name="com.beust.jcommander.JCommanderTest" />
+    </classes>
+  </test>
+
+</suite>
+
