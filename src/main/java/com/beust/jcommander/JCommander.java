@@ -739,7 +739,6 @@ public class JCommander {
     if (m_mainParameterAnnotation != null) {
       out.append(" " + m_mainParameterAnnotation.description() + "\n");
     }
-    out.append("  Options:\n");
 
     // 
     // Align the descriptions at the "longestName" column
@@ -769,6 +768,7 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
+    if (sorted.size() > 0) out.append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
