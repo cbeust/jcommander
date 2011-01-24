@@ -32,6 +32,7 @@ import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
+import com.beust.jcommander.args.ArgsOutOfMemory;
 import com.beust.jcommander.args.ArgsPrivate;
 import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
@@ -448,9 +449,15 @@ public class JCommanderTest {
     jc.parse(new String[] { "f1", "f2" });
   }
 
+  @Test(description = "This used to run out of memory")
+  public void oom() {
+    JCommander jc = new JCommander(new ArgsOutOfMemory());
+    jc.usage(new StringBuilder());
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) {
-    new JCommander(new Help()).usage();
+    new JCommanderTest().oom();
 //    new JCommanderTest().booleanArity1();
 //    ArgsLongDescription a = new ArgsLongDescription();
 //    JCommander jc = new JCommander(a);

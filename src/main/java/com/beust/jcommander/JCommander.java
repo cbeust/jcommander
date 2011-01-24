@@ -812,11 +812,11 @@ public class JCommander {
       if (word.length() > max || current + word.length() <= max) {
         out.append(" ").append(word);
         current += word.length() + 1;
-        i++;
       } else {
-        out.append("\n").append(spaces(indent));
+        out.append("\n").append(spaces(indent + 1)).append(word);
         current = indent;
       }
+      i++;
     }
   }
 
