@@ -1,6 +1,10 @@
 Current
 
-1.14
+Added: Don't display "Options:" if none were defined.
+Added: Enforce that the type of the main parameter is a List.
+Fixed: OOM when parsing certain descriptions with long URL's in them.
+
+1.15
 2011/01/24
 
 Added: Added a constructor that takes a Bundle only, https://github.com/cbeust/jcommander/pull/47 (Russell Egan)
