@@ -629,7 +629,7 @@ public class JCommander {
   /**
    * @return the field that's meant to receive all the parameters that are not options.
    * 
-   * @param arg the arg that we're about to add (only passed here to ouput a meaningful
+   * @param arg the arg that we're about to add (only passed here to output a meaningful
    * error message).
    */
   private List<?> getMainParameter(String arg) {
@@ -639,10 +639,13 @@ public class JCommander {
     }
 
     try {
-      @SuppressWarnings("unchecked")
-      List<?> result = (List<?>) m_mainParameterField.get(m_mainParameterObject);
+      List result = (List) m_mainParameterField.get(m_mainParameterObject);
       if (result == null) {
         result = Lists.newArrayList();
+        if (! List.class.isAssignableFrom(m_mainParameterField.getType())) {
+          throw new ParameterException("Main parameter field " + m_mainParameterField
+              + " needs to be of type List, not " + m_mainParameterField.getType());
+        }
         m_mainParameterField.set(m_mainParameterObject, result);
       }
       return result;
