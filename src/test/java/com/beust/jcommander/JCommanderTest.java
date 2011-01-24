@@ -90,6 +90,16 @@ public class JCommanderTest {
   }
 
   /**
+   * Getting the description of a nonexistent command should throw an exception.
+   */
+  @Test(expectedExceptions = ParameterException.class)
+  public void nonexistentCommandShouldThrow() {
+    String[] argv = { };
+    JCommander jc = new JCommander(new Object(), argv);
+    jc.getCommandDescription("foo");
+  }
+
+  /**
    * Required options with multiple names should work with all names.
    */
   private void multipleNames(String option) {

@@ -702,6 +702,10 @@ public class JCommander {
    */
   public String getCommandDescription(String commandName) {
     JCommander jc = m_commands.get(commandName);
+    if (jc == null) {
+      throw new ParameterException("Asking description for unknown command: " + commandName);
+    }
+
     Parameters p = jc.getObjects().get(0).getClass().getAnnotation(Parameters.class);
     String result = jc.getMainParameterDescription();
     if (p != null) result = p.commandDescription();
