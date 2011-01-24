@@ -5,7 +5,7 @@ export TESTNG=../testng/target/testng-5.14.7beta.jar
 java -classpath target/classes:target/test-classes:${TESTNG}:$CLASSPATH org.testng.TestNG src/test/resources/testng.xml
 
 echo "To deploy to the snapshot repository: mvn deploy"
-echo "To deploy to the release directory: mvn release:clean release:prepare release:perform"
+echo "To deploy to the release directory: mvn -DskipTests=true release:clean release:prepare release:perform"
 echo "Nexus UI:  https://oss.sonatype.org/index.html"
 echo "Wiki: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide"
 
