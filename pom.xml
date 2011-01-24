@@ -170,9 +170,9 @@
           <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>${project.version}</version>
-<!--
             <version>1.13</version>
+<!--
+            <version>${project.version}</version>
 -->
            </dependency>
         </dependencies>
