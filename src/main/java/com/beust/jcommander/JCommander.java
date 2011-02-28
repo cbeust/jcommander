@@ -140,6 +140,7 @@ public class JCommander {
    */
   public JCommander(Object object) {
     addObject(object);
+    createDescriptions();
   }
 
   /**
@@ -655,7 +656,7 @@ public class JCommander {
     }
   }
 
-  private String getMainParameterDescription() {
+  public String getMainParameterDescription() {
     if (m_descriptions == null) createDescriptions();
     return m_mainParameterAnnotation != null ? m_mainParameterAnnotation.description()
         : null;
