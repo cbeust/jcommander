@@ -140,6 +140,7 @@ public class JCommander {
    */
   public JCommander(Object object) {
     addObject(object);
+    createDescriptions();
   }
 
   /**
@@ -629,7 +630,7 @@ public class JCommander {
   /**
    * @return the field that's meant to receive all the parameters that are not options.
    * 
-   * @param arg the arg that we're about to add (only passed here to ouput a meaningful
+   * @param arg the arg that we're about to add (only passed here to output a meaningful
    * error message).
    */
   private List<?> getMainParameter(String arg) {
@@ -639,10 +640,13 @@ public class JCommander {
     }
 
     try {
-      @SuppressWarnings("unchecked")
-      List<?> result = (List<?>) m_mainParameterField.get(m_mainParameterObject);
+      List result = (List) m_mainParameterField.get(m_mainParameterObject);
       if (result == null) {
         result = Lists.newArrayList();
+        if (! List.class.isAssignableFrom(m_mainParameterField.getType())) {
+          throw new ParameterException("Main parameter field " + m_mainParameterField
+              + " needs to be of type List, not " + m_mainParameterField.getType());
+        }
         m_mainParameterField.set(m_mainParameterObject, result);
       }
       return result;
@@ -652,7 +656,7 @@ public class JCommander {
     }
   }
 
-  private String getMainParameterDescription() {
+  public String getMainParameterDescription() {
     if (m_descriptions == null) createDescriptions();
     return m_mainParameterAnnotation != null ? m_mainParameterAnnotation.description()
         : null;
@@ -702,6 +706,10 @@ public class JCommander {
    */
   public String getCommandDescription(String commandName) {
     JCommander jc = m_commands.get(commandName);
+    if (jc == null) {
+      throw new ParameterException("Asking description for unknown command: " + commandName);
+    }
+
     Parameters p = jc.getObjects().get(0).getClass().getAnnotation(Parameters.class);
     String result = jc.getMainParameterDescription();
     if (p != null) result = p.commandDescription();
@@ -735,7 +743,6 @@ public class JCommander {
     if (m_mainParameterAnnotation != null) {
       out.append(" " + m_mainParameterAnnotation.description() + "\n");
     }
-    out.append("  Options:\n");
 
     // 
     // Align the descriptions at the "longestName" column
@@ -765,6 +772,7 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
+    if (sorted.size() > 0) out.append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
@@ -805,11 +813,11 @@ public class JCommander {
       if (word.length() > max || current + word.length() <= max) {
         out.append(" ").append(word);
         current += word.length() + 1;
-        i++;
       } else {
-        out.append("\n").append(spaces(indent));
+        out.append("\n").append(spaces(indent + 1)).append(word);
         current = indent;
       }
+      i++;
     }
   }
 

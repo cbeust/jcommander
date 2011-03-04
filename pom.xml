@@ -24,7 +24,7 @@
   <artifactId>jcommander</artifactId>
   <packaging>jar</packaging>
   <name>JCommander</name>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.16-SNAPSHOT</version>
   <description>A Java framework to parse command line options with annotations.</description>
   <url>http://beust.com/jcommander</url>
   <licenses>
@@ -137,9 +137,9 @@
           <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>${project.version}</version>
-<!--
             <version>1.13</version>
+<!--
+            <version>${project.version}</version>
 -->
            </dependency>
         </dependencies>

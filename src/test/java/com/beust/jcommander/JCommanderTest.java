@@ -32,6 +32,7 @@ import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
+import com.beust.jcommander.args.ArgsOutOfMemory;
 import com.beust.jcommander.args.ArgsPrivate;
 import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
@@ -45,12 +46,15 @@ import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
 
+import org.omg.PortableServer.POAPackage.WrongAdapter;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -87,6 +91,16 @@ public class JCommanderTest {
     Args1 args = new Args1();
     String[] argv = { "-debug" };
     new JCommander(args, argv);
+  }
+
+  /**
+   * Getting the description of a nonexistent command should throw an exception.
+   */
+  @Test(expectedExceptions = ParameterException.class)
+  public void nonexistentCommandShouldThrow() {
+    String[] argv = { };
+    JCommander jc = new JCommander(new Object(), argv);
+    jc.getCommandDescription("foo");
   }
 
   /**
@@ -420,8 +434,30 @@ public class JCommanderTest {
     Assert.assertFalse(arguments.inspect);
   }
 
-//  public static void main(String[] args) {
-//    new JCommanderTest().arity1Fail();
+  @Parameters(commandDescription = "Help for the given commands.")
+  public static class Help {
+      public static final String NAME = "help";
+
+      @Parameter(description = "List of commands.")
+      public List<String> commands=new ArrayList<String>();
+  }
+
+  @Test(expectedExceptions = ParameterException.class,
+      description = "Verify that the main parameter's type is checked to be a List")
+  public void wrongMainTypeShouldThrow() {
+    JCommander jc = new JCommander(new ArgsRequiredWrongMain());
+    jc.parse(new String[] { "f1", "f2" });
+  }
+
+  @Test(description = "This used to run out of memory")
+  public void oom() {
+    JCommander jc = new JCommander(new ArgsOutOfMemory());
+    jc.usage(new StringBuilder());
+  }
+
+  @Test(enabled = false)
+  public static void main(String[] args) {
+    new JCommanderTest().oom();
 //    new JCommanderTest().booleanArity1();
 //    ArgsLongDescription a = new ArgsLongDescription();
 //    JCommander jc = new JCommander(a);
@@ -453,6 +489,7 @@ public class JCommanderTest {
 //    JCommander jc = new JCommander(a, argv);
 //    Assert.assertEquals(a.log.intValue(), 10);
 //  }
+  }
 
   // Tests:
   // required unparsed parameter
