@@ -592,7 +592,7 @@ public class JCommander {
       i++;
     }
 
-      //Flag the parameter descriptions held in field as assigned
+      //Flag the parameter descriptions held in m_fields as assigned
       for (ParameterDescription parameterDescription : m_descriptions.values()) {
           if(parameterDescription.isAssigned()){
             m_fields.get(parameterDescription.getField()).setAssigned(true);
