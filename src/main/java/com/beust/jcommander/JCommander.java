@@ -231,17 +231,6 @@ public class JCommander {
     parseValues(expandArgs(args));
   }
 
-  public List<ParameterDescription> getParsedParameterDescriptions(){
-      List<ParameterDescription> descriptions  = new ArrayList<ParameterDescription>();
-      descriptions.addAll(m_descriptions.values());
-      if(m_mainParameterDescription != null){
-        descriptions.add(m_mainParameterDescription);
-      }
-      return descriptions;
-  }
-
-
-
   private StringBuilder join(Object[] args) {
     StringBuilder result = new StringBuilder();
     for (int i = 0; i < args.length; i++) {
@@ -602,6 +591,14 @@ public class JCommander {
       }
       i++;
     }
+
+      //Flag the parameter descriptions held in field as assigned
+      for (ParameterDescription parameterDescription : m_descriptions.values()) {
+          if(parameterDescription.isAssigned()){
+            m_fields.get(parameterDescription.getField()).setAssigned(true);
+          }
+      }
+
   }
 
   /**
@@ -855,6 +852,13 @@ public class JCommander {
    */
   public List<ParameterDescription> getParameters() {
     return new ArrayList<ParameterDescription>(m_fields.values());
+  }
+
+    /**
+     * @return the main parameter description or null if none is defined.
+     */
+  public ParameterDescription getMainParameter(){
+    return m_mainParameterDescription;
   }
 
   private void p(String string) {
