@@ -20,6 +20,7 @@ package com.beust.jcommander;
 
 
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.validators.NoValidator;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -160,15 +161,29 @@ public class ParameterDescription {
   }
 
   /**
-   * Add the specified value to the field. First look up any field converter, then
-   * any type converter, and if we can't find any, throw an exception.
+   * Add the specified value to the field. First, validate the value if a
+   * validator was specified. Then look up any field converter, then any type
+   * converter, and if we can't find any, throw an exception.
    */
   public void addValue(String value, boolean isDefault) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_field.getName());
+    String name = m_parameterAnnotation.names()[0];
     if (m_assigned && ! isMultiOption()) {
-      throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
+      throw new ParameterException("Can only specify option " + name
           + " once.");
+    }
+
+     Class<? extends IParameterValidator> validator = m_parameterAnnotation.validateWith();
+    if (validator != NoValidator.class) {
+      try {
+        p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
+        validator.newInstance().validate(name, value);
+      } catch (InstantiationException e) {
+        throw new ParameterException("Can't instantiate validator:" + e);
+      } catch (IllegalAccessException e) {
+        throw new ParameterException("Can't instantiate validator:" + e);
+      }
     }
 
     Class<?> type = m_field.getType();

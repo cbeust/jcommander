@@ -37,6 +37,7 @@ import com.beust.jcommander.args.ArgsPrivate;
 import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
 import com.beust.jcommander.args.ArgsSlaveBogus;
+import com.beust.jcommander.args.ArgsValidate1;
 import com.beust.jcommander.args.Arity1;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
@@ -46,7 +47,6 @@ import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
 
-import org.omg.PortableServer.POAPackage.WrongAdapter;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -455,9 +455,23 @@ public class JCommanderTest {
     jc.usage(new StringBuilder());
   }
 
+  @Test
+  public void getParametersShouldNotNpe() {
+    JCommander jc = new JCommander(new Args1());
+    List<ParameterDescription> parameters = jc.getParameters();
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void validationShouldWork1() {
+    ArgsValidate1 a = new ArgsValidate1();
+    JCommander jc = new JCommander(a);
+    jc.parse(new String[] { "-age", "-2 "});
+    System.out.println("Age:" + a.age);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) {
-    new JCommanderTest().oom();
+    new JCommanderTest().validationShouldWork1();
 //    new JCommanderTest().booleanArity1();
 //    ArgsLongDescription a = new ArgsLongDescription();
 //    JCommander jc = new JCommander(a);
