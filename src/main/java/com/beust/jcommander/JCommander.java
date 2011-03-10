@@ -568,7 +568,7 @@ public class JCommander {
             // Command parsing
             //
             JCommander jc = m_commands.get(arg);
-            if (jc == null) throw new ParameterException("Expected a command, got " + arg);
+            if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
             m_parsedCommand = arg;
 
             // Found a valid command, ask it to parse the remainder of the arguments.
