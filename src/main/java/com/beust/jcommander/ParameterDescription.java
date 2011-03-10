@@ -51,6 +51,7 @@ public class ParameterDescription {
    * Find the resource bundle in the annotations.
    * @return
    */
+  @SuppressWarnings("deprecation")
   private ResourceBundle findResourceBundle(Object o) {
     ResourceBundle result = null;
 
