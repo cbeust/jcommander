@@ -884,9 +884,6 @@ public class JCommander {
     if (converterClass == null) {
       converterClass = StringConverter.class;
     }
-    if (converterClass == null && Collection.class.isAssignableFrom(type)) {
-      converterClass = StringConverter.class;
-    }
 
     //
 //    //
