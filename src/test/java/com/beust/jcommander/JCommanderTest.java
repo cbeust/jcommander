@@ -51,6 +51,9 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -475,9 +478,20 @@ public class JCommanderTest {
     jc.parse(new String[] { "-age", "-2 "});
   }
 
+  public void atFileCanContainEmptyLines() throws IOException {
+    File f = File.createTempFile("JCommander", null);
+    f.deleteOnExit();
+    FileWriter fw = new FileWriter(f);
+    fw.write("-log\n");
+    fw.write("\n");
+    fw.write("2\n");
+    fw.close();
+    new JCommander(new Args1(), "@" + f.getAbsolutePath());
+  }
+
   @Test(enabled = false)
-  public static void main(String[] args) {
-    new JCommanderTest().validationShouldWork1();
+  public static void main(String[] args) throws Exception {
+    new JCommanderTest().atFileCanContainEmptyLines();
 //    new JCommanderTest().booleanArity1();
 //    ArgsLongDescription a = new ArgsLongDescription();
 //    JCommander jc = new JCommander(a);

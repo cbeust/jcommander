@@ -381,7 +381,8 @@ public class JCommander {
 
       // Read through file one line at time. Print line # and line
       while ((line = bufRead.readLine()) != null) {
-        result.add(line);
+        // Allow empty lines in these at files
+        if (line.length() > 0) result.add(line);
       }
 
       bufRead.close();
