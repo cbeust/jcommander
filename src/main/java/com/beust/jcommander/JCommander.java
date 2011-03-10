@@ -208,20 +208,20 @@ public class JCommander {
   }
 
   /**
-   * Parse the command line parameters.
+   * Parse and validate the command line parameters.
    */
   public void parse(String... args) {
-    StringBuilder sb = new StringBuilder("Parsing \"");
-    sb.append(join(args).append("\"\n  with:").append(join(m_objects.toArray())));
-    p(sb.toString());
-
-    if (m_descriptions == null) createDescriptions();
-    initializeDefaultValues();
-    parseValues(expandArgs(args));
-    validateOptions();
+    parse(true /* validate */, args);
   }
 
+  /**
+   * Parse the command line parameters without validating them.
+   */
   public void parseWithoutValidation(String... args) {
+    parse(false /* no validation */, args);
+  }
+
+  private void parse(boolean validate, String... args) {
     StringBuilder sb = new StringBuilder("Parsing \"");
     sb.append(join(args).append("\"\n  with:").append(join(m_objects.toArray())));
     p(sb.toString());
@@ -229,6 +229,7 @@ public class JCommander {
     if (m_descriptions == null) createDescriptions();
     initializeDefaultValues();
     parseValues(expandArgs(args));
+    if (validate) validateOptions();
   }
 
   private StringBuilder join(Object[] args) {
@@ -593,12 +594,12 @@ public class JCommander {
       i++;
     }
 
-      //Flag the parameter descriptions held in m_fields as assigned
-      for (ParameterDescription parameterDescription : m_descriptions.values()) {
-          if(parameterDescription.isAssigned()){
-            m_fields.get(parameterDescription.getField()).setAssigned(true);
-          }
+    // Mark the parameter descriptions held in m_fields as assigned
+    for (ParameterDescription parameterDescription : m_descriptions.values()) {
+      if (parameterDescription.isAssigned()) {
+        m_fields.get(parameterDescription.getField()).setAssigned(true);
       }
+    }
 
   }
 
@@ -855,10 +856,10 @@ public class JCommander {
     return new ArrayList<ParameterDescription>(m_fields.values());
   }
 
-    /**
-     * @return the main parameter description or null if none is defined.
-     */
-  public ParameterDescription getMainParameter(){
+  /**
+   * @return the main parameter description or null if none is defined.
+   */
+  public ParameterDescription getMainParameter() {
     return m_mainParameterDescription;
   }
 
