@@ -461,12 +461,18 @@ public class JCommanderTest {
     List<ParameterDescription> parameters = jc.getParameters();
   }
 
-  @Test(expectedExceptions = ParameterException.class)
   public void validationShouldWork1() {
     ArgsValidate1 a = new ArgsValidate1();
     JCommander jc = new JCommander(a);
+    jc.parse(new String[] { "-age", "2 "});
+    Assert.assertEquals(a.age, new Integer(2));
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void validationShouldWork2() {
+    ArgsValidate1 a = new ArgsValidate1();
+    JCommander jc = new JCommander(a);
     jc.parse(new String[] { "-age", "-2 "});
-    System.out.println("Age:" + a.age);
   }
 
   @Test(enabled = false)
