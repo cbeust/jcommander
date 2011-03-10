@@ -898,10 +898,10 @@ public class JCommander {
 //      converter = (IStringConverter) m_converterFactories.getConverter(type);
 //    }
 
-    if (converterClass == null) {
-      throw new ParameterException("Don't know how to convert " + value
-          + " to type " + type + " (field: " + field.getName() + ")");
-    }
+//    if (converterClass == null) {
+//      throw new ParameterException("Don't know how to convert " + value
+//          + " to type " + type + " (field: " + field.getName() + ")");
+//    }
 
     IStringConverter<?> converter;
     Object result = null;
