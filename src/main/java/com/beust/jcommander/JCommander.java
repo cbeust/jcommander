@@ -47,12 +47,12 @@ import java.util.ResourceBundle;
  * The main class for JCommander. It's responsible for parsing the object that contains
  * all the annotated fields, parse the command line and assign the fields with the correct
  * values and a few other helper methods, such as usage().
- * 
+ *
  * The object(s) you pass in the constructor are expected to have one or more
- * \@Parameter annotations on them. You can pass either a single object, an array of objects 
+ * \@Parameter annotations on them. You can pass either a single object, an array of objects
  * or an instance of Iterable. In the case of an array or Iterable, JCommander will collect
  * the \@Parameter annotations from all the objects passed in parameter.
- * 
+ *
  * @author cbeust
  */
 public class JCommander {
@@ -221,6 +221,16 @@ public class JCommander {
     validateOptions();
   }
 
+  public void parseWithoutValidation(String... args) {
+    StringBuilder sb = new StringBuilder("Parsing \"");
+    sb.append(join(args).append("\"\n  with:").append(join(m_objects.toArray())));
+    p(sb.toString());
+
+    if (m_descriptions == null) createDescriptions();
+    initializeDefaultValues();
+    parseValues(expandArgs(args));
+  }
+
   private StringBuilder join(Object[] args) {
     StringBuilder result = new StringBuilder();
     for (int i = 0; i < args.length; i++) {
@@ -258,12 +268,12 @@ public class JCommander {
       }
     }
   }
-  
+
   /**
    * Expand the command line parameters to take @ parameters into account.
    * When @ is encountered, the content of the file that follows is inserted
    * in the command line.
-   * 
+   *
    * @param originalArgv the original command line parameters
    * @return the new and enriched command line parameters
    */
@@ -367,7 +377,7 @@ public class JCommander {
   /**
    * Reads the file specified by filename and returns the file content as a string.
    * End of lines are replaced by a space.
-   * 
+   *
    * @param fileName the command line filename
    * @return the file content as a string.
    */
@@ -500,7 +510,7 @@ public class JCommander {
             // Regular option
             //
             Class<?> fieldType = pd.getField().getType();
-            
+
             // Boolean, set to true as soon as we see it, unless it specified
             // an arity of 1, in which case we need to read the next value
             if ((fieldType == boolean.class || fieldType == Boolean.class)
@@ -552,7 +562,7 @@ public class JCommander {
             List mp = getMainParameter(arg);
             String value = arg;
             Object convertedValue = value;
- 
+
             if (m_mainParameterField.getGenericType() instanceof ParameterizedType) {
               ParameterizedType p = (ParameterizedType) m_mainParameterField.getGenericType();
               Type cls = p.getActualTypeArguments()[0];
@@ -560,7 +570,7 @@ public class JCommander {
                 convertedValue = convertValue(m_mainParameterField, (Class) cls, value);
               }
             }
- 
+
             m_mainParameterDescription.setAssigned(true);
             mp.add(convertedValue);
           }
@@ -582,6 +592,14 @@ public class JCommander {
       }
       i++;
     }
+
+      //Flag the parameter descriptions held in m_fields as assigned
+      for (ParameterDescription parameterDescription : m_descriptions.values()) {
+          if(parameterDescription.isAssigned()){
+            m_fields.get(parameterDescription.getField()).setAssigned(true);
+          }
+      }
+
   }
 
   /**
@@ -592,7 +610,7 @@ public class JCommander {
     System.out.print(description + ": ");
     try {
       Method consoleMethod = System.class.getDeclaredMethod("console", new Class<?>[0]);
-      Object console = consoleMethod.invoke(null, new Object[0]); 
+      Object console = consoleMethod.invoke(null, new Object[0]);
       Method readPassword = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
       return (char[]) readPassword.invoke(console, new Object[0]);
     } catch (Throwable t) {
@@ -630,7 +648,7 @@ public class JCommander {
 
   /**
    * @return the field that's meant to receive all the parameters that are not options.
-   * 
+   *
    * @param arg the arg that we're about to add (only passed here to output a meaningful
    * error message).
    */
@@ -745,7 +763,7 @@ public class JCommander {
       out.append(" " + m_mainParameterAnnotation.description() + "\n");
     }
 
-    // 
+    //
     // Align the descriptions at the "longestName" column
     //
     int longestName = 0;
@@ -835,6 +853,13 @@ public class JCommander {
    */
   public List<ParameterDescription> getParameters() {
     return new ArrayList<ParameterDescription>(m_fields.values());
+  }
+
+    /**
+     * @return the main parameter description or null if none is defined.
+     */
+  public ParameterDescription getMainParameter(){
+    return m_mainParameterDescription;
   }
 
   private void p(String string) {
