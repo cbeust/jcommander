@@ -258,6 +258,48 @@ All you need to do is add the factory to your JCommander object:
 
 Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
 
+<h2><a class="section" name="Parameter_validation">Parameter validation</a></h2>
+
+You can ask JCommander to perform early validation on your parameters by providing a class that implements the following interface:
+
+<pre class="brush:java">
+public interface IParameterValidator {
+ /**
+   * Validate the parameter.
+   *
+   * @param name The name of the parameter (e.g. "-host").
+   * @param value The value of the parameter that we need to validate
+   *
+   * @throws ParameterException Thrown if the value of the parameter is invalid.
+   */
+  void validate(String name, String value) throws ParameterException;
+}
+
+</pre>
+
+Here is an example implementation that will make sure that the parameter is a positive integer:
+
+<pre class="brush:java">
+public class PositiveInteger implements IParameterValidator {
+ public void validate(String name, String value)
+      throws ParameterException {
+    int n = Integer.parseInt(value);
+    if (n < 0) {
+      throw new ParameterException("Parameter " + name + " should be positive (found " + value +")");
+    }
+  }
+}
+</pre>
+
+Specify the name of a class implementing this interface in the <tt>validateWith</tt> attribute of your <tt>@Parameter</tt> annotations:
+
+<pre class="brush:java">
+@Parameter(names = "-age", validateWith = PositiveInteger.class)
+public Integer age;
+</pre>
+
+Attempting to pass a negative integer to this option will cause a <tt>ParameterException</tt> to be thrown.
+
 
 <h2><a class="section" name="Main_parameter">Main parameter</a></h2>
 So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
