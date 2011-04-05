@@ -3,9 +3,9 @@
   <property file="build.properties" />
 
   <target name="clean">
-    <delete dir="${dir.build}"/>
-    <delete dir="${dir.dist}"/>
-    <delete dir="${dir.test.build}" failonerror="false" />
+    <delete dir="${dir.build}" />
+    <delete dir="${dir.dist}" />
+    <delete dir="${dir.test.build}" />
   </target>
   
   <target name="compile">
@@ -17,9 +17,9 @@
   </target>
   
   <target name="dist" depends="compile">
-    <mkdir dir="${dir.build}" />
+    <mkdir dir="${dir.dist}" />
     <jar destfile="${jcommander.jar}">
-      <zipfileset dir="${dir.build}" includes="**/*.class"/>
+      <zipfileset dir="${dir.build}" includes="**/*.class" />
     </jar>
   </target>
 
