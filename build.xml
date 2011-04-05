@@ -4,13 +4,12 @@
 
   <target name="clean">
     <delete dir="${dir.build}"/>
-    <!--<mkdir dir="${dir.build}"/>-->
     <delete dir="${dir.dist}"/>
-    <!--<mkdir dir="${dir.dist}"/>-->
     <delete dir="${dir.test.build}" failonerror="false" />
   </target>
   
   <target name="compile">
+    <mkdir dir="${dir.build}" />
     <javac includeantruntime="false"
            srcdir="${dir.src}" 
            destdir="${dir.build}">
@@ -18,6 +17,7 @@
   </target>
   
   <target name="dist" depends="compile">
+    <mkdir dir="${dir.build}" />
     <jar destfile="${jcommander.jar}">
       <zipfileset dir="${dir.build}" includes="**/*.class"/>
     </jar>
