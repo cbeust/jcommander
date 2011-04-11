@@ -40,8 +40,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -123,10 +126,10 @@ public class JCommander {
   /**
    * The factories used to look up string converters.
    */
-  private static List<IStringConverterFactory> CONVERTER_FACTORIES = Lists.newArrayList();
+  private static LinkedList<IStringConverterFactory> CONVERTER_FACTORIES = Lists.newLinkedList();
 
   static {
-    CONVERTER_FACTORIES.add(new DefaultConverterFactory());
+    CONVERTER_FACTORIES.addFirst(new DefaultConverterFactory());
   };
 
   /**
@@ -877,7 +880,7 @@ public class JCommander {
   }
 
   public void addConverterFactory(IStringConverterFactory converterFactory) {
-    CONVERTER_FACTORIES.add(converterFactory);
+    CONVERTER_FACTORIES.addFirst(converterFactory);
   }
 
   public <T> Class<? extends IStringConverter<T>> findConverter(Class<T> cls) {
