@@ -1,5 +1,6 @@
 Current
 
+Added: Default converter factories can be overridden (Scott Clasen)
 Added: IParameterValidator
 Added: Don't display "Options:" if none were defined.
 Added: Enforce that the type of the main parameter is a List.

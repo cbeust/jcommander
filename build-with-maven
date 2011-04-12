@@ -1,6 +1,6 @@
 mvn clean source:jar javadoc:jar repository:bundle-create -P sign
 
-export TESTNG=../testng/target/testng-6.0.jar
+export TESTNG=../testng/target/testng-6.0.2beta.jar
 
 java -classpath target/classes:target/test-classes:${TESTNG}:$CLASSPATH org.testng.TestNG src/test/resources/testng.xml
 
