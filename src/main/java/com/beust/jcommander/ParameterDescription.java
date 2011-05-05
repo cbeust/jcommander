@@ -175,16 +175,18 @@ public class ParameterDescription {
           + " once.");
     }
 
-     Class<? extends IParameterValidator> validator = m_parameterAnnotation.validateWith();
-    if (validator != NoValidator.class) {
-      try {
-        p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
-        validator.newInstance().validate(name, value);
-      } catch (InstantiationException e) {
-        throw new ParameterException("Can't instantiate validator:" + e);
-      } catch (IllegalAccessException e) {
-        throw new ParameterException("Can't instantiate validator:" + e);
-      }
+    Class<? extends IParameterValidator>[] validators = m_parameterAnnotation.validateWith();
+    if (validators.length > 1 || (validators.length == 1 && validators[0] != NoValidator.class)) {
+      for (Class<? extends IParameterValidator> validator : validators) {
+          try {
+              p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
+              validator.newInstance().validate(name, value);
+            } catch (InstantiationException e) {
+              throw new ParameterException("Can't instantiate validator:" + e);
+            } catch (IllegalAccessException e) {
+              throw new ParameterException("Can't instantiate validator:" + e);
+            }
+  	  }
     }
 
     Class<?> type = m_field.getType();
