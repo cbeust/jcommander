@@ -77,5 +77,5 @@ public @interface Parameter {
   /**
    * The validation class to use.
    */
-  Class<? extends IParameterValidator> validateWith() default NoValidator.class;
+  Class<? extends IParameterValidator>[] validateWith() default NoValidator.class;
 }
