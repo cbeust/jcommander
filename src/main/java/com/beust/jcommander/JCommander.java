@@ -36,9 +36,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
@@ -114,14 +116,24 @@ public class JCommander {
   /**
    * List of commands and their instance.
    */
-  private Map<String, JCommander> m_commands = Maps.newLinkedHashMap();
+  private Map<ProgramName, JCommander> m_commands = Maps.newLinkedHashMap();
+  /**
+   * Alias database for reverse lookup
+   */
+  private Map<String, ProgramName> aliasMap = Maps.newLinkedHashMap();
 
   /**
    * The name of the command after the parsing has run.
    */
   private String m_parsedCommand;
 
-  private String m_programName;
+  /**
+   * The name of command or alias as it was passed to the
+   * command line
+   */
+  private String m_parsedAlias;
+
+  private ProgramName m_programName;
 
   /**
    * The factories used to look up string converters.
@@ -582,9 +594,10 @@ public class JCommander {
             //
             // Command parsing
             //
-            JCommander jc = m_commands.get(arg);
+            JCommander jc = findCommandByAlias(arg);
             if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
-            m_parsedCommand = arg;
+            m_parsedCommand = jc.m_programName.name;
+            m_parsedAlias = arg; //preserve the original form
 
             // Found a valid command, ask it to parse the remainder of the arguments.
             // Setting the boolean commandParsed to true will force the current
@@ -699,7 +712,17 @@ public class JCommander {
    * Set the program name (used only in the usage).
    */
   public void setProgramName(String name) {
-    m_programName = name;
+    setProgramName(name, new String[0]);
+  }
+
+  /**
+   * Set the program name
+   *
+   * @param name    program name
+   * @param aliases aliases to the program name
+   */
+  public void setProgramName(String name, String... aliases) {
+    m_programName = new ProgramName(name, Arrays.asList(aliases));
   }
 
   /**
@@ -716,7 +739,7 @@ public class JCommander {
    */
   public void usage(String commandName, StringBuilder out) {
     String description = getCommandDescription(commandName);
-    JCommander jc = m_commands.get(commandName);
+    JCommander jc = findCommandByAlias(commandName);
     if (description != null) {
       out.append(description);
       out.append("\n");
@@ -728,7 +751,7 @@ public class JCommander {
    * @return the description of the command.
    */
   public String getCommandDescription(String commandName) {
-    JCommander jc = m_commands.get(commandName);
+    JCommander jc = findCommandByAlias(commandName);
     if (jc == null) {
       throw new ParameterException("Asking description for unknown command: " + commandName);
     }
@@ -754,12 +777,12 @@ public class JCommander {
    */
   public void usage(StringBuilder out) {
     if (m_descriptions == null) createDescriptions();
-    boolean hasCommands = ! m_commands.isEmpty();
+    boolean hasCommands = !m_commands.isEmpty();
 
     //
     // First line of the usage
     //
-    String programName = m_programName != null ? m_programName : "<main class>";
+    String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
     out.append("Usage: " + programName + " [options]");
     if (hasCommands) out.append(" [command] [command options]");
     out.append("\n");
@@ -818,10 +841,11 @@ public class JCommander {
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       int ln = longestName(m_commands.keySet()) + 3;
-      for (Map.Entry<String, JCommander> commands : m_commands.entrySet()) {
-        String name = commands.getKey();
-        int spaceCount  = ln - name.length();
-        out.append("    " + name + s(spaceCount) + getCommandDescription(name) + "\n");
+      for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
+        ProgramName progName = commands.getKey();
+        String dispName = progName.getDisplayName();
+        int spaceCount  = ln - dispName.length();
+        out.append("    " + dispName + s(spaceCount) + getCommandDescription(progName.name) + "\n");
       }
     }
   }
@@ -976,17 +1000,62 @@ public class JCommander {
    * Add a command object.
    */
   public void addCommand(String name, Object object) {
+    addCommand(name, object, new String[0]);
+  }
+
+  /**
+   * Add a command object.
+   */
+  public void addCommand(String name, Object object, String... aliases) {
     JCommander jc = new JCommander(object);
-    jc.setProgramName(name);
-    m_commands.put(name, jc);
+    jc.setProgramName(name, aliases);
+    ProgramName progName = jc.m_programName;
+    m_commands.put(progName, jc);
+
+    /*
+    * Register aliases
+    */
+    //register command name as an alias of itself for reverse lookup
+    //Note: Name clash check is intentionally omitted to resemble the
+    //     original behaviour of clashing commands.
+    //     Aliases are, however, are strictly checked for name clashes.
+    aliasMap.put(name, progName);
+    for (String alias : aliases) {
+      //omit pointless aliases to avoid name clash exception
+      if (!alias.equals(name)) {
+        ProgramName mappedName = aliasMap.get(alias);
+        if (mappedName != null && !mappedName.equals(progName)) {
+          throw new ParameterException("Cannot set alias " + alias
+                  + " for " + name
+                  + " command because it has already been defined for "
+                  + mappedName.name + " command");
+        }
+        aliasMap.put(alias, progName);
+      }
+    }
   }
 
   public Map<String, JCommander> getCommands() {
-    return m_commands;
+    Map<String, JCommander> res = Maps.newLinkedHashMap();
+    for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
+      res.put(entry.getKey().name, entry.getValue());
+    }
+    return res;
   }
 
   public String getParsedCommand() {
     return m_parsedCommand;
+  }
+
+  /**
+   * The name of the command or the alias in the form it was
+   * passed to the command line. <code>null</code> if no
+   * command or alias was specified.
+   *
+   * @return Name of command or alias passed to command line. If none passed: <code>null</code>.
+   */
+  public String getParsedAlias() {
+    return m_parsedAlias;
   }
 
   /**
@@ -1008,5 +1077,86 @@ public class JCommander {
   public List<Object> getObjects() {
     return m_objects;
   }
-}
 
+  /*
+  * Reverse lookup JCommand object by command's name or its alias
+  */
+  private JCommander findCommandByAlias(String commandOrAlias) {
+    ProgramName progName = aliasMap.get(commandOrAlias);
+    if (progName == null) {
+      return null;
+    }
+    JCommander jc = m_commands.get(progName);
+    if (jc == null) {
+      throw new IllegalStateException(
+              "There appears to be inconsistency in the internal command database. " +
+                      " This is likely a bug. Please report.");
+    }
+    return jc;
+  }
+
+  private static final class ProgramName {
+    private final String name;
+    private final List<String> aliases;
+
+    ProgramName(String name) {
+      this(name, Collections.<String>emptyList());
+    }
+
+    ProgramName(String name, List<String> aliases) {
+      this.name = name;
+      this.aliases = aliases;
+    }
+
+    private String getDisplayName() {
+      StringBuilder sb = new StringBuilder();
+      sb.append(name);
+      if (!aliases.isEmpty()) {
+        sb.append("(");
+        Iterator<String> aliasesIt = aliases.iterator();
+        while (aliasesIt.hasNext()) {
+          sb.append(aliasesIt.next());
+          if (aliasesIt.hasNext()) {
+            sb.append(",");
+          }
+        }
+        sb.append(")");
+      }
+      return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((name == null) ? 0 : name.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      ProgramName other = (ProgramName) obj;
+      if (name == null) {
+        if (other.name != null)
+          return false;
+      } else if (!name.equals(other.name))
+        return false;
+      return true;
+    }
+
+    /*
+     * Important: ProgramName#toString() is used by longestName(Collection) function
+     * to format usage output.
+     */
+    @Override
+    public String toString() {
+      return getDisplayName();
+    }
+  }
+}
