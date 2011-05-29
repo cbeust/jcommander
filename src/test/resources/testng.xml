@@ -8,6 +8,7 @@
       <class name="com.beust.jcommander.command.CommandAliasTest" />
       <class name="com.beust.jcommander.ConverterFactoryTest" />
       <class name="com.beust.jcommander.DefaultProviderTest" />
+      <class name="com.beust.jcommander.DefaultValueTest" />
       <class name="com.beust.jcommander.JCommanderTest" />
     </classes>
   </test>
