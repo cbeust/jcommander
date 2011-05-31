@@ -145,7 +145,7 @@ public class CommandAliasTest {
   /**
    * Visually test the formatting for "prettiness"
    */
-  @Test
+  @Test(enabled = false, description = "TODO: test the output instead of displaying it")
   public void formattingLooksNice(){
     CommandMain cm = new CommandMain();
     JCommander jc = new JCommander(cm);
