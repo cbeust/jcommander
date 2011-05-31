@@ -20,6 +20,7 @@ package com.beust.jcommander;
 
 
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
 import com.beust.jcommander.validators.NoValidator;
 
 import java.lang.reflect.Field;
@@ -189,16 +190,15 @@ public class ParameterDescription {
 
     Class<?> type = m_field.getType();
 
-    if (! isDefault) m_assigned = true;
     Object convertedValue = m_jCommander.convertValue(this, value);
     boolean isCollection = Collection.class.isAssignableFrom(type);
 
     try {
       if (isCollection) {
         @SuppressWarnings("unchecked")
-        List<Object> l = (List<Object>) m_field.get(m_object);
-        if (l == null) {
-          l = Lists.newArrayList();
+        Collection<Object> l = (Collection<Object>) m_field.get(m_object);
+        if (l == null || fieldIsSetForTheFirstTime(isDefault)) {
+          l = newCollection(type);
           m_field.set(m_object, l);
         }
         if (convertedValue instanceof Collection) {
@@ -211,10 +211,36 @@ public class ParameterDescription {
       } else {
         m_field.set(m_object, convertedValue);
       }
+      if (! isDefault) m_assigned = true;
     }
     catch(IllegalAccessException ex) {
       ex.printStackTrace();
     }
+  }
+
+  /*
+   * Creates a new collection for the field's type.
+   *
+   * Currently only List and Set are supported. Support for
+   * Queues and Stacks could be useful.
+   */
+  private Collection<Object> newCollection(Class<?> type) {
+    if(List.class.isAssignableFrom(type)){
+      return Lists.newArrayList();
+    } else if(Set.class.isAssignableFrom(type)){
+      return Sets.newLinkedHashSet();
+    } else {
+      throw new ParameterException("Parameters of Collection type '" + type.getSimpleName()
+                                  + "' are not supported. Please use List or Set instead.");
+    }
+  }
+
+  /*
+   * Tests if its the first time a non-default value is
+   * being added to the field.
+   */
+  private boolean fieldIsSetForTheFirstTime(boolean isDefault) {
+    return (!isDefault && !m_assigned);
   }
 
   public boolean isNumber() {
