@@ -997,10 +997,33 @@ public class JCommander {
   }
 
   /**
+   * Add a command object. Command name has to be specified
+   * using the {@link Parameters} annotation
+   * @param object
+   */
+  public void addCommand(Object object){
+    Parameters commandParams = object.getClass().getAnnotation(Parameters.class);
+    if(commandParams == null){
+      throw new IllegalArgumentException("No command description found. " +
+              "Please add @" + Parameters.class.getSimpleName() + " annotation with at least " +
+              "name specified, or pass command name to this method.");
+    }
+    String commandName = commandParams.commandName();
+    if(commandName == null || commandName.trim().length()==0){
+      throw new IllegalArgumentException("No command name was specified. " +
+              "Please specify command name using @" + Parameters.class.getSimpleName() +
+              "(name=\"commandname\") or pass command name directly to this method.");
+    }
+    addCommand(commandName, object, commandParams.commandAliases());
+  }
+
+  /**
    * Add a command object.
    */
   public void addCommand(String name, Object object) {
-    addCommand(name, object, new String[0]);
+    Parameters commandParams = object.getClass().getAnnotation(Parameters.class);
+    String[] aliases = commandParams != null ? commandParams.commandAliases() : new String[0];
+    addCommand(name, object, aliases);
   }
 
   /**
