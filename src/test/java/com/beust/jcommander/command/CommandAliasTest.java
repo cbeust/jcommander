@@ -204,7 +204,7 @@ public class CommandAliasTest {
   /**
    * Visually test the formatting for "prettiness"
    */
-  @Test(enabled = false, description = "TODO: test the output instead of displaying it")
+  @Test
   public void formattingLooksNice(){
     CommandMain cm = new CommandMain();
     JCommander jc = new JCommander(cm);
@@ -214,13 +214,25 @@ public class CommandAliasTest {
     jc.addCommand("commit", commit, "ci", "cmt");
     StringBuilder sb = new StringBuilder();
     jc.usage(sb);
-    System.out.println("--- usage() formatting ---");
-    System.out.println(sb.toString());
+    Assert.assertEquals(sb.toString(),
+      "Usage: <main class> [options] [command] [command options]\n" +
+      "  Options:\n" +
+      "    -v   Verbose mode\n" +
+      "         Default: false\n" +
+      "  Commands:\n" +
+      "    add(a)           Add file contents to the index\n" +
+      "    commit(ci,cmt)   Record changes to the repository\n");
 
     sb = new StringBuilder();
     jc.usage("commit", sb);
-    System.out.println("--- usage('commit') formatting ---");
-    System.out.println(sb.toString());
+    Assert.assertEquals(sb.toString(),
+      "Record changes to the repository\n" +
+      "Usage: commit(ci,cmt) [options]\n" +
+      " List of files\n" +
+      "  Options:\n" +
+      "        --amend    Amend\n" +
+      "                   Default: false\n" +
+      "        --author   \n");
   }
 
   private void patternMatchesTimes(String pattern, String input, int times) {
