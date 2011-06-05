@@ -582,6 +582,39 @@ Assert.assertEquals(commit.author, "cbeust");
 Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
 </pre>
 
+Starting from version <tt>1.18</tt>, you can specify command names and aliases using annotations, and register
+callbacks to be executed when the given command is parsed.
+
+<pre class="brush: java">
+@Parameters(commandName = "commit", commandAliases = {"c", "ci"}, commandDescription = "Record changes to the repository")
+public class CommandCommit {
+
+  @Parameter(description = "The list of files to commit")
+  public List&lt;String&gt; files;
+
+  @Parameter(names = "--author")
+  public String author;
+}
+</pre>
+<pre class="brush: java">
+JCommander jc = new JCommander();
+
+jc.addCommand(new CommandAdd(), new JCallable&lt;CommandAdd&gt;(){
+  void call(CommandAdd commit){
+    Assert.assertEquals(commit.author, "cbeust");
+    Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+  }
+});
+
+jc.parse("ci", "--author", "cbeust", "A.java", "B.java");
+</pre>
+
+<p>Command callables can be any of the following types: <tt>JCallable</tt>, <tt>Callable</tt>, <tt>Runnable</tt>.
+The two later types are built-in java types and therefore do not accept arguments to the callback.</p>
+
+<p>Note that, <tt>getParsedCommand()</tt> will always return command name, even if an alias was given to the command line.
+To get the alias use <tt>getParsedAlias()</tt> instead.</p>
+
 <h2><a class="section" name="Exceptions">Exception</a></h2>
 
 Whenever JCommander detects an error, it will throw a
@@ -589,6 +622,10 @@ Whenever JCommander detects an error, it will throw a
 since your application is probably not initialized correctly at this
 point.
 
+<p>Since version <tt>1.18</tt>, when using commands with callbacks that may throw an exception, please
+use <tt>parseChecked()</tt> instead of <tt>parse()</tt> to guarantee that all exceptions will be propagated
+to the caller as-is. Using <tt>parse()</tt> will wrap exceptions in <tt>RuntimeException</tt>
+(except JCommander's own exceptions).</p>
 
 <h2><a class="section" name="Usage">Usage</a></h2>
 
