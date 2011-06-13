@@ -104,6 +104,15 @@ public class ParameterDescription {
       m_default = m_field.get(m_object);
     } catch (Exception e) {
     }
+
+    //
+    // Validate default values, if any and if applicable
+    //
+    if (m_default != null) {
+      String[] names = m_parameterAnnotation.names();
+      String name = names.length > 0 ? names[0] : "";
+      validateParameter(name, m_default.toString());
+    }
   }
 
   public String getLongestName() {
@@ -176,17 +185,7 @@ public class ParameterDescription {
           + " once.");
     }
 
-     Class<? extends IParameterValidator> validator = m_parameterAnnotation.validateWith();
-    if (validator != NoValidator.class) {
-      try {
-        p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
-        validator.newInstance().validate(name, value);
-      } catch (InstantiationException e) {
-        throw new ParameterException("Can't instantiate validator:" + e);
-      } catch (IllegalAccessException e) {
-        throw new ParameterException("Can't instantiate validator:" + e);
-      }
-    }
+    validateParameter(name, value);
 
     Class<?> type = m_field.getType();
 
@@ -215,6 +214,20 @@ public class ParameterDescription {
     }
     catch(IllegalAccessException ex) {
       ex.printStackTrace();
+    }
+  }
+
+  private void validateParameter(String name, String value) {
+    Class<? extends IParameterValidator> validator = m_parameterAnnotation.validateWith();
+    if (validator != NoValidator.class) {
+      try {
+        p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
+        validator.newInstance().validate(name, value);
+      } catch (InstantiationException e) {
+        throw new ParameterException("Can't instantiate validator:" + e);
+      } catch (IllegalAccessException e) {
+        throw new ParameterException("Can't instantiate validator:" + e);
+      }
     }
   }
 

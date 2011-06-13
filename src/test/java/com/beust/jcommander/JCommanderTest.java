@@ -472,6 +472,12 @@ public class JCommanderTest {
   }
 
   @Test(expectedExceptions = ParameterException.class)
+  public void validationShouldWorkWithDefaultValues() {
+    ArgsValidate2 a = new ArgsValidate2();
+    new JCommander(a);
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
   public void validationShouldWork2() {
     ArgsValidate1 a = new ArgsValidate1();
     JCommander jc = new JCommander(a);
@@ -491,7 +497,7 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().atFileCanContainEmptyLines();
+    new JCommanderTest().validationShouldWorkWithDefaultValues();
 //    new JCommanderTest().booleanArity1();
 //    ArgsLongDescription a = new ArgsLongDescription();
 //    JCommander jc = new JCommander(a);
