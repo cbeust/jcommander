@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
 
 
 
@@ -136,6 +137,11 @@ public class JCommander {
   private ProgramName m_programName;
 
   /**
+   * Callable to be executed when command is parsed. May be null.
+   */
+  private Object m_callable;
+
+  /**
    * The factories used to look up string converters.
    */
   private static LinkedList<IStringConverterFactory> CONVERTER_FACTORIES = Lists.newLinkedList();
@@ -224,16 +230,75 @@ public class JCommander {
 
   /**
    * Parse and validate the command line parameters.
+   *
+   * <p>This method assumes
+   * no exceptions will be thrown by the command-associated
+   * callable. If any exception is thrown, it will be wrapped
+   * in {@link RuntimeException} and re-thrown.</p>
    */
   public void parse(String... args) {
-    parse(true /* validate */, args);
+    try{
+      parseChecked(true/* validate */, args);
+    }catch(ParameterException e){
+      throw e;
+    }catch(Exception e){
+      throw new RuntimeException(e);
+    }
   }
 
   /**
    * Parse the command line parameters without validating them.
+   *
+   * <p>This method assumes
+   * no exceptions will be thrown by the command-associated
+   * callable. If any exception is thrown, it will be wrapped
+   * in {@link RuntimeException} and re-thrown.</p>
    */
   public void parseWithoutValidation(String... args) {
-    parse(false /* no validation */, args);
+    try{
+      parseChecked(false/* no validation */, args);
+    }catch(ParameterException e){
+      throw e;
+    }catch(Exception e){
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Parse, validate and run any runnables/callables associated
+   * with the parsed command, if any. Any exception thrown
+   * by the callable will be propagated and thrown as is.
+   * @param args Arguments to parse
+   * @throws Exception Any exception thrown by the command-associated
+   *                    callable, if any.
+   */
+  public void parseChecked(String... args) throws Exception{
+    parseChecked(true/* validate */, args);
+  }
+
+  /**
+   * Parse and run any runnables/callables associated
+   * with the parsed command, if any. Any exception thrown
+   * by the callable will be propagated and thrown as is.
+   * @param validate Whether parameter validation should be enabled
+   * @param args Arguments to parse
+   * @throws Exception Any exception thrown by the command-associated
+   *                    callable, if any.
+   */
+  @SuppressWarnings("unchecked")
+  public void parseChecked(boolean validate, String... args) throws Exception{
+    parse(validate, args);
+    if(m_parsedCommand != null){
+      JCommander cmd = findCommandByAlias(m_parsedCommand);
+      Object callable = cmd.m_callable;
+      if(callable instanceof JCallable){
+        ((JCallable) callable).call(cmd.m_objects.get(0));
+      }else if(callable instanceof Callable){
+        ((Callable) callable).call();
+      }else if(callable instanceof Runnable){
+        ((Runnable) callable).run();
+      }
+    }
   }
 
   private void parse(boolean validate, String... args) {
@@ -726,6 +791,15 @@ public class JCommander {
   }
 
   /**
+   * Set the callable to be executed after the associated
+   * command is parsed.
+   * @param callable Callable to be executed (may be null)
+   */
+  public void setCallable(Object callable){
+    m_callable = callable;
+  }
+
+  /**
    * Display the usage for this command.
    */
   public void usage(String commandName) {
@@ -997,18 +1071,58 @@ public class JCommander {
   }
 
   /**
+   * Add a command object. Command name has to be specified
+   * using the {@link Parameters} annotation
+   */
+  public void addCommand(Object object){
+    addCommand(object, null);
+  }
+
+  /**
+   * Add a command object with an associated callable.
+   * Command name has to be specified using the {@link Parameters}
+   * annotation. The specified callable will be executed whenever
+   * the command is parsed.
+   * @param object  command object
+   * @param callable a callable object associated with this command (may be null)
+   */
+  public void addCommand(Object object, Object callable){
+    Parameters commandParams = object.getClass().getAnnotation(Parameters.class);
+    if(commandParams == null){
+      throw new IllegalArgumentException("No command description found. " +
+              "Please add @" + Parameters.class.getSimpleName() + " annotation with at least " +
+              "name specified, or pass command name to this method.");
+    }
+    String commandName = commandParams.commandName();
+    if(commandName == null || commandName.trim().length()==0){
+      throw new IllegalArgumentException("No command name was specified. " +
+              "Please specify command name using @" + Parameters.class.getSimpleName() +
+              "(name=\"commandname\") or pass command name directly to this method.");
+    }
+    addCommand(commandName, object, commandParams.commandAliases(), callable);
+  }
+
+  /**
    * Add a command object.
    */
   public void addCommand(String name, Object object) {
-    addCommand(name, object, new String[0]);
+    Parameters commandParams = object.getClass().getAnnotation(Parameters.class);
+    String[] aliases = commandParams != null ? commandParams.commandAliases() : new String[0];
+    addCommand(name, object, aliases);
   }
 
   /**
    * Add a command object and its aliases.
    */
   public void addCommand(String name, Object object, String... aliases) {
+    addCommand(name, object, aliases, null);
+  }
+
+  private void addCommand(String name, Object object, String[] aliases, Object callable){
+    checkCallableTypeIsSupported(callable);
     JCommander jc = new JCommander(object);
     jc.setProgramName(name, aliases);
+    jc.setCallable(callable);
     ProgramName progName = jc.m_programName;
     m_commands.put(progName, jc);
 
@@ -1093,6 +1207,20 @@ public class JCommander {
                       " This is likely a bug. Please report.");
     }
     return jc;
+  }
+
+  /*
+   * Check that provided callable is of valid callable type
+   */
+  private void checkCallableTypeIsSupported(Object callable) {
+    if(callable != null){
+      if(!(callable instanceof JCallable ||
+              callable instanceof Callable ||
+              callable instanceof Runnable)){
+        throw new IllegalArgumentException("Specified callable (" + callable.getClass().getName() +") " +
+        " does not implement any of the supported callable types.");
+      }
+    }
   }
 
   private static final class ProgramName {

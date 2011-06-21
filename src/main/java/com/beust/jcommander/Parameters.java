@@ -55,4 +55,24 @@ public @interface Parameters {
    * description when @{link JCommander#usage} is invoked.
    */
   String commandDescription() default "";
+
+  /**
+   * Command name to be used when an annotated class is added using
+   * {@link JCommander#addCommand}. If command name is not specified
+   * in the annotation, it has to be passed during command addition.
+   * Command name given to {@link JCommander#addCommand} takes precedence
+   * over the the name specified in the annotation.
+   * @return
+   */
+  String commandName() default "";
+
+  /**
+   * Command aliases to be used when an annotated class is added using
+   * {@link JCommander#addCommand(Object)} or {@link JCommander#addCommand(String, Object)}.
+   * If {@link JCommander#addCommand(String, Object, String...)} method is used, then
+   * aliases passed to the method take precedence over any aliases specified
+   * in the annotation.
+   * @return
+   */
+  String[] commandAliases() default {};
 }

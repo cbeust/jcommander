@@ -6,6 +6,8 @@
     <classes>
       <class name="com.beust.jcommander.command.CommandTest" />
       <class name="com.beust.jcommander.command.CommandAliasTest" />
+      <class name="com.beust.jcommander.command.CommandCallableTest" />
+      <class name="com.beust.jcommander.command.CommandCallableScenarioTest" />
       <class name="com.beust.jcommander.ConverterFactoryTest" />
       <class name="com.beust.jcommander.DefaultProviderTest" />
       <class name="com.beust.jcommander.DefaultValueTest" />
