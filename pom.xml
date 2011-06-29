@@ -24,7 +24,7 @@
   <artifactId>jcommander</artifactId>
   <packaging>jar</packaging>
   <name>JCommander</name>
-  <version>1.12-SNAPSHOT</version>
+  <version>1.18-SNAPSHOT</version>
   <description>A Java framework to parse command line options with annotations.</description>
   <url>http://beust.com/jcommander</url>
   <licenses>
@@ -125,53 +125,26 @@
         </configuration>
       </plugin>
 
-      <!-- OSGi manifest creation -->
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.1.0</version>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-            <configuration>
-              <instructions>
-                <_versionpolicy>$(@)</_versionpolicy>
-              </instructions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Add OSGi manifest in JAR -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
-        <configuration>
-          <archive>
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-
       <!-- Tests -->
-<!-- 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
+        <version>2.7.1</version>
         <configuration>
-          <suiteXmlFiles>
-            <suiteXmlFile>testng.xml</suiteXmlFile>
-          </suiteXmlFiles>
+          <skipTests>true</skipTests>
         </configuration>
-      </plugin>
+        <dependencies>
+          <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.13</version>
+<!--
+            <version>${project.version}</version>
 -->
- 
+           </dependency>
+        </dependencies>
+      </plugin>
+
       <!-- Generating Javadoc -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

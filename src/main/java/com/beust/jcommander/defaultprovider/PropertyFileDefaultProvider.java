@@ -58,7 +58,6 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
     }
   }
   
-  @Override
   public String getDefaultValueFor(String optionName) {
     int index = 0;
     while (index < optionName.length() && ! Character.isLetterOrDigit(optionName.charAt(index))) {

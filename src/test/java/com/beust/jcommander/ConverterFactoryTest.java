@@ -41,7 +41,6 @@ public class ConverterFactoryTest {
 
   private static final IStringConverterFactory CONVERTER_FACTORY = new IStringConverterFactory() {
 
-    @Override
     public Class<? extends IStringConverter<?>> getConverter(Class forType) {
       return MAP.get(forType);
     }

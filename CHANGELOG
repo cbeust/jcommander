@@ -1,5 +1,22 @@
 Current
 
+Added: Default converter factories can be overridden (Scott Clasen)
+Added: IParameterValidator
+Added: Don't display "Options:" if none were defined.
+Added: Enforce that the type of the main parameter is a List.
+Fixed: Default values with a validator were being validate at parse() time instead of creation time.
+Fixed: Exception when using an @ file with empty lines between options
+Fixed: OOM when parsing certain descriptions with long URL's in them.
+
+1.15
+2011/01/24
+
+Added: Added a constructor that takes a Bundle only, https://github.com/cbeust/jcommander/pull/47 (Russell Egan)
+Fixed: NPE with calling getCommandDescription() of an unknown command
+
+1.13
+2010/12/15
+
 Added: Boolean parameters with arity 0 (e.g. "foo -debug")
 Fixed: JCommander would sometimes just print a stack trace and continue, now rethrowing.
 

@@ -19,12 +19,12 @@
 package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ResourceBundle;
 
-@SuppressWarnings("deprecation")
-@ResourceBundle("MessageBundle")
-public class ArgsI18N2 {
+/**
+ * Test a help option which overrides other options and option validations
+ */
+public class ArgsHelp {
 
-  @Parameter(names = "-host", description = "Host", descriptionKey = "host")
-  String hostName;
+  @Parameter(names = "-h", description = "Display help")
+  public boolean help;
 }

@@ -20,7 +20,6 @@ package com.beust.jcommander;
 
 public class HostPortConverter implements IStringConverter<HostPort> {
 
-  @Override
   public HostPort convert(String value) {
     HostPort result = new HostPort();
     String[] s = value.split(":");

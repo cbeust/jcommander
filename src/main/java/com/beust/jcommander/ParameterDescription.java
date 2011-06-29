@@ -20,6 +20,8 @@ package com.beust.jcommander;
 
 
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
+import com.beust.jcommander.validators.NoValidator;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -50,6 +52,7 @@ public class ParameterDescription {
    * Find the resource bundle in the annotations.
    * @return
    */
+  @SuppressWarnings("deprecation")
   private ResourceBundle findResourceBundle(Object o) {
     ResourceBundle result = null;
 
@@ -100,6 +103,15 @@ public class ParameterDescription {
     try {
       m_default = m_field.get(m_object);
     } catch (Exception e) {
+    }
+
+    //
+    // Validate default values, if any and if applicable
+    //
+    if (m_default != null) {
+      String[] names = m_parameterAnnotation.names();
+      String name = names.length > 0 ? names[0] : "";
+      validateParameter(name, m_default.toString());
     }
   }
 
@@ -160,32 +172,32 @@ public class ParameterDescription {
   }
 
   /**
-   * Add the specified value to the field. First look up any field converter, then
-   * any type converter, and if we can't find any, throw an exception.
-   * 
-   * @param markAdded if true, mark this parameter as assigned
+   * Add the specified value to the field. First, validate the value if a
+   * validator was specified. Then look up any field converter, then any type
+   * converter, and if we can't find any, throw an exception.
    */
   public void addValue(String value, boolean isDefault) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_field.getName());
+    String name = m_parameterAnnotation.names()[0];
     if (m_assigned && ! isMultiOption()) {
-      throw new ParameterException("Can only specify option " + m_parameterAnnotation.names()[0]
+      throw new ParameterException("Can only specify option " + name
           + " once.");
     }
 
+    validateParameter(name, value);
+
     Class<?> type = m_field.getType();
 
-    if (! isDefault) m_assigned = true;
     Object convertedValue = m_jCommander.convertValue(this, value);
     boolean isCollection = Collection.class.isAssignableFrom(type);
-    boolean isMainParameter = m_parameterAnnotation.names().length == 0;
 
     try {
       if (isCollection) {
         @SuppressWarnings("unchecked")
-        List<Object> l = (List<Object>) m_field.get(m_object);
-        if (l == null) {
-          l = Lists.newArrayList();
+        Collection<Object> l = (Collection<Object>) m_field.get(m_object);
+        if (l == null || fieldIsSetForTheFirstTime(isDefault)) {
+          l = newCollection(type);
           m_field.set(m_object, l);
         }
         if (convertedValue instanceof Collection) {
@@ -198,10 +210,50 @@ public class ParameterDescription {
       } else {
         m_field.set(m_object, convertedValue);
       }
+      if (! isDefault) m_assigned = true;
     }
     catch(IllegalAccessException ex) {
       ex.printStackTrace();
     }
+  }
+
+  private void validateParameter(String name, String value) {
+    Class<? extends IParameterValidator> validator = m_parameterAnnotation.validateWith();
+    if (validator != NoValidator.class) {
+      try {
+        p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
+        validator.newInstance().validate(name, value);
+      } catch (InstantiationException e) {
+        throw new ParameterException("Can't instantiate validator:" + e);
+      } catch (IllegalAccessException e) {
+        throw new ParameterException("Can't instantiate validator:" + e);
+      }
+    }
+  }
+
+  /*
+   * Creates a new collection for the field's type.
+   *
+   * Currently only List and Set are supported. Support for
+   * Queues and Stacks could be useful.
+   */
+  private Collection<Object> newCollection(Class<?> type) {
+    if(List.class.isAssignableFrom(type)){
+      return Lists.newArrayList();
+    } else if(Set.class.isAssignableFrom(type)){
+      return Sets.newLinkedHashSet();
+    } else {
+      throw new ParameterException("Parameters of Collection type '" + type.getSimpleName()
+                                  + "' are not supported. Please use List or Set instead.");
+    }
+  }
+
+  /*
+   * Tests if its the first time a non-default value is
+   * being added to the field.
+   */
+  private boolean fieldIsSetForTheFirstTime(boolean isDefault) {
+    return (!isDefault && !m_assigned);
   }
 
   public boolean isNumber() {

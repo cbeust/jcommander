@@ -24,9 +24,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * @deprecated, use @Parameters
+ * @deprecated use @Parameters
  * 
- * @author cbeust
+ * @author Cedric Beust <cedric@beust.com>
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })

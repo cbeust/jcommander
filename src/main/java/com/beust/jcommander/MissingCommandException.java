@@ -16,15 +16,21 @@
  * limitations under the License.
  */
 
-package com.beust.jcommander.args;
+package com.beust.jcommander;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ResourceBundle;
+/**
+ * Thrown when a command was expected.
+ *
+ * @author Cedric Beust <cedric@beust.com>
+ */
+@SuppressWarnings("serial")
+public class MissingCommandException extends ParameterException {
 
-@SuppressWarnings("deprecation")
-@ResourceBundle("MessageBundle")
-public class ArgsI18N2 {
+  public MissingCommandException(String string) {
+    super(string);
+  }
 
-  @Parameter(names = "-host", description = "Host", descriptionKey = "host")
-  String hostName;
+  public MissingCommandException(Throwable t) {
+    super(t);
+  }
 }

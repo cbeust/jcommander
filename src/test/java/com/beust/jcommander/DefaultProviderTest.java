@@ -27,7 +27,6 @@ import org.testng.annotations.Test;
 public class DefaultProviderTest {
   private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
 
-    @Override
     public String getDefaultValueFor(String optionName) {
       return "-debug".equals(optionName) ? "false" : "42";
     }

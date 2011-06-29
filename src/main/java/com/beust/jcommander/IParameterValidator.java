@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 the original author or authors.
+ * Copyright (C) 2011 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,15 +16,23 @@
  * limitations under the License.
  */
 
-package com.beust.jcommander.args;
+package com.beust.jcommander;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ResourceBundle;
+/**
+ * The class used to validate parameters.
+ *
+ * @author Cedric Beust <cedric@beust.com>
+ */
+public interface IParameterValidator {
 
-@SuppressWarnings("deprecation")
-@ResourceBundle("MessageBundle")
-public class ArgsI18N2 {
+  /**
+   * Validate the parameter.
+   *
+   * @param name The name of the parameter (e.g. "-host").
+   * @param value The value of the parameter that we need to validate
+   *
+   * @throws ParameterException Thrown if the value of the parameter is invalid.
+   */
+  void validate(String name, String value) throws ParameterException;
 
-  @Parameter(names = "-host", description = "Host", descriptionKey = "host")
-  String hostName;
 }

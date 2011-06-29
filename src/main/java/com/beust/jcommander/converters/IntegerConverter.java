@@ -31,7 +31,6 @@ public class IntegerConverter extends BaseConverter<Integer> {
     super(optionName);
   }
 
-  @Override
   public Integer convert(String value) {
     try {
       return Integer.parseInt(value);

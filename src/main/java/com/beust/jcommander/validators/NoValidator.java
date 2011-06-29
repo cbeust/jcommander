@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 the original author or authors.
+ * Copyright (C) 2011 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,15 +16,20 @@
  * limitations under the License.
  */
 
-package com.beust.jcommander.args;
+package com.beust.jcommander.validators;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ResourceBundle;
+import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.ParameterException;
 
-@SuppressWarnings("deprecation")
-@ResourceBundle("MessageBundle")
-public class ArgsI18N2 {
+/**
+ * This is the default value of the validateWith attribute.
+ *
+ * @author Cedric Beust <cedric@beust.com>
+ */
+public class NoValidator implements IParameterValidator {
 
-  @Parameter(names = "-host", description = "Host", descriptionKey = "host")
-  String hostName;
+  public void validate(String parameterName, String parameterValue)
+      throws ParameterException {
+  }
+
 }
