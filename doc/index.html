@@ -642,6 +642,37 @@ host: H&ocirc;te
 
 JCommander will then use the default locale to resolve your descriptions.
 
+<h2><a class="section" name="Scala">JCommander in Scala</a></h2>
+
+Here is a quick example of how to use JCommander in Scala (courtesy of Patrick Linskey):
+
+<pre class="brush: java">
+import java.io.File
+import com.beust.jcommander.{JCommander, Parameter}
+import collection.JavaConversions._
+
+object Main {
+  object Args {
+    // Declared as var because JCommander assigns a new collection; declared
+    // as java.util.List because that's what JCommander will replace with.
+    // It'd be nice if JCommander would just use the provided List so this
+    // could be a val and a Scala LinkedList.
+    @Parameter(
+      names = Array("-f", "--file"),
+      description = "File to load. Can be specified multiple times.")
+    var file: java.util.List[String] = null
+  }
+
+  def main(args: Array[String]): Unit = {
+    new JCommander(Args, args.toArray: _*)
+    for (filename <- Args.file) {
+      val f = new File(filename)
+      printf("file: %s\n", f.getName)
+    }
+  }
+}
+</pre>
+
 <h2><a class="section" name="More_examples">More examples</a></h2>
 
 TestNG uses JCommander to parse its command line, here is <a href="http://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">its definition file</a>.
