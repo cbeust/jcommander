@@ -139,7 +139,9 @@ public class CommandAliasTest {
     jc.addCommand("commit", commit, "ci", "cmt");
     StringBuilder out = new StringBuilder();
     jc.usage(out);
-    patternMatchesTimes("commit\\(ci,cmt\\)", out.toString(), 1);
+    // The usage should display this string twice: one as the command name
+    // and one after Usage:
+    patternMatchesTimes("commit\\(ci,cmt\\)", out.toString(), 2);
   }
 
   /**
@@ -167,8 +169,7 @@ public class CommandAliasTest {
   private void patternMatchesTimes(String pattern, String input, int times) {
     Matcher m = Pattern.compile(pattern).matcher(input);
     int matches = 0;
-    while (m.find())
-      matches++;
+    while (m.find()) matches++;
     Assert.assertEquals(matches, times);
   }
 }

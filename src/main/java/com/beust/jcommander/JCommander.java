@@ -596,7 +596,7 @@ public class JCommander {
             //
             JCommander jc = findCommandByAlias(arg);
             if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
-            m_parsedCommand = jc.m_programName.name;
+            m_parsedCommand = jc.m_programName.m_name;
             m_parsedAlias = arg; //preserve the original form
 
             // Found a valid command, ask it to parse the remainder of the arguments.
@@ -738,13 +738,21 @@ public class JCommander {
    * Store the help for the command in the passed string builder.
    */
   public void usage(String commandName, StringBuilder out) {
+    usage(commandName, out, "");
+  }
+
+  /**
+   * Store the help for the command in the passed string builder, indenting
+   * every line with "indent".
+   */
+  public void usage(String commandName, StringBuilder out, String indent) {
     String description = getCommandDescription(commandName);
     JCommander jc = findCommandByAlias(commandName);
     if (description != null) {
-      out.append(description);
+      out.append(indent).append(description);
       out.append("\n");
     }
-    jc.usage(out);
+    jc.usage(out, indent);
   }
 
   /**
@@ -776,6 +784,10 @@ public class JCommander {
    * Store the help in the passed string builder.
    */
   public void usage(StringBuilder out) {
+    usage(out, "");
+  }
+
+  public void usage(StringBuilder out, String indent) {
     if (m_descriptions == null) createDescriptions();
     boolean hasCommands = !m_commands.isEmpty();
 
@@ -783,9 +795,9 @@ public class JCommander {
     // First line of the usage
     //
     String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
-    out.append("Usage: " + programName + " [options]");
-    if (hasCommands) out.append(" [command] [command options]");
-    out.append("\n");
+    out.append(indent).append("Usage: " + programName + " [options]");
+    if (hasCommands) out.append(indent).append(" [command] [command options]");
+//    out.append("\n");
     if (m_mainParameterAnnotation != null) {
       out.append(" " + m_mainParameterAnnotation.description() + "\n");
     }
@@ -818,18 +830,19 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    if (sorted.size() > 0) out.append("  Options:\n");
+    if (sorted.size() > 0) out.append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
       int start = out.length();
-      out.append("  "
+      out.append(indent).append("  "
           + (pd.getParameter().required() ? "* " : "  ")
           + pd.getNames() + s(spaceCount));
-      int indent = out.length() - start;
-      wrapDescription(out, indent, pd.getDescription());
+      int indentCount = out.length() - start;
+      wrapDescription(out, indentCount, pd.getDescription());
       Object def = pd.getDefault();
-      if (def != null) out.append("\n" + spaces(indent + 1)).append("Default: " + def);
+      if (def != null) out.append("\n" + spaces(indentCount + 1))
+          .append("Default: " + def);
       out.append("\n");
     }
 
@@ -840,12 +853,14 @@ public class JCommander {
       out.append("  Commands:\n");
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
-      int ln = longestName(m_commands.keySet()) + 3;
       for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
         ProgramName progName = commands.getKey();
         String dispName = progName.getDisplayName();
-        int spaceCount  = ln - dispName.length();
-        out.append("    " + dispName + s(spaceCount) + getCommandDescription(progName.name) + "\n");
+        out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
+
+        // Options for this command
+        usage(progName.getName(), out, "      ");
+        out.append("\n");
       }
     }
   }
@@ -1028,7 +1043,7 @@ public class JCommander {
           throw new ParameterException("Cannot set alias " + alias
                   + " for " + name
                   + " command because it has already been defined for "
-                  + mappedName.name + " command");
+                  + mappedName.m_name + " command");
         }
         aliasMap.put(alias, progName);
       }
@@ -1038,7 +1053,7 @@ public class JCommander {
   public Map<String, JCommander> getCommands() {
     Map<String, JCommander> res = Maps.newLinkedHashMap();
     for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
-      res.put(entry.getKey().name, entry.getValue());
+      res.put(entry.getKey().m_name, entry.getValue());
     }
     return res;
   }
@@ -1096,24 +1111,24 @@ public class JCommander {
   }
 
   private static final class ProgramName {
-    private final String name;
-    private final List<String> aliases;
-
-    ProgramName(String name) {
-      this(name, Collections.<String>emptyList());
-    }
+    private final String m_name;
+    private final List<String> m_aliases;
 
     ProgramName(String name, List<String> aliases) {
-      this.name = name;
-      this.aliases = aliases;
+      m_name = name;
+      m_aliases = aliases;
+    }
+
+    public String getName() {
+      return m_name;
     }
 
     private String getDisplayName() {
       StringBuilder sb = new StringBuilder();
-      sb.append(name);
-      if (!aliases.isEmpty()) {
+      sb.append(m_name);
+      if (!m_aliases.isEmpty()) {
         sb.append("(");
-        Iterator<String> aliasesIt = aliases.iterator();
+        Iterator<String> aliasesIt = m_aliases.iterator();
         while (aliasesIt.hasNext()) {
           sb.append(aliasesIt.next());
           if (aliasesIt.hasNext()) {
@@ -1129,7 +1144,7 @@ public class JCommander {
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((name == null) ? 0 : name.hashCode());
+      result = prime * result + ((m_name == null) ? 0 : m_name.hashCode());
       return result;
     }
 
@@ -1142,10 +1157,10 @@ public class JCommander {
       if (getClass() != obj.getClass())
         return false;
       ProgramName other = (ProgramName) obj;
-      if (name == null) {
-        if (other.name != null)
+      if (m_name == null) {
+        if (other.m_name != null)
           return false;
-      } else if (!name.equals(other.name))
+      } else if (!m_name.equals(other.m_name))
         return false;
       return true;
     }

@@ -2,11 +2,12 @@ Current
 
 Added: Default converter factories can be overridden (Scott Clasen)
 Added: IParameterValidator
-Added: Don't display "Options:" if none were defined.
-Added: Enforce that the type of the main parameter is a List.
+Added: Don't display "Options:" if none were defined
+Added: Enforce that the type of the main parameter is a List
+Added: usage() now displays the options for each command as well
 Fixed: Default values with a validator were being validate at parse() time instead of creation time.
 Fixed: Exception when using an @ file with empty lines between options
-Fixed: OOM when parsing certain descriptions with long URL's in them.
+Fixed: OOM when parsing certain descriptions with long URL's in them
 
 1.15
 2011/01/24
