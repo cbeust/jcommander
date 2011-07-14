@@ -21,9 +21,14 @@ package com.beust.jcommander.args;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
+import java.util.List;
+
 @Parameters(resourceBundle = "MessageBundle")
 public class ArgsI18N2New {
 
   @Parameter(names = "-host", description = "Host", descriptionKey = "host")
   String hostName;
+
+  @Parameter(descriptionKey = "files")
+  List<String> files;
 }
