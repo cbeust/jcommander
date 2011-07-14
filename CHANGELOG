@@ -1,5 +1,12 @@
 Current
 
+Current
+
+Fixed: GITHUB-73: descriptionKey was being ignored on main parameters
+
+1.18
+2011/07/20
+
 Added: Default converter factories can be overridden (Scott Clasen)
 Added: IParameterValidator
 Added: Don't display "Options:" if none were defined

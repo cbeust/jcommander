@@ -798,8 +798,8 @@ public class JCommander {
     out.append(indent).append("Usage: " + programName + " [options]");
     if (hasCommands) out.append(indent).append(" [command] [command options]");
 //    out.append("\n");
-    if (m_mainParameterAnnotation != null) {
-      out.append(" " + m_mainParameterAnnotation.description() + "\n");
+    if (m_mainParameterDescription != null) {
+      out.append(" " + m_mainParameterDescription.getDescription() + "\n");
     }
 
     //
