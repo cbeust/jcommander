@@ -55,4 +55,9 @@ public @interface Parameters {
    * description when @{link JCommander#usage} is invoked.
    */
   String commandDescription() default "";
+
+  /**
+   * @return the key used to find the command description in the resource bundle.
+   */
+  String commandDescriptionKey() default "";
 }

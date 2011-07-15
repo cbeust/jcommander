@@ -766,9 +766,18 @@ public class JCommander {
 
     Parameters p = jc.getObjects().get(0).getClass().getAnnotation(Parameters.class);
     String result = jc.getMainParameterDescription();
-    if (p != null) result = p.commandDescription();
+    if (p != null) result = getI18nString(p.commandDescriptionKey(), p.commandDescription());
 
     return result;
+  }
+
+  /**
+   * @return The internationalized version of the string if available, otherwise
+   * return def.
+   */
+  private String getI18nString(String key, String def) {
+    String s = m_bundle != null ? m_bundle.getString(key) : null;
+    return s != null ? s : def;
   }
 
   /**
