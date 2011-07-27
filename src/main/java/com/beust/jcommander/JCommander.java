@@ -320,7 +320,7 @@ public class JCommander {
       if (isOption(v1, arg)) {
         String sep = getSeparatorFor(v1, arg);
         if (! " ".equals(sep)) {
-          String[] sp = arg.split("[" + sep + "]");
+          String[] sp = arg.split("[" + sep + "]", 2);
           for (String ssp : sp) {
             vResult2.add(ssp);
           }

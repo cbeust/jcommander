@@ -24,6 +24,7 @@ import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
 import com.beust.jcommander.args.ArgsBooleanArity0;
 import com.beust.jcommander.args.ArgsConverter;
+import com.beust.jcommander.args.ArgsEquals;
 import com.beust.jcommander.args.ArgsHelp;
 import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
@@ -495,9 +496,20 @@ public class JCommanderTest {
     new JCommander(new Args1(), "@" + f.getAbsolutePath());
   }
 
+  public void handleEqualSigns() {
+    ArgsEquals a = new ArgsEquals();
+    JCommander jc = new JCommander(a);
+    jc.parse(new String[] { "-args=a=b,b=c" });
+    Assert.assertEquals(a.args, "a=b,b=c");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().validationShouldWorkWithDefaultValues();
+    new JCommanderTest().handleEqualSigns();
+//    PortsArgs a = new PortsArgs();
+//    JCommander jc = new JCommander(a);
+//    jc.usage();
+//    new JCommanderTest().validationShouldWorkWithDefaultValues();
 //    new JCommanderTest().booleanArity1();
 //    ArgsLongDescription a = new ArgsLongDescription();
 //    JCommander jc = new JCommander(a);
