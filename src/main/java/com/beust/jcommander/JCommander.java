@@ -261,6 +261,10 @@ public class JCommander {
       for (ParameterDescription pd : m_descriptions.values()) {
         initializeDefaultValue(pd);
       }
+
+      for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
+        entry.getValue().initializeDefaultValues();
+      }
     }
   }
 
@@ -925,6 +929,10 @@ public class JCommander {
    */
   public void setDefaultProvider(IDefaultProvider defaultProvider) {
     m_defaultProvider = defaultProvider;
+
+    for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
+      entry.getValue().setDefaultProvider(defaultProvider);
+    }
   }
 
   public void addConverterFactory(IStringConverterFactory converterFactory) {
@@ -1033,6 +1041,7 @@ public class JCommander {
   public void addCommand(String name, Object object, String... aliases) {
     JCommander jc = new JCommander(object);
     jc.setProgramName(name, aliases);
+    jc.setDefaultProvider(m_defaultProvider);
     ProgramName progName = jc.m_programName;
     m_commands.put(progName, jc);
 
