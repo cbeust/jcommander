@@ -3,6 +3,7 @@ Current
 Current
 
 Added: commandDescriptionKey to @Parameters, to allow internationalized command descriptions
+Fixed: defaults for commands were not properly applied (Stevo Slavic)
 Fixed: "-args=a=b,b=c" was not being parsed correctly (Michael Lancaster)
 Fixed: GITHUB-73: descriptionKey was being ignored on main parameters
 
