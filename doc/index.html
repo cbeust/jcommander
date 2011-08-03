@@ -53,7 +53,7 @@ You annotate fields with descriptions of your options:
 <pre class="brush: java">
 import com.beust.jcommander.Parameter;
 
-public class JCommanderTest {
+public class JCommanderExample {
   @Parameter
   public List&lt;String&gt; parameters = Lists.newArrayList();
 
@@ -227,7 +227,7 @@ The factory is straightforward:
 
 <pre class="brush: java">
 public class Factory implements IStringConverterFactory {
-  public Class<? extends IStringConverter<?>> getConverter(Class forType) {
+  public Class&lt;? extends IStringConverter&lt;?&gt;&gt; getConverter(Class forType) {
     if (forType.equals(HostPort.class)) return HostPortConverter.class;
     else return null;
   }
