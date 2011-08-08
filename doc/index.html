@@ -653,8 +653,8 @@ import collection.JavaConversions._
 
 object Main {
   object Args {
-    // Declared as var because JCommander assigns a new collection; declared
-    // as java.util.List because that's what JCommander will replace with.
+    // Declared as var because JCommander assigns a new collection declared
+    // as java.util.List because that's what JCommander will replace it with.
     // It'd be nice if JCommander would just use the provided List so this
     // could be a val and a Scala LinkedList.
     @Parameter(
@@ -688,8 +688,7 @@ You can download JCommander from the following locations:
 
 <ul>
   <li><a href="http://github.com/cbeust/jcommander">Source on github</a></li>
-  <li><a href="jcommander-1.13.jar">Jar file</a></li>
-  <li>Or if you are using Maven, add the following dependency to your <tt>pom.xml</tt>:
+ <li>If you are using Maven, add the following dependency to your <tt>pom.xml</tt>:
 
   <pre class="brush: xml">
 
