@@ -39,6 +39,7 @@ import com.beust.jcommander.args.ArgsRequired;
 import com.beust.jcommander.args.ArgsSlave;
 import com.beust.jcommander.args.ArgsSlaveBogus;
 import com.beust.jcommander.args.ArgsValidate1;
+import com.beust.jcommander.args.ArgsWithSet;
 import com.beust.jcommander.args.Arity1;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
@@ -62,6 +63,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeSet;
 
 @Test
 public class JCommanderTest {
@@ -501,6 +503,13 @@ public class JCommanderTest {
     JCommander jc = new JCommander(a);
     jc.parse(new String[] { "-args=a=b,b=c" });
     Assert.assertEquals(a.args, "a=b,b=c");
+  }
+
+  @SuppressWarnings("serial")
+  public void handleSets() {
+    ArgsWithSet a = new ArgsWithSet();
+    new JCommander(a, new String[] { "-s", "3,1,2" });
+    Assert.assertEquals(a.set, new TreeSet<Integer>() {{ add(1); add(2); add(3); }});
   }
 
   @Test(enabled = false)

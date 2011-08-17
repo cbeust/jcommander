@@ -19,16 +19,18 @@
 package com.beust.jcommander;
 
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Sets;
 import com.beust.jcommander.validators.NoValidator;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class ParameterDescription {
   private Object m_object;
@@ -237,12 +239,12 @@ public class ParameterDescription {
    * Currently only List and Set are supported. Support for
    * Queues and Stacks could be useful.
    */
+  @SuppressWarnings("unchecked")
   private Collection<Object> newCollection(Class<?> type) {
-    if(List.class.isAssignableFrom(type)){
-      return Lists.newArrayList();
-    } else if(Set.class.isAssignableFrom(type)){
-      return Sets.newLinkedHashSet();
-    } else {
+    if (SortedSet.class.isAssignableFrom(type)) return new TreeSet();
+    else if (LinkedHashSet.class.isAssignableFrom(type)) return new LinkedHashSet();
+    else if (List.class.isAssignableFrom(type)) return new ArrayList();
+    else {
       throw new ParameterException("Parameters of Collection type '" + type.getSimpleName()
                                   + "' are not supported. Please use List or Set instead.");
     }
