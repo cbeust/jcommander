@@ -261,7 +261,15 @@ public class ParameterDescription {
   public boolean isNumber() {
     Class<?> type = m_field.getType();
     return type.equals(Integer.class) || type.equals(int.class)
-        || type.equals(Long.class) || type.equals(long.class);
+        || type.equals(Long.class) || type.equals(long.class)
+        || type.equals(Float.class) || type.equals(float.class)
+        || type.equals(Double.class) || type.equals(double.class);
+  }
+
+  public boolean isFractional() {
+      Class<?> type = m_field.getType();
+      return type.equals(Float.class) || type.equals(float.class)
+          || type.equals(Double.class) || type.equals(double.class);
   }
 
   private void p(String string) {
