@@ -18,11 +18,11 @@
 
 package com.beust.jcommander.args;
 
-import com.beust.jcommander.Parameter;
+import java.util.List;
 
 import org.testng.collections.Lists;
 
-import java.util.List;
+import com.beust.jcommander.Parameter;
 
 public class Args1 {
   @Parameter
@@ -39,4 +39,10 @@ public class Args1 {
 
   @Parameter(names = "-long", description = "A long number")
   public long l;
+
+  @Parameter(names = "-double", description = "A double number")
+  public double doub;
+
+  @Parameter(names = "-float", description = "A float number")
+  public float floa;
 }

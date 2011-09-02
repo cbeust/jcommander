@@ -69,13 +69,16 @@ import java.util.TreeSet;
 public class JCommanderTest {
   public void simpleArgs() {
     Args1 args = new Args1();
-    String[] argv = { "-debug", "-log", "2", "-groups", "unit", "a", "b", "c" };
+    String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3",
+            "-groups", "unit", "a", "b", "c" };
     new JCommander(args, argv);
 
     Assert.assertTrue(args.debug);
     Assert.assertEquals(args.verbose.intValue(), 2);
     Assert.assertEquals(args.groups, "unit");
     Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+    Assert.assertEquals(args.floa, 1.2f, 0.1f);
+    Assert.assertEquals(args.doub, 1.3f, 0.1f);
   }
 
   /**
@@ -86,7 +89,7 @@ public class JCommanderTest {
     Args1 args = new Args1();
     String[] argv = { "-log", "2" };
     JCommander jc = new JCommander(args, argv);
-    Assert.assertEquals(jc.getParameters().size(), 4);
+    Assert.assertEquals(jc.getParameters().size(), 6);
   }
 
   /**
@@ -514,7 +517,7 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().handleEqualSigns();
+    new JCommanderTest().repeatedArgs();
 //    PortsArgs a = new PortsArgs();
 //    JCommander jc = new JCommander(a);
 //    jc.usage();
