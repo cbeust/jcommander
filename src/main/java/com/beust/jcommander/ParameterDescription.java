@@ -22,6 +22,7 @@ package com.beust.jcommander;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -243,6 +244,7 @@ public class ParameterDescription {
   private Collection<Object> newCollection(Class<?> type) {
     if (SortedSet.class.isAssignableFrom(type)) return new TreeSet();
     else if (LinkedHashSet.class.isAssignableFrom(type)) return new LinkedHashSet();
+    else if (Set.class.isAssignableFrom(type)) return new HashSet();
     else if (List.class.isAssignableFrom(type)) return new ArrayList();
     else {
       throw new ParameterException("Parameters of Collection type '" + type.getSimpleName()
@@ -256,20 +258,6 @@ public class ParameterDescription {
    */
   private boolean fieldIsSetForTheFirstTime(boolean isDefault) {
     return (!isDefault && !m_assigned);
-  }
-
-  public boolean isNumber() {
-    Class<?> type = m_field.getType();
-    return type.equals(Integer.class) || type.equals(int.class)
-        || type.equals(Long.class) || type.equals(long.class)
-        || type.equals(Float.class) || type.equals(float.class)
-        || type.equals(Double.class) || type.equals(double.class);
-  }
-
-  public boolean isFractional() {
-      Class<?> type = m_field.getType();
-      return type.equals(Float.class) || type.equals(float.class)
-          || type.equals(Double.class) || type.equals(double.class);
   }
 
   private void p(String string) {
