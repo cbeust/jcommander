@@ -24,6 +24,8 @@ import com.beust.jcommander.converters.BooleanConverter;
 import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.converters.IntegerConverter;
 import com.beust.jcommander.converters.LongConverter;
+import com.beust.jcommander.converters.FloatConverter;
+import com.beust.jcommander.converters.DoubleConverter;
 import com.beust.jcommander.converters.StringConverter;
 
 import java.io.File;
@@ -34,7 +36,7 @@ public class DefaultConverterFactory implements IStringConverterFactory {
    * A map of converters per class.
    */
   private static Map<Class, Class<? extends IStringConverter<?>>> m_classConverters;
-  
+
   static {
     m_classConverters = Maps.newHashMap();
     m_classConverters.put(String.class, StringConverter.class);
@@ -42,6 +44,10 @@ public class DefaultConverterFactory implements IStringConverterFactory {
     m_classConverters.put(int.class, IntegerConverter.class);
     m_classConverters.put(Long.class, LongConverter.class);
     m_classConverters.put(long.class, LongConverter.class);
+    m_classConverters.put(Float.class, FloatConverter.class);
+    m_classConverters.put(float.class, FloatConverter.class);
+    m_classConverters.put(Double.class, DoubleConverter.class);
+    m_classConverters.put(double.class, DoubleConverter.class);
     m_classConverters.put(Boolean.class, BooleanConverter.class);
     m_classConverters.put(boolean.class, BooleanConverter.class);
     m_classConverters.put(File.class, FileConverter.class);
