@@ -19,8 +19,6 @@
 package com.beust.jcommander;
 
 
-import com.beust.jcommander.validators.NoValidator;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +29,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import com.beust.jcommander.validators.NoValidator;
 
 public class ParameterDescription {
   private Object m_object;
@@ -170,7 +170,7 @@ public class ParameterDescription {
 
 
   public void setAssigned(boolean b) {
-    m_assigned = true;
+    m_assigned = b;
   }
 
   /**
