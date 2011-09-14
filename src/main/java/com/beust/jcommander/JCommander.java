@@ -590,6 +590,18 @@ public class JCommander {
                 convertedValue = convertValue(m_mainParameterField, (Class) cls, value);
               }
             }
+            
+            Class<? extends IParameterValidator> validator = m_mainParameterAnnotation.validateWith();
+            if (validator != NoValidator.class) {
+              try {
+                p("Validating parameter:" + "default" + " value:" + value + " validator:" + validator);
+                validator.newInstance().validate("Default", value);
+              } catch (InstantiationException e) {
+                throw new ParameterException("Can't instantiate validator:" + e);
+              } catch (IllegalAccessException e) {
+                throw new ParameterException("Can't instantiate validator:" + e);
+              }
+            }
 
             m_mainParameterDescription.setAssigned(true);
             mp.add(convertedValue);
