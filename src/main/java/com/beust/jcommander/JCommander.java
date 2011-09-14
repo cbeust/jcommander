@@ -23,6 +23,7 @@ import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.DefaultConverterFactory;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.validators.NoValidator;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
