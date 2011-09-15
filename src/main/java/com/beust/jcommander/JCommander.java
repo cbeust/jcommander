@@ -592,6 +592,7 @@ public class JCommander {
               }
             }
             
+            // When a default command has a validator specified.
             Class<? extends IParameterValidator> validator = m_mainParameterAnnotation.validateWith();
             if (validator != NoValidator.class) {
               try {
