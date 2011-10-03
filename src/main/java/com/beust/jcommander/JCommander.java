@@ -41,8 +41,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -812,7 +812,7 @@ public class JCommander {
     if (hasCommands) out.append(indent).append(" [command] [command options]");
 //    out.append("\n");
     if (m_mainParameterDescription != null) {
-      out.append(" " + m_mainParameterDescription.getDescription() + "\n");
+      out.append(" " + m_mainParameterDescription.getDescription());
     }
 
     //
@@ -843,7 +843,7 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    if (sorted.size() > 0) out.append(indent).append("  Options:\n");
+    if (sorted.size() > 0) out.append(indent).append("\n  Options:\n");
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
