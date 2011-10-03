@@ -45,6 +45,7 @@ import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
 import com.beust.jcommander.args.SlashSeparator;
+import com.beust.jcommander.args.VariableArity;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
@@ -515,9 +516,35 @@ public class JCommanderTest {
     Assert.assertEquals(a.set, new TreeSet<Integer>() {{ add(1); add(2); add(3); }});
   }
 
+  private static final List<String> V = Arrays.asList("a", "b", "c", "d");
+
+  @DataProvider
+  public Object[][] variable() {
+    return new Object[][] {
+        new Object[] { 0, V.subList(0, 0), V },
+        new Object[] { 1, V.subList(0, 1), V.subList(1, 4) },
+        new Object[] { 2, V.subList(0, 2), V.subList(2, 4) },
+        new Object[] { 3, V.subList(0, 3), V.subList(3, 4) },
+        new Object[] { 4, V.subList(0, 4), V.subList(4, 4) },
+    };
+  }
+
+  @Test(dataProvider = "variable")
+  public void variableArity(int count, List<String> var, List<String> main) {
+    VariableArity va = new VariableArity(count);
+    new JCommander(va).parse("-variable", "a", "b", "c", "d");
+    Assert.assertEquals(var, va.var);
+    Assert.assertEquals(main, va.main);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().repeatedArgs();
+    for (int i = 0; i < 5; i++) {
+      VariableArity va = new VariableArity(i);
+      new JCommander(va).parse("-variable", "a", "b", "c", "d");
+      System.out.println(va.var + " *** " + va.main);
+    }
+//    new JCommanderTest().repeatedArgs();
 //    PortsArgs a = new PortsArgs();
 //    JCommander jc = new JCommander(a);
 //    jc.usage();

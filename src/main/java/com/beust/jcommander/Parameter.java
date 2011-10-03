@@ -78,4 +78,9 @@ public @interface Parameter {
    * The validation class to use.
    */
   Class<? extends IParameterValidator> validateWith() default NoValidator.class;
+
+  /**
+   * @return true if this parameter has a variable arity. See @{IVariableArity}
+   */
+  boolean variableArity() default false;
 }
