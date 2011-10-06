@@ -135,6 +135,13 @@ public class JCommander {
 
   private ProgramName m_programName;
 
+  private Comparator<? super ParameterDescription> m_parameterDescriptionComparator
+      = new Comparator<ParameterDescription>() {
+        public int compare(ParameterDescription p0, ParameterDescription p1) {
+          return p0.getLongestName().compareTo(p1.getLongestName());
+        }
+      };
+
   /**
    * The factories used to look up string converters.
    */
@@ -867,11 +874,7 @@ public class JCommander {
     //
     // Sort the options
     //
-    Collections.sort(sorted, new Comparator<ParameterDescription>() {
-      public int compare(ParameterDescription p0, ParameterDescription p1) {
-        return p0.getLongestName().compareTo(p1.getLongestName());
-      }
-    });
+    Collections.sort(sorted, getParameterDescriptionComparator());
 
     //
     // Display all the names and descriptions
@@ -909,6 +912,14 @@ public class JCommander {
         out.append("\n");
       }
     }
+  }
+
+  private Comparator<? super ParameterDescription> getParameterDescriptionComparator() {
+    return m_parameterDescriptionComparator;
+  }
+
+  public void setParameterDescriptionComparator(Comparator<? super ParameterDescription> c) {
+    m_parameterDescriptionComparator = c;
   }
 
   private void wrapDescription(StringBuilder out, int indent, String description) {

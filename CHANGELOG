@@ -3,6 +3,7 @@ Current
 Current
 
 Added: commandDescriptionKey to @Parameters, to allow internationalized command descriptions
+Added: JCommander#setParameterDescriptionComparator for better control over usage()
 Fixed: Fields of type Set (HashSet and SortedSet) are now supported
 Fixed: defaults for commands were not properly applied (Stevo Slavic)
 Fixed: "-args=a=b,b=c" was not being parsed correctly (Michael Lancaster)
