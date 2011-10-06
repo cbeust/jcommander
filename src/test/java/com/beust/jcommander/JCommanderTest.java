@@ -59,6 +59,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -539,11 +540,19 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    for (int i = 0; i < 5; i++) {
-      VariableArity va = new VariableArity(i);
-      new JCommander(va).parse("-variable", "a", "b", "c", "d");
-      System.out.println(va.var + " *** " + va.main);
-    }
+    JCommander j = new JCommander(new Args1());
+    j.setParameterDescriptionComparator(
+        new Comparator<ParameterDescription>() {
+          public int compare(ParameterDescription p0, ParameterDescription p1) {
+            return p1.getLongestName().length() - p0.getLongestName().length();
+          }
+        });
+    j.usage();
+//    for (int i = 0; i < 5; i++) {
+//      VariableArity va = new VariableArity(i);
+//      new JCommander(va).parse("-variable", "a", "b", "c", "d");
+//      System.out.println(va.var + " *** " + va.main);
+//    }
 //    new JCommanderTest().repeatedArgs();
 //    PortsArgs a = new PortsArgs();
 //    JCommander jc = new JCommander(a);
