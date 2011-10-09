@@ -742,18 +742,18 @@ public class JCommander {
    * Store the help for the command in the passed string builder.
    */
   public void usage(String commandName, StringBuilder out) {
-    usage(commandName, out, "");
+    usage(commandName, out, 0);
   }
 
   /**
    * Store the help for the command in the passed string builder, indenting
    * every line with "indent".
    */
-  public void usage(String commandName, StringBuilder out, String indent) {
+  public void usage(String commandName, StringBuilder out, int indent) {
     String description = getCommandDescription(commandName);
     JCommander jc = findCommandByAlias(commandName);
     if (description != null) {
-      out.append(indent).append(description);
+      out.append("  ").append(description);
       out.append("\n");
     }
     jc.usage(out, indent);
@@ -797,10 +797,13 @@ public class JCommander {
    * Store the help in the passed string builder.
    */
   public void usage(StringBuilder out) {
-    usage(out, "");
+    usage(out, 0);
   }
 
-  public void usage(StringBuilder out, String indent) {
+  public void usage(StringBuilder out, int startIndent) {
+	final int INDENT = 2;
+	int curIndent = startIndent;
+	
     if (m_descriptions == null) createDescriptions();
     boolean hasCommands = !m_commands.isEmpty();
 
@@ -808,26 +811,17 @@ public class JCommander {
     // First line of the usage
     //
     String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
-    out.append(indent).append("Usage: " + programName + " [options]");
-    if (hasCommands) out.append(indent).append(" [command] [command options]");
-//    out.append("\n");
+    out.append(s(curIndent)).append("Usage: " + programName + " [options]");
+    if (hasCommands) out.append(" [command] [command options]");
     if (m_mainParameterDescription != null) {
-      out.append(" " + m_mainParameterDescription.getDescription() + "\n");
+      out.append(" " + m_mainParameterDescription.getDescription());
     }
+    out.append("\n");
 
-    //
-    // Align the descriptions at the "longestName" column
-    //
-    int longestName = 0;
     List<ParameterDescription> sorted = Lists.newArrayList();
     for (ParameterDescription pd : m_fields.values()) {
       if (! pd.getParameter().hidden()) {
         sorted.add(pd);
-        // + to have an extra space between the name and the description
-        int length = pd.getNames().length() + 2;
-        if (length > longestName) {
-          longestName = length;
-        }
       }
     }
 
@@ -843,63 +837,77 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    if (sorted.size() > 0) out.append(indent).append("  Options:\n");
-    for (ParameterDescription pd : sorted) {
-      int l = pd.getNames().length();
-      int spaceCount = longestName - l;
-      int start = out.length();
-      out.append(indent).append("  "
-          + (pd.getParameter().required() ? "* " : "  ")
-          + pd.getNames() + s(spaceCount));
-      int indentCount = out.length() - start;
-      wrapDescription(out, indentCount, pd.getDescription());
-      Object def = pd.getDefault();
-      if (def != null) out.append("\n" + spaces(indentCount + 1))
-          .append("Default: " + def);
-      out.append("\n");
+    if (sorted.size() > 0) {
+      curIndent += INDENT;
+      out.append(s(curIndent)).append("Options:\n");
+      for (ParameterDescription pd : sorted) {
+        curIndent += INDENT;
+        // Option names
+        out.append(s(curIndent)
+            + (pd.getParameter().required() ? "* " : "  ")
+            + pd.getNames() + "\n");
+        // Option's description
+        curIndent += 2*INDENT;
+        wrapDescription(out, curIndent, pd.getDescription());
+        Object def = pd.getDefault();
+        if (def != null) out.append("\n" + s(curIndent))
+            .append("Default: " + def);
+        out.append("\n");
+        curIndent -= 2*INDENT;
+        curIndent -= INDENT;
+      }
+      curIndent -= INDENT;
     }
 
     //
     // If commands were specified, show them as well
     //
     if (hasCommands) {
-      out.append("  Commands:\n");
+      curIndent += INDENT;
+      out.append(s(curIndent) + "Commands:\n");
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
+        curIndent += INDENT;
         ProgramName progName = commands.getKey();
         String dispName = progName.getDisplayName();
-        out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
+        out.append(s(curIndent) + dispName);
 
         // Options for this command
-        usage(progName.getName(), out, "      ");
+        usage(progName.getName(), out, curIndent + INDENT);
         out.append("\n");
+        curIndent -= INDENT;
       }
+      curIndent -= INDENT;
     }
   }
 
   private void wrapDescription(StringBuilder out, int indent, String description) {
     int max = 79;
     String[] words = description.split(" ");
-    int current = indent;
-    int i = 0;
-    while (i < words.length) {
+    boolean appendNewline = false;
+    int current = max + 1;
+    int wdOnLine = 0;
+    for (int i = 0; i < words.length; i++) {
       String word = words[i];
       if (word.length() > max || current + word.length() <= max) {
-        out.append(" ").append(word);
-        current += word.length() + 1;
+    	// Add the word to the current line
       } else {
-        out.append("\n").append(spaces(indent + 1)).append(word);
+    	// Start a new line
+    	if (appendNewline) out.append("\n");
+    	else appendNewline = true;
+        out.append(s(indent));
+        wdOnLine = 0;
         current = indent;
       }
-      i++;
+      if (wdOnLine > 0) {
+    	out.append(" ");
+    	current++;
+      }
+      out.append(word);
+      current += word.length();
+      wdOnLine++;
     }
-  }
-
-  private String spaces(int indent) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < indent; i++) sb.append(" ");
-    return sb.toString();
   }
 
   /**
