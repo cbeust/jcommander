@@ -24,6 +24,7 @@ import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
 import com.beust.jcommander.args.ArgsBooleanArity0;
 import com.beust.jcommander.args.ArgsConverter;
+import com.beust.jcommander.args.ArgsEnum;
 import com.beust.jcommander.args.ArgsEquals;
 import com.beust.jcommander.args.ArgsHelp;
 import com.beust.jcommander.args.ArgsI18N1;
@@ -123,7 +124,7 @@ public class JCommanderTest {
     new JCommander(args, argv);
     Assert.assertEquals(args.verbose.intValue(), 2);
   }
-  
+
   public void multipleNames1() {
     multipleNames("-log");
   }
@@ -536,6 +537,21 @@ public class JCommanderTest {
     new JCommander(va).parse("-variable", "a", "b", "c", "d");
     Assert.assertEquals(var, va.var);
     Assert.assertEquals(main, va.main);
+  }
+
+  public void enumArgs() {
+    ArgsEnum args = new ArgsEnum();
+    String[] argv = { "-choice", "ONE"};
+    new JCommander(args, argv);
+
+    Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void enumArgsFail() {
+    ArgsEnum args = new ArgsEnum();
+    String[] argv = { "-choice", "A" };
+    new JCommander(args, argv);
   }
 
   @Test(enabled = false)
