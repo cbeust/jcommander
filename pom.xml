@@ -164,6 +164,12 @@
   		<version>6.1.1</version>
   		<type>jar</type>
   		<scope>test</scope>
+        <exclusions>
+            <exclusion>
+                <artifactId>jcommander</artifactId>
+                <groupId>com.beust</groupId>
+            </exclusion>
+        </exclusions>
   	</dependency>
   </dependencies>
 

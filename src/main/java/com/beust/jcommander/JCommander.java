@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -543,7 +544,7 @@ public class JCommander {
               // Regular option
               //
               Class<?> fieldType = pd.getField().getType();
-  
+
               // Boolean, set to true as soon as we see it, unless it specified
               // an arity of 1, in which case we need to read the next value
               if ((fieldType == boolean.class || fieldType == Boolean.class)
@@ -1008,8 +1009,14 @@ public class JCommander {
     //
     // Try to find a converter on the annotation
     //
-    if (converterClass == null || converterClass == NoConverter.class) {
-      converterClass = findConverter(type);
+    if ( converterClass == null || converterClass == NoConverter.class) {
+      // If no converter specified and type is enum, used enum values to convert
+      if (type.isEnum()){
+        converterClass = type;
+      } else {
+        converterClass = findConverter(type);
+      }
+
     }
     if (converterClass == null) {
       converterClass = StringConverter.class;
@@ -1035,8 +1042,17 @@ public class JCommander {
     try {
       String[] names = annotation.names();
       String optionName = names.length > 0 ? names[0] : "[Main class]";
-      converter = instantiateConverter(optionName, converterClass);
-      result = converter.convert(value);
+      if (converterClass.isEnum()) {
+        try {
+          result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
+        } catch (Exception e) {
+          throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
+                                       EnumSet.allOf((Class<? extends Enum>) converterClass));
+        }
+      } else {
+        converter = instantiateConverter(optionName, converterClass);
+        result = converter.convert(value);
+      }
     } catch (InstantiationException e) {
       throw new ParameterException(e);
     } catch (IllegalAccessException e) {
