@@ -1,0 +1,46 @@
+/**
+ * Copyright (C) 2010 the original author or authors.
+ * See the notice.md file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.beust.jcommander.args;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+
+import org.testng.Assert;
+
+/**
+ * Test parameter arity.
+ *
+ * @author cbeust
+ */
+public class ArgsEnum {
+
+  public enum ChoiceType { ONE, TWO, THREE };
+  @Parameter(names = "-choice", description = "Choice parameter")
+  public ChoiceType choice = ChoiceType.ONE;
+
+  public static void main(String[] args) {
+      ArgsEnum earg = new ArgsEnum();
+      String[] argv = { "-choice", "ONE"};
+      new JCommander(earg, argv);
+      Assert.assertEquals(earg.choice, ArgsEnum.ChoiceType.ONE);
+  }
+
+}
+
+
