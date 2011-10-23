@@ -2,6 +2,10 @@ Current
 
 Current
 
+Added: Support for enums (Adrian Muraru)
+
+1.19
+2011/10/10
 Added: commandDescriptionKey to @Parameters, to allow internationalized command descriptions
 Added: JCommander#setParameterDescriptionComparator for better control over usage()
 Fixed: Fields of type Set (HashSet and SortedSet) are now supported

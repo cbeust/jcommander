@@ -18,28 +18,18 @@
 
 package com.beust.jcommander.args;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
-import org.testng.Assert;
-
 /**
- * Test parameter arity.
+ * Test enums.
  *
- * @author cbeust
+ * @author Adrian Muraru
  */
 public class ArgsEnum {
 
   public enum ChoiceType { ONE, TWO, THREE };
   @Parameter(names = "-choice", description = "Choice parameter")
   public ChoiceType choice = ChoiceType.ONE;
-
-  public static void main(String[] args) {
-      ArgsEnum earg = new ArgsEnum();
-      String[] argv = { "-choice", "ONE"};
-      new JCommander(earg, argv);
-      Assert.assertEquals(earg.choice, ArgsEnum.ChoiceType.ONE);
-  }
 
 }
 
