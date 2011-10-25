@@ -59,8 +59,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -71,10 +74,10 @@ import java.util.TreeSet;
 
 @Test
 public class JCommanderTest {
-  public void simpleArgs() {
+  public void simpleArgs() throws ParseException {
     Args1 args = new Args1();
     String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
-            "-groups", "unit", "a", "b", "c" };
+            "-date", "2011-10-26", "-groups", "unit", "a", "b", "c" };
     new JCommander(args, argv);
 
     Assert.assertTrue(args.debug);
@@ -84,6 +87,7 @@ public class JCommanderTest {
     Assert.assertEquals(args.floa, 1.2f, 0.1f);
     Assert.assertEquals(args.doub, 1.3f, 0.1f);
     Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
+    Assert.assertEquals(args.date, new SimpleDateFormat("yyyy-MM-dd").parse("2011-10-26"));
   }
 
   /**
@@ -94,7 +98,7 @@ public class JCommanderTest {
     Args1 args = new Args1();
     String[] argv = { "-log", "2" };
     JCommander jc = new JCommander(args, argv);
-    Assert.assertEquals(jc.getParameters().size(), 7);
+    Assert.assertEquals(jc.getParameters().size(), 8);
   }
 
   /**

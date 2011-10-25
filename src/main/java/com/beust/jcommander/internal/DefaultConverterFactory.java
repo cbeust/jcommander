@@ -28,9 +28,11 @@ import com.beust.jcommander.converters.FloatConverter;
 import com.beust.jcommander.converters.DoubleConverter;
 import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.converters.BigDecimalConverter;
+import com.beust.jcommander.converters.ISO8601DateConverter;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 public class DefaultConverterFactory implements IStringConverterFactory {
@@ -54,6 +56,7 @@ public class DefaultConverterFactory implements IStringConverterFactory {
     m_classConverters.put(boolean.class, BooleanConverter.class);
     m_classConverters.put(File.class, FileConverter.class);
     m_classConverters.put(BigDecimal.class, BigDecimalConverter.class);
+    m_classConverters.put(Date.class, ISO8601DateConverter.class);
   }
 
   public Class<? extends IStringConverter<?>> getConverter(Class forType) {
