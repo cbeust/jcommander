@@ -58,6 +58,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -72,7 +73,7 @@ import java.util.TreeSet;
 public class JCommanderTest {
   public void simpleArgs() {
     Args1 args = new Args1();
-    String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3",
+    String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
             "-groups", "unit", "a", "b", "c" };
     new JCommander(args, argv);
 
@@ -82,6 +83,7 @@ public class JCommanderTest {
     Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
     Assert.assertEquals(args.floa, 1.2f, 0.1f);
     Assert.assertEquals(args.doub, 1.3f, 0.1f);
+    Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
   }
 
   /**
@@ -92,7 +94,7 @@ public class JCommanderTest {
     Args1 args = new Args1();
     String[] argv = { "-log", "2" };
     JCommander jc = new JCommander(args, argv);
-    Assert.assertEquals(jc.getParameters().size(), 6);
+    Assert.assertEquals(jc.getParameters().size(), 7);
   }
 
   /**
