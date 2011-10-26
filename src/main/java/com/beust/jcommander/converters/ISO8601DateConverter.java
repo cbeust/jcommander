@@ -28,7 +28,7 @@ import java.util.Date;
  * Converts a String to a Date.
  * TODO Modify to work with all valid ISO 8601 date formats (currently only works with yyyy-MM-dd).
  *
- * @author angus
+ * @author Angus Smithson
  */
 public class ISO8601DateConverter extends BaseConverter<Date> {
 

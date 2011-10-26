@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 /**
  * Converts a String to a BigDecimal.
  *
- * @author angus
+ * @author Angus Smithson
  */
 public class BigDecimalConverter extends BaseConverter<BigDecimal> {
 
