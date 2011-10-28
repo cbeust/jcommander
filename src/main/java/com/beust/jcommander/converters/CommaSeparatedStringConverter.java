@@ -18,20 +18,19 @@
 
 package com.beust.jcommander.converters;
 
-import com.beust.jcommander.IStringConverter;
-
-import java.util.Arrays;
-import java.util.List;
-
 /**
- * Convert a string of comma separated words into a list of string.
- * 
- * @author cbeust
+ * Convert a string of comma separated words into a list of type String.
+ *
+ * @author Angus Smithson
  */
-public class CommaSeparatedConverter implements IStringConverter<List<String>> {
+public class CommaSeparatedStringConverter extends CommaSeparatedBaseConverter<String> {
 
-  public List<String> convert(String value) {
-    return Arrays.asList(value.split(","));
+  public CommaSeparatedStringConverter(String optionName) {
+    super(optionName, "String");
   }
 
+  @Override
+  String getIndividualValue(String value) {
+    return value;
+  }
 }

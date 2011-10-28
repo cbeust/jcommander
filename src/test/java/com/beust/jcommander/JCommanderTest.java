@@ -58,8 +58,12 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -70,10 +74,10 @@ import java.util.TreeSet;
 
 @Test
 public class JCommanderTest {
-  public void simpleArgs() {
+  public void simpleArgs() throws ParseException {
     Args1 args = new Args1();
-    String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3",
-            "-groups", "unit", "a", "b", "c" };
+    String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
+            "-date", "2011-10-26", "-groups", "unit", "a", "b", "c" };
     new JCommander(args, argv);
 
     Assert.assertTrue(args.debug);
@@ -82,6 +86,8 @@ public class JCommanderTest {
     Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
     Assert.assertEquals(args.floa, 1.2f, 0.1f);
     Assert.assertEquals(args.doub, 1.3f, 0.1f);
+    Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
+    Assert.assertEquals(args.date, new SimpleDateFormat("yyyy-MM-dd").parse("2011-10-26"));
   }
 
   /**
@@ -92,7 +98,7 @@ public class JCommanderTest {
     Args1 args = new Args1();
     String[] argv = { "-log", "2" };
     JCommander jc = new JCommander(args, argv);
-    Assert.assertEquals(jc.getParameters().size(), 6);
+    Assert.assertEquals(jc.getParameters().size(), 8);
   }
 
   /**
@@ -254,11 +260,20 @@ public class JCommanderTest {
   public void converterArgs() {
     ArgsConverter args = new ArgsConverter();
     String fileName = "a";
-    new JCommander(args, "-file", "/tmp/" + fileName, "-days", "Tuesday,Thursday");
+    new JCommander(args, "-file", "/tmp/" + fileName, 
+      "-listStrings", "Tuesday,Thursday",
+      "-listInts", "-1,8",
+      "-listBigDecimals", "-11.52,100.12");
     Assert.assertEquals(args.file.getName(), fileName);
-    Assert.assertEquals(args.days.size(), 2);
-    Assert.assertEquals(args.days.get(0), "Tuesday");
-    Assert.assertEquals(args.days.get(1), "Thursday");
+    Assert.assertEquals(args.listStrings.size(), 2);
+    Assert.assertEquals(args.listStrings.get(0), "Tuesday");
+    Assert.assertEquals(args.listStrings.get(1), "Thursday");
+    Assert.assertEquals(args.listInts.size(), 2);
+    Assert.assertEquals(args.listInts.get(0).intValue(), -1);
+    Assert.assertEquals(args.listInts.get(1).intValue(), 8);
+    Assert.assertEquals(args.listBigDecimals.size(), 2);
+    Assert.assertEquals(args.listBigDecimals.get(0), new BigDecimal("-11.52"));
+    Assert.assertEquals(args.listBigDecimals.get(1), new BigDecimal("100.12"));
   }
 
   private void argsBoolean1(String[] params, Boolean expected) {

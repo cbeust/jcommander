@@ -18,7 +18,9 @@
 
 package com.beust.jcommander.args;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Date;
 
 import org.testng.collections.Lists;
 
@@ -45,4 +47,10 @@ public class Args1 {
 
   @Parameter(names = "-float", description = "A float number")
   public float floa;
+
+  @Parameter(names = "-bigdecimal", description = "A BigDecimal number")
+  public BigDecimal bigd;
+
+  @Parameter(names = "-date", description = "An ISO 8601 formatted date.")
+  public Date date;
 }
