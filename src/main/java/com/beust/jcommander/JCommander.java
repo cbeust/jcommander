@@ -465,6 +465,7 @@ public class JCommander {
         p("Field:" + cls.getSimpleName() + "." + f.getName());
         f.setAccessible(true);
         Annotation annotation = f.getAnnotation(Parameter.class);
+        Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
         if (annotation != null) {
           Parameter p = (Parameter) annotation;
           if (p.names().length == 0) {
@@ -489,6 +490,15 @@ public class JCommander {
 
               if (p.required()) m_requiredFields.put(f, pd);
             }
+          }
+        }else if(delegateAnnotation != null){
+          try {
+            Object delegateObject = f.get(object);
+            if(delegateObject == null){
+              throw new ParameterException("Delegate field '" + f.getName() + "' cannot be null.");
+            }
+            addDescription(delegateObject);
+          } catch (IllegalAccessException e) {
           }
         }
       }
