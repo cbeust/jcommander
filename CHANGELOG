@@ -3,6 +3,7 @@ Current
 Current
 
 Added: Support for enums (Adrian Muraru)
+Added: Support for delegating parameter definitions to child classes (rodionmoiseev)
 
 1.19
 2011/10/10
