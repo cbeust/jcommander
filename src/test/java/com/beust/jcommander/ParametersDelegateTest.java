@@ -139,6 +139,29 @@ public class ParametersDelegateTest {
     Assert.assertEquals(c.delegate.a, "a");
   }
 
+  @Test
+  public void mainParametersTest() {
+    class Delegate {
+      @Parameter
+      public List<String> mainParams = new ArrayList<String>();
+    }
+    class Command {
+      @ParametersDelegate
+      public Delegate delegate = new Delegate();
+    }
+
+    Command c = new Command();
+
+    JCommander cmd = new JCommander();
+    cmd.addCommand("command", c);
+
+    cmd.parse("command main params".split(" "));
+    Assert.assertEquals(c.delegate.mainParams, new ArrayList<String>() {{
+      add("main");
+      add("params");
+    }});
+  }
+
   @Test(expectedExceptions = ParameterException.class,
           expectedExceptionsMessageRegExp = ".*delegate.*null.*")
   public void nullDelegatesAreProhibited() {
@@ -171,5 +194,30 @@ public class ParametersDelegateTest {
     MainParams p = new MainParams();
     JCommander cmd = new JCommander(p);
     cmd.parse("-a value".split(" "));
+  }
+
+  @Test(expectedExceptions = ParameterException.class, expectedExceptionsMessageRegExp = "Only one.*is allowed.*")
+  public void duplicateMainParametersAreNotAllowed() {
+    class Delegate1 {
+      @Parameter
+      public List<String> mainParams1 = new ArrayList<String>();
+    }
+    class Delegate2 {
+      @Parameter
+      public List<String> mainParams2 = new ArrayList<String>();
+    }
+    class Command {
+      @ParametersDelegate
+      public Delegate1 delegate1 = new Delegate1();
+      @ParametersDelegate
+      public Delegate2 delegate2 = new Delegate2();
+    }
+
+    Command c = new Command();
+
+    JCommander cmd = new JCommander();
+    cmd.addCommand("command", c);
+
+    cmd.parse("command main params".split(" "));
   }
 }
