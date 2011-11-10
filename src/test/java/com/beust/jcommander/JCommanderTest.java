@@ -261,13 +261,15 @@ public class JCommanderTest {
     ArgsConverter args = new ArgsConverter();
     String fileName = "a";
     new JCommander(args, "-file", "/tmp/" + fileName, 
-      "-listStrings", "Tuesday,Thursday",
+      "-listStrings", "Tuesday\\,Thursday,November,red\\,green\\,blue,one\\,two\\,three",
       "-listInts", "-1,8",
       "-listBigDecimals", "-11.52,100.12");
     Assert.assertEquals(args.file.getName(), fileName);
-    Assert.assertEquals(args.listStrings.size(), 2);
-    Assert.assertEquals(args.listStrings.get(0), "Tuesday");
-    Assert.assertEquals(args.listStrings.get(1), "Thursday");
+    Assert.assertEquals(args.listStrings.size(), 4);
+    Assert.assertEquals(args.listStrings.get(0), "Tuesday\\,Thursday");
+    Assert.assertEquals(args.listStrings.get(1), "November");
+    Assert.assertEquals(args.listStrings.get(2), "red\\,green\\,blue");
+    Assert.assertEquals(args.listStrings.get(3), "one\\,two\\,three");
     Assert.assertEquals(args.listInts.size(), 2);
     Assert.assertEquals(args.listInts.get(0).intValue(), -1);
     Assert.assertEquals(args.listInts.get(1).intValue(), 8);

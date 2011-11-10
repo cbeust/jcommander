@@ -1051,7 +1051,10 @@ public class JCommander {
         }
       } else {
         converter = instantiateConverter(optionName, converterClass);
-        result = converter.convert(value);
+        result = (annotation.list()) 
+          ? parseList(converter, value)
+          : converter.convert(value)
+        ;
       }
     } catch (InstantiationException e) {
       throw new ParameterException(e);
@@ -1063,6 +1066,20 @@ public class JCommander {
 
     return result;
   }
+  
+  private List parseList(IStringConverter<?> converter, String value) {	
+    List l = new ArrayList();
+
+    // Split into elements but allow backslash-escaped commas.
+    // E.g. Input "123,456\,789" will result in an List of two elements: { "123", "456,789" }
+    final String[] values = value.split("(?<!\\\\),");
+    for (String s : values) {
+      l.add(converter.convert(s));
+    }
+
+    return l;
+  }
+  
 
   private IStringConverter<?> instantiateConverter(String optionName,
       Class<? extends IStringConverter<?>> converterClass)
