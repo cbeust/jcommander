@@ -70,6 +70,11 @@ public @interface Parameter {
   Class<? extends IStringConverter<?>> converter() default NoConverter.class;
 
   /**
+   * Whether or not to build a java.util.List of values from the comma-separated input.
+   */
+  boolean list() default false;
+
+  /**
    * If true, this parameter won't appear in the usage().
    */
   boolean hidden() default false;
