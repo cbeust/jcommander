@@ -613,6 +613,21 @@ public class JCommander {
   }
 
   /**
+   * @return the generic type of the collection for this field, or null if not applicable.
+   */
+  private Type findFieldGenericType(Field field) {
+    if (field.getGenericType() instanceof ParameterizedType) {
+      ParameterizedType p = (ParameterizedType) field.getGenericType();
+      Type cls = p.getActualTypeArguments()[0];
+      if (cls instanceof Class) {
+        return cls;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * @return the number of options that were processed.
    */
   private int processVariableArity(String[] args, int index, ParameterDescription pd) {
