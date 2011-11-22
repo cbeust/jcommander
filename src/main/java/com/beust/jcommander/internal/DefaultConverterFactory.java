@@ -20,15 +20,15 @@ package com.beust.jcommander.internal;
 
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.IStringConverterFactory;
+import com.beust.jcommander.converters.BigDecimalConverter;
 import com.beust.jcommander.converters.BooleanConverter;
+import com.beust.jcommander.converters.DoubleConverter;
 import com.beust.jcommander.converters.FileConverter;
+import com.beust.jcommander.converters.FloatConverter;
+import com.beust.jcommander.converters.ISO8601DateConverter;
 import com.beust.jcommander.converters.IntegerConverter;
 import com.beust.jcommander.converters.LongConverter;
-import com.beust.jcommander.converters.FloatConverter;
-import com.beust.jcommander.converters.DoubleConverter;
 import com.beust.jcommander.converters.StringConverter;
-import com.beust.jcommander.converters.BigDecimalConverter;
-import com.beust.jcommander.converters.ISO8601DateConverter;
 
 import java.io.File;
 import java.math.BigDecimal;

@@ -18,6 +18,7 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.internal.DefaultConverterFactory;
@@ -1005,21 +1006,25 @@ public class JCommander {
   public Object convertValue(Field field, Class type, String value) {
     Parameter annotation = field.getAnnotation(Parameter.class);
     Class<? extends IStringConverter<?>> converterClass = annotation.converter();
+    boolean listConverterWasSpecified = annotation.listConverter() != NoConverter.class;
 
     //
     // Try to find a converter on the annotation
     //
-    if ( converterClass == null || converterClass == NoConverter.class) {
+    if (converterClass == null || converterClass == NoConverter.class) {
       // If no converter specified and type is enum, used enum values to convert
       if (type.isEnum()){
         converterClass = type;
       } else {
         converterClass = findConverter(type);
       }
-
     }
+
     if (converterClass == null) {
-      converterClass = StringConverter.class;
+      Type elementType = findFieldGenericType(field);
+      converterClass = elementType != null
+          ? findConverter((Class<? extends IStringConverter<?>>) elementType)
+          : StringConverter.class;
     }
 
     //
@@ -1051,7 +1056,24 @@ public class JCommander {
         }
       } else {
         converter = instantiateConverter(optionName, converterClass);
-        result = converter.convert(value);
+        if (type.isAssignableFrom(List.class)
+              && field.getGenericType() instanceof ParameterizedType) {
+
+          // The field is a List
+          if (listConverterWasSpecified) {
+            // If a list converter was specified, pass the value to it
+            // for direct conversion
+            IStringConverter<?> listConverter =
+                instantiateConverter(optionName, annotation.listConverter());
+            result = listConverter.convert(value);
+          } else {
+            // No list converter: use the single value converter and pass each
+            // parsed value to it individually
+            result = convertToList(value, converter, annotation.splitter());
+          }
+        } else {
+          result = converter.convert(value);
+        }
       }
     } catch (InstantiationException e) {
       throw new ParameterException(e);
@@ -1061,6 +1083,21 @@ public class JCommander {
       throw new ParameterException(e);
     }
 
+    return result;
+  }
+
+  /**
+   * Use the splitter to split the value into multiple values and then convert
+   * each of them individually.
+   */
+  private Object convertToList(String value, IStringConverter<?> converter,
+      Class<? extends IParameterSplitter> splitterClass)
+          throws InstantiationException, IllegalAccessException {
+    IParameterSplitter splitter = splitterClass.newInstance();
+    List<Object> result = Lists.newArrayList();
+    for (String param : splitter.split(value)) {
+      result.add(converter.convert(param));
+    }
     return result;
   }
 

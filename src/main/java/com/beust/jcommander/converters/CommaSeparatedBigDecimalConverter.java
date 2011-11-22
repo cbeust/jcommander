@@ -25,7 +25,8 @@ import java.math.BigDecimal;
  *
  * @author Angus Smithson
  */
-public class CommaSeparatedBigDecimalConverter extends CommaSeparatedBaseConverter<BigDecimal> {
+public class CommaSeparatedBigDecimalConverter extends
+    CommaSeparatedBaseConverter<BigDecimal> {
 
   public CommaSeparatedBigDecimalConverter(String optionName) {
     super(optionName, "BigDecimal");

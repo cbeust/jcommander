@@ -19,7 +19,7 @@
 package com.beust.jcommander.converters;
 
 import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.converters.BaseConverter;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +38,6 @@ public class ISO8601DateConverter extends BaseConverter<Date> {
     super(optionName);
   }
 
-  @Override
   public Date convert(String value) {
     try {
       return DATE_FORMAT.parse(value);

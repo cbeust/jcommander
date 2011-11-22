@@ -20,6 +20,8 @@ package com.beust.jcommander;
 
 import static java.lang.annotation.ElementType.FIELD;
 
+import com.beust.jcommander.converters.CommaParameterSplitter;
+import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.validators.NoValidator;
 
@@ -65,9 +67,18 @@ public @interface Parameter {
   boolean password() default false;
 
   /**
-   * The string converter to use for this field.
+   * The string converter to use for this field. If the field is of type <tt>List</tt>
+   * and not <tt>listConverter</tt> attribute was specified, JCommander will split
+   * the input in individual values and convert each of them separately.
    */
   Class<? extends IStringConverter<?>> converter() default NoConverter.class;
+
+  /**
+   * The list string converter to use for this field. If it's specified, the
+   * field has to be of type <tt>List</tt> and the converter needs to return
+   * a List that's compatible with that type.
+   */
+  Class<? extends IStringConverter<?>> listConverter() default NoConverter.class;
 
   /**
    * If true, this parameter won't appear in the usage().
@@ -83,4 +94,10 @@ public @interface Parameter {
    * @return true if this parameter has a variable arity. See @{IVariableArity}
    */
   boolean variableArity() default false;
+
+  /**
+   * What splitter to use (applicable only on fields of type <tt>List</tt>). By default,
+   * a comma separated splitter will be used.
+   */
+  Class<? extends IParameterSplitter> splitter() default CommaParameterSplitter.class;
 }

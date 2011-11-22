@@ -19,9 +19,6 @@
 package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.converters.CommaSeparatedBigDecimalConverter;
-import com.beust.jcommander.converters.CommaSeparatedIntConverter;
-import com.beust.jcommander.converters.CommaSeparatedStringConverter;
 import com.beust.jcommander.converters.FileConverter;
 
 import java.io.File;
@@ -33,12 +30,12 @@ public class ArgsConverter {
   @Parameter(names = "-file", converter = FileConverter.class)
   public File file;
 
-  @Parameter(names = "-listStrings", converter = CommaSeparatedStringConverter.class)
+  @Parameter(names = "-listStrings")
   public List<String> listStrings;
 
-  @Parameter(names = "-listInts", converter = CommaSeparatedIntConverter.class)
+  @Parameter(names = "-listInts")
   public List<Integer> listInts;
 
-  @Parameter(names = "-listBigDecimals", converter = CommaSeparatedBigDecimalConverter.class)
+  @Parameter(names = "-listBigDecimals")
   public List<BigDecimal> listBigDecimals;
 }

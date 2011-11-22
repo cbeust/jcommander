@@ -21,4 +21,9 @@ package com.beust.jcommander;
 public class HostPort {
   public String host;
   public Integer port;
+  @Override
+
+  public String toString() {
+    return "[Host:" + host + " port:" + port + "]";
+  }
 }

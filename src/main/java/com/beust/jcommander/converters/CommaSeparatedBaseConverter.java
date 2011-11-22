@@ -19,11 +19,13 @@
 package com.beust.jcommander.converters;
 
 import com.beust.jcommander.ParameterException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for comma-separated converters which stores the name of the option and object type in case of errors.
+ * Base class for comma-separated converters which stores the name of the option
+ * and object type in case of errors.
  *
  * @author Angus Smithson
  */
@@ -40,9 +42,12 @@ abstract class CommaSeparatedBaseConverter<T> extends BaseConverter<List<T>> {
     ArrayList<T> al = new ArrayList<T>();
     final String[] values = value.split(",");
     try {
-      for (String s : values) al.add(getIndividualValue(s));
+      for (String s : values) {
+        al.add(getIndividualValue(s));
+      }
     } catch (Throwable t) {
-      throw new ParameterException(getErrorString(value, String.format("a list of type %s.", m_typeDescription)));
+      throw new ParameterException(getErrorString(value,
+          String.format("a list of type %s.", m_typeDescription)));
     }
     return al;
   }

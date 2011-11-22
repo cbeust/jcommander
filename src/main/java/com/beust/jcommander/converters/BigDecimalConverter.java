@@ -19,6 +19,7 @@
 package com.beust.jcommander.converters;
 
 import com.beust.jcommander.ParameterException;
+
 import java.math.BigDecimal;
 
 /**
@@ -32,7 +33,6 @@ public class BigDecimalConverter extends BaseConverter<BigDecimal> {
     super(optionName);
   }
 
-  @Override
   public BigDecimal convert(String value) {
     try {
       return new BigDecimal(value);

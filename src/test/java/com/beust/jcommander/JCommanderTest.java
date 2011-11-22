@@ -31,6 +31,7 @@ import com.beust.jcommander.args.ArgsI18N1;
 import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
 import com.beust.jcommander.args.ArgsInherited;
+import com.beust.jcommander.args.ArgsList;
 import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
@@ -63,8 +64,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -569,57 +568,29 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
+  public void testListAndSplitters() {
+    ArgsList al = new ArgsList();
+    JCommander j = new JCommander(al);
+    j.parse("-groups", "a,b", "-ints", "41,42", "-hp", "localhost:1000;example.com:1001",
+        "-hp2", "localhost:1000,example.com:1001", "-uppercase", "ab,cd");
+    Assert.assertEquals(al.groups.get(0), "a");
+    Assert.assertEquals(al.groups.get(1), "b");
+    Assert.assertEquals(al.ints.get(0).intValue(), 41);
+    Assert.assertEquals(al.ints.get(1).intValue(), 42);
+    Assert.assertEquals(al.hostPorts.get(0).host, "localhost");
+    Assert.assertEquals(al.hostPorts.get(0).port.intValue(), 1000);
+    Assert.assertEquals(al.hostPorts.get(1).host, "example.com");
+    Assert.assertEquals(al.hostPorts.get(1).port.intValue(), 1001);
+    Assert.assertEquals(al.hp2.get(1).host, "example.com");
+    Assert.assertEquals(al.hp2.get(1).port.intValue(), 1001);
+    Assert.assertEquals(al.uppercase.get(0), "AB");
+    Assert.assertEquals(al.uppercase.get(1), "CD");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    JCommander j = new JCommander(new Args1());
-    j.setParameterDescriptionComparator(
-        new Comparator<ParameterDescription>() {
-          public int compare(ParameterDescription p0, ParameterDescription p1) {
-            return p1.getLongestName().length() - p0.getLongestName().length();
-          }
-        });
-    j.usage();
-//    for (int i = 0; i < 5; i++) {
-//      VariableArity va = new VariableArity(i);
-//      new JCommander(va).parse("-variable", "a", "b", "c", "d");
-//      System.out.println(va.var + " *** " + va.main);
-//    }
-//    new JCommanderTest().repeatedArgs();
-//    PortsArgs a = new PortsArgs();
-//    JCommander jc = new JCommander(a);
-//    jc.usage();
-//    new JCommanderTest().validationShouldWorkWithDefaultValues();
-//    new JCommanderTest().booleanArity1();
-//    ArgsLongDescription a = new ArgsLongDescription();
-//    JCommander jc = new JCommander(a);
-//    jc.usage();
-//    ArgsPassword a = new ArgsPassword();
-//    JCommander jc = new JCommander(a);
-//    jc.parse("-password");
-//    System.out.println("Password:" + a.password);
-//    new JCommanderTest().commandsShouldBeShownInOrderOfInsertion();
-//    CommandMain cm = new CommandMain();
-//    JCommander jc = new JCommander(cm);
-//    CommandAdd add = new CommandAdd();
-//    jc.addCommand("add", add);
-//    CommandCommit commit = new CommandCommit();
-//    jc.addCommand("commit", commit);
-//    jc.usage();
-
-//    new JCommanderTest().requiredMainParameters();
-//    new CommandTest().commandTest1();
-//    new DefaultProviderTest().defaultProvider1();
-//    ArgsMainParameter a = new ArgsMainParameter();
-//    new JCommander(a, "ex1:10", "ex2:20");
-//    System.out.println(a.parameters.get(0).host);
-//    new JCommander(new Args1()).usage();
-//    Separator a = new Separator();
-//    String[] argv = new String[] { "-n", "foo" };
-//    String[] argv = new String[] { "-v", "t" };
-//    String[] argv = { "-log=10" };
-//    JCommander jc = new JCommander(a, argv);
-//    Assert.assertEquals(a.log.intValue(), 10);
-//  }
+    new JCommanderTest().testListAndSplitters();
+    new JCommanderTest().converterArgs();
   }
 
   // Tests:
