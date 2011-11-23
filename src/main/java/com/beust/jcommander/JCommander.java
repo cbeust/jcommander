@@ -144,6 +144,8 @@ public class JCommander {
         }
       };
 
+  private int m_columnSize = 79;
+
   /**
    * The factories used to look up string converters.
    */
@@ -939,8 +941,16 @@ public class JCommander {
     m_parameterDescriptionComparator = c;
   }
 
+  public void setColumnSize(int columnSize) {
+    m_columnSize = columnSize;
+  }
+
+  public int getColumnSize() {
+    return m_columnSize;
+  }
+
   private void wrapDescription(StringBuilder out, int indent, String description) {
-    int max = 79;
+    int max = getColumnSize();
     String[] words = description.split(" ");
     int current = indent;
     int i = 0;
