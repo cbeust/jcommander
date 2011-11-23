@@ -1157,6 +1157,18 @@ public class JCommander {
     addCommand(name, object, new String[0]);
   }
 
+  public void addCommand(Object object) {
+    Parameters p = object.getClass().getAnnotation(Parameters.class);
+    if (p != null && p.commandNames().length > 0) {
+      for (String commandName : p.commandNames()) {
+        addCommand(commandName, object);
+      }
+    } else {
+      throw new ParameterException("Trying to add command " + object.getClass().getName()
+          + " without specifying its names in @Parameters");
+    }
+  }
+
   /**
    * Add a command object and its aliases.
    */
@@ -1312,6 +1324,7 @@ public class JCommander {
     @Override
     public String toString() {
       return getDisplayName();
+      
     }
   }
 }

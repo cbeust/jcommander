@@ -19,6 +19,7 @@
 package com.beust.jcommander.command;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -26,6 +27,29 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 
 public class CommandTest {
+  @Test
+  public void namedCommandTest1() {
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+    NamedCommandAdd add = new NamedCommandAdd();
+    jc.addCommand(add);
+    CommandCommit commit = new CommandCommit();
+    jc.addCommand("commit", commit);
+    jc.parse("add", "-i", "A.java");
+
+    Assert.assertEquals(jc.getParsedCommand(), "add");
+    Assert.assertEquals(add.interactive.booleanValue(), true);
+    Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void shouldComplainIfNoAnnotations() {
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+    CommandAdd add = new CommandAdd();
+    jc.addCommand(add);
+  }
+
   @Test
   public void commandTest1() {
     CommandMain cm = new CommandMain();
@@ -64,6 +88,6 @@ public class CommandTest {
   }
 
   public static void main(String[] args) {
-    new CommandTest().commandTest2();
+    new CommandTest().shouldComplainIfNoAnnotations();
   }
 }

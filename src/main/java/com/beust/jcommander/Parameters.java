@@ -60,4 +60,9 @@ public @interface Parameters {
    * @return the key used to find the command description in the resource bundle.
    */
   String commandDescriptionKey() default "";
+
+  /**
+   * An array of allowed command names.
+   */
+  String[] commandNames() default {};
 }
