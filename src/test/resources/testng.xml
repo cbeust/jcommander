@@ -10,6 +10,7 @@
       <class name="com.beust.jcommander.DefaultProviderTest" />
       <class name="com.beust.jcommander.DefaultValueTest" />
       <class name="com.beust.jcommander.JCommanderTest" />
+      <class name="com.beust.jcommander.ParametersDelegateTest" />
     </classes>
   </test>
 
