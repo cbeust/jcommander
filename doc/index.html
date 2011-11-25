@@ -644,6 +644,38 @@ host: H&ocirc;te
 
 JCommander will then use the default locale to resolve your descriptions.
 
+<h2><a class="section" name="ParameterDeletages">Parameter delegates</a></h2>
+
+If you are writing many different tools in the same project, you will probably find that most of these tools can share configurations. While you can use inheritance with your objects to avoid repeating this code, the restriction to single inheritance of implementation might limit your flexibility. To address this problem, JCommander supports parameter delegates.
+
+<p>
+
+When JCommander encounters an object annotated with <tt>@ParameterDelegate</tt> in one of your objects, it acts as if this object had been added as a description object itself:
+
+<pre class="brush: java">
+class Delegate {
+  @Parameter(names = "-port")
+  public int port;
+}
+
+class MainParams {
+  @Parameter(names = "-v")
+  public boolean verbose;
+
+  @ParametersDelegate
+  public Delegate delegate = new Delegate();
+}
+</pre>
+
+The example above specifies a delegate parameter <tt>Delegate</tt> which is then referenced in <tt>MainParams</tt>. You only need to add a <tt>MainParams</tt> object to your JCommander configuration in order to use the delegate:
+
+<pre class="brush: java">
+MainParams p = new MainParams();
+new JCommander(p).parse("-v", "-port", "1234");
+Assert.assertTrue(p.isVerbose);
+Assert.assertEquals(p.delegate.port, 1234);
+</pre>
+
 <h2><a class="section" name="Scala">JCommander in Scala</a></h2>
 
 Here is a quick example of how to use JCommander in Scala (courtesy of Patrick Linskey):

@@ -494,10 +494,10 @@ public class JCommander {
               if (p.required()) m_requiredFields.put(f, pd);
             }
           }
-        }else if(delegateAnnotation != null){
+        } else if (delegateAnnotation != null) {
           try {
             Object delegateObject = f.get(object);
-            if(delegateObject == null){
+            if (delegateObject == null){
               throw new ParameterException("Delegate field '" + f.getName() + "' cannot be null.");
             }
             addDescription(delegateObject);
