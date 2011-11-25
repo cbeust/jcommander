@@ -594,6 +594,8 @@ public class JCommander {
               }
             }
 
+            ParameterDescription.validateParameter(m_mainParameterAnnotation, "Default", value);
+
             m_mainParameterDescription.setAssigned(true);
             mp.add(convertedValue);
           }

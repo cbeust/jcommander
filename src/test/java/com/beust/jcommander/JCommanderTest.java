@@ -597,8 +597,28 @@ public class JCommanderTest {
     new JCommander(a).parse("-lon", "32");
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void mainParameterShouldBeValidate() {
+    class V implements IParameterValidator {
+
+      public void validate(String name, String value) throws ParameterException {
+        Assert.assertEquals("a", value);
+      }
+    }
+
+    class A {
+      @Parameter(validateWith = V.class)
+      public List<String> m;
+    }
+
+    A a = new A();
+    new JCommander(a).parse("b");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
+
+    System.out.println("A");
 //    class A {
 //      @Parameter
 //      List<String> parameters;

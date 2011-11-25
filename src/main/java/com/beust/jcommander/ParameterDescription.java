@@ -31,8 +31,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.beust.jcommander.validators.NoValidator;
-
 public class ParameterDescription {
   private Object m_object;
   private Parameter m_parameterAnnotation;
@@ -221,16 +219,18 @@ public class ParameterDescription {
   }
 
   private void validateParameter(String name, String value) {
-    Class<? extends IParameterValidator> validator = m_parameterAnnotation.validateWith();
-    if (validator != NoValidator.class) {
-      try {
-        p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
-        validator.newInstance().validate(name, value);
-      } catch (InstantiationException e) {
-        throw new ParameterException("Can't instantiate validator:" + e);
-      } catch (IllegalAccessException e) {
-        throw new ParameterException("Can't instantiate validator:" + e);
-      }
+    validateParameter(m_parameterAnnotation, name, value);
+  }
+
+  public static void validateParameter(Parameter annotation, String name, String value) {
+    Class<? extends IParameterValidator> validator = annotation.validateWith();
+    try {
+      p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
+      validator.newInstance().validate(name, value);
+    } catch (InstantiationException e) {
+      throw new ParameterException("Can't instantiate validator:" + e);
+    } catch (IllegalAccessException e) {
+      throw new ParameterException("Can't instantiate validator:" + e);
     }
   }
 
@@ -260,7 +260,7 @@ public class ParameterDescription {
     return (!isDefault && !m_assigned);
   }
 
-  private void p(String string) {
+  private static void p(String string) {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
       System.out.println("[ParameterDescription] " + string);
     }
