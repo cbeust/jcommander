@@ -4,6 +4,7 @@ Current
 
 Added: @Parameter(commandNames) so that command names can be specified with annotations
 Added: Support for enums (Adrian Muraru)
+Added: Support for delegating parameter definitions to child classes (rodionmoiseev)
 
 1.19
 2011/10/10
