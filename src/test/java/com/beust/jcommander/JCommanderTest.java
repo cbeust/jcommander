@@ -587,10 +587,35 @@ public class JCommanderTest {
     Assert.assertEquals(al.uppercase.get(1), "CD");
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void shouldThrowIfUnknownOption() {
+    class A {
+      @Parameter(names = "-long")
+      public long l;
+    }
+    A a = new A();
+    new JCommander(a).parse("-lon", "32");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().testListAndSplitters();
-    new JCommanderTest().converterArgs();
+//    class A {
+//      @Parameter
+//      List<String> parameters;
+//
+//      @Parameter(names = "-long")
+//      public long l;
+//    }
+//    A a = new A();
+//    new JCommander(a).parse("-lon", "32");
+//    System.out.println(a.l);
+//    System.out.println(a.parameters);
+//    ArgsList al = new ArgsList();
+//    JCommander j = new JCommander(al);
+//    j.setColumnSize(40);
+//    j.usage();
+//    new JCommanderTest().testListAndSplitters();
+//    new JCommanderTest().converterArgs();
   }
 
   // Tests:

@@ -569,6 +569,8 @@ public class JCommander {
               }
             }
           }
+        } else {
+          throw new ParameterException("Unknown option: " + arg);
         }
       }
       else {
