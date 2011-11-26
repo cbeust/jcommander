@@ -456,13 +456,16 @@ public class JCommander {
     m_descriptions = Maps.newHashMap();
 
     for (Object object : m_objects) {
-      addDescription(object);
+      addDescription(object, Lists.<Parameters>newArrayList());
     }
   }
 
-  private void addDescription(Object object) {
+  private void addDescription(Object object, List<Parameters> parentParameters) {
     Class<?> cls = object.getClass();
-
+    Parameters parametersAnnotation = cls.getAnnotation(Parameters.class);
+    List<Parameters> parametersAnnotations = Lists.newArrayList(parentParameters);
+    if (parametersAnnotation != null)
+      parametersAnnotations.add(parametersAnnotation);
     while (!Object.class.equals(cls)) {
       for (Field f : cls.getDeclaredFields()) {
         p("Field:" + cls.getSimpleName() + "." + f.getName());
@@ -480,14 +483,14 @@ public class JCommander {
             m_mainParameterField = f;
             m_mainParameterObject = object;
             m_mainParameterAnnotation = p;
-            m_mainParameterDescription = new ParameterDescription(object, p, f, m_bundle, this);
+            m_mainParameterDescription = new ParameterDescription(object, p, f, m_bundle, this, parametersAnnotations);
           } else {
             for (String name : p.names()) {
               if (m_descriptions.containsKey(name)) {
                 throw new ParameterException("Found the option " + name + " multiple times");
               }
               p("Adding description for " + name);
-              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle, this);
+              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle, this, parametersAnnotations);
               m_fields.put(f, pd);
               m_descriptions.put(name, pd);
 
@@ -500,7 +503,7 @@ public class JCommander {
             if (delegateObject == null){
               throw new ParameterException("Delegate field '" + f.getName() + "' cannot be null.");
             }
-            addDescription(delegateObject);
+            addDescription(delegateObject, parametersAnnotations);
           } catch (IllegalAccessException e) {
           }
         }
@@ -823,13 +826,20 @@ public class JCommander {
    * every line with "indent".
    */
   public void usage(String commandName, StringBuilder out, String indent) {
+    Map<String, ParameterDescMap> optGroupMap = Maps.newTreeMap();
+    printUsage(commandName, out, indent, optGroupMap);
+    printOptionGroups(out, indent, optGroupMap);
+  }
+
+  private void printUsage(String commandName, StringBuilder out, String indent,
+                          Map<String, ParameterDescMap> optGroupMap) {
     String description = getCommandDescription(commandName);
     JCommander jc = findCommandByAlias(commandName);
     if (description != null) {
       out.append(indent).append(description);
-      out.append("\n");
     }
-    jc.usage(out, indent);
+    out.append("\n");
+    jc.printUsage(out, indent, optGroupMap);
   }
 
   /**
@@ -853,7 +863,7 @@ public class JCommander {
    * return def.
    */
   private String getI18nString(String key, String def) {
-    String s = m_bundle != null ? m_bundle.getString(key) : null;
+    String s = m_bundle != null && m_bundle.containsKey(key) ? m_bundle.getString(key) : null;
     return s != null ? s : def;
   }
 
@@ -874,27 +884,103 @@ public class JCommander {
   }
 
   public void usage(StringBuilder out, String indent) {
+    Map<String, ParameterDescMap> optGroupMap = Maps.newTreeMap();
+    printUsage(out, indent, optGroupMap);
+    printOptionGroups(out, indent, optGroupMap);
+  }
+
+  private void printUsage(StringBuilder out, String indent, Map<String, ParameterDescMap> optGroupMap) {
     if (m_descriptions == null) createDescriptions();
     boolean hasCommands = !m_commands.isEmpty();
+
+    //
+    // Separate inline parameters from option groups
+    //
+    List<ParameterDescription> parameterDescriptions = Lists.newArrayList();
+    for (ParameterDescription pd : m_fields.values()) {
+      if (! "".equals(pd.getOptionGroupName())) {
+        //Add parameter to its respective option group
+        ParameterDescMap paramDescMap = optGroupMap.get(pd.getOptionGroupName());
+        if (paramDescMap == null) {
+            paramDescMap = new ParameterDescMap(pd.getOptionGroupName(), pd.getOptionGroupDescription());
+            optGroupMap.put(pd.getOptionGroupName(), paramDescMap);
+        }
+        paramDescMap.put(pd.getNames(), pd);
+      } else {
+        //An inline usage parameter
+        parameterDescriptions.add(pd);
+      }
+    }
 
     //
     // First line of the usage
     //
     String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
-    out.append(indent).append("Usage: " + programName + " [options]");
+    StringBuilder optionGroupUsage = new StringBuilder();
+    optionGroupUsage.append("Usage: ").append(programName);
+    if (!parameterDescriptions.isEmpty()) {
+      optionGroupUsage.append(" [options]");
+    }
+    for (String optGroupName : optGroupMap.keySet()) {
+      optionGroupUsage.append(" [").append(optGroupName.toLowerCase()).append("]");
+    }
+    out.append(indent).append(optionGroupUsage);
     if (hasCommands) out.append(indent).append(" [command] [command options]");
-//    out.append("\n");
-    if (m_mainParameterDescription != null) {
+
+    if (m_mainParameterDescription != null &&
+            !"".equals(m_mainParameterDescription.getDescription())) {
       out.append(" " + m_mainParameterDescription.getDescription());
     }
+    out.append("\n");
 
+    //
+    // Show inline parameter descriptions first
+    //
+    printParameterDescriptions(out, indent, parameterDescriptions, "Options");
+
+    //
+    // If commands were specified, show them as well
+    //
+    if (hasCommands) {
+      out.append("  Commands:\n");
+      // The magic value 3 is the number of spaces between the name of the option
+      // and its description
+      for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
+        ProgramName progName = commands.getKey();
+        String dispName = progName.getDisplayName();
+        out.append(indent).append("    " + dispName);
+
+        Map<String, ParameterDescMap> cmdOptGroupMap = Maps.newTreeMap();
+        // Options for this command
+        printUsage(progName.getName(), out, "      ", cmdOptGroupMap);
+        optGroupMap.putAll(cmdOptGroupMap);
+      }
+    }
+  }
+
+  private void printOptionGroups(StringBuilder out, String indent, Map<String, ParameterDescMap> optGroupMap) {
+    if (!optGroupMap.isEmpty()) {
+      out.append("\n");
+      //
+      // Show option groups at the end
+      //
+      for (ParameterDescMap optionGroup : optGroupMap.values()) {
+        out.append(optionGroup.groupDesc).append("\n");
+        printParameterDescriptions(out, indent, optionGroup.values(), optionGroup.groupName);
+      }
+    }
+  }
+
+  private void printParameterDescriptions(StringBuilder out, String indent,
+                                          Iterable<ParameterDescription> parameterDescriptions,
+                                          String optGroupName){
     //
     // Align the descriptions at the "longestName" column
     //
     int longestName = 0;
     List<ParameterDescription> sorted = Lists.newArrayList();
-    for (ParameterDescription pd : m_fields.values()) {
-      if (! pd.getParameter().hidden()) {
+    for (ParameterDescription pd : parameterDescriptions) {
+      if (!pd.getParameter().hidden()) {
         sorted.add(pd);
         // + to have an extra space between the name and the description
         int length = pd.getNames().length() + 2;
@@ -912,7 +998,8 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    if (sorted.size() > 0) out.append(indent).append("\n  Options:\n");
+    if (sorted.size() > 0)
+      out.append(indent).append("  ").append(optGroupName).append(":\n");
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
@@ -923,27 +1010,9 @@ public class JCommander {
       int indentCount = out.length() - start;
       wrapDescription(out, indentCount, pd.getDescription());
       Object def = pd.getDefault();
-      if (def != null) out.append("\n" + spaces(indentCount + 1))
+      if (def != null) out.append("\n").append(spaces(indentCount + 1))
           .append("Default: " + def);
       out.append("\n");
-    }
-
-    //
-    // If commands were specified, show them as well
-    //
-    if (hasCommands) {
-      out.append("  Commands:\n");
-      // The magic value 3 is the number of spaces between the name of the option
-      // and its description
-      for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
-        ProgramName progName = commands.getKey();
-        String dispName = progName.getDisplayName();
-        out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
-
-        // Options for this command
-        usage(progName.getName(), out, "      ");
-        out.append("\n");
-      }
     }
   }
 
@@ -993,7 +1062,7 @@ public class JCommander {
    * format (e.g. HTML).
    */
   public List<ParameterDescription> getParameters() {
-    return new ArrayList<ParameterDescription>(m_fields.values());
+    return Lists.newArrayList(m_fields.values());
   }
 
   /**
@@ -1187,7 +1256,7 @@ public class JCommander {
    * Add a command object and its aliases.
    */
   public void addCommand(String name, Object object, String... aliases) {
-    JCommander jc = new JCommander(object);
+    JCommander jc = new JCommander(object, m_bundle);
     jc.setProgramName(name, aliases);
     jc.setDefaultProvider(m_defaultProvider);
     ProgramName progName = jc.m_programName;
@@ -1340,5 +1409,24 @@ public class JCommander {
       return getDisplayName();
       
     }
+  }
+}
+
+class ParameterDescMap {
+  final String groupName;
+  final String groupDesc;
+  final Map<String, ParameterDescription> map = Maps.newLinkedHashMap();
+
+  ParameterDescMap(String groupName, String groupDesc) {
+    this.groupName = groupName;
+    this.groupDesc = groupDesc;
+  }
+
+  public void put(String names, ParameterDescription pd) {
+    map.put(names, pd);
+  }
+
+  public Collection<ParameterDescription> values() {
+    return map.values();
   }
 }
