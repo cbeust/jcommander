@@ -43,10 +43,12 @@ public class ParameterDescription {
   private Object m_default;
   /** Longest of the names(), used to present usage() alphabetically */
   private String m_longestName = "";
+  private String m_optionGroupName = "";
+  private String m_optionsGroupDesc = "";
 
   public ParameterDescription(Object object, Parameter annotation, Field field,
-      ResourceBundle bundle, JCommander jc) {
-    init(object, annotation, field, bundle, jc);
+      ResourceBundle bundle, JCommander jc, List<Parameters> parametersAnnotations) {
+    init(object, annotation, field, bundle, jc, parametersAnnotations);
   }
 
   /**
@@ -76,7 +78,7 @@ public class ParameterDescription {
   }
 
   private void init(Object object, Parameter annotation, Field field, ResourceBundle bundle,
-      JCommander jCommander) {
+      JCommander jCommander, List<Parameters> parametersAnnotations) {
     m_object = object;
     m_parameterAnnotation = annotation;
     m_field = field;
@@ -85,17 +87,16 @@ public class ParameterDescription {
       m_bundle = findResourceBundle(object);
     }
     m_jCommander = jCommander;
-
-    m_description = annotation.description();
-    if (! "".equals(annotation.descriptionKey())) {
-      if (m_bundle != null) {
-        m_description = m_bundle.getString(annotation.descriptionKey());
-      } else {
-//        System.out.println("Warning: field " + object.getClass() + "." + field.getName()
-//            + " has a descriptionKey but no bundle was defined with @ResourceBundle, using " +
-//            "default description:'" + m_description + "'");
+    if (parametersAnnotations != null) {
+      for (Parameters pa : parametersAnnotations) {
+        if (! "".equals(pa.optionGroupName())) {
+          m_optionGroupName = pa.optionGroupName();
+          m_optionsGroupDesc = getValueFromBundle(pa.optionGroupDescriptionKey(), pa.optionGroupDescription());
+        }
       }
     }
+
+    m_description = getValueFromBundle(annotation.descriptionKey(), annotation.description());
 
     for (String name : annotation.names()) {
       if (name.length() > m_longestName.length()) m_longestName = name;
@@ -130,6 +131,14 @@ public class ParameterDescription {
 
   public Object getObject() {
     return m_object;
+  }
+
+  public String getOptionGroupName(){
+    return m_optionGroupName;
+  }
+
+  public String getOptionGroupDescription(){
+    return m_optionsGroupDesc;
   }
 
   public String getNames() {
@@ -264,6 +273,17 @@ public class ParameterDescription {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
       System.out.println("[ParameterDescription] " + string);
     }
+  }
+
+  private String getValueFromBundle(String key, String defaultValue){
+    if (key != null && ! "".equals(key) && m_bundle != null) {
+      return m_bundle.getString(key);
+    } else {
+//    System.out.println("Warning: field " + object.getClass() + "." + field.getName()
+//      + " has a descriptionKey but no bundle was defined with @ResourceBundle, using " +
+//        "default description:'" + m_description + "'");
+    }
+    return defaultValue;
   }
 
   @Override

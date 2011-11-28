@@ -8,6 +8,9 @@ Added: @Parameter(commandNames) so that command names can be specified with anno
 Added: Support for enums (Adrian Muraru)
 Fixed: Throw if an unknown option is found
 Fixed: Main parameters are now validated as well (Connor Mullen)
+Added: Support for option groups in usage output (rodionmoiseev)
+Fixed: Passing bundle to constructor causes error when no key command description is given (rodionmoiseev)
+Fixed: Command description and options fail to lookup key in the bundle (rodionmoiseev)
 
 1.19
 2011/10/10

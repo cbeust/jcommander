@@ -11,6 +11,9 @@
       <class name="com.beust.jcommander.DefaultValueTest" />
       <class name="com.beust.jcommander.JCommanderTest" />
       <class name="com.beust.jcommander.ParametersDelegateTest" />
+      <class name="com.beust.jcommander.UsageTest" />
+      <class name="com.beust.jcommander.OptionGroupPackageManagerScenarioTest" />
+      <class name="com.beust.jcommander.OptionGroupPackageManagerScenario2Test" />
     </classes>
   </test>
 

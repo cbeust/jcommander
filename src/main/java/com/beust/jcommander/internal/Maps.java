@@ -21,6 +21,7 @@ package com.beust.jcommander.internal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Maps {
 
@@ -32,4 +33,7 @@ public class Maps {
     return new LinkedHashMap<K, V>();
   }
 
+  public static <K, V> Map<K,V> newTreeMap() {
+    return new TreeMap<K, V>();
+  }
 }
