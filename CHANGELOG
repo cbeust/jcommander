@@ -1,5 +1,7 @@
 Current
 
+Fixed: Use JDK 6 Console() when available to improve support of non ascii chars (Julien Henry)
+
 1.20
 2011/11/24
 

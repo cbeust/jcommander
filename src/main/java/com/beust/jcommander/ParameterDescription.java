@@ -91,7 +91,7 @@ public class ParameterDescription {
       if (m_bundle != null) {
         m_description = m_bundle.getString(annotation.descriptionKey());
       } else {
-//        System.out.println("Warning: field " + object.getClass() + "." + field.getName()
+//        JCommander.getConsole().println("Warning: field " + object.getClass() + "." + field.getName()
 //            + " has a descriptionKey but no bundle was defined with @ResourceBundle, using " +
 //            "default description:'" + m_description + "'");
       }
@@ -262,7 +262,7 @@ public class ParameterDescription {
 
   private static void p(String string) {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
-      System.out.println("[ParameterDescription] " + string);
+      JCommander.getConsole().println("[ParameterDescription] " + string);
     }
   }
 
