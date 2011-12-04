@@ -21,14 +21,16 @@ package com.beust.jcommander;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.converters.StringConverter;
+import com.beust.jcommander.internal.Console;
+import com.beust.jcommander.internal.DefaultConsole;
 import com.beust.jcommander.internal.DefaultConverterFactory;
+import com.beust.jcommander.internal.JDK6Console;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -145,6 +147,8 @@ public class JCommander {
       };
 
   private int m_columnSize = 79;
+  
+  private static Console m_console;
 
   /**
    * The factories used to look up string converters.
@@ -196,6 +200,19 @@ public class JCommander {
   public JCommander(Object object, String... args) {
     addObject(object);
     parse(args);
+  }
+  
+  public static Console getConsole() {
+    if (m_console == null) {
+      try {
+        Method consoleMethod = System.class.getDeclaredMethod("console", new Class<?>[0]);
+        Object console = consoleMethod.invoke(null, new Object[0]);
+        m_console = new JDK6Console(console);
+      } catch (Throwable t) {
+        m_console = new DefaultConsole();
+      }
+    }
+    return m_console;
   }
 
   /**
@@ -701,31 +718,8 @@ public class JCommander {
    * on Java 6.
    */
   private char[] readPassword(String description) {
-    System.out.print(description + ": ");
-    try {
-      Method consoleMethod = System.class.getDeclaredMethod("console", new Class<?>[0]);
-      Object console = consoleMethod.invoke(null, new Object[0]);
-      Method readPassword = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
-      return (char[]) readPassword.invoke(console, new Object[0]);
-    } catch (Throwable t) {
-      return readLine(description);
-    }
-  }
-
-  /**
-   * Read a line from stdin (used when java.io.Console is not available)
-   */
-  private char[] readLine(String description) {
-    try {
-      InputStreamReader isr = new InputStreamReader(System.in);
-      BufferedReader in = new BufferedReader(isr);
-      String result = in.readLine();
-      in.close();
-      isr.close();
-      return result.toCharArray();
-    } catch (IOException e) {
-      throw new ParameterException(e);
-    }
+    getConsole().print(description + ": ");
+    return getConsole().readPassword();
   }
 
   private String[] subArray(String[] args, int index) {
@@ -808,7 +802,7 @@ public class JCommander {
   public void usage(String commandName) {
     StringBuilder sb = new StringBuilder();
     usage(commandName, sb);
-    System.out.println(sb.toString());
+    getConsole().println(sb.toString());
   }
 
   /**
@@ -858,12 +852,12 @@ public class JCommander {
   }
 
   /**
-   * Display a the help on System.out.
+   * Display the help on System.out.
    */
   public void usage() {
     StringBuilder sb = new StringBuilder();
     usage(sb);
-    System.out.println(sb.toString());
+    getConsole().println(sb.toString());
   }
 
   /**
@@ -1005,7 +999,7 @@ public class JCommander {
 
   private void p(String string) {
     if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
-      System.out.println("[JCommander] " + string);
+      getConsole().println("[JCommander] " + string);
     }
   }
 
@@ -1305,7 +1299,7 @@ public class JCommander {
       }
       return sb.toString();
     }
-
+    
     @Override
     public int hashCode() {
       final int prime = 31;
