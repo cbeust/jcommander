@@ -13,8 +13,12 @@ public class DynamicParameterTest {
   @Test
   public void simple() {
     DSimple ds = new DSimple();
-    new JCommander(ds).parse("-Da=b", "-Dc=d");
+    new JCommander(ds).parse("-D", "a=b", "-D", "c=d");
     Map<String, String> expected = Maps.newHashMap("a", "b", "c", "d");
     Assert.assertEquals(ds.params, expected);
+  }
+
+  public static void main(String[] args) {
+    new DynamicParameterTest().simple();
   }
 }

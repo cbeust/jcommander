@@ -33,8 +33,11 @@ import java.util.TreeSet;
 
 public class ParameterDescription {
   private Object m_object;
+
+  private WrappedParameter m_wrappedParameter;
   private Parameter m_parameterAnnotation;
   private DynamicParameter m_dynamicParameterAnnotation;
+
   private Field m_field;
   /** Keep track of whether a value was added to flag an error */
   private boolean m_assigned = false;
@@ -48,12 +51,14 @@ public class ParameterDescription {
   public ParameterDescription(Object object, DynamicParameter annotation, Field field,
       ResourceBundle bundle, JCommander jc) {
     m_dynamicParameterAnnotation = annotation;
+    m_wrappedParameter = new WrappedParameter(m_dynamicParameterAnnotation);
     init(object, field, bundle, jc);
   }
 
   public ParameterDescription(Object object, Parameter annotation, Field field,
       ResourceBundle bundle, JCommander jc) {
     m_parameterAnnotation = annotation;
+    m_wrappedParameter = new WrappedParameter(m_parameterAnnotation);
     init(object, field, bundle, jc);
   }
 
@@ -130,10 +135,15 @@ public class ParameterDescription {
     // Validate default values, if any and if applicable
     //
     if (m_default != null) {
-      String[] names = m_parameterAnnotation.names();
-      String name = names.length > 0 ? names[0] : "";
-      validateParameter(name, m_default.toString());
+      if (m_parameterAnnotation != null) {
+        validateDefaultValues(m_parameterAnnotation.names());
+      }
     }
+  }
+
+  private void validateDefaultValues(String[] names) {
+    String name = names.length > 0 ? names[0] : "";
+    validateParameter(name, m_default.toString());
   }
 
   public String getLongestName() {
@@ -163,8 +173,8 @@ public class ParameterDescription {
     return sb.toString();
   }
 
-  public Parameter getParameter() {
-    return m_parameterAnnotation;
+  WrappedParameter getParameter() {
+    return m_wrappedParameter;
   }
 
   public Field getField() {
@@ -200,7 +210,7 @@ public class ParameterDescription {
   public void addValue(String value, boolean isDefault) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_field.getName());
-    String name = m_parameterAnnotation.names()[0];
+    String name = m_wrappedParameter.names()[0];
     if (m_assigned && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + name
           + " once.");

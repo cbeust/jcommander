@@ -34,4 +34,9 @@ public @interface DynamicParameter {
    * The key used to find the string in the message bundle.
    */
   String descriptionKey() default "";
+
+  /**
+   * If true, this parameter won't appear in the usage().
+   */
+  boolean hidden() default false;
 }
