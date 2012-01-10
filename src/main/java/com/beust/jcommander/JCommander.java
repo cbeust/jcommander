@@ -486,7 +486,11 @@ public class JCommander {
         f.setAccessible(true);
         Annotation annotation = f.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
+        Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
         if (annotation != null) {
+          //
+          // @Parameter
+          //
           Parameter p = (Parameter) annotation;
           if (p.names().length == 0) {
             p("Found main parameter:" + f);
@@ -512,6 +516,9 @@ public class JCommander {
             }
           }
         } else if (delegateAnnotation != null) {
+          //
+          // @ParametersDelegate
+          //
           try {
             Object delegateObject = f.get(object);
             if (delegateObject == null){
@@ -519,6 +526,22 @@ public class JCommander {
             }
             addDescription(delegateObject);
           } catch (IllegalAccessException e) {
+          }
+        } else if (dynamicParameter != null) {
+          //
+          // @DynamicParameter
+          //
+          DynamicParameter dp = (DynamicParameter) dynamicParameter;
+          for (String name : dp.names()) {
+            if (m_descriptions.containsKey(name)) {
+              throw new ParameterException("Found the option " + name + " multiple times");
+            }
+            p("Adding description for " + name);
+            ParameterDescription pd = new ParameterDescription(object, dp, f, m_bundle, this);
+            m_fields.put(f, pd);
+            m_descriptions.put(name, pd);
+
+            if (dp.required()) m_requiredFields.put(f, pd);
           }
         }
       }

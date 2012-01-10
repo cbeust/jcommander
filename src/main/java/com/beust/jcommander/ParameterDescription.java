@@ -34,6 +34,7 @@ import java.util.TreeSet;
 public class ParameterDescription {
   private Object m_object;
   private Parameter m_parameterAnnotation;
+  private DynamicParameter m_dynamicParameterAnnotation;
   private Field m_field;
   /** Keep track of whether a value was added to flag an error */
   private boolean m_assigned = false;
@@ -44,9 +45,16 @@ public class ParameterDescription {
   /** Longest of the names(), used to present usage() alphabetically */
   private String m_longestName = "";
 
+  public ParameterDescription(Object object, DynamicParameter annotation, Field field,
+      ResourceBundle bundle, JCommander jc) {
+    m_dynamicParameterAnnotation = annotation;
+    init(object, field, bundle, jc);
+  }
+
   public ParameterDescription(Object object, Parameter annotation, Field field,
       ResourceBundle bundle, JCommander jc) {
-    init(object, annotation, field, bundle, jc);
+    m_parameterAnnotation = annotation;
+    init(object, field, bundle, jc);
   }
 
   /**
@@ -75,21 +83,11 @@ public class ParameterDescription {
     return s == null || "".equals(s);
   }
 
-  private void init(Object object, Parameter annotation, Field field, ResourceBundle bundle,
-      JCommander jCommander) {
-    m_object = object;
-    m_parameterAnnotation = annotation;
-    m_field = field;
-    m_bundle = bundle;
-    if (m_bundle == null) {
-      m_bundle = findResourceBundle(object);
-    }
-    m_jCommander = jCommander;
-
-    m_description = annotation.description();
-    if (! "".equals(annotation.descriptionKey())) {
+  private void initDescription(String description, String descriptionKey, String[] names) {
+    m_description = description;
+    if (! "".equals(descriptionKey)) {
       if (m_bundle != null) {
-        m_description = m_bundle.getString(annotation.descriptionKey());
+        m_description = m_bundle.getString(descriptionKey);
       } else {
 //        JCommander.getConsole().println("Warning: field " + object.getClass() + "." + field.getName()
 //            + " has a descriptionKey but no bundle was defined with @ResourceBundle, using " +
@@ -97,8 +95,30 @@ public class ParameterDescription {
       }
     }
 
-    for (String name : annotation.names()) {
+    for (String name : names) {
       if (name.length() > m_longestName.length()) m_longestName = name;
+    }
+  }
+
+  private void init(Object object, Field field, ResourceBundle bundle,
+      JCommander jCommander) {
+    m_object = object;
+    m_field = field;
+    m_bundle = bundle;
+    if (m_bundle == null) {
+      m_bundle = findResourceBundle(object);
+    }
+    m_jCommander = jCommander;
+
+    if (m_parameterAnnotation != null) {
+      initDescription(m_parameterAnnotation.description(), m_parameterAnnotation.descriptionKey(),
+          m_parameterAnnotation.names());
+    } else if (m_dynamicParameterAnnotation != null) {
+      initDescription(m_dynamicParameterAnnotation.description(),
+          m_dynamicParameterAnnotation.descriptionKey(),
+          m_dynamicParameterAnnotation.names());
+    } else {
+      throw new AssertionError("Shound never happen");
     }
 
     try {
