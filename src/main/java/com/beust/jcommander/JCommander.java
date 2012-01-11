@@ -949,14 +949,23 @@ public class JCommander {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
       int start = out.length();
+      WrappedParameter parameter = pd.getParameter();
       out.append(indent).append("  "
-          + (pd.getParameter().required() ? "* " : "  ")
+          + (parameter.required() ? "* " : "  ")
           + pd.getNames() + s(spaceCount));
       int indentCount = out.length() - start;
       wrapDescription(out, indentCount, pd.getDescription());
       Object def = pd.getDefault();
-      if (def != null) out.append("\n" + spaces(indentCount + 1))
-          .append("Default: " + def);
+      if (pd.isDynamicParameter()) {
+        out.append("\n" + spaces(indentCount + 1))
+            .append("Syntax: " + parameter.names()[0]
+                + "key" + parameter.getAssignment()
+                + "value");
+      }
+      if (def != null && ! "".equals(def)) {
+        out.append("\n" + spaces(indentCount + 1))
+            .append("Default: " + def);
+      }
       out.append("\n");
     }
 

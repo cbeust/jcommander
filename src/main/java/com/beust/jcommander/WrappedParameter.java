@@ -82,4 +82,8 @@ public class WrappedParameter {
   private Method findPut(Class<?> cls) throws SecurityException, NoSuchMethodException {
     return cls.getMethod("put", Object.class, Object.class);
   }
+
+  public String getAssignment() {
+    return m_dynamicParameter != null ? m_dynamicParameter.assignment() : "";
+  }
 }
