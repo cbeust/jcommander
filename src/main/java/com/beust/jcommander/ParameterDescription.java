@@ -169,7 +169,7 @@ public class ParameterDescription {
 
   public String getNames() {
     StringBuilder sb = new StringBuilder();
-    String[] names = m_parameterAnnotation.names();
+    String[] names = m_wrappedParameter.names();
     for (int i = 0; i < names.length; i++) {
       if (i > 0) sb.append(", ");
       if (names.length == 1 && names[i].startsWith("--")) sb.append("    ");

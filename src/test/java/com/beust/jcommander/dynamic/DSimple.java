@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class DSimple {
 
-  @DynamicParameter(names = "-D")
+  @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
   public Map<String, String> params = Maps.newHashMap();
 
   @DynamicParameter(names = "-A", assignment = "@")

@@ -7,6 +7,7 @@ import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@Test
 public class DynamicParameterTest {
 
   @Test(expectedExceptions = ParameterException.class)
@@ -26,17 +27,19 @@ public class DynamicParameterTest {
     Assert.assertEquals(ds.params, Maps.newHashMap("a", "b", "c", "d"));
   }
 
-  @Test
   public void simpleWithSpaces() {
     simple("-D", "a=b", "-D", "c=d");
   }
 
-  @Test
   public void simpleWithoutSpaces() {
     simple("-Da=b", "-Dc=d");
   }
 
-  @Test
+  public void usage() {
+    DSimple ds = new DSimple();
+    new JCommander(ds).usage(new StringBuilder());
+  }
+
   public void differentAssignment() {
     DSimple ds = new DSimple();
     new JCommander(ds).parse("-D", "a=b", "-A", "c@d");
@@ -44,12 +47,14 @@ public class DynamicParameterTest {
     Assert.assertEquals(ds.params2, Maps.newHashMap("c", "d"));
   }
 
+  @Test(enabled = false)
   public static void main(String[] args) {
     DynamicParameterTest dpt = new DynamicParameterTest();
 //    dpt.simple();
 //    dpt.nonMapShouldThrow();
 //    dpt.wrongSeparatorShouldThrow();
-    dpt.differentAssignment();
+//    dpt.differentAssignment();
 //    dpt.arity0();
+    dpt.usage();
   }
 }
