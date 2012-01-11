@@ -338,11 +338,11 @@ public class JCommander {
         vResult1.addAll(readFile(fileName));
       }
       else {
-        vResult1.add(arg);
+        List<String> expanded = expandDynamicArg(arg);
+        vResult1.addAll(expanded);
       }
     }
 
-    //
     // Expand separators
     //
     List<String> vResult2 = Lists.newArrayList();
@@ -365,6 +365,20 @@ public class JCommander {
     }
 
     return vResult2.toArray(new String[vResult2.size()]);
+  }
+
+  private List<String> expandDynamicArg(String arg) {
+    for (ParameterDescription pd : m_descriptions.values()) {
+      if (pd.isDynamicParameter()) {
+        for (String name : pd.getParameter().names()) {
+          if (arg.startsWith(name) && !arg.equals(name)) {
+            return Arrays.asList(name, arg.substring(name.length()));
+          }
+        }
+      }
+    }
+
+    return Arrays.asList(arg);
   }
 
   private boolean isOption(String[] args, String arg) {

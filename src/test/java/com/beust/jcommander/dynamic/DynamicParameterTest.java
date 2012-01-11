@@ -7,11 +7,8 @@ import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Map;
-
 public class DynamicParameterTest {
 
-  // test using the wrong separator
   @Test(expectedExceptions = ParameterException.class)
   public void nonMapShouldThrow() {
     new JCommander(new DSimpleBad()).parse("-D", "a=b", "-D", "c=d");
@@ -23,12 +20,20 @@ public class DynamicParameterTest {
     new JCommander(ds).parse("-D", "a:b", "-D", "c=d");
   }
 
-  @Test
-  public void simple() {
+  private void simple(String... parameters) {
     DSimple ds = new DSimple();
-    new JCommander(ds).parse("-D", "a=b", "-D", "c=d");
-    Map<String, String> expected = Maps.newHashMap("a", "b", "c", "d");
-    Assert.assertEquals(ds.params, expected);
+    new JCommander(ds).parse(parameters);
+    Assert.assertEquals(ds.params, Maps.newHashMap("a", "b", "c", "d"));
+  }
+
+  @Test
+  public void simpleWithSpaces() {
+    simple("-D", "a=b", "-D", "c=d");
+  }
+
+  @Test
+  public void simpleWithoutSpaces() {
+    simple("-Da=b", "-Dc=d");
   }
 
   @Test
@@ -41,9 +46,10 @@ public class DynamicParameterTest {
 
   public static void main(String[] args) {
     DynamicParameterTest dpt = new DynamicParameterTest();
-    dpt.simple();
+//    dpt.simple();
 //    dpt.nonMapShouldThrow();
 //    dpt.wrongSeparatorShouldThrow();
     dpt.differentAssignment();
+//    dpt.arity0();
   }
 }

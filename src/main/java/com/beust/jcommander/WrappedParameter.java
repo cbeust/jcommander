@@ -20,7 +20,7 @@ public class WrappedParameter {
   }
 
   public int arity() {
-    return m_parameter != null ? m_parameter.arity() : m_dynamicParameter.arity();
+    return m_parameter != null ? m_parameter.arity() : 1;
   }
 
   public boolean hidden() {

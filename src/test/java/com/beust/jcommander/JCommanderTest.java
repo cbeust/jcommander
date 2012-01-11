@@ -619,15 +619,15 @@ public class JCommanderTest {
   public static void main(String[] args) throws Exception {
 
     System.out.println("A");
-//    class A {
-//      @Parameter
-//      List<String> parameters;
-//
-//      @Parameter(names = "-long")
-//      public long l;
-//    }
-//    A a = new A();
-//    new JCommander(a).parse("-lon", "32");
+    class A {
+      @Parameter
+      List<String> parameters;
+
+      @Parameter(names = "-long")
+      public long l;
+    }
+    A a = new A();
+    new JCommander(a).parse("-long", "32");
 //    System.out.println(a.l);
 //    System.out.println(a.parameters);
 //    ArgsList al = new ArgsList();

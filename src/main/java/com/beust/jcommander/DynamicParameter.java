@@ -16,13 +16,6 @@ public @interface DynamicParameter {
   String[] names() default {};
 
   /**
-   * How many parameter values this parameter will consume. For example,
-   * an arity of 0 allow "-Da=b", 1 allows "-D a=b" and 2, "-D a b". Larger
-   * arities are not allowed for dynamic parameters.
-   */
-  int arity() default -1;
-
-  /**
    * Whether this option is required.
    */
   boolean required() default false;

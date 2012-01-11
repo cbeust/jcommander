@@ -313,4 +313,8 @@ public class ParameterDescription {
   public String toString() {
     return "[ParameterDescription " + m_field.getName() + "]";
   }
+
+  public boolean isDynamicParameter() {
+    return m_dynamicParameterAnnotation != null;
+  }
 }
