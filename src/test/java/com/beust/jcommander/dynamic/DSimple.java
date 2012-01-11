@@ -10,4 +10,7 @@ public class DSimple {
 
   @DynamicParameter(names = "-D")
   public Map<String, String> params = Maps.newHashMap();
+
+  @DynamicParameter(names = "-A", assignment = "@")
+  public Map<String, String> params2 = Maps.newHashMap();
 }

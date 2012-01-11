@@ -17,7 +17,7 @@ public class DynamicParameterTest {
     new JCommander(new DSimpleBad()).parse("-D", "a=b", "-D", "c=d");
   }
 
-  @Test
+  @Test(expectedExceptions = ParameterException.class)
   public void wrongSeparatorShouldThrow() {
     DSimple ds = new DSimple();
     new JCommander(ds).parse("-D", "a:b", "-D", "c=d");
@@ -31,10 +31,19 @@ public class DynamicParameterTest {
     Assert.assertEquals(ds.params, expected);
   }
 
+  @Test
+  public void differentAssignment() {
+    DSimple ds = new DSimple();
+    new JCommander(ds).parse("-D", "a=b", "-A", "c@d");
+    Assert.assertEquals(ds.params, Maps.newHashMap("a", "b"));
+    Assert.assertEquals(ds.params2, Maps.newHashMap("c", "d"));
+  }
+
   public static void main(String[] args) {
     DynamicParameterTest dpt = new DynamicParameterTest();
-//    new DynamicParameterTest().simple();
+    dpt.simple();
 //    dpt.nonMapShouldThrow();
-    dpt.wrongSeparatorShouldThrow();
+//    dpt.wrongSeparatorShouldThrow();
+    dpt.differentAssignment();
   }
 }
