@@ -18,7 +18,6 @@
 
 package com.beust.jcommander;
 
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -50,6 +50,11 @@ public class ParameterDescription {
 
   public ParameterDescription(Object object, DynamicParameter annotation, Field field,
       ResourceBundle bundle, JCommander jc) {
+    if (! Map.class.isAssignableFrom(field.getType())) {
+      throw new ParameterException("@DynamicParameter " + field.getName() + " should be of type "
+          + "Map but is " + field.getType().getName());
+    }
+
     m_dynamicParameterAnnotation = annotation;
     m_wrappedParameter = new WrappedParameter(m_dynamicParameterAnnotation);
     init(object, field, bundle, jc);
@@ -183,7 +188,12 @@ public class ParameterDescription {
 
   private boolean isMultiOption() {
     Class<?> fieldType = m_field.getType();
-    return fieldType.equals(List.class) || fieldType.equals(Set.class);
+    return fieldType.equals(List.class) || fieldType.equals(Set.class)
+        || isDynamicParameter(m_field);
+  }
+
+  private boolean isDynamicParameter(Field field) {
+    return field.getAnnotation(DynamicParameter.class) != null;
   }
 
   public void addValue(String value) {
@@ -239,7 +249,7 @@ public class ParameterDescription {
 //          l.
         }
       } else {
-        m_field.set(m_object, convertedValue);
+        m_wrappedParameter.addValue(m_field, m_object, convertedValue);
       }
       if (! isDefault) m_assigned = true;
     }
@@ -249,11 +259,14 @@ public class ParameterDescription {
   }
 
   private void validateParameter(String name, String value) {
-    validateParameter(m_parameterAnnotation, name, value);
+    Class<? extends IParameterValidator> validator = m_wrappedParameter.validateWith();
+    if (validator != null) {
+      validateParameter(validator, name, value);
+    }
   }
 
-  public static void validateParameter(Parameter annotation, String name, String value) {
-    Class<? extends IParameterValidator> validator = annotation.validateWith();
+  public static void validateParameter(Class<? extends IParameterValidator> validator,
+      String name, String value) {
     try {
       p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
       validator.newInstance().validate(name, value);

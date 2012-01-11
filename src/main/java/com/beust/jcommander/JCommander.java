@@ -634,7 +634,8 @@ public class JCommander {
               }
             }
 
-            ParameterDescription.validateParameter(m_mainParameterAnnotation, "Default", value);
+            ParameterDescription.validateParameter(m_mainParameterAnnotation.validateWith(),
+                "Default", value);
 
             m_mainParameterDescription.setAssigned(true);
             mp.add(convertedValue);
@@ -1061,6 +1062,10 @@ public class JCommander {
    */
   public Object convertValue(Field field, Class type, String value) {
     Parameter annotation = field.getAnnotation(Parameter.class);
+
+    // Do nothing if it's a @DynamicParameter
+    if (annotation == null) return value;
+
     Class<? extends IStringConverter<?>> converterClass = annotation.converter();
     boolean listConverterWasSpecified = annotation.listConverter() != NoConverter.class;
 

@@ -2,6 +2,8 @@ package com.beust.jcommander;
 
 import static java.lang.annotation.ElementType.FIELD;
 
+import com.beust.jcommander.validators.NoValidator;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -39,4 +41,14 @@ public @interface DynamicParameter {
    * If true, this parameter won't appear in the usage().
    */
   boolean hidden() default false;
+
+  /**
+   * The validation class to use.
+   */
+  Class<? extends IParameterValidator> validateWith() default NoValidator.class;
+
+  /**
+   * The character(s) used to assign the values.
+   */
+  String assignment() default "=";
 }

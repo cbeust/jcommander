@@ -11,6 +11,7 @@
       <class name="com.beust.jcommander.DefaultValueTest" />
       <class name="com.beust.jcommander.JCommanderTest" />
       <class name="com.beust.jcommander.ParametersDelegateTest" />
+      <class name="com.beust.jcommander.dynamic.DynamicParameterTest" />
     </classes>
   </test>
 
