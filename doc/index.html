@@ -5,7 +5,6 @@
       <link rel="stylesheet" href="testng.css" type="text/css" />
       <link type="text/css" rel="stylesheet" href="http://beust.com/beust.css"  />
       <script type="text/javascript" src="http://beust.com/prettify.js"></script>
-      <script type="text/javascript" src="http://testng.org/doc/banner.js"></script>
 
       <script type="text/javascript" src="http://beust.com/scripts/shCore.js"></script>
       <script type="text/javascript" src="http://beust.com/scripts/shBrushJava.js"></script>
@@ -676,6 +675,17 @@ Assert.assertTrue(p.isVerbose);
 Assert.assertEquals(p.delegate.port, 1234);
 </pre>
 
+<h2><a class="section" name="DynamicParameters">Dynamic parameters</a></h2>
+
+JCommander allows you to specify parameters that are not known at compile time, such as <tt>"-Da=b -Dc=d"</tt>. Such parameters are specified with the <tt><a href="apidocs/com/beust/jcommander/DynamicParameter.html">@DynamicParameter</a></tt> annotation and must be of type <tt>Map&lt;String, String&gt;</tt>. Dynamic parameters are allowed to appear multiple times on the command line:
+
+<pre class="brush: java">
+@DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+public Map&lt;String, String&gt; params = Maps.newHashMap();
+</pre>
+
+You can specify a different assignment string than <tt>=</tt> by using the attribute <tt>assignment</tt>.
+
 <h2><a class="section" name="Scala">JCommander in Scala</a></h2>
 
 Here is a quick example of how to use JCommander in Scala (courtesy of Patrick Linskey):
@@ -741,5 +751,6 @@ You can download JCommander from the following locations:
 </body>
 
 <script type="text/javascript" src="http://beust.com/toc.js"></script>
+<script type="text/javascript"> generateToc(); </script>
 
 </html>
