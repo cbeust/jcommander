@@ -587,7 +587,8 @@ public class JCommander {
       String a = trim(arg);
       p("Parsing arg:" + a);
 
-      if (isOption(args, a)) {
+      JCommander jc = findCommandByAlias(arg);
+      if (isOption(args, a) && jc == null) {
         //
         // Option
         //
@@ -658,7 +659,6 @@ public class JCommander {
             //
             // Command parsing
             //
-            JCommander jc = findCommandByAlias(arg);
             if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
             m_parsedCommand = jc.m_programName.m_name;
             m_parsedAlias = arg; //preserve the original form
