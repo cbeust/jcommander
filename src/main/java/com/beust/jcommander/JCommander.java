@@ -338,11 +338,11 @@ public class JCommander {
         vResult1.addAll(readFile(fileName));
       }
       else {
-        vResult1.add(arg);
+        List<String> expanded = expandDynamicArg(arg);
+        vResult1.addAll(expanded);
       }
     }
 
-    //
     // Expand separators
     //
     List<String> vResult2 = Lists.newArrayList();
@@ -365,6 +365,20 @@ public class JCommander {
     }
 
     return vResult2.toArray(new String[vResult2.size()]);
+  }
+
+  private List<String> expandDynamicArg(String arg) {
+    for (ParameterDescription pd : m_descriptions.values()) {
+      if (pd.isDynamicParameter()) {
+        for (String name : pd.getParameter().names()) {
+          if (arg.startsWith(name) && !arg.equals(name)) {
+            return Arrays.asList(name, arg.substring(name.length()));
+          }
+        }
+      }
+    }
+
+    return Arrays.asList(arg);
   }
 
   private boolean isOption(String[] args, String arg) {
@@ -486,7 +500,11 @@ public class JCommander {
         f.setAccessible(true);
         Annotation annotation = f.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
+        Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
         if (annotation != null) {
+          //
+          // @Parameter
+          //
           Parameter p = (Parameter) annotation;
           if (p.names().length == 0) {
             p("Found main parameter:" + f);
@@ -512,6 +530,9 @@ public class JCommander {
             }
           }
         } else if (delegateAnnotation != null) {
+          //
+          // @ParametersDelegate
+          //
           try {
             Object delegateObject = f.get(object);
             if (delegateObject == null){
@@ -519,6 +540,22 @@ public class JCommander {
             }
             addDescription(delegateObject);
           } catch (IllegalAccessException e) {
+          }
+        } else if (dynamicParameter != null) {
+          //
+          // @DynamicParameter
+          //
+          DynamicParameter dp = (DynamicParameter) dynamicParameter;
+          for (String name : dp.names()) {
+            if (m_descriptions.containsKey(name)) {
+              throw new ParameterException("Found the option " + name + " multiple times");
+            }
+            p("Adding description for " + name);
+            ParameterDescription pd = new ParameterDescription(object, dp, f, m_bundle, this);
+            m_fields.put(f, pd);
+            m_descriptions.put(name, pd);
+
+            if (dp.required()) m_requiredFields.put(f, pd);
           }
         }
       }
@@ -550,7 +587,8 @@ public class JCommander {
       String a = trim(arg);
       p("Parsing arg:" + a);
 
-      if (isOption(args, a)) {
+      JCommander jc = findCommandByAlias(arg);
+      if (isOption(args, a) && jc == null) {
         //
         // Option
         //
@@ -611,7 +649,8 @@ public class JCommander {
               }
             }
 
-            ParameterDescription.validateParameter(m_mainParameterAnnotation, "Default", value);
+            ParameterDescription.validateParameter(m_mainParameterAnnotation.validateWith(),
+                "Default", value);
 
             m_mainParameterDescription.setAssigned(true);
             mp.add(convertedValue);
@@ -620,7 +659,6 @@ public class JCommander {
             //
             // Command parsing
             //
-            JCommander jc = findCommandByAlias(arg);
             if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
             m_parsedCommand = jc.m_programName.m_name;
             m_parsedAlias = arg; //preserve the original form
@@ -911,14 +949,23 @@ public class JCommander {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
       int start = out.length();
+      WrappedParameter parameter = pd.getParameter();
       out.append(indent).append("  "
-          + (pd.getParameter().required() ? "* " : "  ")
+          + (parameter.required() ? "* " : "  ")
           + pd.getNames() + s(spaceCount));
       int indentCount = out.length() - start;
       wrapDescription(out, indentCount, pd.getDescription());
       Object def = pd.getDefault();
-      if (def != null) out.append("\n" + spaces(indentCount + 1))
-          .append("Default: " + def);
+      if (pd.isDynamicParameter()) {
+        out.append("\n" + spaces(indentCount + 1))
+            .append("Syntax: " + parameter.names()[0]
+                + "key" + parameter.getAssignment()
+                + "value");
+      }
+      if (def != null && ! "".equals(def)) {
+        out.append("\n" + spaces(indentCount + 1))
+            .append("Default: " + def);
+      }
       out.append("\n");
     }
 
@@ -1038,6 +1085,10 @@ public class JCommander {
    */
   public Object convertValue(Field field, Class type, String value) {
     Parameter annotation = field.getAnnotation(Parameter.class);
+
+    // Do nothing if it's a @DynamicParameter
+    if (annotation == null) return value;
+
     Class<? extends IStringConverter<?>> converterClass = annotation.converter();
     boolean listConverterWasSpecified = annotation.listConverter() != NoConverter.class;
 

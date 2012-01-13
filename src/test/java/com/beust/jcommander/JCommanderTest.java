@@ -615,10 +615,30 @@ public class JCommanderTest {
     new JCommander(a).parse("b");
   }
 
+  @Parameters(commandNames = { "--configure" })
+  public static class ConfigureArgs {
+  }
+
+  public static class BaseArgs {
+    @Parameter(names = { "-h", "--help" }, description = "Show this help screen")
+    private boolean help = false;
+
+    @Parameter(names = { "--version", "-version" }, description = "Show the program version")
+    private boolean version;
+  }
+
+  public void commandsWithSamePrefixAsOptionsShouldWork() {
+    BaseArgs a = new BaseArgs();
+    ConfigureArgs conf = new ConfigureArgs();
+    JCommander jc = new JCommander(a);
+    jc.addCommand(conf);
+    jc.parse("--configure");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-
-    System.out.println("A");
+//    System.out.println("Help:" + a.help);
+//    System.out.println("A");
 //    class A {
 //      @Parameter
 //      List<String> parameters;
@@ -627,7 +647,7 @@ public class JCommanderTest {
 //      public long l;
 //    }
 //    A a = new A();
-//    new JCommander(a).parse("-lon", "32");
+//    new JCommander(a).parse("-long", "32");
 //    System.out.println(a.l);
 //    System.out.println(a.parameters);
 //    ArgsList al = new ArgsList();

@@ -32,4 +32,12 @@ public class Maps {
     return new LinkedHashMap<K, V>();
   }
 
+  public static <T> Map<T, T> newHashMap(T... parameters) {
+    Map<T, T> result = Maps.newHashMap();
+    for (int i = 0; i < parameters.length; i += 2) {
+      result.put(parameters[i], parameters[i + 1]);
+    }
+    return result;
+  }
+
 }

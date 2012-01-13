@@ -1,5 +1,11 @@
 Current
 
+Fixed: Commands with same prefix as options were not working properly.
+
+1.23
+2012/01/12
+
+Added: @DynamicParameter
 Fixed: Use JDK 6 Console() when available to improve support of non ascii chars (Julien Henry)
 
 1.20

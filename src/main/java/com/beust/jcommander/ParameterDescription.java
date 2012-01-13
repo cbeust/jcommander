@@ -18,7 +18,6 @@
 
 package com.beust.jcommander;
 
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -33,7 +33,11 @@ import java.util.TreeSet;
 
 public class ParameterDescription {
   private Object m_object;
+
+  private WrappedParameter m_wrappedParameter;
   private Parameter m_parameterAnnotation;
+  private DynamicParameter m_dynamicParameterAnnotation;
+
   private Field m_field;
   /** Keep track of whether a value was added to flag an error */
   private boolean m_assigned = false;
@@ -44,9 +48,23 @@ public class ParameterDescription {
   /** Longest of the names(), used to present usage() alphabetically */
   private String m_longestName = "";
 
+  public ParameterDescription(Object object, DynamicParameter annotation, Field field,
+      ResourceBundle bundle, JCommander jc) {
+    if (! Map.class.isAssignableFrom(field.getType())) {
+      throw new ParameterException("@DynamicParameter " + field.getName() + " should be of type "
+          + "Map but is " + field.getType().getName());
+    }
+
+    m_dynamicParameterAnnotation = annotation;
+    m_wrappedParameter = new WrappedParameter(m_dynamicParameterAnnotation);
+    init(object, field, bundle, jc);
+  }
+
   public ParameterDescription(Object object, Parameter annotation, Field field,
       ResourceBundle bundle, JCommander jc) {
-    init(object, annotation, field, bundle, jc);
+    m_parameterAnnotation = annotation;
+    m_wrappedParameter = new WrappedParameter(m_parameterAnnotation);
+    init(object, field, bundle, jc);
   }
 
   /**
@@ -75,21 +93,11 @@ public class ParameterDescription {
     return s == null || "".equals(s);
   }
 
-  private void init(Object object, Parameter annotation, Field field, ResourceBundle bundle,
-      JCommander jCommander) {
-    m_object = object;
-    m_parameterAnnotation = annotation;
-    m_field = field;
-    m_bundle = bundle;
-    if (m_bundle == null) {
-      m_bundle = findResourceBundle(object);
-    }
-    m_jCommander = jCommander;
-
-    m_description = annotation.description();
-    if (! "".equals(annotation.descriptionKey())) {
+  private void initDescription(String description, String descriptionKey, String[] names) {
+    m_description = description;
+    if (! "".equals(descriptionKey)) {
       if (m_bundle != null) {
-        m_description = m_bundle.getString(annotation.descriptionKey());
+        m_description = m_bundle.getString(descriptionKey);
       } else {
 //        JCommander.getConsole().println("Warning: field " + object.getClass() + "." + field.getName()
 //            + " has a descriptionKey but no bundle was defined with @ResourceBundle, using " +
@@ -97,8 +105,30 @@ public class ParameterDescription {
       }
     }
 
-    for (String name : annotation.names()) {
+    for (String name : names) {
       if (name.length() > m_longestName.length()) m_longestName = name;
+    }
+  }
+
+  private void init(Object object, Field field, ResourceBundle bundle,
+      JCommander jCommander) {
+    m_object = object;
+    m_field = field;
+    m_bundle = bundle;
+    if (m_bundle == null) {
+      m_bundle = findResourceBundle(object);
+    }
+    m_jCommander = jCommander;
+
+    if (m_parameterAnnotation != null) {
+      initDescription(m_parameterAnnotation.description(), m_parameterAnnotation.descriptionKey(),
+          m_parameterAnnotation.names());
+    } else if (m_dynamicParameterAnnotation != null) {
+      initDescription(m_dynamicParameterAnnotation.description(),
+          m_dynamicParameterAnnotation.descriptionKey(),
+          m_dynamicParameterAnnotation.names());
+    } else {
+      throw new AssertionError("Shound never happen");
     }
 
     try {
@@ -110,10 +140,15 @@ public class ParameterDescription {
     // Validate default values, if any and if applicable
     //
     if (m_default != null) {
-      String[] names = m_parameterAnnotation.names();
-      String name = names.length > 0 ? names[0] : "";
-      validateParameter(name, m_default.toString());
+      if (m_parameterAnnotation != null) {
+        validateDefaultValues(m_parameterAnnotation.names());
+      }
     }
+  }
+
+  private void validateDefaultValues(String[] names) {
+    String name = names.length > 0 ? names[0] : "";
+    validateParameter(name, m_default.toString());
   }
 
   public String getLongestName() {
@@ -134,7 +169,7 @@ public class ParameterDescription {
 
   public String getNames() {
     StringBuilder sb = new StringBuilder();
-    String[] names = m_parameterAnnotation.names();
+    String[] names = m_wrappedParameter.names();
     for (int i = 0; i < names.length; i++) {
       if (i > 0) sb.append(", ");
       if (names.length == 1 && names[i].startsWith("--")) sb.append("    ");
@@ -143,8 +178,8 @@ public class ParameterDescription {
     return sb.toString();
   }
 
-  public Parameter getParameter() {
-    return m_parameterAnnotation;
+  WrappedParameter getParameter() {
+    return m_wrappedParameter;
   }
 
   public Field getField() {
@@ -153,7 +188,12 @@ public class ParameterDescription {
 
   private boolean isMultiOption() {
     Class<?> fieldType = m_field.getType();
-    return fieldType.equals(List.class) || fieldType.equals(Set.class);
+    return fieldType.equals(List.class) || fieldType.equals(Set.class)
+        || isDynamicParameter(m_field);
+  }
+
+  private boolean isDynamicParameter(Field field) {
+    return field.getAnnotation(DynamicParameter.class) != null;
   }
 
   public void addValue(String value) {
@@ -180,7 +220,7 @@ public class ParameterDescription {
   public void addValue(String value, boolean isDefault) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_field.getName());
-    String name = m_parameterAnnotation.names()[0];
+    String name = m_wrappedParameter.names()[0];
     if (m_assigned && ! isMultiOption()) {
       throw new ParameterException("Can only specify option " + name
           + " once.");
@@ -209,7 +249,7 @@ public class ParameterDescription {
 //          l.
         }
       } else {
-        m_field.set(m_object, convertedValue);
+        m_wrappedParameter.addValue(m_field, m_object, convertedValue);
       }
       if (! isDefault) m_assigned = true;
     }
@@ -219,11 +259,14 @@ public class ParameterDescription {
   }
 
   private void validateParameter(String name, String value) {
-    validateParameter(m_parameterAnnotation, name, value);
+    Class<? extends IParameterValidator> validator = m_wrappedParameter.validateWith();
+    if (validator != null) {
+      validateParameter(validator, name, value);
+    }
   }
 
-  public static void validateParameter(Parameter annotation, String name, String value) {
-    Class<? extends IParameterValidator> validator = annotation.validateWith();
+  public static void validateParameter(Class<? extends IParameterValidator> validator,
+      String name, String value) {
     try {
       p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
       validator.newInstance().validate(name, value);
@@ -269,5 +312,9 @@ public class ParameterDescription {
   @Override
   public String toString() {
     return "[ParameterDescription " + m_field.getName() + "]";
+  }
+
+  public boolean isDynamicParameter() {
+    return m_dynamicParameterAnnotation != null;
   }
 }
