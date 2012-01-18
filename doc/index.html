@@ -25,7 +25,6 @@
       </script>
 </head>
 
-<body onLoad="generateToc();">
 <table width="100%">
   <tr>
     <td align="center">
@@ -58,16 +57,16 @@ import com.beust.jcommander.Parameter;
 
 public class JCommanderExample {
   @Parameter
-  public List&lt;String&gt; parameters = Lists.newArrayList();
+  private List&lt;String&gt; parameters = Lists.newArrayList();
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
-  public Integer verbose = 1;
+  private Integer verbose = 1;
 
   @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
-  public String groups;
+  private String groups;
 
   @Parameter(names = "-debug", description = "Debug mode")
-  public boolean debug = false;
+  private boolean debug = false;
 }
 </pre>
 
@@ -91,7 +90,7 @@ When a <tt>Parameter</tt> annotation is found on a field of type <tt>boolean</tt
 
 <pre class="brush: java">
 @Parameter(names = "-debug", description = "Debug mode")
-public boolean debug = false;
+private boolean debug = false;
 </pre>
 
 Such a parameter does not require any additional parameter on the command line and if it's detected during parsing, the corresponding field will be set to <tt>true</tt>.
@@ -102,7 +101,7 @@ When a <tt>Parameter</tt> annotation is found on a field of type <tt>String</tt>
 
 <pre class="brush: java">
 @Parameter(names = "-log", description = "Level of verbosity")
-public Integer verbose = 1;
+private Integer verbose = 1;
 </pre>
 
 <pre class="brush: plain">
@@ -123,7 +122,7 @@ When a <tt>Parameter</tt> annotation is found on a field of type <tt>List</tt>, 
 
 <pre class="brush: java">
 @Parameter(names = "-host", description = "The host")
-public List&lt;String&gt; hosts = new ArrayList&lt;String&gt;();
+private List&lt;String&gt; hosts = new ArrayList&lt;String&gt;();
 </pre>
 
 will allow you to parse the following command line:
@@ -141,7 +140,7 @@ If one of your parameters is a password or some other value that you do not wish
 <pre class="brush: java">
 public class ArgsPassword {
   @Parameter(names = "-password", description = "Connection password", password = true)
-  public String password;
+  private String password;
 }
 </pre>
 
@@ -170,7 +169,7 @@ For example, here is a converter that turns a string into a <tt>File</tt>:
 <pre class="brush: java">
 public class FileConverter implements IStringConverter&lt;File&gt; {
   @Override
-  public File convert(String value) {
+  private File convert(String value) {
     return new File(value);
   }
 }
@@ -205,8 +204,8 @@ You define the holder class :
 
 <pre class="brush: java">
 public class HostPort {
-  public String host;
-  public Integer port;
+  private String host;
+  private Integer port;
 }
 </pre>
 
@@ -241,7 +240,7 @@ You can now use the type <tt>HostPort</tt> as a parameter without any <tt>conver
 <pre class="brush: java">
 public class ArgsConverterFactory {
   @Parameter(names = "-hostport")
-  public HostPort hostPort;
+  private HostPort hostPort;
 }
 </pre>
 
@@ -298,7 +297,7 @@ Specify the name of a class implementing this interface in the <tt>validateWith<
 
 <pre class="brush:java">
 @Parameter(names = "-age", validateWith = PositiveInteger.class)
-public Integer age;
+private Integer age;
 </pre>
 
 Attempting to pass a negative integer to this option will cause a <tt>ParameterException</tt> to be thrown.
@@ -309,10 +308,10 @@ So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attr
 
 <pre class="brush: java">
 @Parameter(description = "Files")
-public List&lt;String&gt; files = new ArrayList&lt;String&gt;();
+private List&lt;String&gt; files = new ArrayList&lt;String&gt;();
 
 @Parameter(names = "-debug", description = "Debugging level")
-public Integer debug = 1;
+private Integer debug = 1;
 </pre>
 
 will allow you to parse:
@@ -364,7 +363,7 @@ You define the separator with the <tt>@Parameters</tt> annotation:
 @Parameters(separators = "=")
 public class SeparatorEqual {
   @Parameter(names = "-level")
-  public Integer level = 2;
+  private Integer level = 2;
 }
 </pre>
 
@@ -383,7 +382,7 @@ class. For example, you can define the following two classes:
 <pre class="brush: java">
 public class ArgsMaster {
   @Parameter(names = "-master")
-  public String master;
+  private String master;
 }
 </pre>
 
@@ -391,7 +390,7 @@ public class ArgsMaster {
 <pre class="brush: java">
 public class ArgsSlave {
   @Parameter(names = "-slave")
-  public String slave;
+  private String slave;
 }
 </pre>
 
@@ -439,7 +438,7 @@ attribute and make that parameter a <tt>List&lt;String&gt;</tt>:
 
 <pre class="brush: java">
 @Parameter(names = "-pairs", arity = 2, description = "Pairs")
-public List&lt;String&gt; pairs;
+private List&lt;String&gt; pairs;
 </pre>
 
 You don't need to specify an arity for parameters of type
@@ -460,7 +459,7 @@ You can specify more than one option name:
 <pre class="brush: java">
 
   @Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
-  public String outputDirectory;
+  private String outputDirectory;
 
 </pre>
 
@@ -479,7 +478,7 @@ If some of your parameters are mandatory, you can use the
 <pre class="brush: java">
 
   @Parameter(names = "-host", required = true)
-  public String host;
+  private String host;
 
 </pre>
 
@@ -540,16 +539,16 @@ Words such as "commit" above are called "commands" in JCommander, and you can sp
 
 <pre class="brush: java">
 @Parameters(separators = "=", commandDescription = "Record changes to the repository")
-public class CommandCommit {
+private class CommandCommit {
 
   @Parameter(description = "The list of files to commit")
-  public List&lt;String&gt; files;
+  private List&lt;String&gt; files;
 
   @Parameter(names = "--amend", description = "Amend")
-  public Boolean amend = false;
+  private Boolean amend = false;
 
   @Parameter(names = "--author")
-  public String author;
+  private String author;
 }
 </pre>
 
@@ -558,10 +557,10 @@ public class CommandCommit {
 public class CommandAdd {
 
   @Parameter(description = "File patterns to add to the index")
-  public List&lt;String&gt; patterns;
+  private List&lt;String&gt; patterns;
 
   @Parameter(names = "-i")
-  public Boolean interactive = false;
+  private Boolean interactive = false;
 }
 </pre>
 
@@ -616,7 +615,7 @@ If you don't want certain parameters to appear in the usage, you can mark them a
 
 <pre class="brush: java">
 @Parameter(names = "-debug", description = "Debug mode", hidden = true)
-public boolean debug = false;
+private boolean debug = false;
 </pre>
 
 <h2><a class="section" name="Internationalization">Internationalization</a></h2>
@@ -630,7 +629,7 @@ First you use the <tt>@Parameters</tt> annotation at the top of your class to de
 <h3 class="sourcetitle">I18N.java</h3>
 <pre class="brush:java">
 @Parameters(resourceBundle = "MessageBundle")
-public class ArgsI18N2 {
+private class ArgsI18N2 {
   @Parameter(names = "-host", description = "Host", descriptionKey = "host")
   String hostName;
 }
@@ -658,15 +657,15 @@ When JCommander encounters an object annotated with <tt>@ParameterDelegate</tt> 
 <pre class="brush: java">
 class Delegate {
   @Parameter(names = "-port")
-  public int port;
+  private int port;
 }
 
 class MainParams {
   @Parameter(names = "-v")
-  public boolean verbose;
+  private boolean verbose;
 
   @ParametersDelegate
-  public Delegate delegate = new Delegate();
+  private Delegate delegate = new Delegate();
 }
 </pre>
 
@@ -685,7 +684,7 @@ JCommander allows you to specify parameters that are not known at compile time, 
 
 <pre class="brush: java">
 @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
-public Map&lt;String, String&gt; params = Maps.newHashMap();
+private Map&lt;String, String&gt; params = Maps.newHashMap();
 </pre>
 
 You can specify a different assignment string than <tt>=</tt> by using the attribute <tt>assignment</tt>.
