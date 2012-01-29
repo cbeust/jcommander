@@ -601,6 +601,7 @@ public class JCommander {
             //
             char[] password = readPassword(pd.getDescription());
             pd.addValue(new String(password));
+            m_requiredFields.remove(pd.getField());
           } else {
             if (pd.getParameter().variableArity()) {
               //

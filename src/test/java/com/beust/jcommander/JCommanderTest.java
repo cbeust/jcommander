@@ -18,6 +18,27 @@
 
 package com.beust.jcommander;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.TreeSet;
+
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args2;
 import com.beust.jcommander.args.ArgsArityString;
@@ -51,25 +72,6 @@ import com.beust.jcommander.args.VariableArity;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
-
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TreeSet;
 
 @Test
 public class JCommanderTest {
@@ -660,4 +662,23 @@ public class JCommanderTest {
 
   // Tests:
   // required unparsed parameter
+  @Test
+  public void askedRequiredPassword() {
+    class A {    	
+        @Parameter (names={"--password", "-p"}, description="Private key password", password=true, required=true)
+        public String password;
+        @Parameter (names={"--port", "-o"}, description="Port to bind server to", required=true)
+        public int port;
+    }
+    A a = new A();
+    InputStream stdin = System.in;
+    try {
+      System.setIn(new ByteArrayInputStream("password".getBytes()));      
+      new JCommander(a,new String[]{"--port", "7","--password"});
+      Assert.assertEquals(a.port, 7);
+      Assert.assertEquals(a.password, "password");
+    } finally {
+      System.setIn(stdin);
+    }    
+  }
 }
