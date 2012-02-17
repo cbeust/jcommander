@@ -27,6 +27,7 @@ public class JDK6Console implements Console {
 
   public char[] readPassword() {
     try {
+      writer.flush();
       Method readPasswordMethod = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
       return (char[]) readPasswordMethod.invoke(console, new Object[0]);
     }
