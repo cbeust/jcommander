@@ -56,9 +56,11 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -635,8 +637,35 @@ public class JCommanderTest {
     jc.parse("--configure");
   }
 
+  // Tests:
+  // required unparsed parameter
+  @Test(enabled = false,
+      description = "For some reason, this test still asks the password on stdin")
+  public void askedRequiredPassword() {
+    class A {     
+        @Parameter(names = { "--password", "-p" }, description = "Private key password", 
+            password = true, required = true)
+        public String password;
+
+        @Parameter(names = { "--port", "-o" }, description = "Port to bind server to",
+            required = true)
+        public int port;
+    }
+    A a = new A();
+    InputStream stdin = System.in;
+    try {
+      System.setIn(new ByteArrayInputStream("password".getBytes()));      
+      new JCommander(a,new String[]{"--port", "7","--password"});
+      Assert.assertEquals(a.port, 7);
+      Assert.assertEquals(a.password, "password");
+    } finally {
+      System.setIn(stdin);
+    }    
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
+    new JCommanderTest().askedRequiredPassword();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {

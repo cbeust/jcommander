@@ -1,6 +1,7 @@
 Current
 
 Fixed: Commands with same prefix as options were not working properly.
+Fixed: GITHUB-97: Required password always complains that it is not specified (timoteoponce)
 
 1.23
 2012/01/12
