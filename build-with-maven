@@ -1,8 +1,10 @@
 mvn -B clean source:jar javadoc:jar repository:bundle-create -P sign
 
-v=6.4.1beta
+v=6.5beta
 export TESTNG=../testng/target/testng-${v}.jar
 
+run="java -classpath target/classes:target/test-classes:${TESTNG}:$CLASSPATH org.testng.TestNG src/test/resources/testng.xml"
+echo "Launching tests: ${run}"
 java -classpath target/classes:target/test-classes:${TESTNG}:$CLASSPATH org.testng.TestNG src/test/resources/testng.xml
 
 echo "To deploy to the snapshot repository: mvn deploy"
