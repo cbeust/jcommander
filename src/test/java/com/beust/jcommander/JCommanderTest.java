@@ -55,6 +55,7 @@ import com.beust.jcommander.command.CommandMain;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.collections.Maps;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -663,9 +664,21 @@ public class JCommanderTest {
     }    
   }
 
+  public void dynamicParameters() {
+    class Command {
+      @DynamicParameter(names = {"-P"}, description = "Additional command parameters")
+      private Map<String, String> params = Maps.newHashMap();
+    }
+    JCommander commander = new JCommander();
+    Command c = new Command();
+    commander.addCommand("command", c);
+    commander.parse(new String[] { "command", "-Pparam='name=value'" });
+    Assert.assertEquals(c.params.get("param"), "'name=value'");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().askedRequiredPassword();
+    new JCommanderTest().dynamicParameters();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {

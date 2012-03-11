@@ -54,12 +54,14 @@ public class WrappedParameter {
     } else {
       String a = m_dynamicParameter.assignment();
       String sv = value.toString();
-      String[] kv = sv.split(a);
-      if (kv.length != 2) {
-        throw new ParameterException("Dynamic parameter expected a value of the form a" + a + "b"
-            + " but got:" + sv);
+
+      int aInd = sv.indexOf(a);
+      if (aInd == -1) {
+        throw new ParameterException(
+            "Dynamic parameter expected a value of the form a" + a + "b"
+                + " but got:" + sv);
       }
-      callPut(object, field, kv[0], kv[1]);
+      callPut(object, field, sv.substring(0, aInd), sv.substring(aInd + 1));
     }
   }
 
