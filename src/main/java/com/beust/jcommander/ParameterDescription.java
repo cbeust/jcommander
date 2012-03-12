@@ -111,6 +111,7 @@ public class ParameterDescription {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void init(Object object, Field field, ResourceBundle bundle,
       JCommander jCommander) {
     m_object = object;
@@ -123,7 +124,8 @@ public class ParameterDescription {
 
     if (m_parameterAnnotation != null) {
       String description;
-      if (Enum.class.isAssignableFrom(field.getType()) &&  m_parameterAnnotation.description().isEmpty()) {
+      if (Enum.class.isAssignableFrom(field.getType())
+          && m_parameterAnnotation.description().isEmpty()) {
         description = "Options: " + EnumSet.allOf((Class<? extends Enum>) field.getType());
       }else {
         description = m_parameterAnnotation.description();
