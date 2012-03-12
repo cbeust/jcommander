@@ -2,7 +2,7 @@ package com.beust.jcommander;
 
 /**
  * Must be implemented by argument classes that contain at least one
- * @Parameter with "variableArity = true".
+ * \@Parameter with "variableArity = true".
  */
 public interface IVariableArity {
 
