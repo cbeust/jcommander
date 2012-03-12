@@ -945,7 +945,7 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    if (sorted.size() > 0) out.append(indent).append("\n  Options:\n");
+    if (sorted.size() > 0) out.append(indent).append("\n").append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
