@@ -67,6 +67,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -559,9 +560,12 @@ public class JCommanderTest {
   public void enumArgs() {
     ArgsEnum args = new ArgsEnum();
     String[] argv = { "-choice", "ONE"};
-    new JCommander(args, argv);
+    JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
+    
+    Assert.assertEquals(jc.getParameters().get(0).getDescription(), "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
+    
   }
 
   @Test(expectedExceptions = ParameterException.class)

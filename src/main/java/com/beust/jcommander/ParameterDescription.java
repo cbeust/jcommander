@@ -21,6 +21,7 @@ package com.beust.jcommander;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -121,7 +122,13 @@ public class ParameterDescription {
     m_jCommander = jCommander;
 
     if (m_parameterAnnotation != null) {
-      initDescription(m_parameterAnnotation.description(), m_parameterAnnotation.descriptionKey(),
+      String description;
+      if (Enum.class.isAssignableFrom(field.getType()) &&  m_parameterAnnotation.description().isEmpty()) {
+        description = "Options: " + EnumSet.allOf((Class<? extends Enum>) field.getType());
+      }else {
+        description = m_parameterAnnotation.description();
+      }
+      initDescription(description, m_parameterAnnotation.descriptionKey(),
           m_parameterAnnotation.names());
     } else if (m_dynamicParameterAnnotation != null) {
       initDescription(m_dynamicParameterAnnotation.description(),
