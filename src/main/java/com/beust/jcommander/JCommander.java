@@ -565,11 +565,13 @@ public class JCommander {
   }
 
   private void initializeDefaultValue(ParameterDescription pd) {
-    String optionName = pd.getParameter().names()[0];
-    String def = m_defaultProvider.getDefaultValueFor(optionName);
-    if (def != null) {
-      p("Initializing " + optionName + " with default value:" + def);
-      pd.addValue(def, true /* default */);
+    for (String optionName : pd.getParameter().names()) {
+      String def = m_defaultProvider.getDefaultValueFor(optionName);
+      if (def != null) {
+        p("Initializing " + optionName + " with default value:" + def);
+        pd.addValue(def, true /* default */);
+        return;
+      }
     }
   }
 
