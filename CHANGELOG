@@ -1,5 +1,6 @@
 Current
 
+Added: Default passwords are no longer displayed in the usage (Paul Mendelson)
 Fixed: GITHUB-105: If no description is given for an enum, use that enum's value (Adrian Muraru)
 Fixed: GITHUB-108: Dynamic parameters with "=" in them are not parsed correctly (szhem)
 Fixed: Commands with same prefix as options were not working properly.
