@@ -967,7 +967,7 @@ public class JCommander {
       }
       if (def != null && ! "".equals(def)) {
         out.append("\n" + spaces(indentCount + 1))
-            .append("Default: " + def);
+            .append("Default: " + (parameter.password()?"********":def));
       }
       out.append("\n");
     }
@@ -1390,3 +1390,4 @@ public class JCommander {
     }
   }
 }
+
