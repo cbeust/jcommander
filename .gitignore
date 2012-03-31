@@ -2,4 +2,8 @@ target
 .classpath
 .project
 .settings
+*.iml
+*.iws
+*.ipr
+.idea/
 test-output
