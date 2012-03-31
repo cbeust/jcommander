@@ -18,6 +18,7 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.converters.EnumConverter;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.converters.StringConverter;
@@ -1109,9 +1110,14 @@ public class JCommander {
 
     if (converterClass == null) {
       Type elementType = findFieldGenericType(field);
-      converterClass = elementType != null
-          ? findConverter((Class<? extends IStringConverter<?>>) elementType)
-          : StringConverter.class;
+      if (elementType != null) {
+        converterClass = findConverter((Class<? extends IStringConverter<?>>) elementType);
+        if (converterClass == null && ((Class) elementType).isEnum()) {
+          converterClass = (Class) elementType;
+        }
+      } else {
+        converterClass = StringConverter.class;
+      }
     }
 
     //
@@ -1124,43 +1130,34 @@ public class JCommander {
 //      converter = (IStringConverter) m_converterFactories.getConverter(type);
 //    }
 
-//    if (converterClass == null) {
-//      throw new ParameterException("Don't know how to convert " + value
-//          + " to type " + type + " (field: " + field.getName() + ")");
-//    }
+    if (converterClass == null) {
+      throw new ParameterException("Don't know how to convert " + value
+          + " to type " + type + " (field: " + field.getName() + ")");
+    }
 
     IStringConverter<?> converter;
     Object result = null;
     try {
       String[] names = annotation.names();
       String optionName = names.length > 0 ? names[0] : "[Main class]";
-      if (converterClass.isEnum()) {
-        try {
-          result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
-        } catch (Exception e) {
-          throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-                                       EnumSet.allOf((Class<? extends Enum>) converterClass));
+      converter = instantiateConverter(optionName, converterClass);
+      if (type.isAssignableFrom(List.class)
+            && field.getGenericType() instanceof ParameterizedType) {
+
+        // The field is a List
+        if (listConverterWasSpecified) {
+          // If a list converter was specified, pass the value to it
+          // for direct conversion
+          IStringConverter<?> listConverter =
+              instantiateConverter(optionName, annotation.listConverter());
+          result = listConverter.convert(value);
+        } else {
+          // No list converter: use the single value converter and pass each
+          // parsed value to it individually
+          result = convertToList(value, converter, annotation.splitter());
         }
       } else {
-        converter = instantiateConverter(optionName, converterClass);
-        if (type.isAssignableFrom(List.class)
-              && field.getGenericType() instanceof ParameterizedType) {
-
-          // The field is a List
-          if (listConverterWasSpecified) {
-            // If a list converter was specified, pass the value to it
-            // for direct conversion
-            IStringConverter<?> listConverter =
-                instantiateConverter(optionName, annotation.listConverter());
-            result = listConverter.convert(value);
-          } else {
-            // No list converter: use the single value converter and pass each
-            // parsed value to it individually
-            result = convertToList(value, converter, annotation.splitter());
-          }
-        } else {
-          result = converter.convert(value);
-        }
+        result = converter.convert(value);
       }
     } catch (InstantiationException e) {
       throw new ParameterException(e);
@@ -1189,9 +1186,16 @@ public class JCommander {
   }
 
   private IStringConverter<?> instantiateConverter(String optionName,
-      Class<? extends IStringConverter<?>> converterClass)
+      Class converterClass)
       throws IllegalArgumentException, InstantiationException, IllegalAccessException,
       InvocationTargetException {
+
+    // Special case for enums
+    if (converterClass.isEnum()) {
+      return new EnumConverter(optionName, (Class<? extends Enum>) converterClass);
+    }
+
+    // Default case: instantiate the IStringConverter
     Constructor<IStringConverter<?>> ctor = null;
     Constructor<IStringConverter<?>> stringCtor = null;
     Constructor<IStringConverter<?>>[] ctors
