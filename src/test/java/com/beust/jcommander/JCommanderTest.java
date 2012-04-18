@@ -680,9 +680,20 @@ public class JCommanderTest {
     Assert.assertEquals(c.params.get("param"), "'name=value'");
   }
 
+  public void exeParser() {
+      class Params {
+        @Parameter( names= "-i")
+        private String inputFile;
+      }
+
+      String args[] = { "-i", "" };
+      Params p = new Params();
+      new JCommander(p, args);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().dynamicParameters();
+    new JCommanderTest().exeParser();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {

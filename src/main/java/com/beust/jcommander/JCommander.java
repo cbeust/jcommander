@@ -383,7 +383,7 @@ public class JCommander {
 
   private boolean isOption(String[] args, String arg) {
     String prefixes = getOptionPrefixes(args, arg);
-    return prefixes.indexOf(arg.charAt(0)) >= 0;
+    return arg.length() > 0 && prefixes.indexOf(arg.charAt(0)) >= 0;
   }
 
   private ParameterDescription getPrefixDescriptionFor(String arg) {
