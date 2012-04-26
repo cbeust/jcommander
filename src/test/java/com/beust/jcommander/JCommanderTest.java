@@ -55,6 +55,7 @@ import com.beust.jcommander.command.CommandMain;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 import org.testng.collections.Maps;
 
 import java.io.ByteArrayInputStream;
@@ -691,9 +692,35 @@ public class JCommanderTest {
       new JCommander(p, args);
   }
 
+  public void multiList() {
+    class Params implements IVariableArity {
+      @Parameter(names = "-paramA", description = "ParamA", variableArity = true)
+      private List<String> paramA = Lists.newArrayList();
+
+      @Parameter(names = "-paramB", description = "ParamB", variableArity = true)
+      private List<String> paramB = Lists.newArrayList();
+
+      public int processVariableArity(String optionName, String[] options) {
+        int i = 0;
+        while (i < options.length && !options[i].startsWith("-")) {
+          if ("-paramA".equals(optionName)) paramA.add(options[i]);
+          else paramB.add(options[i]);
+          i++;
+        }
+        return i;
+      }
+    }
+
+    String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
+    Params p = new Params();
+    new JCommander(p, args).parse();
+    Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2" }));
+    Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().exeParser();
+    new JCommanderTest().multiList();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {
