@@ -21,9 +21,6 @@ public class VariableArity implements IVariableArity {
   public List<String> var = new ArrayList<String>();
 
   public int processVariableArity(String optionName, String[] options) {
-    for (int i = 0; i < m_count; i++) {
-      var.add(options[i]);
-    }
     return m_count;
   }
 }
