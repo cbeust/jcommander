@@ -47,6 +47,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -895,9 +896,22 @@ public class JCommander {
       throw new ParameterException("Asking description for unknown command: " + commandName);
     }
 
-    Parameters p = jc.getObjects().get(0).getClass().getAnnotation(Parameters.class);
+    Object arg = jc.getObjects().get(0);
+    Parameters p = arg.getClass().getAnnotation(Parameters.class);
     String result = jc.getMainParameterDescription();
-    if (p != null) result = getI18nString(p.commandDescriptionKey(), p.commandDescription());
+    ResourceBundle bundle = null;
+    if (p != null) {
+      String bundleName = p.resourceBundle();
+      if (!"".equals(bundleName)) {
+        bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+      } else {
+        bundle = m_bundle;
+      }
+
+      if (bundle != null) {
+        result = getI18nString(bundle, p.commandDescriptionKey(), p.commandDescription());
+      }
+    }
 
     return result;
   }
@@ -906,8 +920,8 @@ public class JCommander {
    * @return The internationalized version of the string if available, otherwise
    * return def.
    */
-  private String getI18nString(String key, String def) {
-    String s = m_bundle != null ? m_bundle.getString(key) : null;
+  private String getI18nString(ResourceBundle bundle, String key, String def) {
+    String s = bundle != null ? bundle.getString(key) : null;
     return s != null ? s : def;
   }
 

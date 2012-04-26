@@ -708,9 +708,23 @@ public class JCommanderTest {
     Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
   }
 
+  @Test(enabled = false,
+      description = "Need to double check that the command description is i18n'ed in the usage")
+  public void commandKey() {
+    @Parameters(resourceBundle = "MessageBundle", commandDescriptionKey = "command")
+    class Args {
+      @Parameter(names="-myoption", descriptionKey="myoption")
+      private boolean option; 
+    }
+    JCommander j = new JCommander();
+    Args a = new Args();
+    j.addCommand("comm", a);
+    j.usage();
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().multiVariableArityList();
+    new JCommanderTest().commandKey();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {
