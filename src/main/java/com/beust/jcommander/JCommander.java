@@ -701,36 +701,55 @@ public class JCommander {
     return null;
   }
 
+  private class DefaultVariableArity implements IVariableArity {
+
+    public int processVariableArity(String optionName, String[] options) {
+        int i = 0;
+        while (i < options.length && !isOption(options, options[i])) {
+          i++;
+        }
+        return i;
+    }
+  }
+  private final IVariableArity DEFAULT_VARIABLE_ARITY = new DefaultVariableArity();
+
   /**
    * @return the number of options that were processed.
    */
   private int processVariableArity(String[] args, int index, ParameterDescription pd) {
     Object arg = pd.getObject();
+    IVariableArity va;
     if (! (arg instanceof IVariableArity)) {
-      throw new ParameterException("Arg class " + arg.getClass()
-          + " should implement IVariableArity");
+        va = DEFAULT_VARIABLE_ARITY;
+    } else {
+        va = (IVariableArity) arg;
     }
 
-    IVariableArity va = (IVariableArity) arg;
     List<String> currentArgs = Lists.newArrayList();
     for (int j = index + 1; j < args.length; j++) {
       currentArgs.add(args[j]);
     }
-    int result = va.processVariableArity(pd.getParameter().names()[0],
+    int arity = va.processVariableArity(pd.getParameter().names()[0],
         currentArgs.toArray(new String[0]));
-    return result;
+
+    return processFixedArity(args, index, pd, List.class, arity);
   }
 
   private int processFixedArity(String[] args, int index, ParameterDescription pd,
       Class<?> fieldType) {
     // Regular parameter, use the arity to tell use how many values
     // we need to consume
-    String arg = args[index];
     int arity = pd.getParameter().arity();
     int n = (arity != -1 ? arity : 1);
 
+    return processFixedArity(args, index, pd, fieldType, n);
+  }
+
+  private int processFixedArity(String[] args, int index, ParameterDescription pd,
+                                Class<?> fieldType, int arity) {
+    String arg = args[index];
     // Special case for boolean parameters of arity 0
-    if (n == 0 &&
+    if (arity == 0 &&
         (Boolean.class.isAssignableFrom(fieldType)
             || boolean.class.isAssignableFrom(fieldType))) {
       pd.addValue("true");
@@ -738,14 +757,14 @@ public class JCommander {
     } else if (index < args.length - 1) {
       int offset = "--".equals(args[index + 1]) ? 1 : 0;
 
-      if (index + n < args.length) {
-        for (int j = 1; j <= n; j++) {
+      if (index + arity < args.length) {
+        for (int j = 1; j <= arity; j++) {
           pd.addValue(trim(args[index + j + offset]));
           m_requiredFields.remove(pd.getField());
         }
-        index += n + offset;
+        index += arity + offset;
       } else {
-        throw new ParameterException("Expected " + n + " values after " + arg);
+        throw new ParameterException("Expected " + arity + " values after " + arg);
       }
     } else {
       throw new ParameterException("Expected a value after parameter " + arg);

@@ -692,23 +692,13 @@ public class JCommanderTest {
       new JCommander(p, args);
   }
 
-  public void multiList() {
-    class Params implements IVariableArity {
+  public void multiVariableArityList() {
+    class Params {
       @Parameter(names = "-paramA", description = "ParamA", variableArity = true)
       private List<String> paramA = Lists.newArrayList();
 
       @Parameter(names = "-paramB", description = "ParamB", variableArity = true)
       private List<String> paramB = Lists.newArrayList();
-
-      public int processVariableArity(String optionName, String[] options) {
-        int i = 0;
-        while (i < options.length && !options[i].startsWith("-")) {
-          if ("-paramA".equals(optionName)) paramA.add(options[i]);
-          else paramB.add(options[i]);
-          i++;
-        }
-        return i;
-      }
     }
 
     String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
@@ -720,7 +710,7 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().multiList();
+    new JCommanderTest().multiVariableArityList();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {
