@@ -426,6 +426,8 @@ java Main @/tmp/parameters
 
 <h2><a class="section" name="Arities">Arities (multiple values for parameters)</a></h2>
 
+<h3><a class="section" name="fixed-arities" indent="..">Fixed arities</a></h3>
+
 If some of your parameters require more than one value, such as the
 following example where two values are expected after <tt>-pairs</tt>:
 
@@ -451,6 +453,22 @@ Also, note that only <tt>List&lt;String&gt;</tt> is allowed for
 parameters that define an arity. You will have to convert these values
 yourself if the parameters you need are of type <tt>Integer</tt> or
 other (this limitation is due to Java's erasure).
+
+<h3><a class="section" name="variable-arities" indent="..">Variable arities</a></h3>
+
+You can specify that a parameter can receive an indefinite number of parameters, up to the next option. For example:
+
+<pre class="brush: java">
+program -foo a1 a2 a3 -bar
+program -foo a1 -bar
+</pre>
+
+Such a parameter must be of type <tt>List&lt;String&gt;</tt> and have the boolean <tt>variableArity</tt> set to <tt>true</tt>
+
+<pre class="brush: java">
+@Parameter(names = "-foo", variableArity = true)
+public List&lt;String&gt; foo = new ArrayList&lt;String&gt;();
+</pre>
 
 <h2><a class="section" name="Multiple_option_names">Multiple option names</a></h2>
 
