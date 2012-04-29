@@ -55,6 +55,7 @@ import com.beust.jcommander.command.CommandMain;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 import org.testng.collections.Maps;
 
 import java.io.ByteArrayInputStream;
@@ -680,9 +681,50 @@ public class JCommanderTest {
     Assert.assertEquals(c.params.get("param"), "'name=value'");
   }
 
+  public void exeParser() {
+      class Params {
+        @Parameter( names= "-i")
+        private String inputFile;
+      }
+
+      String args[] = { "-i", "" };
+      Params p = new Params();
+      new JCommander(p, args);
+  }
+
+  public void multiVariableArityList() {
+    class Params {
+      @Parameter(names = "-paramA", description = "ParamA", variableArity = true)
+      private List<String> paramA = Lists.newArrayList();
+
+      @Parameter(names = "-paramB", description = "ParamB", variableArity = true)
+      private List<String> paramB = Lists.newArrayList();
+    }
+
+    String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
+    Params p = new Params();
+    new JCommander(p, args).parse();
+    Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2" }));
+    Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
+  }
+
+  @Test(enabled = false,
+      description = "Need to double check that the command description is i18n'ed in the usage")
+  public void commandKey() {
+    @Parameters(resourceBundle = "MessageBundle", commandDescriptionKey = "command")
+    class Args {
+      @Parameter(names="-myoption", descriptionKey="myoption")
+      private boolean option; 
+    }
+    JCommander j = new JCommander();
+    Args a = new Args();
+    j.addCommand("comm", a);
+    j.usage();
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().dynamicParameters();
+    new JCommanderTest().commandKey();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {

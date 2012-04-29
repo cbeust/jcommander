@@ -47,6 +47,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -383,7 +384,7 @@ public class JCommander {
 
   private boolean isOption(String[] args, String arg) {
     String prefixes = getOptionPrefixes(args, arg);
-    return prefixes.indexOf(arg.charAt(0)) >= 0;
+    return arg.length() > 0 && prefixes.indexOf(arg.charAt(0)) >= 0;
   }
 
   private ParameterDescription getPrefixDescriptionFor(String arg) {
@@ -609,7 +610,7 @@ public class JCommander {
               //
               // Variable arity?
               //
-              i = processVariableArity(args, i, pd);
+              i += processVariableArity(args, i, pd);
             } else {
               //
               // Regular option
@@ -701,36 +702,55 @@ public class JCommander {
     return null;
   }
 
+  private class DefaultVariableArity implements IVariableArity {
+
+    public int processVariableArity(String optionName, String[] options) {
+        int i = 0;
+        while (i < options.length && !isOption(options, options[i])) {
+          i++;
+        }
+        return i;
+    }
+  }
+  private final IVariableArity DEFAULT_VARIABLE_ARITY = new DefaultVariableArity();
+
   /**
    * @return the number of options that were processed.
    */
   private int processVariableArity(String[] args, int index, ParameterDescription pd) {
     Object arg = pd.getObject();
+    IVariableArity va;
     if (! (arg instanceof IVariableArity)) {
-      throw new ParameterException("Arg class " + arg.getClass()
-          + " should implement IVariableArity");
+        va = DEFAULT_VARIABLE_ARITY;
+    } else {
+        va = (IVariableArity) arg;
     }
 
-    IVariableArity va = (IVariableArity) arg;
     List<String> currentArgs = Lists.newArrayList();
     for (int j = index + 1; j < args.length; j++) {
       currentArgs.add(args[j]);
     }
-    int result = va.processVariableArity(pd.getParameter().names()[0],
+    int arity = va.processVariableArity(pd.getParameter().names()[0],
         currentArgs.toArray(new String[0]));
-    return result;
+
+    return processFixedArity(args, index, pd, List.class, arity);
   }
 
   private int processFixedArity(String[] args, int index, ParameterDescription pd,
       Class<?> fieldType) {
     // Regular parameter, use the arity to tell use how many values
     // we need to consume
-    String arg = args[index];
     int arity = pd.getParameter().arity();
     int n = (arity != -1 ? arity : 1);
 
+    return processFixedArity(args, index, pd, fieldType, n);
+  }
+
+  private int processFixedArity(String[] args, int index, ParameterDescription pd,
+                                Class<?> fieldType, int arity) {
+    String arg = args[index];
     // Special case for boolean parameters of arity 0
-    if (n == 0 &&
+    if (arity == 0 &&
         (Boolean.class.isAssignableFrom(fieldType)
             || boolean.class.isAssignableFrom(fieldType))) {
       pd.addValue("true");
@@ -738,14 +758,14 @@ public class JCommander {
     } else if (index < args.length - 1) {
       int offset = "--".equals(args[index + 1]) ? 1 : 0;
 
-      if (index + n < args.length) {
-        for (int j = 1; j <= n; j++) {
+      if (index + arity < args.length) {
+        for (int j = 1; j <= arity; j++) {
           pd.addValue(trim(args[index + j + offset]));
           m_requiredFields.remove(pd.getField());
         }
-        index += n + offset;
+        index += arity + offset;
       } else {
-        throw new ParameterException("Expected " + n + " values after " + arg);
+        throw new ParameterException("Expected " + arity + " values after " + arg);
       }
     } else {
       throw new ParameterException("Expected a value after parameter " + arg);
@@ -876,9 +896,22 @@ public class JCommander {
       throw new ParameterException("Asking description for unknown command: " + commandName);
     }
 
-    Parameters p = jc.getObjects().get(0).getClass().getAnnotation(Parameters.class);
+    Object arg = jc.getObjects().get(0);
+    Parameters p = arg.getClass().getAnnotation(Parameters.class);
     String result = jc.getMainParameterDescription();
-    if (p != null) result = getI18nString(p.commandDescriptionKey(), p.commandDescription());
+    ResourceBundle bundle = null;
+    if (p != null) {
+      String bundleName = p.resourceBundle();
+      if (!"".equals(bundleName)) {
+        bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+      } else {
+        bundle = m_bundle;
+      }
+
+      if (bundle != null) {
+        result = getI18nString(bundle, p.commandDescriptionKey(), p.commandDescription());
+      }
+    }
 
     return result;
   }
@@ -887,8 +920,8 @@ public class JCommander {
    * @return The internationalized version of the string if available, otherwise
    * return def.
    */
-  private String getI18nString(String key, String def) {
-    String s = m_bundle != null ? m_bundle.getString(key) : null;
+  private String getI18nString(ResourceBundle bundle, String key, String def) {
+    String s = bundle != null ? bundle.getString(key) : null;
     return s != null ? s : def;
   }
 

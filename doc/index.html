@@ -57,7 +57,7 @@ import com.beust.jcommander.Parameter;
 
 public class JCommanderExample {
   @Parameter
-  private List&lt;String&gt; parameters = Lists.newArrayList();
+  private List&lt;String&gt; parameters = new ArrayList&lt;String&gt;();
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
   private Integer verbose = 1;
@@ -684,7 +684,7 @@ JCommander allows you to specify parameters that are not known at compile time, 
 
 <pre class="brush: java">
 @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
-private Map&lt;String, String&gt; params = Maps.newHashMap();
+private Map&lt;String, String&gt; params = new HashMap&lt;String, String&gt;();
 </pre>
 
 You can specify a different assignment string than <tt>=</tt> by using the attribute <tt>assignment</tt>.
@@ -738,14 +738,14 @@ You can download JCommander from the following locations:
 
 <ul>
   <li><a href="http://github.com/cbeust/jcommander">Source on github</a></li>
- <li>If you are using Maven, add the following dependency to your <tt>pom.xml</tt>:
+  <li>If you are using Maven, add the following dependency to your <tt>pom.xml</tt>:
 
   <pre class="brush: xml">
 
 <dependency>
   &lt;groupId&gt;com.beust&lt;/groupId&gt;
   &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
-  <version>1.20</version>
+  &lt;version&gt;1.20&lt;/version&gt;
 </dependency>
   </pre>
 

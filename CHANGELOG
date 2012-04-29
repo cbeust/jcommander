@@ -1,6 +1,9 @@
 Current
 
 Added: Default passwords are no longer displayed in the usage (Paul Mendelson)
+Added: Variable arities now work magically, no need for IVariableArity any more
+Fixed: Commands using @Parameters(resourceBundle) were not i18n'ed properly in the usage()
+Fixed: StringIndexOutOfBoundsException if passing an empty parameter (bomanz)
 Fixed: GITHUB-105: If no description is given for an enum, use that enum's value (Adrian Muraru)
 Fixed: GITHUB-108: Dynamic parameters with "=" in them are not parsed correctly (szhem)
 Fixed: Commands with same prefix as options were not working properly.
