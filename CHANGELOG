@@ -1,5 +1,10 @@
 Current
 
+========================
+
+1.25
+2012/04/26
+
 Added: Default passwords are no longer displayed in the usage (Paul Mendelson)
 Added: Variable arities now work magically, no need for IVariableArity any more
 Fixed: Commands using @Parameters(resourceBundle) were not i18n'ed properly in the usage()
