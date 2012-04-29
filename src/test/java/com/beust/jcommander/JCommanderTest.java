@@ -701,11 +701,21 @@ public class JCommanderTest {
       private List<String> paramB = Lists.newArrayList();
     }
 
-    String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
-    Params p = new Params();
-    new JCommander(p, args).parse();
-    Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2" }));
-    Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
+    {
+      String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
+      Params p = new Params();
+      new JCommander(p, args).parse();
+      Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2" }));
+      Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
+    }
+
+    {
+      String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "-paramA", "a3" };
+      Params p = new Params();
+      new JCommander(p, args).parse();
+      Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2", "a3" }));
+      Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1" }));
+    }
   }
 
   @Test(enabled = false,
@@ -724,7 +734,7 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().commandKey();
+    new JCommanderTest().multiVariableArityList();
 //    System.out.println("Help:" + a.help);
 //    System.out.println("A");
 //    class A {

@@ -610,7 +610,7 @@ public class JCommander {
               //
               // Variable arity?
               //
-              i += processVariableArity(args, i, pd);
+              i = processVariableArity(args, i, pd);
             } else {
               //
               // Regular option

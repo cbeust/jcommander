@@ -1,5 +1,7 @@
 Current
 
+Fixed: variable arities not working when same parameter appears multiple times.
+
 ========================
 
 1.25
