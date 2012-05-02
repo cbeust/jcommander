@@ -588,9 +588,10 @@ public class JCommander {
     while (i < args.length && ! commandParsed) {
       String arg = args[i];
       String a = trim(arg);
-      p("Parsing arg:" + a);
+      p("Parsing arg: " + a);
 
       JCommander jc = findCommandByAlias(arg);
+      int increment = 1;
       if (isOption(args, a) && jc == null) {
         //
         // Option
@@ -610,7 +611,7 @@ public class JCommander {
               //
               // Variable arity?
               //
-              i += processVariableArity(args, i, pd);
+              increment = processVariableArity(args, i, pd);
             } else {
               //
               // Regular option
@@ -624,7 +625,7 @@ public class JCommander {
                 pd.addValue("true");
                 m_requiredFields.remove(pd.getField());
               } else {
-                i = processFixedArity(args, i, pd, fieldType);
+                increment = processFixedArity(args, i, pd, fieldType);
               }
             }
           }
@@ -675,7 +676,7 @@ public class JCommander {
           }
         }
       }
-      i++;
+      i += increment;
     }
 
     // Mark the parameter descriptions held in m_fields as assigned
@@ -733,7 +734,8 @@ public class JCommander {
     int arity = va.processVariableArity(pd.getParameter().names()[0],
         currentArgs.toArray(new String[0]));
 
-    return processFixedArity(args, index, pd, List.class, arity);
+    int result = processFixedArity(args, index, pd, List.class, arity);
+    return result;
   }
 
   private int processFixedArity(String[] args, int index, ParameterDescription pd,
@@ -746,8 +748,9 @@ public class JCommander {
     return processFixedArity(args, index, pd, fieldType, n);
   }
 
-  private int processFixedArity(String[] args, int index, ParameterDescription pd,
+  private int processFixedArity(String[] args, int originalIndex, ParameterDescription pd,
                                 Class<?> fieldType, int arity) {
+    int index = originalIndex;
     String arg = args[index];
     // Special case for boolean parameters of arity 0
     if (arity == 0 &&
@@ -771,7 +774,7 @@ public class JCommander {
       throw new ParameterException("Expected a value after parameter " + arg);
     }
 
-    return index;
+    return arity + 1;
   }
 
   /**
