@@ -25,6 +25,7 @@ import com.beust.jcommander.args.ArgsBooleanArity;
 import com.beust.jcommander.args.ArgsBooleanArity0;
 import com.beust.jcommander.args.ArgsConverter;
 import com.beust.jcommander.args.ArgsEnum;
+import com.beust.jcommander.args.ArgsEnumList;
 import com.beust.jcommander.args.ArgsEquals;
 import com.beust.jcommander.args.ArgsHelp;
 import com.beust.jcommander.args.ArgsI18N1;
@@ -564,9 +565,16 @@ public class JCommanderTest {
     JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
-    
+
     Assert.assertEquals(jc.getParameters().get(0).getDescription(), "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
-    
+
+  }
+
+  public void enumListArgs() {
+    ArgsEnumList args = new ArgsEnumList();
+    String[] argv = { "-choices", "ONE,THREE"};
+    new JCommander(args, argv);
+    Assert.assertEquals(args.choices, Arrays.asList(ArgsEnum.ChoiceType.ONE,ArgsEnum.ChoiceType.THREE));
   }
 
   @Test(expectedExceptions = ParameterException.class)
