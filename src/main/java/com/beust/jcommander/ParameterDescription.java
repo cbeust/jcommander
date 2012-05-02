@@ -233,8 +233,7 @@ public class ParameterDescription {
         + " to parameter:" + m_field.getName());
     String name = m_wrappedParameter.names()[0];
     if (m_assigned && ! isMultiOption()) {
-      throw new ParameterException("Can only specify option " + name
-          + " once.");
+      throw new ParameterException("Can only specify option " + name + " once.");
     }
 
     validateParameter(name, value);
