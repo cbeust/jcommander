@@ -901,9 +901,10 @@ public class JCommander {
 
     Object arg = jc.getObjects().get(0);
     Parameters p = arg.getClass().getAnnotation(Parameters.class);
-    String result = jc.getMainParameterDescription();
     ResourceBundle bundle = null;
+    String result = null;
     if (p != null) {
+      result = p.commandDescription();
       String bundleName = p.resourceBundle();
       if (!"".equals(bundleName)) {
         bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
