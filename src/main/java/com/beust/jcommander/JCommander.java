@@ -306,7 +306,9 @@ public class JCommander {
       for (ParameterDescription pd : m_requiredFields.values()) {
         missingFields.append(pd.getNames()).append(" ");
       }
-      throw new ParameterException("The following options are required: " + missingFields);
+      throw new ParameterException("The following "
+            + pluralize(m_requiredFields.size(), "option is required: ", "options are required: ")
+            + missingFields);
     }
 
     if (m_mainParameterDescription != null) {
@@ -316,6 +318,10 @@ public class JCommander {
             + m_mainParameterDescription.getDescription() + "\")");
       }
     }
+  }
+
+  private static String pluralize(int quantity, String singular, String plural) {
+    return quantity == 1 ? singular : plural;
   }
 
   /**
