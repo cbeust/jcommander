@@ -51,6 +51,10 @@
     <artifactId>oss-parent</artifactId>
     <version>3</version>
   </parent>
+  
+   <properties>
+    <skipTests>true</skipTests>
+  </properties>
 
   <build>
     <plugins>
@@ -131,7 +135,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.10</version>
         <configuration>
-          <skipTests>true</skipTests>
+          <skipTests>${skipTests}</skipTests>
+          <argLine>-Duser.language=en</argLine>
         </configuration>
         <dependencies>
           <dependency>

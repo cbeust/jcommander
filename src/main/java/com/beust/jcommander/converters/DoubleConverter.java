@@ -35,7 +35,7 @@ public class DoubleConverter extends BaseConverter<Double> {
     try {
       return Double.parseDouble(value);
     } catch(NumberFormatException ex) {
-      throw new ParameterException(getErrorString(value, "a double"));
+      throw new ParameterException(getErrorString(value, "double"));
     }
   }
 

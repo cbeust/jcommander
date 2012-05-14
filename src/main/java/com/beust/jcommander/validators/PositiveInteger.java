@@ -19,6 +19,7 @@
 package com.beust.jcommander.validators;
 
 import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.Messages;
 import com.beust.jcommander.ParameterException;
 
 /**
@@ -32,8 +33,7 @@ public class PositiveInteger implements IParameterValidator {
       throws ParameterException {
     int n = Integer.parseInt(value);
     if (n < 0) {
-      throw new ParameterException("Parameter " + name
-          + " should be positive (found " + value +")");
+      throw new ParameterException(Messages.getMsg("ex.validator_error.positive_integer", name, value));
     }
   }
 

@@ -57,9 +57,7 @@ public class WrappedParameter {
 
       int aInd = sv.indexOf(a);
       if (aInd == -1) {
-        throw new ParameterException(
-            "Dynamic parameter expected a value of the form a" + a + "b"
-                + " but got:" + sv);
+        throw new ParameterException(Messages.getMsg("ex.dynamic_parameter.value_in_wrong_format", a, sv));
       }
       callPut(object, field, sv.substring(0, aInd), sv.substring(aInd + 1));
     }

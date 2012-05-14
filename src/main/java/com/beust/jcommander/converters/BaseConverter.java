@@ -19,6 +19,7 @@
 package com.beust.jcommander.converters;
 
 import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.Messages;
 
 /**
  * Base class for converters that stores the name of the option.
@@ -38,7 +39,7 @@ abstract public class BaseConverter<T> implements IStringConverter<T> {
   }
 
   protected String getErrorString(String value, String to) {
-    return "\"" + getOptionName() + "\": couldn't convert \"" + value + "\" to " + to;
+	return Messages.getMsg("base_converter.error", getOptionName(), value, to);
   }
 
 }

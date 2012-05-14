@@ -37,7 +37,7 @@ public class BigDecimalConverter extends BaseConverter<BigDecimal> {
     try {
       return new BigDecimal(value);
     } catch (NumberFormatException nfe) {
-      throw new ParameterException(getErrorString(value, "a BigDecimal"));
+      throw new ParameterException(getErrorString(value, "BigDecimal"));
     }
   }
 }
