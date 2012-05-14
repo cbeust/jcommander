@@ -306,14 +306,13 @@ public class JCommander {
       for (ParameterDescription pd : m_requiredFields.values()) {
         missingFields.append(pd.getNames()).append(" ");
       }
-      throw new ParameterException("The following options are required: " + missingFields);
+      throw new ParameterException(Messages.getMsg("ex.options_required", missingFields));
     }
 
     if (m_mainParameterDescription != null) {
       if (m_mainParameterDescription.getParameter().required() &&
           !m_mainParameterDescription.isAssigned()) {
-        throw new ParameterException("Main parameters are required (\""
-            + m_mainParameterDescription.getDescription() + "\")");
+        throw new ParameterException(Messages.getMsg("ex.main_parameters_required", m_mainParameterDescription.getDescription()));
       }
     }
   }
@@ -409,7 +408,7 @@ public class JCommander {
       if (a.equals(arg)) return result;
     }
 
-    throw new ParameterException("Unknown parameter: " + arg);
+    throw new ParameterException(Messages.getMsg("ex.unknown_parameter", arg));
   }
 
   private String getSeparatorFor(String[] args, String arg) {
@@ -461,7 +460,7 @@ public class JCommander {
       bufRead.close();
     }
     catch (IOException e) {
-      throw new ParameterException("Could not read file " + fileName + ": " + e);
+      throw new ParameterException(Messages.getPassMsg(e, "ex.reading_file.error", fileName));
     }
 
     return result;
@@ -510,8 +509,7 @@ public class JCommander {
           if (p.names().length == 0) {
             p("Found main parameter:" + f);
             if (m_mainParameterField != null) {
-              throw new ParameterException("Only one @Parameter with no names attribute is"
-                  + " allowed, found:" + m_mainParameterField + " and " + f);
+              throw new ParameterException(Messages.getMsg("ex.main_parameter.many", m_mainParameterField, f));
             }
             m_mainParameterField = f;
             m_mainParameterObject = object;
@@ -520,7 +518,7 @@ public class JCommander {
           } else {
             for (String name : p.names()) {
               if (m_descriptions.containsKey(name)) {
-                throw new ParameterException("Found the option " + name + " multiple times");
+                throw new ParameterException(Messages.getMsg("ex.option.many", name));
               }
               p("Adding description for " + name);
               ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle, this);
@@ -537,7 +535,7 @@ public class JCommander {
           try {
             Object delegateObject = f.get(object);
             if (delegateObject == null){
-              throw new ParameterException("Delegate field '" + f.getName() + "' cannot be null.");
+              throw new ParameterException(Messages.getMsg("ex.delegate_field.null", f.getName()));
             }
             addDescription(delegateObject);
           } catch (IllegalAccessException e) {
@@ -549,7 +547,7 @@ public class JCommander {
           DynamicParameter dp = (DynamicParameter) dynamicParameter;
           for (String name : dp.names()) {
             if (m_descriptions.containsKey(name)) {
-              throw new ParameterException("Found the option " + name + " multiple times");
+              throw new ParameterException(Messages.getMsg("ex.option.many", name));
             }
             p("Adding description for " + name);
             ParameterDescription pd = new ParameterDescription(object, dp, f, m_bundle, this);
@@ -630,7 +628,7 @@ public class JCommander {
             }
           }
         } else {
-          throw new ParameterException("Unknown option: " + arg);
+          throw new ParameterException(Messages.getMsg("ex.unknown_option", arg));
         }
       }
       else {
@@ -655,7 +653,7 @@ public class JCommander {
             }
 
             ParameterDescription.validateParameter(m_mainParameterAnnotation.validateWith(),
-                "Default", value);
+                Messages.getMsg("default_option.name"), value);
 
             m_mainParameterDescription.setAssigned(true);
             mp.add(convertedValue);
@@ -664,7 +662,7 @@ public class JCommander {
             //
             // Command parsing
             //
-            if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
+            if (jc == null) throw new MissingCommandException(Messages.getMsg("ex.missing_command", arg));
             m_parsedCommand = jc.m_programName.m_name;
             m_parsedAlias = arg; //preserve the original form
 
@@ -768,10 +766,10 @@ public class JCommander {
         }
         index += arity + offset;
       } else {
-        throw new ParameterException("Expected " + arity + " values after " + arg);
+        throw new ParameterException(Messages.getMsg("ex.argument.expected_arity", arity, arg));
       }
     } else {
-      throw new ParameterException("Expected a value after parameter " + arg);
+      throw new ParameterException(Messages.getMsg("ex.parameter.value_expected", arg));
     }
 
     return arity + 1;
@@ -806,8 +804,7 @@ public class JCommander {
    */
   private List<?> getMainParameter(String arg) {
     if (m_mainParameterField == null) {
-      throw new ParameterException(
-          "Was passed main parameter '" + arg + "' but no main parameter was defined");
+      throw new ParameterException(Messages.getMsg("ex.main_parameter.null_on_query", arg));
     }
 
     try {
@@ -815,15 +812,14 @@ public class JCommander {
       if (result == null) {
         result = Lists.newArrayList();
         if (! List.class.isAssignableFrom(m_mainParameterField.getType())) {
-          throw new ParameterException("Main parameter field " + m_mainParameterField
-              + " needs to be of type List, not " + m_mainParameterField.getType());
+          throw new ParameterException(Messages.getMsg("ex.main_parameter.list_type", m_mainParameterField, m_mainParameterField.getType()));
         }
         m_mainParameterField.set(m_mainParameterObject, result);
       }
       return result;
     }
     catch(IllegalAccessException ex) {
-      throw new ParameterException("Couldn't access main parameter: " + ex.getMessage());
+      throw new ParameterException(Messages.getPassMsg(ex, "ex.main_parameter.access_error"));
     }
   }
 
@@ -896,7 +892,7 @@ public class JCommander {
   public String getCommandDescription(String commandName) {
     JCommander jc = findCommandByAlias(commandName);
     if (jc == null) {
-      throw new ParameterException("Asking description for unknown command: " + commandName);
+      throw new ParameterException(Messages.getMsg("ex.command_description.missing_command", commandName));
     }
 
     Object arg = jc.getObjects().get(0);
@@ -952,9 +948,9 @@ public class JCommander {
     //
     // First line of the usage
     //
-    String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
-    out.append(indent).append("Usage: " + programName + " [options]");
-    if (hasCommands) out.append(indent).append(" [command] [command options]");
+    String programName = m_programName != null ? m_programName.getDisplayName() : Messages.getMsg("description.main_class");
+    out.append(indent).append(Messages.getMsg("description.usage_cmd_main", programName));
+    if (hasCommands) out.append(indent).append(" " + Messages.getMsg("description.usage_commands"));
 //    out.append("\n");
     if (m_mainParameterDescription != null) {
       out.append(" " + m_mainParameterDescription.getDescription());
@@ -984,7 +980,7 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    if (sorted.size() > 0) out.append(indent).append("\n").append(indent).append("  Options:\n");
+    if (sorted.size() > 0) out.append(indent).append("\n").append(indent).append("  ").append(Messages.getMsg("description.options")).append("\n");
     for (ParameterDescription pd : sorted) {
       int l = pd.getNames().length();
       int spaceCount = longestName - l;
@@ -998,13 +994,11 @@ public class JCommander {
       Object def = pd.getDefault();
       if (pd.isDynamicParameter()) {
         out.append("\n" + spaces(indentCount + 1))
-            .append("Syntax: " + parameter.names()[0]
-                + "key" + parameter.getAssignment()
-                + "value");
+            .append(Messages.getMsg("description.syntax", parameter.names()[0], parameter.getAssignment()));
       }
       if (def != null && ! "".equals(def)) {
         out.append("\n" + spaces(indentCount + 1))
-            .append("Default: " + (parameter.password()?"********":def));
+            .append(Messages.getMsg("description.default") + ": " + (parameter.password()?"********":def));
       }
       out.append("\n");
     }
@@ -1013,7 +1007,7 @@ public class JCommander {
     // If commands were specified, show them as well
     //
     if (hasCommands) {
-      out.append("  Commands:\n");
+      out.append("\n  " + Messages.getMsg("description.commands") + ":\n");
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
@@ -1162,6 +1156,7 @@ public class JCommander {
 //    }
 
 //    if (converterClass == null) {
+//      Messages.getMsg()
 //      throw new ParameterException("Don't know how to convert " + value
 //          + " to type " + type + " (field: " + field.getName() + ")");
 //    }
@@ -1170,13 +1165,12 @@ public class JCommander {
     Object result = null;
     try {
       String[] names = annotation.names();
-      String optionName = names.length > 0 ? names[0] : "[Main class]";
+      String optionName = names.length > 0 ? names[0] : Messages.getMsg("convert_value.main_class");
       if (converterClass.isEnum()) {
         try {
           result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
         } catch (Exception e) {
-          throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-                                       EnumSet.allOf((Class<? extends Enum>) converterClass));
+          throw new ParameterException(Messages.getMsg("ex.option.invalid_value", optionName, EnumSet.allOf((Class<? extends Enum>) converterClass)));
         }
       } else {
         converter = instantiateConverter(optionName, converterClass);
@@ -1263,8 +1257,7 @@ public class JCommander {
         addCommand(commandName, object);
       }
     } else {
-      throw new ParameterException("Trying to add command " + object.getClass().getName()
-          + " without specifying its names in @Parameters");
+      throw new ParameterException(Messages.getMsg("ex.command.add_without_name", object.getClass().getName()));
     }
   }
 
@@ -1291,10 +1284,7 @@ public class JCommander {
       if (!alias.equals(name)) {
         ProgramName mappedName = aliasMap.get(alias);
         if (mappedName != null && !mappedName.equals(progName)) {
-          throw new ParameterException("Cannot set alias " + alias
-                  + " for " + name
-                  + " command because it has already been defined for "
-                  + mappedName.m_name + " command");
+          throw new ParameterException(Messages.getMsg("ex.command.doubled_alias", alias, name, mappedName.m_name));
         }
         aliasMap.put(alias, progName);
       }
@@ -1354,9 +1344,7 @@ public class JCommander {
     }
     JCommander jc = m_commands.get(progName);
     if (jc == null) {
-      throw new IllegalStateException(
-              "There appears to be inconsistency in the internal command database. " +
-                      " This is likely a bug. Please report.");
+      throw new IllegalStateException(Messages.getMsg("ex.inconsistency"));
     }
     return jc;
   }

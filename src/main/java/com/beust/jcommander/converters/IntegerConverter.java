@@ -35,7 +35,7 @@ public class IntegerConverter extends BaseConverter<Integer> {
     try {
       return Integer.parseInt(value);
     } catch(NumberFormatException ex) {
-      throw new ParameterException(getErrorString(value, "an integer"));
+      throw new ParameterException(getErrorString(value, "integer"));
     }
   }
 

@@ -19,6 +19,7 @@
 package com.beust.jcommander.defaultprovider;
 
 import com.beust.jcommander.IDefaultProvider;
+import com.beust.jcommander.Messages;
 import com.beust.jcommander.ParameterException;
 
 import java.io.IOException;
@@ -49,12 +50,11 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
       if (url != null) {
         m_properties.load(url.openStream());
       } else {
-        throw new ParameterException("Could not find property file: " + fileName
-            + " on the class path");
+        throw new ParameterException(Messages.getMsg("ex.prop_file.not_found", fileName));
       }
     }
     catch (IOException e) {
-      throw new ParameterException("Could not open property file: " + fileName);
+      throw new ParameterException(Messages.getMsg("ex.prop_file.cannot_open", fileName));
     }
   }
   

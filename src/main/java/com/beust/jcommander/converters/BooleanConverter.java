@@ -35,7 +35,7 @@ public class BooleanConverter extends BaseConverter<Boolean> {
     if ("false".equalsIgnoreCase(value) || "true".equalsIgnoreCase(value)) {
       return Boolean.parseBoolean(value);
     } else {
-      throw new ParameterException(getErrorString(value, "a boolean"));
+      throw new ParameterException(getErrorString(value, "boolean"));
     }
   }
 

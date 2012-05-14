@@ -54,8 +54,7 @@ public class ParameterDescription {
   public ParameterDescription(Object object, DynamicParameter annotation, Field field,
       ResourceBundle bundle, JCommander jc) {
     if (! Map.class.isAssignableFrom(field.getType())) {
-      throw new ParameterException("@DynamicParameter " + field.getName() + " should be of type "
-          + "Map but is " + field.getType().getName());
+      throw new ParameterException(Messages.getMsg("ex.dynamic_parameter.should_be_map", field.getName(), field.getType().getName()));
     }
 
     m_dynamicParameterAnnotation = annotation;
@@ -128,7 +127,7 @@ public class ParameterDescription {
       String description;
       if (Enum.class.isAssignableFrom(field.getType())
           && m_parameterAnnotation.description().isEmpty()) {
-        description = "Options: " + EnumSet.allOf((Class<? extends Enum>) field.getType());
+        description = Messages.getMsg("description.options") + EnumSet.allOf((Class<? extends Enum>) field.getType());
       }else {
         description = m_parameterAnnotation.description();
       }
@@ -233,7 +232,7 @@ public class ParameterDescription {
         + " to parameter:" + m_field.getName());
     String name = m_wrappedParameter.names()[0];
     if (m_assigned && ! isMultiOption()) {
-      throw new ParameterException("Can only specify option " + name + " once.");
+      throw new ParameterException(Messages.getMsg("ex.parameter_value.many_values_forbidden", name));
     }
 
     validateParameter(name, value);
@@ -283,9 +282,9 @@ public class ParameterDescription {
       }
       validator.newInstance().validate(name, value);
     } catch (InstantiationException e) {
-      throw new ParameterException("Can't instantiate validator:" + e);
+      throw new ParameterException(Messages.getPassMsg(e, "ex.validator_initialization_error"));
     } catch (IllegalAccessException e) {
-      throw new ParameterException("Can't instantiate validator:" + e);
+      throw new ParameterException(Messages.getPassMsg(e, "ex.validator_initialization_error"));
     }
   }
 
@@ -295,15 +294,13 @@ public class ParameterDescription {
    * Currently only List and Set are supported. Support for
    * Queues and Stacks could be useful.
    */
-  @SuppressWarnings("unchecked")
   private Collection<Object> newCollection(Class<?> type) {
-    if (SortedSet.class.isAssignableFrom(type)) return new TreeSet();
-    else if (LinkedHashSet.class.isAssignableFrom(type)) return new LinkedHashSet();
-    else if (Set.class.isAssignableFrom(type)) return new HashSet();
-    else if (List.class.isAssignableFrom(type)) return new ArrayList();
+    if (SortedSet.class.isAssignableFrom(type)) return new TreeSet<Object>();
+    else if (LinkedHashSet.class.isAssignableFrom(type)) return new LinkedHashSet<Object>();
+    else if (Set.class.isAssignableFrom(type)) return new HashSet<Object>();
+    else if (List.class.isAssignableFrom(type)) return new ArrayList<Object>();
     else {
-      throw new ParameterException("Parameters of Collection type '" + type.getSimpleName()
-                                  + "' are not supported. Please use List or Set instead.");
+      throw new ParameterException(Messages.getMsg("ex.parameters_collection_unsupported", type.getSimpleName()));
     }
   }
 

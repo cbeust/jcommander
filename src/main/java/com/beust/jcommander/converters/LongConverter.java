@@ -35,7 +35,7 @@ public class LongConverter extends BaseConverter<Long> {
     try {
       return Long.parseLong(value);
     } catch(NumberFormatException ex) {
-      throw new ParameterException(getErrorString(value, "a long"));
+      throw new ParameterException(getErrorString(value, "long"));
     }
   }
 

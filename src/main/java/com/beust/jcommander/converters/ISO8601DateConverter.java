@@ -18,8 +18,10 @@
 
 package com.beust.jcommander.converters;
 
+import com.beust.jcommander.Messages;
 import com.beust.jcommander.ParameterException;
 
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,7 +44,9 @@ public class ISO8601DateConverter extends BaseConverter<Date> {
     try {
       return DATE_FORMAT.parse(value);
     } catch (ParseException pe) {
-      throw new ParameterException(getErrorString(value, String.format("an ISO-8601 formatted date (%s)", DATE_FORMAT.toPattern())));
+    	String msgTemplate = Messages.getMsg("date_converter.name_with_format");
+    	String msg = MessageFormat.format(msgTemplate, DATE_FORMAT.toPattern()); // TODO przetestowac
+      throw new ParameterException(getErrorString(value, msg));
     }
   }
 }
