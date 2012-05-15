@@ -439,8 +439,22 @@ public class JCommander {
           .getAnnotation(Parameters.class);
       if (p != null) return p.optionPrefixes();
     }
+    String result = Parameters.DEFAULT_OPTION_PREFIXES;
 
-    return Parameters.DEFAULT_OPTION_PREFIXES;
+    // See if any of the objects contains a @Parameters(optionPrefixes)
+    StringBuilder sb = new StringBuilder();
+    for (Object o : m_objects) {
+      Parameters p = o.getClass().getAnnotation(Parameters.class);
+      if (p != null && !Parameters.DEFAULT_OPTION_PREFIXES.equals(p.optionPrefixes())) {
+        sb.append(p.optionPrefixes());
+      }
+    }
+
+    if (! Strings.isStringEmpty(sb.toString())) {
+      result = sb.toString();
+    }
+
+    return result;
   }
 
   /**
@@ -643,7 +657,7 @@ public class JCommander {
         //
         // Main parameter
         //
-        if (! isStringEmpty(arg)) {
+        if (! Strings.isStringEmpty(arg)) {
           if (m_commands.isEmpty()) {
             //
             // Regular (non-command) parsing
@@ -798,10 +812,6 @@ public class JCommander {
     System.arraycopy(args, index, result, 0, l);
 
     return result;
-  }
-
-  private static boolean isStringEmpty(String s) {
-    return s == null || "".equals(s);
   }
 
   /**

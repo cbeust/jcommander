@@ -701,11 +701,21 @@ public class JCommanderTest {
       private List<String> paramB = Lists.newArrayList();
     }
 
-    String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
-    Params p = new Params();
-    new JCommander(p, args).parse();
-    Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2" }));
-    Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
+    {
+      String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
+      Params p = new Params();
+      new JCommander(p, args).parse();
+      Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2" }));
+      Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
+    }
+
+    {
+      String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "-paramA", "a3" };
+      Params p = new Params();
+      new JCommander(p, args).parse();
+      Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2", "a3" }));
+      Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1" }));
+    }
   }
 
   @Test(enabled = false,
@@ -722,20 +732,45 @@ public class JCommanderTest {
     j.usage();
   }
 
+  public void tmp() {
+    class A {
+      @Parameter(names = "-b")
+      public String b;
+    }
+    new JCommander(new A()).parse("");
+  }
+
+  public void unknownOptionWithDifferentPrefix() {
+    @Parameters(optionPrefixes = "/")
+    class SlashSeparator {
+
+     @Parameter(names = "/verbose")
+     public boolean verbose = false;
+
+     @Parameter(names = "/file")
+     public String file;
+    }
+    SlashSeparator ss = new SlashSeparator();
+    try {
+      new JCommander(ss).parse("/notAParam");
+    } catch (ParameterException ex) {
+      boolean result = ex.getMessage().contains("Unknown option");
+      Assert.assertTrue(result);
+    }
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().commandKey();
-//    System.out.println("Help:" + a.help);
-//    System.out.println("A");
+    new JCommanderTest().unknownOptionWithDifferentPrefix();
 //    class A {
-//      @Parameter
+//      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
 //
-//      @Parameter(names = "-long")
+//      @Parameter(names = "-long", required = true)
 //      public long l;
 //    }
 //    A a = new A();
-//    new JCommander(a).parse("-long", "32");
+//    new JCommander(a).parse();
 //    System.out.println(a.l);
 //    System.out.println(a.parameters);
 //    ArgsList al = new ArgsList();

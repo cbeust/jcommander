@@ -1,5 +1,6 @@
 Current
 
+Fixed: if using a different option prefix, unknown option are mistakenly reported as "no main parameter defined" (kurmasz)
 Fixed: 113: getCommandDescription() returns the description of the main parameter instead of that of the command
 Fixed: bug with several multiple arity parameters (VariableArityTest)
 Fixed: variable arities not working when same parameter appears multiple times.
