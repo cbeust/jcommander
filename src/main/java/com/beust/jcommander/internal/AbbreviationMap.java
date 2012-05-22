@@ -70,8 +70,8 @@ public class AbbreviationMap<V> {
      * @return {@code true} if {@code key} is present in the map
      * @throws NullPointerException if {@code key} is {@code null}
      */
-    public boolean contains( String aKey ) {
-        return get( aKey ) != null;
+    public boolean contains(String aKey) {
+        return get(aKey) != null;
     }
 
     /**
@@ -80,16 +80,16 @@ public class AbbreviationMap<V> {
      *
      * @param aKey key to look up
      * @return the value associated with {@code aKey}; or {@code null} if there is no
-     * such value or {@code aKey} is not a unique abbreviation of a key in the map
+     *         such value or {@code aKey} is not a unique abbreviation of a key in the map
      * @throws NullPointerException if {@code aKey} is {@code null}
      */
-    public V get( String aKey ) {
-        char[] chars = charsOf( aKey );
+    public V get(String aKey) {
+        char[] chars = charsOf(aKey);
 
         AbbreviationMap<V> child = this;
-        for ( char each : chars ) {
-            child = child.children.get( each );
-            if ( child == null )
+        for (char each : chars) {
+            child = child.children.get(each);
+            if (child == null)
                 return null;
         }
 
@@ -100,56 +100,56 @@ public class AbbreviationMap<V> {
      * <p>Associates a given value with a given key.  If there was a previous
      * association, the old value is replaced with the new one.</p>
      *
-     * @param aKey key to create in the map
+     * @param aKey     key to create in the map
      * @param newValue value to associate with the key
-     * @throws NullPointerException if {@code aKey} or {@code newValue} is {@code null}
+     * @throws NullPointerException     if {@code aKey} or {@code newValue} is {@code null}
      * @throws IllegalArgumentException if {@code aKey} is a zero-length string
      */
-    public void put( String aKey, V newValue ) {
-        if ( newValue == null )
+    public void put(String aKey, V newValue) {
+        if (newValue == null)
             throw new NullPointerException();
-        if ( aKey.length() == 0 )
+        if (aKey.length() == 0)
             throw new IllegalArgumentException();
 
-        char[] chars = charsOf( aKey );
-        add( chars, newValue, 0, chars.length );
+        char[] chars = charsOf(aKey);
+        add(chars, newValue, 0, chars.length);
     }
 
     /**
      * <p>Associates a given value with a given set of keys.  If there was a previous
      * association, the old value is replaced with the new one.</p>
      *
-     * @param keys keys to create in the map
+     * @param keys     keys to create in the map
      * @param newValue value to associate with the key
-     * @throws NullPointerException if {@code keys} or {@code newValue} is {@code null}
+     * @throws NullPointerException     if {@code keys} or {@code newValue} is {@code null}
      * @throws IllegalArgumentException if any of {@code keys} is a zero-length string
      */
-    public void putAll( Iterable<String> keys, V newValue ) {
-        for ( String each : keys )
-            put( each, newValue );
+    public void putAll(Iterable<String> keys, V newValue) {
+        for (String each : keys)
+            put(each, newValue);
     }
 
-    private boolean add( char[] chars, V newValue, int offset, int length ) {
-        if ( offset == length ) {
+    private boolean add(char[] chars, V newValue, int offset, int length) {
+        if (offset == length) {
             value = newValue;
             boolean wasAlreadyAKey = key != null;
-            key = new String( chars );
+            key = new String(chars);
             return !wasAlreadyAKey;
         }
 
-        char nextChar = chars[ offset ];
-        AbbreviationMap<V> child = children.get( nextChar );
-        if ( child == null ) {
+        char nextChar = chars[offset];
+        AbbreviationMap<V> child = children.get(nextChar);
+        if (child == null) {
             child = new AbbreviationMap<V>();
-            children.put( nextChar, child );
+            children.put(nextChar, child);
         }
 
-        boolean newKeyAdded = child.add( chars, newValue, offset + 1, length );
+        boolean newKeyAdded = child.add(chars, newValue, offset + 1, length);
 
-        if ( newKeyAdded )
+        if (newKeyAdded)
             ++keysBeyond;
 
-        if ( key == null )
+        if (key == null)
             value = keysBeyond > 1 ? null : newValue;
 
         return newKeyAdded;
@@ -159,30 +159,30 @@ public class AbbreviationMap<V> {
      * <p>If the map contains the given key, dissociates the key from its value.</p>
      *
      * @param aKey key to remove
-     * @throws NullPointerException if {@code aKey} is {@code null}
+     * @throws NullPointerException     if {@code aKey} is {@code null}
      * @throws IllegalArgumentException if {@code aKey} is a zero-length string
      */
-    public void remove( String aKey ) {
-        if ( aKey.length() == 0 )
+    public void remove(String aKey) {
+        if (aKey.length() == 0)
             throw new IllegalArgumentException();
 
-        char[] keyChars = charsOf( aKey );
-        remove( keyChars, 0, keyChars.length );
+        char[] keyChars = charsOf(aKey);
+        remove(keyChars, 0, keyChars.length);
     }
 
-    private boolean remove( char[] aKey, int offset, int length ) {
-        if ( offset == length )
+    private boolean remove(char[] aKey, int offset, int length) {
+        if (offset == length)
             return removeAtEndOfKey();
 
-        char nextChar = aKey[ offset ];
-        AbbreviationMap<V> child = children.get( nextChar );
-        if ( child == null || !child.remove( aKey, offset + 1, length ) )
+        char nextChar = aKey[offset];
+        AbbreviationMap<V> child = children.get(nextChar);
+        if (child == null || !child.remove(aKey, offset + 1, length))
             return false;
 
         --keysBeyond;
-        if ( child.keysBeyond == 0 )
-            children.remove( nextChar );
-        if ( keysBeyond == 1 && key == null )
+        if (child.keysBeyond == 0)
+            children.remove(nextChar);
+        if (keysBeyond == 1 && key == null)
             setValueToThatOfOnlyChild();
 
         return true;
@@ -195,11 +195,11 @@ public class AbbreviationMap<V> {
     }
 
     private boolean removeAtEndOfKey() {
-        if ( key == null )
+        if (key == null)
             return false;
 
         key = null;
-        if ( keysBeyond == 1 )
+        if (keysBeyond == 1)
             setValueToThatOfOnlyChild();
         else
             value = null;
@@ -208,27 +208,27 @@ public class AbbreviationMap<V> {
     }
 
     /**
-    * Gives a Java map representation of this abbreviation map.
+     * Gives a Java map representation of this abbreviation map.
      *
      * @return a Java map corresponding to this abbreviation map
      */
     public Map<String, V> toJavaUtilMap() {
         Map<String, V> mappings = new TreeMap<String, V>();
-        addToMappings( mappings );
+        addToMappings(mappings);
         return mappings;
     }
 
-    private void addToMappings( Map<String, V> mappings ) {
-        if ( key != null )
-            mappings.put( key, value );
+    private void addToMappings(Map<String, V> mappings) {
+        if (key != null)
+            mappings.put(key, value);
 
-        for ( AbbreviationMap<V> each : children.values() )
-            each.addToMappings( mappings );
+        for (AbbreviationMap<V> each : children.values())
+            each.addToMappings(mappings);
     }
 
-    private static char[] charsOf( String aKey ) {
-        char[] chars = new char[ aKey.length() ];
-        aKey.getChars( 0, aKey.length(), chars, 0 );
+    private static char[] charsOf(String aKey) {
+        char[] chars = new char[aKey.length()];
+        aKey.getChars(0, aKey.length(), chars, 0);
         return chars;
     }
 }
