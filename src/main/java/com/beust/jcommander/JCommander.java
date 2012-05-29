@@ -623,7 +623,7 @@ public class JCommander {
             //
             // Password option, use the Console to retrieve the password
             //
-            char[] password = readPassword(pd.getDescription());
+            char[] password = readPassword(pd.getDescription(), pd.getParameter().echoInput());
             pd.addValue(new String(password));
             m_requiredFields.remove(pd.getField());
           } else {
@@ -801,9 +801,9 @@ public class JCommander {
    * Invoke Console.readPassword through reflection to avoid depending
    * on Java 6.
    */
-  private char[] readPassword(String description) {
+  private char[] readPassword(String description, boolean echoInput) {
     getConsole().print(description + ": ");
-    return getConsole().readPassword();
+    return getConsole().readPassword(echoInput);
   }
 
   private String[] subArray(String[] args, int index) {
