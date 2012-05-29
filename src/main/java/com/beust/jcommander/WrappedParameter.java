@@ -46,6 +46,10 @@ public class WrappedParameter {
   public Class<? extends IParameterValidator> validateWith() {
     return m_parameter != null ? m_parameter.validateWith() : m_dynamicParameter.validateWith();
   }
+  
+  public boolean echoInput() {
+	  return m_parameter != null ? m_parameter.echoInput() : false;
+  }
 
   public void addValue(Field field, Object object, Object value)
       throws IllegalArgumentException, IllegalAccessException {

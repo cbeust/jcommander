@@ -25,11 +25,17 @@ public class JDK6Console implements Console {
     writer.println(msg);
   }
 
-  public char[] readPassword() {
+  public char[] readPassword(boolean echoInput) {
     try {
       writer.flush();
-      Method readPasswordMethod = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
-      return (char[]) readPasswordMethod.invoke(console, new Object[0]);
+      Method method;
+      if (echoInput) {
+          method = console.getClass().getDeclaredMethod("readLine", new Class<?>[0]);
+          return ((String) method.invoke(console, new Object[0])).toCharArray();
+      } else {
+          method = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
+          return (char[]) method.invoke(console, new Object[0]);
+      }
     }
     catch (Exception e) {
       throw new ParameterException(e);

@@ -16,7 +16,7 @@ public class DefaultConsole implements Console {
     System.out.println(msg);
   }
 
-  public char[] readPassword() {
+  public char[] readPassword(boolean echoInput) {
     try {
       InputStreamReader isr = new InputStreamReader(System.in);
       BufferedReader in = new BufferedReader(isr);

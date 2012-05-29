@@ -6,5 +6,5 @@ public interface Console {
 
   void println(String msg);
 
-  char[] readPassword();
+  char[] readPassword(boolean echoInput);
 }
