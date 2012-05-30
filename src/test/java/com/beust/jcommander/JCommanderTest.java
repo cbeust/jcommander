@@ -666,7 +666,7 @@ public class JCommanderTest {
       Assert.assertEquals(a.password, "password");
     } finally {
       System.setIn(stdin);
-    }    
+    }
   }
 
   public void dynamicParameters() {
