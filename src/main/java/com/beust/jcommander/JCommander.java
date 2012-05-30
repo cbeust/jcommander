@@ -306,7 +306,9 @@ public class JCommander {
       for (ParameterDescription pd : m_requiredFields.values()) {
         missingFields.append(pd.getNames()).append(" ");
       }
-      throw new ParameterException("The following options are required: " + missingFields);
+      throw new ParameterException("The following "
+            + pluralize(m_requiredFields.size(), "option is required: ", "options are required: ")
+            + missingFields);
     }
 
     if (m_mainParameterDescription != null) {
@@ -316,6 +318,10 @@ public class JCommander {
             + m_mainParameterDescription.getDescription() + "\")");
       }
     }
+  }
+
+  private static String pluralize(int quantity, String singular, String plural) {
+    return quantity == 1 ? singular : plural;
   }
 
   /**
@@ -433,8 +439,22 @@ public class JCommander {
           .getAnnotation(Parameters.class);
       if (p != null) return p.optionPrefixes();
     }
+    String result = Parameters.DEFAULT_OPTION_PREFIXES;
 
-    return Parameters.DEFAULT_OPTION_PREFIXES;
+    // See if any of the objects contains a @Parameters(optionPrefixes)
+    StringBuilder sb = new StringBuilder();
+    for (Object o : m_objects) {
+      Parameters p = o.getClass().getAnnotation(Parameters.class);
+      if (p != null && !Parameters.DEFAULT_OPTION_PREFIXES.equals(p.optionPrefixes())) {
+        sb.append(p.optionPrefixes());
+      }
+    }
+
+    if (! Strings.isStringEmpty(sb.toString())) {
+      result = sb.toString();
+    }
+
+    return result;
   }
 
   /**
@@ -588,9 +608,10 @@ public class JCommander {
     while (i < args.length && ! commandParsed) {
       String arg = args[i];
       String a = trim(arg);
-      p("Parsing arg:" + a);
+      p("Parsing arg: " + a);
 
       JCommander jc = findCommandByAlias(arg);
+      int increment = 1;
       if (isOption(args, a) && jc == null) {
         //
         // Option
@@ -602,7 +623,7 @@ public class JCommander {
             //
             // Password option, use the Console to retrieve the password
             //
-            char[] password = readPassword(pd.getDescription());
+            char[] password = readPassword(pd.getDescription(), pd.getParameter().echoInput());
             pd.addValue(new String(password));
             m_requiredFields.remove(pd.getField());
           } else {
@@ -610,7 +631,7 @@ public class JCommander {
               //
               // Variable arity?
               //
-              i = processVariableArity(args, i, pd);
+              increment = processVariableArity(args, i, pd);
             } else {
               //
               // Regular option
@@ -624,7 +645,7 @@ public class JCommander {
                 pd.addValue("true");
                 m_requiredFields.remove(pd.getField());
               } else {
-                i = processFixedArity(args, i, pd, fieldType);
+                increment = processFixedArity(args, i, pd, fieldType);
               }
             }
           }
@@ -636,7 +657,7 @@ public class JCommander {
         //
         // Main parameter
         //
-        if (! isStringEmpty(arg)) {
+        if (! Strings.isStringEmpty(arg)) {
           if (m_commands.isEmpty()) {
             //
             // Regular (non-command) parsing
@@ -675,7 +696,7 @@ public class JCommander {
           }
         }
       }
-      i++;
+      i += increment;
     }
 
     // Mark the parameter descriptions held in m_fields as assigned
@@ -733,7 +754,8 @@ public class JCommander {
     int arity = va.processVariableArity(pd.getParameter().names()[0],
         currentArgs.toArray(new String[0]));
 
-    return processFixedArity(args, index, pd, List.class, arity);
+    int result = processFixedArity(args, index, pd, List.class, arity);
+    return result;
   }
 
   private int processFixedArity(String[] args, int index, ParameterDescription pd,
@@ -746,8 +768,9 @@ public class JCommander {
     return processFixedArity(args, index, pd, fieldType, n);
   }
 
-  private int processFixedArity(String[] args, int index, ParameterDescription pd,
+  private int processFixedArity(String[] args, int originalIndex, ParameterDescription pd,
                                 Class<?> fieldType, int arity) {
+    int index = originalIndex;
     String arg = args[index];
     // Special case for boolean parameters of arity 0
     if (arity == 0 &&
@@ -771,16 +794,16 @@ public class JCommander {
       throw new ParameterException("Expected a value after parameter " + arg);
     }
 
-    return index;
+    return arity + 1;
   }
 
   /**
    * Invoke Console.readPassword through reflection to avoid depending
    * on Java 6.
    */
-  private char[] readPassword(String description) {
+  private char[] readPassword(String description, boolean echoInput) {
     getConsole().print(description + ": ");
-    return getConsole().readPassword();
+    return getConsole().readPassword(echoInput);
   }
 
   private String[] subArray(String[] args, int index) {
@@ -789,10 +812,6 @@ public class JCommander {
     System.arraycopy(args, index, result, 0, l);
 
     return result;
-  }
-
-  private static boolean isStringEmpty(String s) {
-    return s == null || "".equals(s);
   }
 
   /**
@@ -898,9 +917,10 @@ public class JCommander {
 
     Object arg = jc.getObjects().get(0);
     Parameters p = arg.getClass().getAnnotation(Parameters.class);
-    String result = jc.getMainParameterDescription();
     ResourceBundle bundle = null;
+    String result = null;
     if (p != null) {
+      result = p.commandDescription();
       String bundleName = p.resourceBundle();
       if (!"".equals(bundleName)) {
         bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());

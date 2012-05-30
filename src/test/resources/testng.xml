@@ -12,6 +12,7 @@
       <class name="com.beust.jcommander.JCommanderTest" />
       <class name="com.beust.jcommander.ParametersDelegateTest" />
       <class name="com.beust.jcommander.dynamic.DynamicParameterTest" />
+      <class name="com.beust.jcommander.VariableArityTest" />
     </classes>
   </test>
 

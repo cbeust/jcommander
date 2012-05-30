@@ -100,4 +100,10 @@ public @interface Parameter {
    * a comma separated splitter will be used.
    */
   Class<? extends IParameterSplitter> splitter() default CommaParameterSplitter.class;
+  
+  /**
+   * If true, console will not echo typed input
+   * Used in conjunction with password = true
+   */
+  boolean echoInput() default false;
 }

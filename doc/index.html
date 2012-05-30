@@ -157,6 +157,16 @@ Value for -password (Connection password):
 
 You will need to type the value at this point before JCommander resumes.
 
+<h4>Echo Input</h4>
+
+In Java 6, by default, you will not be able to see what you type for passwords entered at the prompt (Java 5 and lower will always show the password).  However, you can override this by setting <tt>echoInput</tt> to "true" (default is "false" and this setting only has an effect when <tt>password</tt> is "true"):
+<pre class="brush: java">
+public class ArgsPassword {
+  @Parameter(names = "-password", description = "Connection password", password = true, echoInput = true)
+  private String password;
+}
+</pre>
+
 <h2><a class="section" name="Custom_types">Custom types</a></h2>
 
 <h3>By annotation</h3>
@@ -754,6 +764,11 @@ Join the <a href="http://groups.google.com/group/jcommander">JCommander Google g
 <h2><a class="section" name="Javadocs">Javadocs</a></h2>
 
 The Javadocs for JCommander can be found <a href="apidocs/">here</a>.
+
+<h2><a class="section" name="License">License</a></h2>
+
+JCommander is released under the <a
+href="https://github.com/cbeust/jcommander/blob/master/license.txt">Apache 2.0</a> license.
 
 <h2><a class="section" name="Download">Download</a></h2>
 

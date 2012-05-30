@@ -18,6 +18,8 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.validators.NoValidator;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -276,7 +278,9 @@ public class ParameterDescription {
   public static void validateParameter(Class<? extends IParameterValidator> validator,
       String name, String value) {
     try {
-      p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
+      if (validator != NoValidator.class) {
+        p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
+      }
       validator.newInstance().validate(name, value);
     } catch (InstantiationException e) {
       throw new ParameterException("Can't instantiate validator:" + e);

@@ -1,13 +1,13 @@
 Current
 
 Added: echoInput, used when password=true to echo the characters (Jason Wheeler)
+Fixed: if using a different option prefix, unknown option are mistakenly reported as "no main parameter defined" (kurmasz)
+Fixed: 113: getCommandDescription() returns the description of the main parameter instead of that of the command
+Fixed: bug with several multiple arity parameters (VariableArityTest)
 Fixed: variable arities not working when same parameter appears multiple times.
-
-========================
 
 1.25
 2012/04/26
-
 Added: Default passwords are no longer displayed in the usage (Paul Mendelson)
 Added: Variable arities now work magically, no need for IVariableArity any more
 Fixed: Commands using @Parameters(resourceBundle) were not i18n'ed properly in the usage()
