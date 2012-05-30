@@ -1,5 +1,6 @@
 Current
 
+Added: echoInput, used when password=true to echo the characters (Jason Wheeler)
 Fixed: variable arities not working when same parameter appears multiple times.
 
 ========================
