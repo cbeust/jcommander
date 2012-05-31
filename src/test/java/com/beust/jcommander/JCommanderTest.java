@@ -759,9 +759,23 @@ public class JCommanderTest {
     }
   }
 
+  public void equalSeparator() {
+    @Parameters(separators = "=", commandDescription = "My command")
+    class MyClass {
+       @Parameter(names = { "-p", "--param" }, required = true,
+           description = "param desc...")
+       private String param;
+    }
+
+    MyClass c = new MyClass();
+    String expected = "some=value";
+    new JCommander(c).parse("--param=" + expected);
+    Assert.assertEquals(c.param, expected);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().unknownOptionWithDifferentPrefix();
+    new JCommanderTest().equalSeparator();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
