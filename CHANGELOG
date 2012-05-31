@@ -1,6 +1,7 @@
 Current
 
 Added: echoInput, used when password=true to echo the characters (Jason Wheeler)
+Fixed: wasn't handling parameters that start with " but don't end with one correctly
 Fixed: if using a different option prefix, unknown option are mistakenly reported as "no main parameter defined" (kurmasz)
 Fixed: 113: getCommandDescription() returns the description of the main parameter instead of that of the command
 Fixed: bug with several multiple arity parameters (VariableArityTest)

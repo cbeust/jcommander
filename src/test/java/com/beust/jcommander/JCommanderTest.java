@@ -762,15 +762,14 @@ public class JCommanderTest {
   public void equalSeparator() {
     @Parameters(separators = "=", commandDescription = "My command")
     class MyClass {
-       @Parameter(names = { "-p", "--param" }, required = true,
-           description = "param desc...")
+
+       @Parameter(names = { "-p", "--param" }, required = true, description = "param desc...")
        private String param;
     }
-
     MyClass c = new MyClass();
-    String expected = "some=value";
+    String expected = "\"hello\"world";
     new JCommander(c).parse("--param=" + expected);
-    Assert.assertEquals(c.param, expected);
+    Assert.assertEquals(expected, c.param);
   }
 
   @Test(enabled = false)
