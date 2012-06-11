@@ -3,6 +3,7 @@ package com.beust.jcommander;
 import static java.lang.annotation.ElementType.FIELD;
 
 import com.beust.jcommander.validators.NoValidator;
+import com.beust.jcommander.validators.NoValueValidator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -44,4 +45,6 @@ public @interface DynamicParameter {
    * The character(s) used to assign the values.
    */
   String assignment() default "=";
+
+  Class<? extends IValueValidator> validateValueWith() default NoValueValidator.class;
 }

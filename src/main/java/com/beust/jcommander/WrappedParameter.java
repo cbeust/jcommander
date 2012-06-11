@@ -46,7 +46,13 @@ public class WrappedParameter {
   public Class<? extends IParameterValidator> validateWith() {
     return m_parameter != null ? m_parameter.validateWith() : m_dynamicParameter.validateWith();
   }
-  
+
+  public Class<? extends IValueValidator> validateValueWith() {
+    return m_parameter != null
+        ? m_parameter.validateValueWith()
+        : m_dynamicParameter.validateValueWith();
+  }
+
   public boolean echoInput() {
 	  return m_parameter != null ? m_parameter.echoInput() : false;
   }
@@ -92,4 +98,5 @@ public class WrappedParameter {
   public String getAssignment() {
     return m_dynamicParameter != null ? m_dynamicParameter.assignment() : "";
   }
+
 }

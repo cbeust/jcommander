@@ -19,6 +19,7 @@
 package com.beust.jcommander;
 
 import com.beust.jcommander.validators.NoValidator;
+import com.beust.jcommander.validators.NoValueValidator;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -159,7 +160,7 @@ public class ParameterDescription {
 
   private void validateDefaultValues(String[] names) {
     String name = names.length > 0 ? names[0] : "";
-    validateParameter(name, m_default.toString());
+    validateValueParameter(name, m_default);
   }
 
   public String getLongestName() {
@@ -241,6 +242,7 @@ public class ParameterDescription {
     Class<?> type = m_field.getType();
 
     Object convertedValue = m_jCommander.convertValue(this, value);
+    validateValueParameter(name, convertedValue);
     boolean isCollection = Collection.class.isAssignableFrom(type);
 
     try {
@@ -272,6 +274,27 @@ public class ParameterDescription {
     Class<? extends IParameterValidator> validator = m_wrappedParameter.validateWith();
     if (validator != null) {
       validateParameter(validator, name, value);
+    }
+  }
+
+  private void validateValueParameter(String name, Object value) {
+    Class<? extends IValueValidator> validator = m_wrappedParameter.validateValueWith();
+    if (validator != null) {
+      validateValueParameter(validator, name, value);
+    }
+  }
+
+  public static void validateValueParameter(Class<? extends IValueValidator> validator,
+      String name, Object value) {
+    try {
+      if (validator != NoValueValidator.class) {
+        p("Validating value parameter:" + name + " value:" + value + " validator:" + validator);
+      }
+      validator.newInstance().validate(name, value);
+    } catch (InstantiationException e) {
+      throw new ParameterException("Can't instantiate validator:" + e);
+    } catch (IllegalAccessException e) {
+      throw new ParameterException("Can't instantiate validator:" + e);
     }
   }
 

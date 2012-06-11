@@ -24,6 +24,7 @@ import com.beust.jcommander.converters.CommaParameterSplitter;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.validators.NoValidator;
+import com.beust.jcommander.validators.NoValueValidator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -86,9 +87,14 @@ public @interface Parameter {
   boolean hidden() default false;
 
   /**
-   * The validation class to use.
+   * Validate the parameter found on the command line.
    */
   Class<? extends IParameterValidator> validateWith() default NoValidator.class;
+
+  /**
+   * Validate the value for this parameter.
+   */
+  Class<? extends IValueValidator> validateValueWith() default NoValueValidator.class;
 
   /**
    * @return true if this parameter has a variable arity. See @{IVariableArity}
@@ -106,4 +112,5 @@ public @interface Parameter {
    * Used in conjunction with password = true
    */
   boolean echoInput() default false;
+
 }
