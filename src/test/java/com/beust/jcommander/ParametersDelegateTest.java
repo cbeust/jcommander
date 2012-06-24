@@ -220,4 +220,8 @@ public class ParametersDelegateTest {
 
     cmd.parse("command main params".split(" "));
   }
+
+  public static void main(String[] args) {
+    new ParametersDelegateTest().commandTest();
+  }
 }

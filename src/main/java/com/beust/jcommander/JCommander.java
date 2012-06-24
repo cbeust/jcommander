@@ -31,16 +31,13 @@ import com.beust.jcommander.internal.Maps;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -79,10 +76,10 @@ public class JCommander {
   private List<Object> m_objects = Lists.newArrayList();
 
   /**
-   * This field will contain whatever command line parameter is not an option.
+   * This field/method will contain whatever command line parameter is not an option.
    * It is expected to be a List<String>.
    */
-  private Field m_mainParameterField = null;
+  private Parameterized m_mainParameter = null;
 
   /**
    * The object on which we found the main parameter field.
@@ -97,19 +94,19 @@ public class JCommander {
   private ParameterDescription m_mainParameterDescription;
 
   /**
-   * A set of all the fields that are required. During the reflection phase,
+   * A set of all the parameterizeds that are required. During the reflection phase,
    * this field receives all the fields that are annotated with required=true
    * and during the parsing phase, all the fields that are assigned a value
    * are removed from it. At the end of the parsing phase, if it's not empty,
    * then some required fields did not receive a value and an exception is
    * thrown.
    */
-  private Map<Field, ParameterDescription> m_requiredFields = Maps.newHashMap();
+  private Map<Parameterized, ParameterDescription> m_requiredFields = Maps.newHashMap();
 
   /**
-   * A map of all the annotated fields.
+   * A map of all the parameterized fields/methods/
    */
-  private Map<Field, ParameterDescription> m_fields = Maps.newHashMap();
+  private Map<Parameterized, ParameterDescription> m_fields = Maps.newHashMap();
 
   private ResourceBundle m_bundle;
 
@@ -142,6 +139,7 @@ public class JCommander {
 
   private Comparator<? super ParameterDescription> m_parameterDescriptionComparator
       = new Comparator<ParameterDescription>() {
+        @Override
         public int compare(ParameterDescription p0, ParameterDescription p1) {
           return p0.getLongestName().compareTo(p1.getLongestName());
         }
@@ -512,74 +510,138 @@ public class JCommander {
   private void addDescription(Object object) {
     Class<?> cls = object.getClass();
 
-    while (!Object.class.equals(cls)) {
-      for (Field f : cls.getDeclaredFields()) {
-        p("Field:" + cls.getSimpleName() + "." + f.getName());
-        f.setAccessible(true);
-        Annotation annotation = f.getAnnotation(Parameter.class);
-        Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
-        Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
-        if (annotation != null) {
-          //
-          // @Parameter
-          //
-          Parameter p = (Parameter) annotation;
-          if (p.names().length == 0) {
-            p("Found main parameter:" + f);
-            if (m_mainParameterField != null) {
-              throw new ParameterException("Only one @Parameter with no names attribute is"
-                  + " allowed, found:" + m_mainParameterField + " and " + f);
-            }
-            m_mainParameterField = f;
-            m_mainParameterObject = object;
-            m_mainParameterAnnotation = p;
-            m_mainParameterDescription = new ParameterDescription(object, p, f, m_bundle, this);
-          } else {
-            for (String name : p.names()) {
-              if (m_descriptions.containsKey(name)) {
-                throw new ParameterException("Found the option " + name + " multiple times");
-              }
-              p("Adding description for " + name);
-              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle, this);
-              m_fields.put(f, pd);
-              m_descriptions.put(name, pd);
-
-              if (p.required()) m_requiredFields.put(f, pd);
-            }
+    List<Parameterized> parameterizeds = Parameterized.parseArg(object);
+    for (Parameterized parameterized : parameterizeds) {
+      WrappedParameter wp = parameterized.getWrappedParameter();
+      if (wp != null && wp.getParameter() != null) {
+        Parameter annotation = wp.getParameter();
+        //
+        // @Parameter
+        //
+        Parameter p = annotation;
+        if (p.names().length == 0) {
+          p("Found main parameter:" + parameterized);
+          if (m_mainParameter != null) {
+            throw new ParameterException("Only one @Parameter with no names attribute is"
+                + " allowed, found:" + m_mainParameter + " and " + parameterized);
           }
-        } else if (delegateAnnotation != null) {
-          //
-          // @ParametersDelegate
-          //
-          try {
-            Object delegateObject = f.get(object);
-            if (delegateObject == null){
-              throw new ParameterException("Delegate field '" + f.getName() + "' cannot be null.");
-            }
-            addDescription(delegateObject);
-          } catch (IllegalAccessException e) {
-          }
-        } else if (dynamicParameter != null) {
-          //
-          // @DynamicParameter
-          //
-          DynamicParameter dp = (DynamicParameter) dynamicParameter;
-          for (String name : dp.names()) {
+          m_mainParameter = parameterized;
+          m_mainParameterObject = object;
+          m_mainParameterAnnotation = p;
+          m_mainParameterDescription =
+              new ParameterDescription(object, p, parameterized, m_bundle, this);
+        } else {
+          for (String name : p.names()) {
             if (m_descriptions.containsKey(name)) {
               throw new ParameterException("Found the option " + name + " multiple times");
             }
             p("Adding description for " + name);
-            ParameterDescription pd = new ParameterDescription(object, dp, f, m_bundle, this);
-            m_fields.put(f, pd);
+            ParameterDescription pd =
+                new ParameterDescription(object, p, parameterized, m_bundle, this);
+            m_fields.put(parameterized, pd);
             m_descriptions.put(name, pd);
 
-            if (dp.required()) m_requiredFields.put(f, pd);
+            if (p.required()) m_requiredFields.put(parameterized, pd);
           }
         }
+      } else if (parameterized.getDelegateAnnotation() != null) {
+        //
+        // @ParametersDelegate
+        //
+        Object delegateObject = parameterized.get(object);
+        if (delegateObject == null){
+          throw new ParameterException("Delegate field '" + parameterized.getName()
+              + "' cannot be null.");
+        }
+        addDescription(delegateObject);
+      } else if (wp != null && wp.getDynamicParameter() != null) {
+        //
+        // @DynamicParameter
+        //
+        DynamicParameter dp = wp.getDynamicParameter();
+        for (String name : dp.names()) {
+          if (m_descriptions.containsKey(name)) {
+            throw new ParameterException("Found the option " + name + " multiple times");
+          }
+          p("Adding description for " + name);
+          ParameterDescription pd =
+              new ParameterDescription(object, dp, parameterized, m_bundle, this);
+          m_fields.put(parameterized, pd);
+          m_descriptions.put(name, pd);
+    
+          if (dp.required()) m_requiredFields.put(parameterized, pd);
+        }
       }
-      // Traverse the super class until we find Object.class
-      cls = cls.getSuperclass();
     }
+
+//    while (!Object.class.equals(cls)) {
+//      for (Field f : cls.getDeclaredFields()) {
+//        p("Field:" + cls.getSimpleName() + "." + f.getName());
+//        f.setAccessible(true);
+//        Annotation annotation = f.getAnnotation(Parameter.class);
+//        Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
+//        Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
+//        if (annotation != null) {
+//          //
+//          // @Parameter
+//          //
+//          Parameter p = (Parameter) annotation;
+//          if (p.names().length == 0) {
+//            p("Found main parameter:" + f);
+//            if (m_mainParameterField != null) {
+//              throw new ParameterException("Only one @Parameter with no names attribute is"
+//                  + " allowed, found:" + m_mainParameterField + " and " + f);
+//            }
+//            m_mainParameterField = parameterized;
+//            m_mainParameterObject = object;
+//            m_mainParameterAnnotation = p;
+//            m_mainParameterDescription = new ParameterDescription(object, p, f, m_bundle, this);
+//          } else {
+//            for (String name : p.names()) {
+//              if (m_descriptions.containsKey(name)) {
+//                throw new ParameterException("Found the option " + name + " multiple times");
+//              }
+//              p("Adding description for " + name);
+//              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle, this);
+//              m_fields.put(f, pd);
+//              m_descriptions.put(name, pd);
+//
+//              if (p.required()) m_requiredFields.put(f, pd);
+//            }
+//          }
+//        } else if (delegateAnnotation != null) {
+//          //
+//          // @ParametersDelegate
+//          //
+//          try {
+//            Object delegateObject = f.get(object);
+//            if (delegateObject == null){
+//              throw new ParameterException("Delegate field '" + f.getName() + "' cannot be null.");
+//            }
+//            addDescription(delegateObject);
+//          } catch (IllegalAccessException e) {
+//          }
+//        } else if (dynamicParameter != null) {
+//          //
+//          // @DynamicParameter
+//          //
+//          DynamicParameter dp = (DynamicParameter) dynamicParameter;
+//          for (String name : dp.names()) {
+//            if (m_descriptions.containsKey(name)) {
+//              throw new ParameterException("Found the option " + name + " multiple times");
+//            }
+//            p("Adding description for " + name);
+//            ParameterDescription pd = new ParameterDescription(object, dp, f, m_bundle, this);
+//            m_fields.put(f, pd);
+//            m_descriptions.put(name, pd);
+//
+//            if (dp.required()) m_requiredFields.put(f, pd);
+//          }
+//        }
+//      }
+//      // Traverse the super class until we find Object.class
+//      cls = cls.getSuperclass();
+//    }
   }
 
   private void initializeDefaultValue(ParameterDescription pd) {
@@ -622,7 +684,7 @@ public class JCommander {
             //
             char[] password = readPassword(pd.getDescription(), pd.getParameter().echoInput());
             pd.addValue(new String(password));
-            m_requiredFields.remove(pd.getField());
+            m_requiredFields.remove(pd.getParameterized());
           } else {
             if (pd.getParameter().variableArity()) {
               //
@@ -633,14 +695,14 @@ public class JCommander {
               //
               // Regular option
               //
-              Class<?> fieldType = pd.getField().getType();
+              Class<?> fieldType = pd.getParameterized().getType();
 
               // Boolean, set to true as soon as we see it, unless it specified
               // an arity of 1, in which case we need to read the next value
               if ((fieldType == boolean.class || fieldType == Boolean.class)
                   && pd.getParameter().arity() == -1) {
                 pd.addValue("true");
-                m_requiredFields.remove(pd.getField());
+                m_requiredFields.remove(pd.getParameterized());
               } else {
                 increment = processFixedArity(args, i, pd, fieldType);
               }
@@ -663,11 +725,11 @@ public class JCommander {
             String value = arg;
             Object convertedValue = value;
 
-            if (m_mainParameterField.getGenericType() instanceof ParameterizedType) {
-              ParameterizedType p = (ParameterizedType) m_mainParameterField.getGenericType();
+            if (m_mainParameter.getGenericType() instanceof ParameterizedType) {
+              ParameterizedType p = (ParameterizedType) m_mainParameter.getGenericType();
               Type cls = p.getActualTypeArguments()[0];
               if (cls instanceof Class) {
-                convertedValue = convertValue(m_mainParameterField, (Class) cls, value);
+                convertedValue = convertValue(m_mainParameter, (Class) cls, value);
               }
             }
 
@@ -699,29 +761,15 @@ public class JCommander {
     // Mark the parameter descriptions held in m_fields as assigned
     for (ParameterDescription parameterDescription : m_descriptions.values()) {
       if (parameterDescription.isAssigned()) {
-        m_fields.get(parameterDescription.getField()).setAssigned(true);
+        m_fields.get(parameterDescription.getParameterized()).setAssigned(true);
       }
     }
 
-  }
-
-  /**
-   * @return the generic type of the collection for this field, or null if not applicable.
-   */
-  private Type findFieldGenericType(Field field) {
-    if (field.getGenericType() instanceof ParameterizedType) {
-      ParameterizedType p = (ParameterizedType) field.getGenericType();
-      Type cls = p.getActualTypeArguments()[0];
-      if (cls instanceof Class) {
-        return cls;
-      }
-    }
-
-    return null;
   }
 
   private class DefaultVariableArity implements IVariableArity {
 
+    @Override
     public int processVariableArity(String optionName, String[] options) {
         int i = 0;
         while (i < options.length && !isOption(options, options[i])) {
@@ -774,14 +822,14 @@ public class JCommander {
         (Boolean.class.isAssignableFrom(fieldType)
             || boolean.class.isAssignableFrom(fieldType))) {
       pd.addValue("true");
-      m_requiredFields.remove(pd.getField());
+      m_requiredFields.remove(pd.getParameterized());
     } else if (index < args.length - 1) {
       int offset = "--".equals(args[index + 1]) ? 1 : 0;
 
       if (index + arity < args.length) {
         for (int j = 1; j <= arity; j++) {
           pd.addValue(trim(args[index + j + offset]));
-          m_requiredFields.remove(pd.getField());
+          m_requiredFields.remove(pd.getParameterized());
         }
         index += arity + offset;
       } else {
@@ -818,26 +866,21 @@ public class JCommander {
    * error message).
    */
   private List<?> getMainParameter(String arg) {
-    if (m_mainParameterField == null) {
+    if (m_mainParameter == null) {
       throw new ParameterException(
           "Was passed main parameter '" + arg + "' but no main parameter was defined");
     }
 
-    try {
-      List result = (List) m_mainParameterField.get(m_mainParameterObject);
-      if (result == null) {
-        result = Lists.newArrayList();
-        if (! List.class.isAssignableFrom(m_mainParameterField.getType())) {
-          throw new ParameterException("Main parameter field " + m_mainParameterField
-              + " needs to be of type List, not " + m_mainParameterField.getType());
-        }
-        m_mainParameterField.set(m_mainParameterObject, result);
+    List<?> result = (List<?>) m_mainParameter.get(m_mainParameterObject);
+    if (result == null) {
+      result = Lists.newArrayList();
+      if (! List.class.isAssignableFrom(m_mainParameter.getType())) {
+        throw new ParameterException("Main parameter field " + m_mainParameter
+            + " needs to be of type List, not " + m_mainParameter.getType());
       }
-      return result;
+      m_mainParameter.set(m_mainParameterObject, result);
     }
-    catch(IllegalAccessException ex) {
-      throw new ParameterException("Couldn't access main parameter: " + ex.getMessage());
-    }
+    return result;
   }
 
   public String getMainParameterDescription() {
@@ -846,15 +889,15 @@ public class JCommander {
         : null;
   }
 
-  private int longestName(Collection<?> objects) {
-    int result = 0;
-    for (Object o : objects) {
-      int l = o.toString().length();
-      if (l > result) result = l;
-    }
-
-    return result;
-  }
+//  private int longestName(Collection<?> objects) {
+//    int result = 0;
+//    for (Object o : objects) {
+//      int l = o.toString().length();
+//      if (l > result) result = l;
+//    }
+//
+//    return result;
+//  }
 
   /**
    * Set the program name (used only in the usage).
@@ -1128,7 +1171,7 @@ public class JCommander {
   }
 
   public Object convertValue(ParameterDescription pd, String value) {
-    return convertValue(pd.getField(), pd.getField().getType(), value);
+    return convertValue(pd.getParameterized(), pd.getParameterized().getType(), value);
   }
 
   /**
@@ -1136,8 +1179,8 @@ public class JCommander {
    * @param type The type of the actual parameter
    * @param value The value to convert
    */
-  public Object convertValue(Field field, Class type, String value) {
-    Parameter annotation = field.getAnnotation(Parameter.class);
+  public Object convertValue(Parameterized parameterized, Class type, String value) {
+    Parameter annotation = parameterized.getParameter();
 
     // Do nothing if it's a @DynamicParameter
     if (annotation == null) return value;
@@ -1158,7 +1201,7 @@ public class JCommander {
     }
 
     if (converterClass == null) {
-      Type elementType = findFieldGenericType(field);
+      Type elementType = parameterized.findFieldGenericType();
       converterClass = elementType != null
           ? findConverter((Class<? extends IStringConverter<?>>) elementType)
           : StringConverter.class;
@@ -1194,7 +1237,7 @@ public class JCommander {
       } else {
         converter = instantiateConverter(optionName, converterClass);
         if (type.isAssignableFrom(List.class)
-              && field.getGenericType() instanceof ParameterizedType) {
+              && parameterized.getGenericType() instanceof ParameterizedType) {
 
           // The field is a List
           if (listConverterWasSpecified) {

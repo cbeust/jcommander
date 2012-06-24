@@ -19,6 +19,7 @@
 package com.beust.jcommander;
 
 import com.beust.jcommander.args.Args1;
+import com.beust.jcommander.args.Args1Setter;
 import com.beust.jcommander.args.Args2;
 import com.beust.jcommander.args.ArgsArityString;
 import com.beust.jcommander.args.ArgsBooleanArity;
@@ -231,6 +232,38 @@ public class JCommanderTest {
 
   public void arityString() {
     ArgsArityString args = new ArgsArityString();
+    String[] argv = { "-pairs", "pair0", "pair1", "rest" };
+    new JCommander(args, argv);
+
+    Assert.assertEquals(args.pairs.size(), 2);
+    Assert.assertEquals(args.pairs.get(0), "pair0");
+    Assert.assertEquals(args.pairs.get(1), "pair1");
+    Assert.assertEquals(args.rest.size(), 1);
+    Assert.assertEquals(args.rest.get(0), "rest");
+  }
+
+  public void arityStringsSetter() {
+    class ArgsArityStringSetter {
+
+      @Parameter(names = "-pairs", arity = 2, description = "Pairs")
+      public void setPairs(List<String> pairs) {
+        this.pairs = pairs;
+      }
+      public List<String> getPairs() {
+        return this.pairs;
+      }
+      public List<String> pairs;
+
+      @Parameter(description = "Rest")
+      public void setRest(List<String> rest) {
+        this.rest = rest;
+      }
+      public List<String> getRest() {
+        return this.rest;
+      }
+      public List<String> rest;
+    }
+    ArgsArityStringSetter args = new ArgsArityStringSetter();
     String[] argv = { "-pairs", "pair0", "pair1", "rest" };
     new JCommander(args, argv);
 
@@ -609,6 +642,7 @@ public class JCommanderTest {
   public void mainParameterShouldBeValidate() {
     class V implements IParameterValidator {
 
+      @Override
       public void validate(String name, String value) throws ParameterException {
         Assert.assertEquals("a", value);
       }
@@ -772,9 +806,25 @@ public class JCommanderTest {
     Assert.assertEquals(expected, c.param);
   }
 
+  public void simpleArgsSetter() throws ParseException {
+    Args1Setter args = new Args1Setter();
+    String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
+            "-date", "2011-10-26", "-groups", "unit", "a", "b", "c" };
+    new JCommander(args, argv);
+
+    Assert.assertTrue(args.debug);
+    Assert.assertEquals(args.verbose.intValue(), 2);
+    Assert.assertEquals(args.groups, "unit");
+    Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+    Assert.assertEquals(args.floa, 1.2f, 0.1f);
+    Assert.assertEquals(args.doub, 1.3f, 0.1f);
+    Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
+    Assert.assertEquals(args.date, new SimpleDateFormat("yyyy-MM-dd").parse("2011-10-26"));
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().equalSeparator();
+    new JCommanderTest().arityStringsSetter();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

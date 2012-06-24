@@ -19,6 +19,7 @@
 package com.beust.jcommander;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 
 import com.beust.jcommander.converters.CommaParameterSplitter;
 import com.beust.jcommander.converters.IParameterSplitter;
@@ -30,7 +31,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target({ FIELD })
+@Target({ FIELD, METHOD })
 public @interface Parameter {
 
   /**
