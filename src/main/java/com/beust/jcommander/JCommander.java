@@ -168,6 +168,10 @@ public class JCommander {
   private Map<Field, Object> m_parameterFileOptions = Maps.newHashMap();
   
   /**
+   * Stores a mapping from Field to names
+   */
+  private Map<Field, String> m_parameterFileNames = Maps.newHashMap();
+  /**
    * The factories used to look up string converters.
    */
   private static LinkedList<IStringConverterFactory> CONVERTER_FACTORIES = Lists.newLinkedList();
@@ -186,7 +190,14 @@ public class JCommander {
    * @param object The arg object expected to contain {@link Parameter} annotations.
    */
   public JCommander(Object object) {
-    addObject(object);
+    this(object, true);
+  }
+
+  /**
+   * @param object The arg object expected to contain {@link Parameter} annotations.
+   */
+  public JCommander(Object object, boolean parseParameterFiles) {
+    addObject(object, parseParameterFiles);
     createDescriptions();
   }
 
@@ -241,7 +252,23 @@ public class JCommander {
    * the child objects will be added instead.
    */
   // declared final since this is invoked from constructors
-  public final void addObject(Object object) {
+  
+  public final void addObject(Object object)
+  {
+	  addObject(object, true);
+  }
+  /**
+   * Adds the provided arg object to the set of objects that this commander
+   * will parse arguments into.
+   *
+   * @param object The arg object expected to contain {@link Parameter}
+   * annotations. If <code>object</code> is an array or is {@link Iterable},
+   * the child objects will be added instead.
+   * @param parseParameterFiles  <code>true</code> if we should load parameter files into the object, <code>false</code> otherwise.
+   */
+  // declared final since this is invoked from constructors
+ 
+  public final void addObject(Object object, boolean parseParameterFiles) {
     if (object instanceof Iterable) {
       // Iterable
       for (Object o : (Iterable<?>) object) {
@@ -256,40 +283,45 @@ public class JCommander {
       // Single object
       m_objects.add(object);
     }
-    try {
-    	getAllDelegates(object);
-    	m_parameterObjectForFiles.add(object);
-    	for(Object obj : m_parameterObjectForFiles)
-    	{
-    		for(Field field : obj.getClass().getFields())
-    		{
-    			if(field.isAnnotationPresent(ParameterFile.class))
-    			{
-    			   if(!field.isAnnotationPresent(Parameter.class))
-    			   {
-    				   throw new ParameterException("@ParameterFile annotation can only occur with @Parameter annotation");
-    			   } else if(!File.class.isAssignableFrom(field.getType()))
-    			   {
-    				   throw new ParameterException("@ParameterFile annotation can only occur with @Parameter's of type File");   
-    			   } else
-    			   {
-    				   Parameter parameter = field.getAnnotation(Parameter.class);
-    				   String name = "Parameter has no name?";
-    				   if(parameter.names().length > 0)
-    				   {
-    						   name = parameter.names()[0];	   
-    				   }
-    				   
-    				   p("Adding ParameterFile Field " + name);
-       				this.m_parameterFileOptions.put(field,  obj);
-    			   }
-    			   
-    			}
-    		}
-    	}
-    } catch(IllegalAccessException e)
+    
+    if(parseParameterFiles)
     {
-    	throw new ParameterException(e);
+	    try {
+	    	getAllDelegates(object);
+	    	m_parameterObjectForFiles.add(object);
+	    	for(Object obj : m_parameterObjectForFiles)
+	    	{
+	    		for(Field field : obj.getClass().getFields())
+	    		{
+	    			if(field.isAnnotationPresent(ParameterFile.class))
+	    			{
+	    			   if(!field.isAnnotationPresent(Parameter.class))
+	    			   {
+	    				   throw new ParameterException("@ParameterFile annotation can only occur with @Parameter annotation");
+	    			   } else if(!File.class.isAssignableFrom(field.getType()))
+	    			   {
+	    				   throw new ParameterException("@ParameterFile annotation can only occur with @Parameter's of type File");   
+	    			   } else
+	    			   {
+	    				   Parameter parameter = field.getAnnotation(Parameter.class);
+	    				   String name = "Parameter has no name?";
+	    				   if(parameter.names().length > 0)
+	    				   {
+	    						   name = parameter.names()[0];	   
+	    				   }
+	    				   
+	    				   p("Adding ParameterFile Field " + name);
+	       				this.m_parameterFileOptions.put(field,  obj);
+	       				this.m_parameterFileNames.put(field, name);
+	    			   }
+	    			   
+	    			}
+	    		}
+	    	}
+	    } catch(IllegalAccessException e)
+	    {
+	    	throw new ParameterException(e);
+	    }
     }
   }
 
@@ -384,9 +416,16 @@ public class JCommander {
       for (ParameterDescription pd : m_requiredFields.values()) {
         missingFields.append(pd.getNames()).append(" ");
       }
+      
+      StringBuilder parameterFileNames = new StringBuilder();
+      for(Entry<Field, String> pFiles :  m_parameterFileNames.entrySet())
+      {
+    	  parameterFileNames.append(pFiles.getValue()).append(" ");
+      }
       throw new ParameterException("The following "
             + pluralize(m_requiredFields.size(), "option is required: ", "options are required: ")
-            + missingFields);
+            + missingFields + ". Perhaps you forgot to set one of: "
+            + parameterFileNames);
     }
 
     if (m_mainParameterDescription != null) {
