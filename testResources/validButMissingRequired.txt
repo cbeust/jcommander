@@ -1,0 +1,3 @@
+intValue = 3
+strValue = Hello 
+simpleBooleanFalse = false
