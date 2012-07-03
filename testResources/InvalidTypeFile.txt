@@ -1,0 +1,4 @@
+intValue = There
+strValue = Hello 
+simpleBooleanTrue = true
+simpleBooleanFalse = false

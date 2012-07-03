@@ -27,11 +27,16 @@ import com.beust.jcommander.internal.DefaultConverterFactory;
 import com.beust.jcommander.internal.JDK6Console;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Sets;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -46,7 +51,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 
 
@@ -136,6 +144,11 @@ public class JCommander {
   private String m_parsedAlias;
 
   private ProgramName m_programName;
+  
+  
+  /**
+   * 
+   */
 
   private Comparator<? super ParameterDescription> m_parameterDescriptionComparator
       = new Comparator<ParameterDescription>() {
@@ -149,6 +162,11 @@ public class JCommander {
   
   private static Console m_console;
 
+  /**
+   * Stores a list of parameter delegates
+   */
+  private Map<Field, Object> m_parameterFileOptions = Maps.newHashMap();
+  
   /**
    * The factories used to look up string converters.
    */
@@ -238,8 +256,69 @@ public class JCommander {
       // Single object
       m_objects.add(object);
     }
+    try {
+    	getAllDelegates(object);
+    	m_parameterObjectForFiles.add(object);
+    	for(Object obj : m_parameterObjectForFiles)
+    	{
+    		for(Field field : obj.getClass().getFields())
+    		{
+    			if(field.isAnnotationPresent(ParameterFile.class))
+    			{
+    			   if(!field.isAnnotationPresent(Parameter.class))
+    			   {
+    				   throw new ParameterException("@ParameterFile annotation can only occur with @Parameter annotation");
+    			   } else if(!File.class.isAssignableFrom(field.getType()))
+    			   {
+    				   throw new ParameterException("@ParameterFile annotation can only occur with @Parameter's of type File");   
+    			   } else
+    			   {
+    				   Parameter parameter = field.getAnnotation(Parameter.class);
+    				   String name = "Parameter has no name?";
+    				   if(parameter.names().length > 0)
+    				   {
+    						   name = parameter.names()[0];	   
+    				   }
+    				   
+    				   p("Adding ParameterFile Field " + name);
+       				this.m_parameterFileOptions.put(field,  obj);
+    			   }
+    			   
+    			}
+    		}
+    	}
+    } catch(IllegalAccessException e)
+    {
+    	throw new ParameterException(e);
+    }
   }
 
+  
+  private List<Object> m_parameterObjectForFiles = Lists.newArrayList();
+
+  private Set<Field> m_parsedParameterFiles = Sets.newHashSet();
+  
+  /**
+	 * Scans an object for delegates and recursively adds it to the list of objects found
+	 * 
+	 * Note: I assume a Delegate can only appear once 
+	 * 
+	 * 
+	 * @param optionObjectToScan object to scan for <code>@ParameterDelegates</code>
+	 * 
+	 * @throws IllegalAccessException if we cannot access a field (all option objects should have public fields)
+	 */
+	public void getAllDelegates(Object objectToScan)
+			throws IllegalAccessException {
+		for (Field field : objectToScan.getClass().getFields()) {
+			if (field.isAnnotationPresent(ParametersDelegate.class)) {
+				m_parameterObjectForFiles.add(field.get(objectToScan));
+				getAllDelegates(field.get(objectToScan));
+			}
+		}
+
+	}
+	
   /**
    * Sets the {@link ResourceBundle} to use for looking up descriptions.
    * Set this to <code>null</code> to use description text directly.
@@ -271,6 +350,7 @@ public class JCommander {
     if (m_descriptions == null) createDescriptions();
     initializeDefaultValues();
     parseValues(expandArgs(args));
+    
     if (validate) validateOptions();
   }
 
@@ -658,7 +738,13 @@ public class JCommander {
   /**
    * Main method that parses the values and initializes the fields accordingly.
    */
-  private void parseValues(String[] args) {
+  
+  private void parseValues(String[] args)
+  {
+	  parseValues(args, false, false);
+  }
+  
+  private void parseValues(String[] args, boolean treatBooleansAsArityOne, boolean skipAlreadyAssigned) {
     // This boolean becomes true if we encounter a command, which indicates we need
     // to stop parsing (the parsing of the command will be done in a sub JCommander
     // object)
@@ -700,11 +786,11 @@ public class JCommander {
               // Boolean, set to true as soon as we see it, unless it specified
               // an arity of 1, in which case we need to read the next value
               if ((fieldType == boolean.class || fieldType == Boolean.class)
-                  && pd.getParameter().arity() == -1) {
+                  && pd.getParameter().arity() == -1 && !treatBooleansAsArityOne) {
                 pd.addValue("true");
                 m_requiredFields.remove(pd.getParameterized());
               } else {
-                increment = processFixedArity(args, i, pd, fieldType);
+            	  increment = processFixedArity(args, i, pd, fieldType, skipAlreadyAssigned);
               }
             }
           }
@@ -764,10 +850,116 @@ public class JCommander {
         m_fields.get(parameterDescription.getParameterized()).setAssigned(true);
       }
     }
-
+    
+    /**
+     * Scan for @ParameterFile annotations on objects and delegates
+     * for each annotation found convert the file into a String[] and call
+     * parseValues()
+     */
+     for(Entry<Field, Object> ent : m_parameterFileOptions.entrySet())
+     {
+    	 try {
+    	    	
+	    	Field field  = ent.getKey();
+	    	Object obj = ent.getValue();
+	    	 
+	    	
+	    	if(m_parsedParameterFiles.contains(field)) continue;
+	    	File parameterFile = (File) field.get(obj);
+	    	
+	    	if(parameterFile == null) continue;
+	    	
+	    	if(!parameterFile.exists())
+	    	{
+	    		throw new ParameterException("Parameter File does not exist: " + parameterFile.getName());
+	    	}
+	    	
+			if(!parameterFile.canRead())
+			{
+				throw new ParameterException("Parameter File is not readable: " + parameterFile.getName());
+			}
+	    	
+			String[] paramFileContents = parseParameterFile(parameterFile);
+			m_parsedParameterFiles.add(field);
+			parseValues(paramFileContents, true, true);
+			
+    	 } catch(ParameterException e)
+    	 {
+			throw e;
+    	 } catch (Exception e) {
+			throw new ParameterException(e);
+    	 }
+    	 
+    	 
+    	 
+    	 
+    	 
+     }
+    
+   
+    
   }
 
-  private class DefaultVariableArity implements IVariableArity {
+  
+  /**
+   * Converts a ParameterFile into a String[] array	
+   * @param parameterFile 	file to parse
+   * @return	String[] of arguments in correct form
+   */
+  private String[] parseParameterFile(File parameterFile) {
+	Properties p = new Properties();
+	
+	try {
+		FileInputStream inStream = null;
+		try { 
+		Map<String, List<String>> arguments = Maps.newLinkedHashMap();
+		inStream = new FileInputStream(parameterFile);
+		p.load(inStream);
+		inStream.close();
+		for(Entry<Object, Object> obj : p.entrySet())
+		{
+			String name = obj.getKey().toString();	
+			String value = obj.getValue().toString();
+			List<String> values = arguments.get(name);
+			if(values == null)
+			{
+				values = Lists.newArrayList();
+				arguments.put(name, values);
+			}
+			values.add(value);
+		}
+		
+		//I didn't use the List.newArrayList() here because it returns a List and not ArrayList, which was annoying since I need 
+		//ArrayList<String> list = (ArrayList<String>) (ArrayList) Lists.newArrayList()
+		//to get it to compile 
+		ArrayList<String> list =  new ArrayList<String>();
+		
+		for(Entry<String,List<String>> entry : arguments.entrySet())
+		{
+			list.add("--" + entry.getKey());
+			for(String value : entry.getValue())
+			{
+				list.add(value);
+			}
+		}
+		
+		String[] values = new String[list.size()];
+		return list.toArray(values);
+		} finally  
+		{
+			if(inStream != null) inStream.close();
+		}
+		
+		
+	} catch (IOException e) {
+		throw new ParameterException(e);
+	}
+	
+}
+
+
+
+private class DefaultVariableArity implements IVariableArity {
 
     @Override
     public int processVariableArity(String optionName, String[] options) {
@@ -803,18 +995,24 @@ public class JCommander {
     return result;
   }
 
+
   private int processFixedArity(String[] args, int index, ParameterDescription pd,
-      Class<?> fieldType) {
+	      Class<?> fieldType, int arity)
+  {
+	  return processFixedArity(args, index, pd, fieldType, arity,  false);
+  }
+  private int processFixedArity(String[] args, int index, ParameterDescription pd,
+      Class<?> fieldType, boolean skipAlreadyAssignedParameters) {
     // Regular parameter, use the arity to tell use how many values
     // we need to consume
     int arity = pd.getParameter().arity();
     int n = (arity != -1 ? arity : 1);
 
-    return processFixedArity(args, index, pd, fieldType, n);
+    return processFixedArity(args, index, pd, fieldType, n, skipAlreadyAssignedParameters);
   }
 
   private int processFixedArity(String[] args, int originalIndex, ParameterDescription pd,
-                                Class<?> fieldType, int arity) {
+                                Class<?> fieldType, int arity, boolean skipAlreadyAssignedParameters) {
     int index = originalIndex;
     String arg = args[index];
     // Special case for boolean parameters of arity 0
@@ -828,8 +1026,15 @@ public class JCommander {
 
       if (index + arity < args.length) {
         for (int j = 1; j <= arity; j++) {
-          pd.addValue(trim(args[index + j + offset]));
-          m_requiredFields.remove(pd.getParameterized());
+          if(m_fields.get(pd.getParameterized()).isAssigned() && skipAlreadyAssignedParameters)
+          {
+        	  p("Field is already assigned " + pd.getLongestName());
+          } else
+          {
+              pd.addValue(trim(args[index + j + offset]));
+              m_requiredFields.remove(pd.getParameterized());
+
+          }
         }
         index += arity + offset;
       } else {
