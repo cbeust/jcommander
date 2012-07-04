@@ -105,4 +105,8 @@ public class WrappedParameter {
     return m_dynamicParameter != null ? m_dynamicParameter.assignment() : "";
   }
 
+  public boolean isHelp() {
+    return m_parameter != null && m_parameter.help();
+  }
+
 }

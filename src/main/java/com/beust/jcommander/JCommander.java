@@ -146,6 +146,8 @@ public class JCommander {
       };
 
   private int m_columnSize = 79;
+
+  private boolean m_helpWasSpecified;
   
   private static Console m_console;
 
@@ -299,6 +301,11 @@ public class JCommander {
    * Make sure that all the required parameters have received a value.
    */
   private void validateOptions() {
+    // No validation if we found a help parameter
+    if (m_helpWasSpecified) {
+      return;
+    }
+
     if (! m_requiredFields.isEmpty()) {
       StringBuilder missingFields = new StringBuilder();
       for (ParameterDescription pd : m_requiredFields.values()) {
@@ -705,6 +712,10 @@ public class JCommander {
                 m_requiredFields.remove(pd.getParameterized());
               } else {
                 increment = processFixedArity(args, i, pd, fieldType);
+              }
+              // If it's a help option, remember for later
+              if (pd.isHelp()) {
+                m_helpWasSpecified = true;
               }
             }
           }

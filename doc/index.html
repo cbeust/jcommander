@@ -560,6 +560,17 @@ JCommander jc = new JCommander(new Args());
 jc.setDefaultProvider(DEFAULT_PROVIDER);
 </pre>
 
+<h2><a class="section" name="Help_parameter">Help parameter</a></h2>
+
+If one of your parameters is used to display some help or usage, you need use the <tt>help</tt> attribute:
+
+<pre class="brush: java">
+  @Parameter(names = "--help", help = true)
+  private boolean help;
+</pre>
+
+If you omit this boolean, JCommander will instead issue an error message when it tries to validate your command and it finds that you didn't specify some of the required parameters.
+
 <h2><a class="section" name="Complex">More complex syntaxes (commands)</a></h2>
 
 Complex tools such as <tt>git</tt> or <tt>svn</tt> understand a whole set of commands, each of which with their own specific syntax:

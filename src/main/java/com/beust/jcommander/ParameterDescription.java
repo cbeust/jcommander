@@ -345,4 +345,8 @@ public class ParameterDescription {
   public boolean isDynamicParameter() {
     return m_dynamicParameterAnnotation != null;
   }
+
+  public boolean isHelp() {
+    return m_wrappedParameter.isHelp();
+  }
 }

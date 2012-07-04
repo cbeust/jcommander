@@ -2,6 +2,7 @@ Current
 
 Added: IValueValidator to validate parameter values (typed) as oppoed to IParameterValidator which validates strings
 Added: echoInput, used when password=true to echo the characters (Jason Wheeler)
+Added: @Parameter(help = true)
 Fixed: wasn't handling parameters that start with " but don't end with one correctly
 Fixed: if using a different option prefix, unknown option are mistakenly reported as "no main parameter defined" (kurmasz)
 Fixed: 113: getCommandDescription() returns the description of the main parameter instead of that of the command

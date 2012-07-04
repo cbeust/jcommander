@@ -822,9 +822,24 @@ public class JCommanderTest {
     Assert.assertEquals(args.date, new SimpleDateFormat("yyyy-MM-dd").parse("2011-10-26"));
   }
 
+  public void verifyHelp() {
+    class Arg {
+      @Parameter(names = "--help", help = true)
+      public boolean help = false;
+
+      @Parameter(names = "file", required = true)
+      public String file;
+    }
+    Arg arg = new Arg();
+    String[] argv = { "--help" };
+    new JCommander(arg, argv);
+
+    Assert.assertTrue(arg.help);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().arityStringsSetter();
+    new JCommanderTest().verifyHelp();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

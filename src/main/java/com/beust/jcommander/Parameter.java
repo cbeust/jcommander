@@ -114,4 +114,9 @@ public @interface Parameter {
    */
   boolean echoInput() default false;
 
+  /**
+   * If true, this parameter is for help. If such a parameter is specified,
+   * required parameters are no longer checked for their presence.
+   */
+  boolean help() default false;
 }
