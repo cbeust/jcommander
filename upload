@@ -1,4 +1,4 @@
-scp doc/index.html  target/jcommander-1.7.jar beust.com@beust.com:domains/jcommander.org/html
+scp doc/index.html  target/jcommander-1.27.jar beust.com@beust.com:domains/jcommander.org/html
 mvn javadoc:javadoc
 scp -r target/site/apidocs beust.com@beust.com:domains/jcommander.org/html
 
