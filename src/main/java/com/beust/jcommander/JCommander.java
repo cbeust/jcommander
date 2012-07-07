@@ -27,6 +27,7 @@ import com.beust.jcommander.internal.DefaultConverterFactory;
 import com.beust.jcommander.internal.JDK6Console;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Nullable;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -48,8 +49,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-
-
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
  * all the annotated fields, parse the command line and assign the fields with the correct
@@ -60,7 +59,7 @@ import java.util.ResourceBundle;
  * or an instance of Iterable. In the case of an array or Iterable, JCommander will collect
  * the \@Parameter annotations from all the objects passed in parameter.
  *
- * @author cbeust
+ * @author Cedric Beust <cedric@beust.com>
  */
 public class JCommander {
   public static final String DEBUG_PROPERTY = "jcommander.debug";
@@ -104,7 +103,7 @@ public class JCommander {
   private Map<Parameterized, ParameterDescription> m_requiredFields = Maps.newHashMap();
 
   /**
-   * A map of all the parameterized fields/methods/
+   * A map of all the parameterized fields/methods.
    */
   private Map<Parameterized, ParameterDescription> m_fields = Maps.newHashMap();
 
@@ -119,6 +118,7 @@ public class JCommander {
    * List of commands and their instance.
    */
   private Map<ProgramName, JCommander> m_commands = Maps.newLinkedHashMap();
+
   /**
    * Alias database for reverse lookup
    */
@@ -178,7 +178,7 @@ public class JCommander {
    * @param object The arg object expected to contain {@link Parameter} annotations.
    * @param bundle The bundle to use for the descriptions. Can be null.
    */
-  public JCommander(Object object, ResourceBundle bundle) {
+  public JCommander(Object object, @Nullable ResourceBundle bundle) {
     addObject(object);
     setDescriptionsBundle(bundle);
   }
@@ -1188,11 +1188,11 @@ public class JCommander {
   }
 
   /**
-   * @param field The field
    * @param type The type of the actual parameter
    * @param value The value to convert
    */
-  public Object convertValue(Parameterized parameterized, Class type, String value) {
+  public Object convertValue(Parameterized parameterized, Class type,
+      String value) {
     Parameter annotation = parameterized.getParameter();
 
     // Do nothing if it's a @DynamicParameter
@@ -1313,9 +1313,11 @@ public class JCommander {
 
     IStringConverter<?> result = stringCtor != null
         ? stringCtor.newInstance(optionName)
-        : ctor.newInstance();
+        : (ctor != null
+            ? ctor.newInstance()
+            : null);
 
-        return result;
+    return result;
   }
 
   /**
@@ -1430,6 +1432,9 @@ public class JCommander {
     return jc;
   }
 
+  /**
+   * Encapsulation of either a main application or an individual command.
+   */
   private static final class ProgramName {
     private final String m_name;
     private final List<String> m_aliases;
