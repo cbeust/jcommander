@@ -178,7 +178,12 @@ public class Parameterized {
     } catch (IllegalAccessException ex) {
       throw new ParameterException(ex);
     } catch (InvocationTargetException ex) {
-      throw new ParameterException(ex);
+      // If a ParameterException was thrown, don't wrap it into another one
+      if (ex.getTargetException() instanceof ParameterException) {
+        throw (ParameterException) ex.getTargetException();
+      } else {
+        throw new ParameterException(ex);
+      }
     }
   }
 

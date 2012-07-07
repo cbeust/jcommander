@@ -837,9 +837,26 @@ public class JCommanderTest {
     Assert.assertTrue(arg.help);
   }
 
+  public void setterThatThrows() {
+    class Arg {
+      @Parameter(names = "--host")
+      public void setHost(String host) {
+        throw new ParameterException("Illegal host");
+      }
+    }
+    boolean passed = false;
+    try {
+      new JCommander(new Arg(), new String[] { "--host", "host" });
+    } catch(ParameterException ex) {
+      Assert.assertEquals(ex.getCause(), null);
+      passed = true;
+    }
+    Assert.assertTrue(passed, "Should have thrown an exception");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().verifyHelp();
+    new JCommanderTest().setterThatThrows();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
