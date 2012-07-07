@@ -1,6 +1,9 @@
 Current
 
-Added: IValueValidator to validate parameter values (typed) as oppoed to IParameterValidator which validates strings
+
+1.27
+1012/08/05
+Added: IValueValidator to validate parameter values (typed) as opposed to IParameterValidator which validates strings
 Added: echoInput, used when password=true to echo the characters (Jason Wheeler)
 Added: @Parameter(help = true)
 Fixed: wasn't handling parameters that start with " but don't end with one correctly
