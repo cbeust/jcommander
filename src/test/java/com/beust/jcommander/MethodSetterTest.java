@@ -59,8 +59,27 @@ public class MethodSetterTest {
     Assert.assertTrue(passed, "Should have thrown an exception");
   }
 
+  public void getterReturningNonString() {
+    class Arg {
+      private Integer port;
+
+      @Parameter(names = "--port")
+      public void setPort(String port) {
+        this.port = Integer.parseInt(port);
+      }
+
+      public Integer getPort() {
+        return port;
+      }
+    }
+    Arg arg = new Arg();
+    new JCommander(arg, new String[] { "--port", "42" });
+
+    Assert.assertEquals(arg.port, new Integer(42));
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new MethodSetterTest().arityStringsSetter();
+    new MethodSetterTest().getterReturningNonString();
   }
 }
