@@ -117,7 +117,22 @@ public class Parameterized {
     } catch (SecurityException e) {
       throw new ParameterException(e);
     } catch (NoSuchMethodException e) {
-      return null;
+      // Try to find a field
+      String name = m_method.getName();
+      String fieldName = Character.toLowerCase(name.charAt(3)) + name.substring(4);
+      Object result = null;
+      try {
+        Field field = m_method.getDeclaringClass().getDeclaredField(fieldName);
+        if (field != null) {
+          field.setAccessible(true);
+          result = field.get(object);
+        }
+      } catch(NoSuchFieldException ex) {
+        // ignore
+      } catch(IllegalAccessException ex) {
+        // ignore
+      }
+      return result;
     } catch (IllegalArgumentException e) {
       throw new ParameterException(e);
     } catch (IllegalAccessException e) {

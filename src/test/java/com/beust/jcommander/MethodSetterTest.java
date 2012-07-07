@@ -78,8 +78,23 @@ public class MethodSetterTest {
     Assert.assertEquals(arg.port, new Integer(42));
   }
 
+  public void noGetterButWithField() {
+    class Arg {
+      private Integer port = 43;
+
+      @Parameter(names = "--port")
+      public void setPort(String port) {
+        this.port = Integer.parseInt(port);
+      }
+    }
+    Arg arg = new Arg();
+    JCommander jc = new JCommander(arg, new String[] { "--port", "42" });
+    ParameterDescription pd = jc.getParameters().get(0);
+    Assert.assertEquals(pd.getDefault(), 43);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new MethodSetterTest().getterReturningNonString();
+    new MethodSetterTest().noGetterButWithField();
   }
 }
