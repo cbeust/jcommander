@@ -117,7 +117,7 @@ public class Parameterized {
     } catch (SecurityException e) {
       throw new ParameterException(e);
     } catch (NoSuchMethodException e) {
-      throw new ParameterException(e);
+      return null;
     } catch (IllegalArgumentException e) {
       throw new ParameterException(e);
     } catch (IllegalAccessException e) {
