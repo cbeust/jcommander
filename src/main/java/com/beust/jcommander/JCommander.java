@@ -791,6 +791,8 @@ public class JCommander {
   }
   private final IVariableArity DEFAULT_VARIABLE_ARITY = new DefaultVariableArity();
 
+  private int m_verbose = 0;
+
   /**
    * @return the number of options that were processed.
    */
@@ -1152,7 +1154,7 @@ public class JCommander {
   }
 
   private void p(String string) {
-    if (System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
+    if (m_verbose > 0 || System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
       getConsole().println("[JCommander] " + string);
     }
   }
@@ -1492,6 +1494,10 @@ public class JCommander {
       return getDisplayName();
       
     }
+  }
+
+  public void setVerbose(int verbose) {
+    m_verbose = verbose;
   }
 }
 
