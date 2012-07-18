@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+  
+<suite name="JCommander" verbose="2">
+
+  <test name="JCommander tests">
+    <classes>
+      <class name="com.beust.jcommander.PositiveIntegerTest">
+      </class>
+    </classes>
+  </test>
+
+</suite>
+
