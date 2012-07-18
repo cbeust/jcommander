@@ -1,5 +1,6 @@
 Current
 
+Fixed: Parameters with a single double quote were not working properly
 
 1.27
 1012/08/05

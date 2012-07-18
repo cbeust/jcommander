@@ -497,7 +497,7 @@ public class JCommander {
    */
   private static String trim(String string) {
     String result = string.trim();
-    if (result.startsWith("\"") && result.endsWith("\"")) {
+    if (result.startsWith("\"") && result.endsWith("\"") && result.length() > 1) {
       result = result.substring(1, result.length() - 1);
     }
     return result;

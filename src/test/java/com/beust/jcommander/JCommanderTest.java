@@ -805,6 +805,48 @@ public class JCommanderTest {
     Assert.assertTrue(arg.help);
   }
 
+  public void helpTest() {
+    class Arg {
+      @Parameter(names = { "?", "-help", "--help" }, description = "Shows help", help = true)
+      private boolean help = false;
+    }
+    Arg arg = new Arg();
+    JCommander jc = new JCommander(arg);
+    jc.parse(new String[] { "-help" });
+    System.out.println(arg.help);
+  }
+
+  @Test(enabled = false, description = "Should only be enable once multiple parameters are allowed")
+  public void duplicateParameterNames() {
+    class ArgBase {
+      @Parameter(names = { "-host" })
+      protected String host;
+    }
+
+    class Arg1 extends ArgBase {}
+    Arg1 arg1 = new Arg1();
+
+    class Arg2 extends ArgBase {}
+    Arg2 arg2 = new Arg2();
+
+    JCommander jc = new JCommander(new Object[] { arg1, arg2});
+    jc.parse(new String[] { "-host", "foo" });
+    Assert.assertEquals(arg1.host, "foo");
+    Assert.assertEquals(arg2.host, "foo");
+  }
+
+  public void parameterWithOneDoubleQuote() {
+    @Parameters(separators = "=")
+    class Arg {
+  
+      @Parameter(names = { "-p", "--param" })
+      private String param;
+    }
+
+    JCommander jc = new JCommander(new MyClass());
+    jc.parse("-p=\"");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
     new JCommanderTest().verifyHelp();
