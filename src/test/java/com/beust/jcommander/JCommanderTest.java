@@ -847,9 +847,20 @@ public class JCommanderTest {
     jc.parse("-p=\"");
   }
 
+  public void emptyStringAsDefault() {
+    class Arg {
+      @Parameter(names = "-x")
+      String s = "";
+    }
+    Arg a = new Arg();
+    StringBuilder sb = new StringBuilder();
+    new JCommander(a).usage(sb);
+    Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().verifyHelp();
+    new JCommanderTest().emptyStringAsDefault();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

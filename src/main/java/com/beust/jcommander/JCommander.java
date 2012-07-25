@@ -1071,9 +1071,12 @@ public class JCommander {
                 + "key" + parameter.getAssignment()
                 + "value");
       }
-      if (def != null && ! "".equals(def)) {
+      if (def != null) {
+        String displayedDef = Strings.isStringEmpty(def.toString())
+            ? "<empty string>"
+            : def.toString();
         out.append("\n" + spaces(indentCount + 1))
-            .append("Default: " + (parameter.password()?"********":def));
+            .append("Default: " + (parameter.password()?"********" : displayedDef));
       }
       out.append("\n");
     }
