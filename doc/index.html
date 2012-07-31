@@ -100,6 +100,22 @@ private boolean debug = false;
 
 Such a parameter does not require any additional parameter on the command line and if it's detected during parsing, the corresponding field will be set to <tt>true</tt>.
 
+<p>
+
+  If you want to define a boolean parameter that's <tt>true</tt> by default, you can declare it as having an arity of 1. Users will then have to specify the value they want explicitly:
+
+  <pre class="brush: java">
+    @Parameter(names = "-debug", description = "Debug mode", arity = 1)
+    private boolean debug = true;
+  </pre>
+
+  Invoke with either of:
+
+  <pre class="brush: plain">
+    program -debug true
+    program -debug false
+  </pre>
+
 <h4>String, Integer, Long</h4>
 
 When a <tt>Parameter</tt> annotation is found on a field of type <tt>String</tt>, <tt>Integer</tt>, <tt>int</tt>, <tt>Long</tt> or <tt>long</tt>, JCommander will parse the following parameter and it will attempt to cast it to the right type:
