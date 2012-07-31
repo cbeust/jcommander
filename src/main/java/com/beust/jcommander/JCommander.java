@@ -1066,7 +1066,7 @@ public class JCommander {
       wrapDescription(out, indentCount, pd.getDescription());
       Object def = pd.getDefault();
       if (pd.isDynamicParameter()) {
-        out.append("\n" + spaces(indentCount + 1))
+        out.append("\n" + s(indentCount + 1))
             .append("Syntax: " + parameter.names()[0]
                 + "key" + parameter.getAssignment()
                 + "value");
@@ -1075,7 +1075,7 @@ public class JCommander {
         String displayedDef = Strings.isStringEmpty(def.toString())
             ? "<empty string>"
             : def.toString();
-        out.append("\n" + spaces(indentCount + 1))
+        out.append("\n" + s(indentCount + 1))
             .append("Default: " + (parameter.password()?"********" : displayedDef));
       }
       out.append("\n");
@@ -1127,17 +1127,11 @@ public class JCommander {
         out.append(" ").append(word);
         current += word.length() + 1;
       } else {
-        out.append("\n").append(spaces(indent + 1)).append(word);
+        out.append("\n").append(s(indent + 1)).append(word);
         current = indent;
       }
       i++;
     }
-  }
-
-  private String spaces(int indent) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < indent; i++) sb.append(" ");
-    return sb.toString();
   }
 
   /**
