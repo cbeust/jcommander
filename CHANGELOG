@@ -1,5 +1,6 @@
 Current
 
+Fixed: The description of commands is now displayed on the next line and indented.
 Fixed: Empty string defaults now displayed as "<empty string>" in the usage
 Fixed: Bugs with the PositiveInteger validator
 Fixed: Parameters with a single double quote were not working properly

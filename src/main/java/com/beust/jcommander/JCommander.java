@@ -1053,16 +1053,16 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
+    int descriptionIndent = 6;
     if (sorted.size() > 0) out.append(indent).append("\n").append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
-      int l = pd.getNames().length();
-      int spaceCount = longestName - l;
-      int start = out.length();
       WrappedParameter parameter = pd.getParameter();
       out.append(indent).append("  "
           + (parameter.required() ? "* " : "  ")
-          + pd.getNames() + s(spaceCount));
-      int indentCount = out.length() - start;
+          + pd.getNames()
+          + "\n"
+          + indent + s(descriptionIndent));
+      int indentCount = indent.length() + descriptionIndent;
       wrapDescription(out, indentCount, pd.getDescription());
       Object def = pd.getDefault();
       if (pd.isDynamicParameter()) {
