@@ -41,7 +41,8 @@ public class ArgsEnum {
     String[] argv = { "-choice", "ONE"};
     JCommander jc = new JCommander(args, argv);
     jc.usage();
-    Assert.assertEquals(jc.getParameters().get(0).getDescription(), "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
+    Assert.assertEquals(jc.getParameters().get(0).getDescription(),
+        "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
   }
 
 }
