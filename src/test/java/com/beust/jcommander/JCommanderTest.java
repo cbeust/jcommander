@@ -566,7 +566,8 @@ public class JCommanderTest {
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
     
-    Assert.assertEquals(jc.getParameters().get(0).getDescription(), "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
+    Assert.assertEquals(jc.getParameters().get(0).getDescription(),
+        "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
     
   }
 
@@ -813,7 +814,7 @@ public class JCommanderTest {
     Arg arg = new Arg();
     JCommander jc = new JCommander(arg);
     jc.parse(new String[] { "-help" });
-    System.out.println(arg.help);
+//    System.out.println("helpTest:" + arg.help);
   }
 
   @Test(enabled = false, description = "Should only be enable once multiple parameters are allowed")
@@ -860,7 +861,7 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().emptyStringAsDefault();
+    new JCommanderTest().parameterWithOneDoubleQuote();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
