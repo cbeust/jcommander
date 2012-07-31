@@ -682,7 +682,7 @@ public class JCommander {
         //
         // Option
         //
-        ParameterDescription pd = m_descriptions.get(a);
+        ParameterDescription pd = findParameterDescription(a);
 
         if (pd != null) {
           if (pd.getParameter().password()) {
@@ -792,6 +792,9 @@ public class JCommander {
   private final IVariableArity DEFAULT_VARIABLE_ARITY = new DefaultVariableArity();
 
   private int m_verbose = 0;
+
+  private boolean m_caseSensitiveOptions = true;
+  private boolean m_caseSensitiveCommands = true;
 
   /**
    * @return the number of options that were processed.
@@ -1412,15 +1415,49 @@ public class JCommander {
     return m_objects;
   }
 
+  private <V> V findCaseSensitiveMap(Map<String, V> map, String name) {
+    if (m_caseSensitiveOptions) {
+      return map.get(name);
+    } else {
+      for (String c : map.keySet()) {
+        if (c.equalsIgnoreCase(name)) {
+          return map.get(c);
+        }
+      }
+    }
+    return null;
+  }
+
+  private ParameterDescription findParameterDescription(String arg) {
+    return findCaseSensitiveMap(m_descriptions, arg);
+  }
+
+  private JCommander findCommand(ProgramName name) {
+    if (! m_caseSensitiveCommands) {
+      return m_commands.get(name);
+    } else {
+      for (ProgramName c : m_commands.keySet()) {
+        if (c.getName().equalsIgnoreCase(name.getName())) {
+          return m_commands.get(c);
+        }
+      }
+    }
+    return null;
+  }
+
+  private ProgramName findProgramName(String name) {
+    return findCaseSensitiveMap(aliasMap, name);
+  }
+
   /*
   * Reverse lookup JCommand object by command's name or its alias
   */
   private JCommander findCommandByAlias(String commandOrAlias) {
-    ProgramName progName = aliasMap.get(commandOrAlias);
+    ProgramName progName = findProgramName(commandOrAlias);
     if (progName == null) {
       return null;
     }
-    JCommander jc = m_commands.get(progName);
+    JCommander jc = findCommand(progName);
     if (jc == null) {
       throw new IllegalStateException(
               "There appears to be inconsistency in the internal command database. " +
@@ -1501,5 +1538,13 @@ public class JCommander {
   public void setVerbose(int verbose) {
     m_verbose = verbose;
   }
+
+  public void setCaseSensitiveOptions(boolean b) {
+    m_caseSensitiveOptions = b;
+  }
+
+//  public void setCaseSensitiveCommands(boolean b) {
+//    m_caseSensitiveCommands = b;
+//  }
 }
 

@@ -859,9 +859,34 @@ public class JCommanderTest {
     Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
   }
 
+  public void caseInsensitiveOption() {
+    class Arg {
+  
+      @Parameter(names = { "-p", "--param" })
+      private String param;
+    }
+    Arg a = new Arg();
+    JCommander jc = new JCommander(a);
+    jc.setCaseSensitiveOptions(false);
+    jc.parse(new String[] { "--PARAM", "foo" });
+    Assert.assertEquals(a.param, "foo");
+  }
+
+  public void caseInsensitiveCommand() {
+    BaseArgs a = new BaseArgs();
+    ConfigureArgs conf = new ConfigureArgs();
+    JCommander jc = new JCommander(a);
+    jc.addCommand(conf);
+    jc.setCaseSensitiveOptions(false);
+//    jc.setCaseSensitiveCommands(false);
+    jc.parse("--CONFIGURE");
+    String command = jc.getParsedCommand();
+    Assert.assertEquals(command, "--configure");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().parameterWithOneDoubleQuote();
+    new JCommanderTest().caseInsensitiveCommand();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
