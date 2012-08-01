@@ -15,6 +15,7 @@
       <class name="com.beust.jcommander.VariableArityTest" />
       <class name="com.beust.jcommander.MethodSetterTest" />
       <class name="com.beust.jcommander.PositiveIntegerTest" />
+      <class name="com.beust.jcommander.FinderTest" />
     </classes>
   </test>
 

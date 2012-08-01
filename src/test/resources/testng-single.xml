@@ -4,7 +4,7 @@
 
   <test name="JCommander tests">
     <classes>
-      <class name="com.beust.jcommander.PositiveIntegerTest">
+      <class name="com.beust.jcommander.FinderTest">
       </class>
     </classes>
   </test>

@@ -794,7 +794,6 @@ public class JCommander {
   private int m_verbose = 0;
 
   private boolean m_caseSensitiveOptions = true;
-  private boolean m_caseSensitiveCommands = true;
   private boolean m_allowAbbreviatedOptions = false;
 
   /**
@@ -1464,7 +1463,7 @@ public class JCommander {
   }
 
   private JCommander findCommand(ProgramName name) {
-    if (! m_caseSensitiveCommands) {
+    if (! m_caseSensitiveOptions) {
       return m_commands.get(name);
     } else {
       for (ProgramName c : m_commands.keySet()) {
