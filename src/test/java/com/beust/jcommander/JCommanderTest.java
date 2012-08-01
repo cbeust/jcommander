@@ -861,7 +861,7 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-//    new JCommanderTest().ambiguousAbbreviatedOptionsCaseInsensitive();
+    new JCommanderTest().multiObjectsWithDuplicatesFail();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

@@ -18,6 +18,7 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.FuzzyMap.IKey;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.converters.StringConverter;
@@ -67,7 +68,7 @@ public class JCommander {
   /**
    * A map to look up parameter description per option name.
    */
-  private Map<String, ParameterDescription> m_descriptions;
+  private Map<IKey, ParameterDescription> m_descriptions;
 
   /**
    * The objects that contain fields annotated with @Parameter.
@@ -122,7 +123,7 @@ public class JCommander {
   /**
    * Alias database for reverse lookup
    */
-  private Map<String, ProgramName> aliasMap = Maps.newLinkedHashMap();
+  private Map<IKey, ProgramName> aliasMap = Maps.newLinkedHashMap();
 
   /**
    * The name of the command after the parsing has run.
@@ -399,8 +400,8 @@ public class JCommander {
   }
 
   private ParameterDescription getPrefixDescriptionFor(String arg) {
-    for (Map.Entry<String, ParameterDescription> es : m_descriptions.entrySet()) {
-      if (arg.startsWith(es.getKey())) return es.getValue();
+    for (Map.Entry<IKey, ParameterDescription> es : m_descriptions.entrySet()) {
+      if (arg.startsWith(es.getKey().getName())) return es.getValue();
     }
 
     return null;
@@ -539,14 +540,14 @@ public class JCommander {
               new ParameterDescription(object, p, parameterized, m_bundle, this);
         } else {
           for (String name : p.names()) {
-            if (m_descriptions.containsKey(name)) {
+            if (m_descriptions.containsKey(new StringKey(name))) {
               throw new ParameterException("Found the option " + name + " multiple times");
             }
             p("Adding description for " + name);
             ParameterDescription pd =
                 new ParameterDescription(object, p, parameterized, m_bundle, this);
             m_fields.put(parameterized, pd);
-            m_descriptions.put(name, pd);
+            m_descriptions.put(new StringKey(name), pd);
 
             if (p.required()) m_requiredFields.put(parameterized, pd);
           }
@@ -574,7 +575,7 @@ public class JCommander {
           ParameterDescription pd =
               new ParameterDescription(object, dp, parameterized, m_bundle, this);
           m_fields.put(parameterized, pd);
-          m_descriptions.put(name, pd);
+          m_descriptions.put(new StringKey(name), pd);
     
           if (dp.required()) m_requiredFields.put(parameterized, pd);
         }
@@ -1356,8 +1357,9 @@ public class JCommander {
     //Note: Name clash check is intentionally omitted to resemble the
     //     original behaviour of clashing commands.
     //     Aliases are, however, are strictly checked for name clashes.
-    aliasMap.put(name, progName);
-    for (String alias : aliases) {
+    aliasMap.put(new StringKey(name), progName);
+    for (String a : aliases) {
+      IKey alias = new StringKey(a);
       //omit pointless aliases to avoid name clash exception
       if (!alias.equals(name)) {
         ProgramName mappedName = aliasMap.get(alias);
@@ -1415,68 +1417,29 @@ public class JCommander {
     return m_objects;
   }
 
-  private <V> V findAbbreviatedOption(Map<String, V> map, String name, boolean caseSensitive) {
-    Map<String, V> results = Maps.newHashMap();
-    for (String c : map.keySet()) {
-      boolean match = (caseSensitive && c.startsWith(name))
-          || ((! caseSensitive) && c.toLowerCase().startsWith(name.toLowerCase()));
-      if (match) {
-        results.put(c, map.get(c));
-      }
-    }
-    V result;
-    if (results.size() > 1) {
-      throw new ParameterException("Ambiguous option: " + name
-          + " matches " + results.keySet());
-    } else if (results.size() == 1) {
-      result = results.values().iterator().next();
-    } else {
-      result = null;
-    }
-
-    return result;
-  }
-
-  private <V> V findCaseSensitiveMap(Map<String, V> map, String name) {
-    if (m_caseSensitiveOptions) {
-      if (m_allowAbbreviatedOptions) {
-        return findAbbreviatedOption(map, name, m_caseSensitiveOptions);
-      } else {
-        return map.get(name);
-      }
-    } else {
-      if (m_allowAbbreviatedOptions) {
-        return findAbbreviatedOption(map, name, m_caseSensitiveOptions);
-      } else {
-        for (String c : map.keySet()) {
-          if (c.equalsIgnoreCase(name)) {
-            return map.get(c);
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   private ParameterDescription findParameterDescription(String arg) {
-    return findCaseSensitiveMap(m_descriptions, arg);
+    return FuzzyMap.findInMap(m_descriptions, new StringKey(arg), m_caseSensitiveOptions,
+        m_allowAbbreviatedOptions);
   }
 
   private JCommander findCommand(ProgramName name) {
-    if (! m_caseSensitiveOptions) {
-      return m_commands.get(name);
-    } else {
-      for (ProgramName c : m_commands.keySet()) {
-        if (c.getName().equalsIgnoreCase(name.getName())) {
-          return m_commands.get(c);
-        }
-      }
-    }
-    return null;
+    return FuzzyMap.findInMap(m_commands, name,
+        m_caseSensitiveOptions, m_allowAbbreviatedOptions);
+//    if (! m_caseSensitiveOptions) {
+//      return m_commands.get(name);
+//    } else {
+//      for (ProgramName c : m_commands.keySet()) {
+//        if (c.getName().equalsIgnoreCase(name.getName())) {
+//          return m_commands.get(c);
+//        }
+//      }
+//    }
+//    return null;
   }
 
   private ProgramName findProgramName(String name) {
-    return findCaseSensitiveMap(aliasMap, name);
+    return FuzzyMap.findInMap(aliasMap, new StringKey(name),
+        m_caseSensitiveOptions, m_allowAbbreviatedOptions);
   }
 
   /*
@@ -1499,7 +1462,7 @@ public class JCommander {
   /**
    * Encapsulation of either a main application or an individual command.
    */
-  private static final class ProgramName {
+  private static final class ProgramName implements IKey {
     private final String m_name;
     private final List<String> m_aliases;
 
@@ -1508,6 +1471,7 @@ public class JCommander {
       m_aliases = aliases;
     }
 
+    @Override
     public String getName() {
       return m_name;
     }

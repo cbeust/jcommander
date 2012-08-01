@@ -4,7 +4,13 @@
 
   <test name="JCommander tests">
     <classes>
-      <class name="com.beust.jcommander.FinderTest">
+<!-- 
+      <class name="com.beust.jcommander.FinderTest" />
+-->
+      <class name="com.beust.jcommander.command.CommandAliasTest">
+        <methods>
+          <include name="clashingAliasesAreNotAllowed" />
+        </methods>
       </class>
     </classes>
   </test>
