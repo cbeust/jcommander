@@ -519,6 +519,21 @@ java Main -d /tmp
 java Main --outputDirectory /tmp
 </pre>
 
+<h2><a class="section" name="Other option configurations">Other option configurations</a></h2>
+
+You can configure how options are looked up in a few different ways:
+
+<ul>
+  <li><tt>JCommander#setCaseSensitiveOptions(boolean)</tt>: specify whether options are case sensitive. If you call this method with <tt>false</tt>, then <tt>"-param"</tt> and
+    <tt>"-PARAM"</tt> are considered equal.
+  </li>
+  <li><tt>JCommander#setAllowAbbreviatedOptions(boolean)</tt>: specify whether users can
+    pass abbreviated options. If you call this method with <tt>true</tt> then users
+    can pass <tt>"-par"</tt> to specify an option called <tt>-param</tt>. JCommander will
+    throw a <tt>ParameterException</tt> if the abbreviated name is ambiguous.
+  </li>
+</ul>
+
 <h2><a class="section" name="Required_and_optional">Required and optional parameters</a></h2>
 
 If some of your parameters are mandatory, you can use the
