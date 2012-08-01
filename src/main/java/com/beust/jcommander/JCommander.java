@@ -795,6 +795,7 @@ public class JCommander {
 
   private boolean m_caseSensitiveOptions = true;
   private boolean m_caseSensitiveCommands = true;
+  private boolean m_allowAbbreviatedOptions = false;
 
   /**
    * @return the number of options that were processed.
@@ -1415,13 +1416,43 @@ public class JCommander {
     return m_objects;
   }
 
+  private <V> V findAbbreviatedOption(Map<String, V> map, String name, boolean caseSensitive) {
+    Map<String, V> results = Maps.newHashMap();
+    for (String c : map.keySet()) {
+      boolean match = (caseSensitive && c.startsWith(name))
+          || ((! caseSensitive) && c.toLowerCase().startsWith(name.toLowerCase()));
+      if (match) {
+        results.put(c, map.get(c));
+      }
+    }
+    V result;
+    if (results.size() > 1) {
+      throw new ParameterException("Ambiguous option: " + name
+          + " matches " + results.keySet());
+    } else if (results.size() == 1) {
+      result = results.values().iterator().next();
+    } else {
+      result = null;
+    }
+
+    return result;
+  }
+
   private <V> V findCaseSensitiveMap(Map<String, V> map, String name) {
     if (m_caseSensitiveOptions) {
-      return map.get(name);
+      if (m_allowAbbreviatedOptions) {
+        return findAbbreviatedOption(map, name, m_caseSensitiveOptions);
+      } else {
+        return map.get(name);
+      }
     } else {
-      for (String c : map.keySet()) {
-        if (c.equalsIgnoreCase(name)) {
-          return map.get(c);
+      if (m_allowAbbreviatedOptions) {
+        return findAbbreviatedOption(map, name, m_caseSensitiveOptions);
+      } else {
+        for (String c : map.keySet()) {
+          if (c.equalsIgnoreCase(name)) {
+            return map.get(c);
+          }
         }
       }
     }
@@ -1541,6 +1572,10 @@ public class JCommander {
 
   public void setCaseSensitiveOptions(boolean b) {
     m_caseSensitiveOptions = b;
+  }
+
+  public void setAllowAbbreviatedOptions(boolean b) {
+    m_allowAbbreviatedOptions = b;
   }
 
 //  public void setCaseSensitiveCommands(boolean b) {
