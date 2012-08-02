@@ -859,9 +859,20 @@ public class JCommanderTest {
     Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
   }
 
+  public void spaces() {
+    class Arg {
+      @Parameter(names = "-rule", description = "rule")
+      private List<String> rules = new ArrayList<String>();
+    }
+    Arg a = new Arg();
+    StringBuilder sb = new StringBuilder();
+    new JCommander(a, "-rule", "some test");
+    Assert.assertEquals(a.rules, Arrays.asList("some test"));
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().multiObjectsWithDuplicatesFail();
+    new JCommanderTest().spaces();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
