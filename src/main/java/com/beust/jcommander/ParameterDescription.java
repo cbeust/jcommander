@@ -302,6 +302,8 @@ public class ParameterDescription {
       throw new ParameterException("Can't instantiate validator:" + e);
     } catch (IllegalAccessException e) {
       throw new ParameterException("Can't instantiate validator:" + e);
+    } catch(ParameterException ex) {
+      throw ex;
     } catch(Exception ex) {
       throw new ParameterException(ex);
     }
