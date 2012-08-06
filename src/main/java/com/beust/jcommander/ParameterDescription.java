@@ -192,7 +192,7 @@ public class ParameterDescription {
     return sb.toString();
   }
 
-  WrappedParameter getParameter() {
+  public WrappedParameter getParameter() {
     return m_wrappedParameter;
   }
 
