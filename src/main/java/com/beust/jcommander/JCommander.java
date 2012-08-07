@@ -745,7 +745,8 @@ public class JCommander {
               }
             }
 
-            ParameterDescription.validateParameter(m_mainParameterAnnotation.validateWith(),
+            ParameterDescription.validateParameter(m_mainParameterDescription,
+                m_mainParameterAnnotation.validateWith(),
                 "Default", value);
 
             m_mainParameterDescription.setAssigned(true);

@@ -839,11 +839,9 @@ public class JCommanderTest {
   public void parameterWithOneDoubleQuote() {
     @Parameters(separators = "=")
     class Arg {
-  
       @Parameter(names = { "-p", "--param" })
       private String param;
     }
-
     JCommander jc = new JCommander(new MyClass());
     jc.parse("-p=\"");
   }
@@ -865,14 +863,42 @@ public class JCommanderTest {
       private List<String> rules = new ArrayList<String>();
     }
     Arg a = new Arg();
-    StringBuilder sb = new StringBuilder();
     new JCommander(a, "-rule", "some test");
     Assert.assertEquals(a.rules, Arrays.asList("some test"));
   }
 
+  static class V2 implements IParameterValidator2 {
+    final static List<String> names =  Lists.newArrayList();
+    static boolean validateCalled = false;
+
+    @Override
+    public void validate(String name, String value) throws ParameterException {
+      validateCalled = true;
+    }
+
+    @Override
+    public void validate(String name, String value, ParameterDescription pd)
+        throws ParameterException {
+      names.addAll(Arrays.asList(pd.getParameter().names()));
+    }
+  }
+
+  public void validator2() {
+    class Arg {
+      @Parameter(names = { "-h", "--host" }, validateWith = V2.class)
+      String host;
+    }
+    Arg a = new Arg();
+    V2.names.clear();
+    V2.validateCalled = false;
+    new JCommander(a, "--host", "h");
+    Assert.assertEquals(V2.names, Arrays.asList(new String[] { "-h", "--host" }));
+    Assert.assertTrue(V2.validateCalled);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().spaces();
+    new JCommanderTest().parameterWithOneDoubleQuote();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

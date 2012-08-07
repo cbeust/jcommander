@@ -266,7 +266,7 @@ public class ParameterDescription {
   private void validateParameter(String name, String value) {
     Class<? extends IParameterValidator> validator = m_wrappedParameter.validateWith();
     if (validator != null) {
-      validateParameter(validator, name, value);
+      validateParameter(this, validator, name, value);
     }
   }
 
@@ -291,13 +291,18 @@ public class ParameterDescription {
     }
   }
 
-  public static void validateParameter(Class<? extends IParameterValidator> validator,
+  public static void validateParameter(ParameterDescription pd,
+      Class<? extends IParameterValidator> validator,
       String name, String value) {
     try {
       if (validator != NoValidator.class) {
         p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
       }
       validator.newInstance().validate(name, value);
+      if (IParameterValidator2.class.isAssignableFrom(validator)) {
+        IParameterValidator2 instance = (IParameterValidator2) validator.newInstance();
+        instance.validate(name, value, pd);
+      }
     } catch (InstantiationException e) {
       throw new ParameterException("Can't instantiate validator:" + e);
     } catch (IllegalAccessException e) {
