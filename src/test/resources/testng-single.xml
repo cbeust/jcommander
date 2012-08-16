@@ -7,10 +7,7 @@
 <!-- 
       <class name="com.beust.jcommander.FinderTest" />
 -->
-      <class name="com.beust.jcommander.command.CommandAliasTest">
-        <methods>
-          <include name="clashingAliasesAreNotAllowed" />
-        </methods>
+      <class name="com.beust.jcommander.CmdTest">
       </class>
     </classes>
   </test>

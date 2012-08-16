@@ -273,7 +273,7 @@ public class JCommander {
 
     if (m_descriptions == null) createDescriptions();
     initializeDefaultValues();
-    parseValues(expandArgs(args));
+    parseValues(expandArgs(args), validate);
     if (validate) validateOptions();
   }
 
@@ -666,7 +666,7 @@ public class JCommander {
   /**
    * Main method that parses the values and initializes the fields accordingly.
    */
-  private void parseValues(String[] args) {
+  private void parseValues(String[] args, boolean validate) {
     // This boolean becomes true if we encounter a command, which indicates we need
     // to stop parsing (the parsing of the command will be done in a sub JCommander
     // object)
@@ -756,15 +756,18 @@ public class JCommander {
             //
             // Command parsing
             //
-            if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
-            m_parsedCommand = jc.m_programName.m_name;
-            m_parsedAlias = arg; //preserve the original form
-
-            // Found a valid command, ask it to parse the remainder of the arguments.
-            // Setting the boolean commandParsed to true will force the current
-            // loop to end.
-            jc.parse(subArray(args, i + 1));
-            commandParsed = true;
+            if (jc == null && validate) {
+                throw new MissingCommandException("Expected a command, got " + arg);
+            } else if (jc != null){
+                m_parsedCommand = jc.m_programName.m_name;
+                m_parsedAlias = arg; //preserve the original form
+    
+                // Found a valid command, ask it to parse the remainder of the arguments.
+                // Setting the boolean commandParsed to true will force the current
+                // loop to end.
+                jc.parse(subArray(args, i + 1));
+                commandParsed = true;
+            }
           }
         }
       }
