@@ -18,6 +18,28 @@
 
 package com.beust.jcommander;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.TreeSet;
+
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args1Setter;
 import com.beust.jcommander.args.Args2;
@@ -52,30 +74,8 @@ import com.beust.jcommander.args.VariableArity;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
-
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-import org.testng.collections.Lists;
-import org.testng.collections.Maps;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TreeSet;
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
 
 @Test
 public class JCommanderTest {
@@ -891,9 +891,24 @@ public class JCommanderTest {
     Arg a = new Arg();
     V2.names.clear();
     V2.validateCalled = false;
-    new JCommander(a, "--host", "h");
+    JCommander jc = new JCommander(a, "--host", "h");
+    jc.setNoThrow(true);
     Assert.assertEquals(V2.names, Arrays.asList(new String[] { "-h", "--host" }));
     Assert.assertTrue(V2.validateCalled);
+  }
+
+  public void partialValidation() {
+    class Arg {
+      @Parameter(names = { "-h", "--host" })
+      String host;
+    }
+    Arg a = new Arg();
+    JCommander jc = new JCommander();
+    jc.setNoThrow(true);
+    jc.addObject(a);
+    jc.parse("-a", "foo", "-h", "host");
+    Assert.assertEquals(a.host, "host");
+    Assert.assertEquals(jc.getUnknownArgs(), Lists.newArrayList("-a", "foo"));
   }
 
   @Test(enabled = false)

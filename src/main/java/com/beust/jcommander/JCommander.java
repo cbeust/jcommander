@@ -18,18 +18,6 @@
 
 package com.beust.jcommander;
 
-import com.beust.jcommander.FuzzyMap.IKey;
-import com.beust.jcommander.converters.IParameterSplitter;
-import com.beust.jcommander.converters.NoConverter;
-import com.beust.jcommander.converters.StringConverter;
-import com.beust.jcommander.internal.Console;
-import com.beust.jcommander.internal.DefaultConsole;
-import com.beust.jcommander.internal.DefaultConverterFactory;
-import com.beust.jcommander.internal.JDK6Console;
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
-import com.beust.jcommander.internal.Nullable;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -49,6 +37,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import com.beust.jcommander.FuzzyMap.IKey;
+import com.beust.jcommander.converters.IParameterSplitter;
+import com.beust.jcommander.converters.NoConverter;
+import com.beust.jcommander.converters.StringConverter;
+import com.beust.jcommander.internal.Console;
+import com.beust.jcommander.internal.DefaultConsole;
+import com.beust.jcommander.internal.DefaultConverterFactory;
+import com.beust.jcommander.internal.JDK6Console;
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Nullable;
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -149,6 +149,9 @@ public class JCommander {
   private int m_columnSize = 79;
 
   private boolean m_helpWasSpecified;
+
+  private List<String> m_unknownArgs = Lists.newArrayList();
+  private boolean m_noThrow;
   
   private static Console m_console;
 
@@ -721,7 +724,16 @@ public class JCommander {
             }
           }
         } else {
-          throw new ParameterException("Unknown option: " + arg);
+          if (m_noThrow) {
+            m_unknownArgs.add(arg);
+            i++;
+            while (i < args.length && ! isOption(args, args[i])) {
+              m_unknownArgs.add(args[i++]);
+            }
+            increment = 0;
+          } else {
+            throw new ParameterException("Unknown option: " + arg);
+          }
         }
       }
       else {
@@ -1543,6 +1555,14 @@ public class JCommander {
 
   public void setAllowAbbreviatedOptions(boolean b) {
     m_allowAbbreviatedOptions = b;
+  }
+
+  public void setNoThrow(boolean b) {
+    m_noThrow = b;
+  }
+
+  public List<String> getUnknownArgs() {
+    return m_unknownArgs;
   }
 
 //  public void setCaseSensitiveCommands(boolean b) {
