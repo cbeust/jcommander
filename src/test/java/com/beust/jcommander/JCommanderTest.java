@@ -896,6 +896,56 @@ public class JCommanderTest {
     Assert.assertEquals(V2.names, Arrays.asList(new String[] { "-h", "--host" }));
     Assert.assertTrue(V2.validateCalled);
   }
+  
+  public void usageCommandsUnderUsage() {
+    class Arg {
+    }
+    @Parameters(commandDescription = "command a")
+    class ArgCommandA {
+      @Parameter(description = "command a parameters")
+      List<String> parameters;
+    }
+    @Parameters(commandDescription = "command b")
+    class ArgCommandB {
+      @Parameter(description = "command b parameters")
+      List<String> parameters;
+    }
+    
+    Arg a = new Arg();
+    
+    JCommander c = new JCommander(a);
+    c.addCommand("a", new ArgCommandA());
+    c.addCommand("b", new ArgCommandB());
+    
+    StringBuilder sb = new StringBuilder();
+    c.usage(sb);
+    Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
+  }
+
+  public void usageWithEmpytLine() {
+    class Arg {
+    }
+    @Parameters(commandDescription = "command a")
+    class ArgCommandA {
+      @Parameter(description = "command a parameters")
+      List<String> parameters;
+    }
+    @Parameters(commandDescription = "command b")
+    class ArgCommandB {
+      @Parameter(description = "command b parameters")
+      List<String> parameters;
+    }
+    
+    Arg a = new Arg();
+    
+    JCommander c = new JCommander(a);
+    c.addCommand("a", new ArgCommandA());
+    c.addCommand("b", new ArgCommandB());
+    
+    StringBuilder sb = new StringBuilder();
+    c.usage(sb);
+    Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
+  }
 
   public void partialValidation() {
     class Arg {

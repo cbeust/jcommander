@@ -1044,10 +1044,10 @@ public class JCommander {
     String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
     out.append(indent).append("Usage: " + programName + " [options]");
     if (hasCommands) out.append(indent).append(" [command] [command options]");
-//    out.append("\n");
     if (m_mainParameterDescription != null) {
       out.append(" " + m_mainParameterDescription.getDescription());
     }
+    out.append("\n");
 
     //
     // Align the descriptions at the "longestName" column
@@ -1074,7 +1074,7 @@ public class JCommander {
     // Display all the names and descriptions
     //
     int descriptionIndent = 6;
-    if (sorted.size() > 0) out.append(indent).append("\n").append(indent).append("  Options:\n");
+    if (sorted.size() > 0) out.append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       WrappedParameter parameter = pd.getParameter();
       out.append(indent).append("  "
