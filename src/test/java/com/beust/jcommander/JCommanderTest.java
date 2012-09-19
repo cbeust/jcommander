@@ -958,7 +958,7 @@ public class JCommanderTest {
     jc.addObject(a);
     jc.parse("-a", "foo", "-h", "host");
     Assert.assertEquals(a.host, "host");
-    Assert.assertEquals(jc.getUnknownArgs(), Lists.newArrayList("-a", "foo"));
+    Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
   }
 
   @Test(enabled = false)

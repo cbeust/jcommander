@@ -1561,7 +1561,7 @@ public class JCommander {
     m_acceptUnknownOptions = b;
   }
 
-  public List<String> getUnknownArgs() {
+  public List<String> getUnknownOptions() {
     return m_unknownArgs;
   }
 
