@@ -151,7 +151,7 @@ public class JCommander {
   private boolean m_helpWasSpecified;
 
   private List<String> m_unknownArgs = Lists.newArrayList();
-  private boolean m_noThrow;
+  private boolean m_acceptUnknownOptions = false;
   
   private static Console m_console;
 
@@ -724,7 +724,7 @@ public class JCommander {
             }
           }
         } else {
-          if (m_noThrow) {
+          if (m_acceptUnknownOptions) {
             m_unknownArgs.add(arg);
             i++;
             while (i < args.length && ! isOption(args, args[i])) {
@@ -1557,8 +1557,8 @@ public class JCommander {
     m_allowAbbreviatedOptions = b;
   }
 
-  public void setNoThrow(boolean b) {
-    m_noThrow = b;
+  public void setAcceptUnknownOptions(boolean b) {
+    m_acceptUnknownOptions = b;
   }
 
   public List<String> getUnknownArgs() {

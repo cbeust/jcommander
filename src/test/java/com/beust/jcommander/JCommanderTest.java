@@ -892,7 +892,7 @@ public class JCommanderTest {
     V2.names.clear();
     V2.validateCalled = false;
     JCommander jc = new JCommander(a, "--host", "h");
-    jc.setNoThrow(true);
+    jc.setAcceptUnknownOptions(true);
     Assert.assertEquals(V2.names, Arrays.asList(new String[] { "-h", "--host" }));
     Assert.assertTrue(V2.validateCalled);
   }
@@ -954,7 +954,7 @@ public class JCommanderTest {
     }
     Arg a = new Arg();
     JCommander jc = new JCommander();
-    jc.setNoThrow(true);
+    jc.setAcceptUnknownOptions(true);
     jc.addObject(a);
     jc.parse("-a", "foo", "-h", "host");
     Assert.assertEquals(a.host, "host");
