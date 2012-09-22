@@ -1221,6 +1221,9 @@ public class JCommander {
       converterClass = elementType != null
           ? findConverter((Class<? extends IStringConverter<?>>) elementType)
           : StringConverter.class;
+      if(converterClass == null && Enum.class.isAssignableFrom((Class) elementType)) {
+         converterClass = (Class<? extends IStringConverter<?>>) elementType;
+      }
     }
 
     //
