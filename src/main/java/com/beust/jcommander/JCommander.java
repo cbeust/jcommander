@@ -50,6 +50,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Nullable;
 
+
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
  * all the annotated fields, parse the command line and assign the fields with the correct
@@ -1235,6 +1236,10 @@ public class JCommander {
       converterClass = elementType != null
           ? findConverter((Class<? extends IStringConverter<?>>) elementType)
           : StringConverter.class;
+       // Check for enum type parameter
+       if(converterClass == null && Enum.class.isAssignableFrom((Class) elementType)) {
+        	 converterClass = (Class<? extends IStringConverter<?>>) elementType;
+       }
     }
 
     //
