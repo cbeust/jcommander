@@ -26,7 +26,6 @@ import com.beust.jcommander.args.ArgsBooleanArity;
 import com.beust.jcommander.args.ArgsBooleanArity0;
 import com.beust.jcommander.args.ArgsConverter;
 import com.beust.jcommander.args.ArgsEnum;
-import com.beust.jcommander.args.ArgsEnum.ChoiceType;
 import com.beust.jcommander.args.ArgsEquals;
 import com.beust.jcommander.args.ArgsHelp;
 import com.beust.jcommander.args.ArgsI18N1;
@@ -562,13 +561,11 @@ public class JCommanderTest {
 
   public void enumArgs() {
     ArgsEnum args = new ArgsEnum();
-    String[] argv = { "-choice", "ONE", "-choices", "ONE", "TWO"};
+    String[] argv = { "-choice", "ONE"};
     JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
-    List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.TWO);
-    Assert.assertEquals(expected, args.choices);
-
+    
     Assert.assertEquals(jc.getParameters().get(0).getDescription(), "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
     
   }
@@ -846,7 +843,7 @@ public class JCommanderTest {
       private String param;
     }
 
-    JCommander jc = new JCommander(new Arg());
+    JCommander jc = new JCommander(new MyClass());
     jc.parse("-p=\"");
   }
 
