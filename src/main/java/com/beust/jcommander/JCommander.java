@@ -18,17 +18,6 @@
 
 package com.beust.jcommander;
 
-import com.beust.jcommander.converters.IParameterSplitter;
-import com.beust.jcommander.converters.NoConverter;
-import com.beust.jcommander.converters.StringConverter;
-import com.beust.jcommander.internal.Console;
-import com.beust.jcommander.internal.DefaultConsole;
-import com.beust.jcommander.internal.DefaultConverterFactory;
-import com.beust.jcommander.internal.JDK6Console;
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
-import com.beust.jcommander.internal.Nullable;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -49,6 +38,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import com.beust.jcommander.FuzzyMap.IKey;
+import com.beust.jcommander.converters.IParameterSplitter;
+import com.beust.jcommander.converters.NoConverter;
+import com.beust.jcommander.converters.StringConverter;
+import com.beust.jcommander.internal.Console;
+import com.beust.jcommander.internal.DefaultConsole;
+import com.beust.jcommander.internal.DefaultConverterFactory;
+import com.beust.jcommander.internal.JDK6Console;
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Nullable;
+
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
  * all the annotated fields, parse the command line and assign the fields with the correct
@@ -67,7 +68,7 @@ public class JCommander {
   /**
    * A map to look up parameter description per option name.
    */
-  private Map<String, ParameterDescription> m_descriptions;
+  private Map<IKey, ParameterDescription> m_descriptions;
 
   /**
    * The objects that contain fields annotated with @Parameter.
@@ -122,7 +123,7 @@ public class JCommander {
   /**
    * Alias database for reverse lookup
    */
-  private Map<String, ProgramName> aliasMap = Maps.newLinkedHashMap();
+  private Map<IKey, ProgramName> aliasMap = Maps.newLinkedHashMap();
 
   /**
    * The name of the command after the parsing has run.
@@ -148,6 +149,9 @@ public class JCommander {
   private int m_columnSize = 79;
 
   private boolean m_helpWasSpecified;
+
+  private List<String> m_unknownArgs = Lists.newArrayList();
+  private boolean m_acceptUnknownOptions = false;
   
   private static Console m_console;
 
@@ -272,7 +276,7 @@ public class JCommander {
 
     if (m_descriptions == null) createDescriptions();
     initializeDefaultValues();
-    parseValues(expandArgs(args));
+    parseValues(expandArgs(args), validate);
     if (validate) validateOptions();
   }
 
@@ -399,8 +403,8 @@ public class JCommander {
   }
 
   private ParameterDescription getPrefixDescriptionFor(String arg) {
-    for (Map.Entry<String, ParameterDescription> es : m_descriptions.entrySet()) {
-      if (arg.startsWith(es.getKey())) return es.getValue();
+    for (Map.Entry<IKey, ParameterDescription> es : m_descriptions.entrySet()) {
+      if (arg.startsWith(es.getKey().getName())) return es.getValue();
     }
 
     return null;
@@ -539,14 +543,14 @@ public class JCommander {
               new ParameterDescription(object, p, parameterized, m_bundle, this);
         } else {
           for (String name : p.names()) {
-            if (m_descriptions.containsKey(name)) {
+            if (m_descriptions.containsKey(new StringKey(name))) {
               throw new ParameterException("Found the option " + name + " multiple times");
             }
             p("Adding description for " + name);
             ParameterDescription pd =
                 new ParameterDescription(object, p, parameterized, m_bundle, this);
             m_fields.put(parameterized, pd);
-            m_descriptions.put(name, pd);
+            m_descriptions.put(new StringKey(name), pd);
 
             if (p.required()) m_requiredFields.put(parameterized, pd);
           }
@@ -574,7 +578,7 @@ public class JCommander {
           ParameterDescription pd =
               new ParameterDescription(object, dp, parameterized, m_bundle, this);
           m_fields.put(parameterized, pd);
-          m_descriptions.put(name, pd);
+          m_descriptions.put(new StringKey(name), pd);
     
           if (dp.required()) m_requiredFields.put(parameterized, pd);
         }
@@ -665,7 +669,7 @@ public class JCommander {
   /**
    * Main method that parses the values and initializes the fields accordingly.
    */
-  private void parseValues(String[] args) {
+  private void parseValues(String[] args, boolean validate) {
     // This boolean becomes true if we encounter a command, which indicates we need
     // to stop parsing (the parsing of the command will be done in a sub JCommander
     // object)
@@ -682,7 +686,7 @@ public class JCommander {
         //
         // Option
         //
-        ParameterDescription pd = m_descriptions.get(a);
+        ParameterDescription pd = findParameterDescription(a);
 
         if (pd != null) {
           if (pd.getParameter().password()) {
@@ -720,7 +724,16 @@ public class JCommander {
             }
           }
         } else {
-          throw new ParameterException("Unknown option: " + arg);
+          if (m_acceptUnknownOptions) {
+            m_unknownArgs.add(arg);
+            i++;
+            while (i < args.length && ! isOption(args, args[i])) {
+              m_unknownArgs.add(args[i++]);
+            }
+            increment = 0;
+          } else {
+            throw new ParameterException("Unknown option: " + arg);
+          }
         }
       }
       else {
@@ -744,7 +757,8 @@ public class JCommander {
               }
             }
 
-            ParameterDescription.validateParameter(m_mainParameterAnnotation.validateWith(),
+            ParameterDescription.validateParameter(m_mainParameterDescription,
+                m_mainParameterAnnotation.validateWith(),
                 "Default", value);
 
             m_mainParameterDescription.setAssigned(true);
@@ -754,15 +768,18 @@ public class JCommander {
             //
             // Command parsing
             //
-            if (jc == null) throw new MissingCommandException("Expected a command, got " + arg);
-            m_parsedCommand = jc.m_programName.m_name;
-            m_parsedAlias = arg; //preserve the original form
-
-            // Found a valid command, ask it to parse the remainder of the arguments.
-            // Setting the boolean commandParsed to true will force the current
-            // loop to end.
-            jc.parse(subArray(args, i + 1));
-            commandParsed = true;
+            if (jc == null && validate) {
+                throw new MissingCommandException("Expected a command, got " + arg);
+            } else if (jc != null){
+                m_parsedCommand = jc.m_programName.m_name;
+                m_parsedAlias = arg; //preserve the original form
+    
+                // Found a valid command, ask it to parse the remainder of the arguments.
+                // Setting the boolean commandParsed to true will force the current
+                // loop to end.
+                jc.parse(subArray(args, i + 1));
+                commandParsed = true;
+            }
           }
         }
       }
@@ -792,6 +809,9 @@ public class JCommander {
   private final IVariableArity DEFAULT_VARIABLE_ARITY = new DefaultVariableArity();
 
   private int m_verbose = 0;
+
+  private boolean m_caseSensitiveOptions = true;
+  private boolean m_allowAbbreviatedOptions = false;
 
   /**
    * @return the number of options that were processed.
@@ -1024,10 +1044,10 @@ public class JCommander {
     String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
     out.append(indent).append("Usage: " + programName + " [options]");
     if (hasCommands) out.append(indent).append(" [command] [command options]");
-//    out.append("\n");
     if (m_mainParameterDescription != null) {
       out.append(" " + m_mainParameterDescription.getDescription());
     }
+    out.append("\n");
 
     //
     // Align the descriptions at the "longestName" column
@@ -1053,20 +1073,20 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    if (sorted.size() > 0) out.append(indent).append("\n").append(indent).append("  Options:\n");
+    int descriptionIndent = 6;
+    if (sorted.size() > 0) out.append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
-      int l = pd.getNames().length();
-      int spaceCount = longestName - l;
-      int start = out.length();
       WrappedParameter parameter = pd.getParameter();
       out.append(indent).append("  "
           + (parameter.required() ? "* " : "  ")
-          + pd.getNames() + s(spaceCount));
-      int indentCount = out.length() - start;
+          + pd.getNames()
+          + "\n"
+          + indent + s(descriptionIndent));
+      int indentCount = indent.length() + descriptionIndent;
       wrapDescription(out, indentCount, pd.getDescription());
       Object def = pd.getDefault();
       if (pd.isDynamicParameter()) {
-        out.append("\n" + spaces(indentCount + 1))
+        out.append("\n" + s(indentCount + 1))
             .append("Syntax: " + parameter.names()[0]
                 + "key" + parameter.getAssignment()
                 + "value");
@@ -1075,7 +1095,7 @@ public class JCommander {
         String displayedDef = Strings.isStringEmpty(def.toString())
             ? "<empty string>"
             : def.toString();
-        out.append("\n" + spaces(indentCount + 1))
+        out.append("\n" + s(indentCount + 1))
             .append("Default: " + (parameter.password()?"********" : displayedDef));
       }
       out.append("\n");
@@ -1127,17 +1147,11 @@ public class JCommander {
         out.append(" ").append(word);
         current += word.length() + 1;
       } else {
-        out.append("\n").append(spaces(indent + 1)).append(word);
+        out.append("\n").append(s(indent + 1)).append(word);
         current = indent;
       }
       i++;
     }
-  }
-
-  private String spaces(int indent) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < indent; i++) sb.append(" ");
-    return sb.toString();
   }
 
   /**
@@ -1359,8 +1373,9 @@ public class JCommander {
     //Note: Name clash check is intentionally omitted to resemble the
     //     original behaviour of clashing commands.
     //     Aliases are, however, are strictly checked for name clashes.
-    aliasMap.put(name, progName);
-    for (String alias : aliases) {
+    aliasMap.put(new StringKey(name), progName);
+    for (String a : aliases) {
+      IKey alias = new StringKey(a);
       //omit pointless aliases to avoid name clash exception
       if (!alias.equals(name)) {
         ProgramName mappedName = aliasMap.get(alias);
@@ -1418,15 +1433,40 @@ public class JCommander {
     return m_objects;
   }
 
+  private ParameterDescription findParameterDescription(String arg) {
+    return FuzzyMap.findInMap(m_descriptions, new StringKey(arg), m_caseSensitiveOptions,
+        m_allowAbbreviatedOptions);
+  }
+
+  private JCommander findCommand(ProgramName name) {
+    return FuzzyMap.findInMap(m_commands, name,
+        m_caseSensitiveOptions, m_allowAbbreviatedOptions);
+//    if (! m_caseSensitiveOptions) {
+//      return m_commands.get(name);
+//    } else {
+//      for (ProgramName c : m_commands.keySet()) {
+//        if (c.getName().equalsIgnoreCase(name.getName())) {
+//          return m_commands.get(c);
+//        }
+//      }
+//    }
+//    return null;
+  }
+
+  private ProgramName findProgramName(String name) {
+    return FuzzyMap.findInMap(aliasMap, new StringKey(name),
+        m_caseSensitiveOptions, m_allowAbbreviatedOptions);
+  }
+
   /*
   * Reverse lookup JCommand object by command's name or its alias
   */
   private JCommander findCommandByAlias(String commandOrAlias) {
-    ProgramName progName = aliasMap.get(commandOrAlias);
+    ProgramName progName = findProgramName(commandOrAlias);
     if (progName == null) {
       return null;
     }
-    JCommander jc = m_commands.get(progName);
+    JCommander jc = findCommand(progName);
     if (jc == null) {
       throw new IllegalStateException(
               "There appears to be inconsistency in the internal command database. " +
@@ -1438,7 +1478,7 @@ public class JCommander {
   /**
    * Encapsulation of either a main application or an individual command.
    */
-  private static final class ProgramName {
+  private static final class ProgramName implements IKey {
     private final String m_name;
     private final List<String> m_aliases;
 
@@ -1447,6 +1487,7 @@ public class JCommander {
       m_aliases = aliases;
     }
 
+    @Override
     public String getName() {
       return m_name;
     }
@@ -1507,5 +1548,25 @@ public class JCommander {
   public void setVerbose(int verbose) {
     m_verbose = verbose;
   }
+
+  public void setCaseSensitiveOptions(boolean b) {
+    m_caseSensitiveOptions = b;
+  }
+
+  public void setAllowAbbreviatedOptions(boolean b) {
+    m_allowAbbreviatedOptions = b;
+  }
+
+  public void setAcceptUnknownOptions(boolean b) {
+    m_acceptUnknownOptions = b;
+  }
+
+  public List<String> getUnknownOptions() {
+    return m_unknownArgs;
+  }
+
+//  public void setCaseSensitiveCommands(boolean b) {
+//    m_caseSensitiveCommands = b;
+//  }
 }
 

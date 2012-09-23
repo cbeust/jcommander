@@ -4,7 +4,13 @@
 
   <test name="JCommander tests">
     <classes>
-      <class name="com.beust.jcommander.PositiveIntegerTest">
+<!-- 
+      <class name="com.beust.jcommander.FinderTest" />
+-->
+      <class name="com.beust.jcommander.JCommanderTest">
+        <methods>
+          <include name="partialValidation"></include>
+        </methods>
       </class>
     </classes>
   </test>
