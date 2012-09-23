@@ -1236,10 +1236,10 @@ public class JCommander {
       converterClass = elementType != null
           ? findConverter((Class<? extends IStringConverter<?>>) elementType)
           : StringConverter.class;
-       // Check for enum type parameter
-       if(converterClass == null && Enum.class.isAssignableFrom((Class) elementType)) {
-        	 converterClass = (Class<? extends IStringConverter<?>>) elementType;
-       }
+      // Check for enum type parameter
+      if (converterClass == null && Enum.class.isAssignableFrom((Class) elementType)) {
+        converterClass = (Class<? extends IStringConverter<?>>) elementType;
+      }
     }
 
     //
@@ -1262,7 +1262,7 @@ public class JCommander {
     try {
       String[] names = annotation.names();
       String optionName = names.length > 0 ? names[0] : "[Main class]";
-      if (converterClass.isEnum()) {
+      if (converterClass != null && converterClass.isEnum()) {
         try {
           result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
         } catch (Exception e) {

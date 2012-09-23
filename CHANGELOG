@@ -3,6 +3,7 @@ Current
 Added: JCommander#setNoThrow and JCommander#getUnknownArgs
 Added: JCommander#allowAbbreviatedOptions (default: false)
 Added: JCommander#setCaseSensitiveOptions (default: true)
+Added: Support for enums (Scott M Stark)
 Fixed: Missing new lines in usage (styurin)
 Fixed: The description of commands is now displayed on the next line and indented.
 Fixed: Empty string defaults now displayed as "<empty string>" in the usage
