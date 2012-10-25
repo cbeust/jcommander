@@ -79,7 +79,7 @@ and then you simply ask JCommander to parse:
 
 <pre class="brush: java">
 JCommanderExample jct = new JCommanderExample();
-String[] argv = { "-log", "2", "-groups", "unit", "a", "b", "c" };
+String[] argv = { "-log", "2", "-groups", "unit" };
 new JCommander(jct, argv);
 
 Assert.assertEquals(jct.verbose.intValue(), 2);
