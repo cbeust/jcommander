@@ -18,6 +18,10 @@ public class JCommanderTest {
  
     @Parameter(names = "-debug", description = "Debug mode")
     public boolean debug = false;
+
+    @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+    public Map<String, String> dynamicParams = new HashMap<String, String>();
+
 }
 ```
 
@@ -25,10 +29,19 @@ and how you use it:
 
 ```java
 CommanderTest jct = new JCommanderTest();
-String[] argv = { "-log", "2", "-groups", "unit", "a", "b", "c" };
+String[] argv = { "-log", "2", "-groups", "unit1,unit2,unit3",
+                  "-Doption=value", "a", "b", "c" };
 new JCommander(jct, argv);
 
-Assert.assertEquals(jct.verbose.intValue(), 2);
+Assert.assertEquals(2, jct.verbose.intValue());
+
+Assert.assertEquals("unit1,unit2,unit3", jct.groups);
+
+Map<String, String> params = new HashMap<String, String>();
+params.put("option", "value");
+Assert.assertEquals(params, jct.params);
+
+Assert.assertEquals(Arrays.asList("a", "b", "c"), jct.parameters);
 ```
 
 The full doc is available at http://beust.com/jcommander
