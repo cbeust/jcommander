@@ -1,17 +1,20 @@
 Current
 
-Added: JCommander#setNoThrow and JCommander#getUnknownArgs
+Added: JCommander#acceptUnknownOption and JCommander#getUnknownArgs
 Added: JCommander#allowAbbreviatedOptions (default: false)
 Added: JCommander#setCaseSensitiveOptions (default: true)
 Added: Support for enums (Scott M Stark)
 Fixed: Missing new lines in usage (styurin)
 Fixed: The description of commands is now displayed on the next line and indented.
+
+1.29
+2012/07/28
 Fixed: Empty string defaults now displayed as "<empty string>" in the usage
 Fixed: Bugs with the PositiveInteger validator
 Fixed: Parameters with a single double quote were not working properly
 
 1.27
-1012/08/05
+2012/07/05
 Added: IValueValidator to validate parameter values (typed) as opposed to IParameterValidator which validates strings
 Added: echoInput, used when password=true to echo the characters (Jason Wheeler)
 Added: @Parameter(help = true)
