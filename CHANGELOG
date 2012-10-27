@@ -1,5 +1,8 @@
 Current
 
+1.30
+2012/10/27
+
 Added: JCommander#acceptUnknownOption and JCommander#getUnknownArgs
 Added: JCommander#allowAbbreviatedOptions (default: false)
 Added: JCommander#setCaseSensitiveOptions (default: true)
@@ -9,12 +12,14 @@ Fixed: The description of commands is now displayed on the next line and indente
 
 1.29
 2012/07/28
+
 Fixed: Empty string defaults now displayed as "<empty string>" in the usage
 Fixed: Bugs with the PositiveInteger validator
 Fixed: Parameters with a single double quote were not working properly
 
 1.27
 2012/07/05
+
 Added: IValueValidator to validate parameter values (typed) as opposed to IParameterValidator which validates strings
 Added: echoInput, used when password=true to echo the characters (Jason Wheeler)
 Added: @Parameter(help = true)
@@ -26,6 +31,7 @@ Fixed: variable arities not working when same parameter appears multiple times.
 
 1.25
 2012/04/26
+
 Added: Default passwords are no longer displayed in the usage (Paul Mendelson)
 Added: Variable arities now work magically, no need for IVariableArity any more
 Fixed: Commands using @Parameters(resourceBundle) were not i18n'ed properly in the usage()
