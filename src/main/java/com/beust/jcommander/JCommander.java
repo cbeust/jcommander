@@ -1264,7 +1264,7 @@ public class JCommander {
       String optionName = names.length > 0 ? names[0] : "[Main class]";
       if (converterClass != null && converterClass.isEnum()) {
         try {
-          result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
+          result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
         } catch (Exception e) {
           throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
                                        EnumSet.allOf((Class<? extends Enum>) converterClass));
