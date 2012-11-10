@@ -1,5 +1,7 @@
 Current
 
+Fixed: GITHUB-107: Allow enum values without converting them to uppercase.
+
 1.30
 2012/10/27
 

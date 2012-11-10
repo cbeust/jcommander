@@ -562,12 +562,12 @@ public class JCommanderTest {
 
   public void enumArgs() {
     ArgsEnum args = new ArgsEnum();
-    String[] argv = { "-choice", "ONE", "-choices", "ONE", "TWO" };
+    String[] argv = { "-choice", "ONE", "-choices", "ONE", "Two" };
     JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
     
-    List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.TWO);
+    List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
     Assert.assertEquals(expected, args.choices);
     Assert.assertEquals(jc.getParameters().get(0).getDescription(),
         "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
@@ -966,7 +966,7 @@ public class JCommanderTest {
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().parameterWithOneDoubleQuote();
+    new JCommanderTest().enumArgs();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
