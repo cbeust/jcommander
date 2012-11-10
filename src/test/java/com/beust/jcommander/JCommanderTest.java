@@ -964,9 +964,22 @@ public class JCommanderTest {
     Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
   }
 
+  /**
+   * GITHUB-137.
+   */
+  public void listArgShouldBeCleared() {
+    class Args {
+      @Parameter(description = "[endpoint]")
+      public List<String> endpoint = Lists.newArrayList("prod");
+    }
+    Args a = new Args();
+    new JCommander(a, new String[] { "dev" });
+    Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().enumArgs();
+    new JCommanderTest().listParameters(); // listArgShouldBeCleared();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

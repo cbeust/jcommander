@@ -75,6 +75,8 @@ public class JCommander {
    */
   private List<Object> m_objects = Lists.newArrayList();
 
+  private boolean m_firstTimeMainParameter = true;
+
   /**
    * This field/method will contain whatever command line parameter is not an option.
    * It is expected to be a List<String>.
@@ -913,6 +915,10 @@ public class JCommander {
       }
       m_mainParameter.set(m_mainParameterObject, result);
     }
+    if (m_firstTimeMainParameter) {
+      result.clear();
+      m_firstTimeMainParameter = false;
+    }
     return result;
   }
 
@@ -1240,21 +1246,6 @@ public class JCommander {
         converterClass = (Class<? extends IStringConverter<?>>) elementType;
       }
     }
-
-    //
-//    //
-//    // Try to find a converter in the factory
-//    //
-//    IStringConverter<?> converter = null;
-//    if (converterClass == null && m_converterFactories != null) {
-//      // Mmmh, javac requires a cast here
-//      converter = (IStringConverter) m_converterFactories.getConverter(type);
-//    }
-
-//    if (converterClass == null) {
-//      throw new ParameterException("Don't know how to convert " + value
-//          + " to type " + type + " (field: " + field.getName() + ")");
-//    }
 
     IStringConverter<?> converter;
     Object result = null;

@@ -1,5 +1,6 @@
 Current
 
+Fixed: GITHUB-137: Main parameters with a default value should be overridden if a main parameter is specified 
 Fixed: GITHUB-107: Allow enum values without converting them to uppercase.
 
 1.30
