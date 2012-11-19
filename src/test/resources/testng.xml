@@ -13,6 +13,10 @@
       <class name="com.beust.jcommander.ParametersDelegateTest" />
       <class name="com.beust.jcommander.dynamic.DynamicParameterTest" />
       <class name="com.beust.jcommander.VariableArityTest" />
+      <class name="com.beust.jcommander.MethodSetterTest" />
+      <class name="com.beust.jcommander.PositiveIntegerTest" />
+      <class name="com.beust.jcommander.FinderTest" />
+      <class name="com.beust.jcommander.CmdTest" />
     </classes>
   </test>
 

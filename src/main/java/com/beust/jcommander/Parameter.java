@@ -19,17 +19,19 @@
 package com.beust.jcommander;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 
 import com.beust.jcommander.converters.CommaParameterSplitter;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.validators.NoValidator;
+import com.beust.jcommander.validators.NoValueValidator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-@Target({ FIELD })
+@Target({ FIELD, METHOD })
 public @interface Parameter {
 
   /**
@@ -86,9 +88,14 @@ public @interface Parameter {
   boolean hidden() default false;
 
   /**
-   * The validation class to use.
+   * Validate the parameter found on the command line.
    */
   Class<? extends IParameterValidator> validateWith() default NoValidator.class;
+
+  /**
+   * Validate the value for this parameter.
+   */
+  Class<? extends IValueValidator> validateValueWith() default NoValueValidator.class;
 
   /**
    * @return true if this parameter has a variable arity. See @{IVariableArity}
@@ -100,4 +107,16 @@ public @interface Parameter {
    * a comma separated splitter will be used.
    */
   Class<? extends IParameterSplitter> splitter() default CommaParameterSplitter.class;
+  
+  /**
+   * If true, console will not echo typed input
+   * Used in conjunction with password = true
+   */
+  boolean echoInput() default false;
+
+  /**
+   * If true, this parameter is for help. If such a parameter is specified,
+   * required parameters are no longer checked for their presence.
+   */
+  boolean help() default false;
 }

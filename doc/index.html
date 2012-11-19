@@ -39,7 +39,7 @@
   </tr>
   <tr>
     <td align="right">
-      Last updated: April 25th, 2012
+      Last updated: July 31st, 2012
     </td>
   </tr>
   <tr><td align="right"><a href="mailto:cedric@beust.com">C&eacute;dric Beust</a></td></tr>
@@ -79,7 +79,7 @@ and then you simply ask JCommander to parse:
 
 <pre class="brush: java">
 JCommanderExample jct = new JCommanderExample();
-String[] argv = { "-log", "2", "-groups", "unit", "a", "b", "c" };
+String[] argv = { "-log", "2", "-groups", "unit" };
 new JCommander(jct, argv);
 
 Assert.assertEquals(jct.verbose.intValue(), 2);
@@ -99,6 +99,22 @@ private boolean debug = false;
 </pre>
 
 Such a parameter does not require any additional parameter on the command line and if it's detected during parsing, the corresponding field will be set to <tt>true</tt>.
+
+<p>
+
+  If you want to define a boolean parameter that's <tt>true</tt> by default, you can declare it as having an arity of 1. Users will then have to specify the value they want explicitly:
+
+  <pre class="brush: java">
+    @Parameter(names = "-debug", description = "Debug mode", arity = 1)
+    private boolean debug = true;
+  </pre>
+
+  Invoke with either of:
+
+  <pre class="brush: plain">
+    program -debug true
+    program -debug false
+  </pre>
 
 <h4>String, Integer, Long</h4>
 
@@ -156,6 +172,16 @@ Value for -password (Connection password):
 </pre>
 
 You will need to type the value at this point before JCommander resumes.
+
+<h4>Echo Input</h4>
+
+In Java 6, by default, you will not be able to see what you type for passwords entered at the prompt (Java 5 and lower will always show the password).  However, you can override this by setting <tt>echoInput</tt> to "true" (default is "false" and this setting only has an effect when <tt>password</tt> is "true"):
+<pre class="brush: java">
+public class ArgsPassword {
+  @Parameter(names = "-password", description = "Connection password", password = true, echoInput = true)
+  private String password;
+}
+</pre>
 
 <h2><a class="section" name="Custom_types">Custom types</a></h2>
 
@@ -493,6 +519,21 @@ java Main -d /tmp
 java Main --outputDirectory /tmp
 </pre>
 
+<h2><a class="section" name="Other option configurations">Other option configurations</a></h2>
+
+You can configure how options are looked up in a few different ways:
+
+<ul>
+  <li><tt>JCommander#setCaseSensitiveOptions(boolean)</tt>: specify whether options are case sensitive. If you call this method with <tt>false</tt>, then <tt>"-param"</tt> and
+    <tt>"-PARAM"</tt> are considered equal.
+  </li>
+  <li><tt>JCommander#setAllowAbbreviatedOptions(boolean)</tt>: specify whether users can
+    pass abbreviated options. If you call this method with <tt>true</tt> then users
+    can pass <tt>"-par"</tt> to specify an option called <tt>-param</tt>. JCommander will
+    throw a <tt>ParameterException</tt> if the abbreviated name is ambiguous.
+  </li>
+</ul>
+
 <h2><a class="section" name="Required_and_optional">Required and optional parameters</a></h2>
 
 If some of your parameters are mandatory, you can use the
@@ -549,6 +590,17 @@ private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() 
 JCommander jc = new JCommander(new Args());
 jc.setDefaultProvider(DEFAULT_PROVIDER);
 </pre>
+
+<h2><a class="section" name="Help_parameter">Help parameter</a></h2>
+
+If one of your parameters is used to display some help or usage, you need use the <tt>help</tt> attribute:
+
+<pre class="brush: java">
+  @Parameter(names = "--help", help = true)
+  private boolean help;
+</pre>
+
+If you omit this boolean, JCommander will instead issue an error message when it tries to validate your command and it finds that you didn't specify some of the required parameters.
 
 <h2><a class="section" name="Complex">More complex syntaxes (commands)</a></h2>
 
@@ -755,6 +807,11 @@ Join the <a href="http://groups.google.com/group/jcommander">JCommander Google g
 
 The Javadocs for JCommander can be found <a href="apidocs/">here</a>.
 
+<h2><a class="section" name="License">License</a></h2>
+
+JCommander is released under the <a
+href="https://github.com/cbeust/jcommander/blob/master/license.txt">Apache 2.0</a> license.
+
 <h2><a class="section" name="Download">Download</a></h2>
 
 You can download JCommander from the following locations:
@@ -768,7 +825,7 @@ You can download JCommander from the following locations:
 <dependency>
   &lt;groupId&gt;com.beust&lt;/groupId&gt;
   &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
-  &lt;version&gt;1.25&lt;/version&gt;
+  &lt;version&gt;1.27&lt;/version&gt;
 </dependency>
   </pre>
 

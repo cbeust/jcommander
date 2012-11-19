@@ -1,6 +1,5 @@
 package com.beust.jcommander;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -17,6 +16,14 @@ public class WrappedParameter {
 
   public WrappedParameter(DynamicParameter p) {
     m_dynamicParameter = p;
+  }
+
+  public Parameter getParameter() {
+    return m_parameter;
+  }
+
+  public DynamicParameter getDynamicParameter() {
+    return m_dynamicParameter;
   }
 
   public int arity() {
@@ -47,10 +54,19 @@ public class WrappedParameter {
     return m_parameter != null ? m_parameter.validateWith() : m_dynamicParameter.validateWith();
   }
 
-  public void addValue(Field field, Object object, Object value)
-      throws IllegalArgumentException, IllegalAccessException {
+  public Class<? extends IValueValidator> validateValueWith() {
+    return m_parameter != null
+        ? m_parameter.validateValueWith()
+        : m_dynamicParameter.validateValueWith();
+  }
+
+  public boolean echoInput() {
+	  return m_parameter != null ? m_parameter.echoInput() : false;
+  }
+
+  public void addValue(Parameterized parameterized, Object object, Object value) {
     if (m_parameter != null) {
-      field.set(object, value);
+      parameterized.set(object, value);
     } else {
       String a = m_dynamicParameter.assignment();
       String sv = value.toString();
@@ -59,15 +75,15 @@ public class WrappedParameter {
       if (aInd == -1) {
         throw new ParameterException(Messages.getMsg("ex.dynamic_parameter.value_in_wrong_format", a, sv));
       }
-      callPut(object, field, sv.substring(0, aInd), sv.substring(aInd + 1));
+      callPut(object, parameterized, sv.substring(0, aInd), sv.substring(aInd + 1));
     }
   }
 
-  private void callPut(Object object, Field field, String key, String value) {
+  private void callPut(Object object, Parameterized parameterized, String key, String value) {
     try {
       Method m;
-      m = findPut(field.getType());
-      m.invoke(field.get(object), key, value);
+      m = findPut(parameterized.getType());
+      m.invoke(parameterized.get(object), key, value);
     } catch (SecurityException e) {
       e.printStackTrace();
     } catch(IllegalAccessException e) {
@@ -86,4 +102,9 @@ public class WrappedParameter {
   public String getAssignment() {
     return m_dynamicParameter != null ? m_dynamicParameter.assignment() : "";
   }
+
+  public boolean isHelp() {
+    return m_parameter != null && m_parameter.help();
+  }
+
 }
