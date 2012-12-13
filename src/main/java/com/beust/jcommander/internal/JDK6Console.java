@@ -2,6 +2,9 @@ package com.beust.jcommander.internal;
 
 import com.beust.jcommander.ParameterException;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 
@@ -14,7 +17,15 @@ public class JDK6Console implements Console {
   public JDK6Console(Object console) throws Exception {
     this.console = console;
     Method writerMethod = console.getClass().getDeclaredMethod("writer", new Class<?>[0]);
-    writer = (PrintWriter) writerMethod.invoke(console, new Object[0]);
+    
+    final PrintWriter cWriter = (PrintWriter) writerMethod.invoke(console, new Object[0]);
+    OutputStream writerOS = new OutputStream() {
+		@Override
+		public void write(int b) throws IOException {
+			cWriter.write(b);			
+		}    	
+    };
+    writer = new PrintWriter(new OutputStreamWriter(writerOS, "UTF-8"));
   }
 
   public void print(String msg) {

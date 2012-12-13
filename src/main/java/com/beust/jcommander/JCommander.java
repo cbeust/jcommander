@@ -1026,7 +1026,7 @@ public class JCommander {
 	          ? descEmptyString
 	          : def.toString();
 	      out.append("\n" + s(indentCount + 1))
-	          .append(descDefault + (parameter.password()?"********" : displayedDef));
+	          .append(descDefault + ": " + (parameter.password()?"********" : displayedDef));
 	    }
 	    out.append("\n");
 	  }
