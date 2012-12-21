@@ -18,10 +18,11 @@
 
 package com.beust.jcommander;
 
-import static java.lang.annotation.ElementType.TYPE;
-
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
 
 /**
  * An annotation used to specify settings for parameter parsing.
@@ -30,6 +31,7 @@ import java.lang.annotation.Target;
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })
+@Inherited
 public @interface Parameters {
 
   public static final String DEFAULT_OPTION_PREFIXES = "-";
