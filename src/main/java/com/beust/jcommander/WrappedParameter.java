@@ -61,7 +61,7 @@ public class WrappedParameter {
   }
 
   public boolean echoInput() {
-	  return m_parameter != null ? m_parameter.echoInput() : false;
+    return m_parameter != null ? m_parameter.echoInput() : false;
   }
 
   public void addValue(Parameterized parameterized, Object object, Object value) {
@@ -73,11 +73,11 @@ public class WrappedParameter {
 
       int aInd = sv.indexOf(a);
       if (aInd == -1) {
-        throw new ParameterException(
-            "Dynamic parameter expected a value of the form a" + a + "b"
-                + " but got:" + sv);
+        callPut(object, parameterized, sv, null);
       }
-      callPut(object, parameterized, sv.substring(0, aInd), sv.substring(aInd + 1));
+      else {
+        callPut(object, parameterized, sv.substring(0, aInd), sv.substring(aInd + 1));
+      }
     }
   }
 
@@ -88,9 +88,9 @@ public class WrappedParameter {
       m.invoke(parameterized.get(object), key, value);
     } catch (SecurityException e) {
       e.printStackTrace();
-    } catch(IllegalAccessException e) {
+    } catch (IllegalAccessException e) {
       e.printStackTrace();
-    } catch(InvocationTargetException e) {
+    } catch (InvocationTargetException e) {
       e.printStackTrace();
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
