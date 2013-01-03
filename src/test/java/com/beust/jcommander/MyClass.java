@@ -15,7 +15,6 @@ public class MyClass {
   }
 
   public static class MyValidator implements IParameterValidator {
-    @Override
     public void validate(String name, String value) throws ParameterException {
       Assert.assertEquals(value, "\"");
     }
