@@ -10,7 +10,6 @@ public class StringKey implements IKey {
     m_name = name;
   }
 
-  @Override
   public String getName() {
     return m_name;
   }

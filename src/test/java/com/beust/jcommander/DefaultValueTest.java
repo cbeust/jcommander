@@ -73,9 +73,8 @@ public class DefaultValueTest {
     Assert.assertEquals(opts.list.get(0), "anotherValue");
     Assert.assertEquals(opts.list.get(1), "anotherValue2");
     Assert.assertEquals(opts.set.size(), 2);
-    Iterator<String> arg2it = opts.set.iterator();
-    Assert.assertEquals(arg2it.next(), "anotherValue3");
-    Assert.assertEquals(arg2it.next(), "anotherValue4");
+    Assert.assertTrue(opts.set.contains("anotherValue3"));
+    Assert.assertTrue(opts.set.contains("anotherValue4"));
   }
 
   public static class MyOpts {

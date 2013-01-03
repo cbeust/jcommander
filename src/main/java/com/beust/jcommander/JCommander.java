@@ -142,7 +142,6 @@ public class JCommander {
 
   private Comparator<? super ParameterDescription> m_parameterDescriptionComparator
       = new Comparator<ParameterDescription>() {
-        @Override
         public int compare(ParameterDescription p0, ParameterDescription p1) {
           return p0.getLongestName().compareTo(p1.getLongestName());
         }
@@ -154,7 +153,7 @@ public class JCommander {
 
   private List<String> m_unknownArgs = Lists.newArrayList();
   private boolean m_acceptUnknownOptions = false;
-  
+
   private static Console m_console;
 
   /**
@@ -208,7 +207,7 @@ public class JCommander {
     addObject(object);
     parse(args);
   }
-  
+
   public static Console getConsole() {
     if (m_console == null) {
       try {
@@ -581,7 +580,7 @@ public class JCommander {
               new ParameterDescription(object, dp, parameterized, m_bundle, this);
           m_fields.put(parameterized, pd);
           m_descriptions.put(new StringKey(name), pd);
-    
+
           if (dp.required()) m_requiredFields.put(parameterized, pd);
         }
       }
@@ -775,7 +774,7 @@ public class JCommander {
             } else if (jc != null){
                 m_parsedCommand = jc.m_programName.m_name;
                 m_parsedAlias = arg; //preserve the original form
-    
+
                 // Found a valid command, ask it to parse the remainder of the arguments.
                 // Setting the boolean commandParsed to true will force the current
                 // loop to end.
@@ -799,7 +798,6 @@ public class JCommander {
 
   private class DefaultVariableArity implements IVariableArity {
 
-    @Override
     public int processVariableArity(String optionName, String[] options) {
         int i = 0;
         while (i < options.length && !isOption(options, options[i])) {
@@ -1485,7 +1483,6 @@ public class JCommander {
       m_aliases = aliases;
     }
 
-    @Override
     public String getName() {
       return m_name;
     }
@@ -1506,7 +1503,7 @@ public class JCommander {
       }
       return sb.toString();
     }
-    
+
     @Override
     public int hashCode() {
       final int prime = 31;
@@ -1539,7 +1536,7 @@ public class JCommander {
     @Override
     public String toString() {
       return getDisplayName();
-      
+
     }
   }
 

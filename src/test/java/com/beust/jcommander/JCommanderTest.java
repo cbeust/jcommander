@@ -266,7 +266,7 @@ public class JCommanderTest {
   public void converterArgs() {
     ArgsConverter args = new ArgsConverter();
     String fileName = "a";
-    new JCommander(args, "-file", "/tmp/" + fileName, 
+    new JCommander(args, "-file", "/tmp/" + fileName,
       "-listStrings", "Tuesday,Thursday",
       "-listInts", "-1,8",
       "-listBigDecimals", "-11.52,100.12");
@@ -566,12 +566,12 @@ public class JCommanderTest {
     JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
-    
+
     List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
     Assert.assertEquals(expected, args.choices);
     Assert.assertEquals(jc.getParameters().get(0).getDescription(),
         "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
-    
+
   }
 
   @Test(expectedExceptions = ParameterException.class)
@@ -614,7 +614,6 @@ public class JCommanderTest {
   public void mainParameterShouldBeValidate() {
     class V implements IParameterValidator {
 
-      @Override
       public void validate(String name, String value) throws ParameterException {
         Assert.assertEquals("a", value);
       }
@@ -654,8 +653,8 @@ public class JCommanderTest {
   @Test(enabled = false,
       description = "For some reason, this test still asks the password on stdin")
   public void askedRequiredPassword() {
-    class A {     
-        @Parameter(names = { "--password", "-p" }, description = "Private key password", 
+    class A {
+        @Parameter(names = { "--password", "-p" }, description = "Private key password",
             password = true, required = true)
         public String password;
 
@@ -666,7 +665,7 @@ public class JCommanderTest {
     A a = new A();
     InputStream stdin = System.in;
     try {
-      System.setIn(new ByteArrayInputStream("password".getBytes()));      
+      System.setIn(new ByteArrayInputStream("password".getBytes()));
       new JCommander(a,new String[]{"--port", "7","--password"});
       Assert.assertEquals(a.port, 7);
       Assert.assertEquals(a.password, "password");
@@ -730,7 +729,7 @@ public class JCommanderTest {
     @Parameters(resourceBundle = "MessageBundle", commandDescriptionKey = "command")
     class Args {
       @Parameter(names="-myoption", descriptionKey="myoption")
-      private boolean option; 
+      private boolean option;
     }
     JCommander j = new JCommander();
     Args a = new Args();
@@ -874,12 +873,10 @@ public class JCommanderTest {
     final static List<String> names =  Lists.newArrayList();
     static boolean validateCalled = false;
 
-    @Override
     public void validate(String name, String value) throws ParameterException {
       validateCalled = true;
     }
 
-    @Override
     public void validate(String name, String value, ParameterDescription pd)
         throws ParameterException {
       names.addAll(Arrays.asList(pd.getParameter().names()));
@@ -899,7 +896,7 @@ public class JCommanderTest {
     Assert.assertEquals(V2.names, Arrays.asList(new String[] { "-h", "--host" }));
     Assert.assertTrue(V2.validateCalled);
   }
-  
+
   public void usageCommandsUnderUsage() {
     class Arg {
     }
@@ -913,13 +910,13 @@ public class JCommanderTest {
       @Parameter(description = "command b parameters")
       List<String> parameters;
     }
-    
+
     Arg a = new Arg();
-    
+
     JCommander c = new JCommander(a);
     c.addCommand("a", new ArgCommandA());
     c.addCommand("b", new ArgCommandB());
-    
+
     StringBuilder sb = new StringBuilder();
     c.usage(sb);
     Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
@@ -938,13 +935,13 @@ public class JCommanderTest {
       @Parameter(description = "command b parameters")
       List<String> parameters;
     }
-    
+
     Arg a = new Arg();
-    
+
     JCommander c = new JCommander(a);
     c.addCommand("a", new ArgCommandA());
     c.addCommand("b", new ArgCommandB());
-    
+
     StringBuilder sb = new StringBuilder();
     c.usage(sb);
     Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
@@ -981,13 +978,13 @@ public class JCommanderTest {
     class Arguments {
         @Parameter(names = { "-help", "-h" }, arity = 0, description = "Show this help message")
         public Boolean help = false;
-        
+
         @Parameter(names = { "-verbose", "-v" }, arity = 0, description = "Verbose output mode")
         public Boolean verbose = false;
-        
+
         @Parameter(names = { "-target" }, arity = 1, description = "Target directory", required = true)
         public File target;
-        
+
         @Parameter(names = { "-input" }, variableArity = true, description = "Input paths", required = true)
         public List<String> paths;
     }

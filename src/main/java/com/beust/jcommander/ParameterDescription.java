@@ -130,7 +130,7 @@ public class ParameterDescription {
     if (m_parameterAnnotation != null) {
       String description;
       if (Enum.class.isAssignableFrom(parameterized.getType())
-          && m_parameterAnnotation.description().isEmpty()) {
+          && m_parameterAnnotation.description().length() == 0) {
         description = "Options: " + EnumSet.allOf((Class<? extends Enum>) parameterized.getType());
       }else {
         description = m_parameterAnnotation.description();

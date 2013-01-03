@@ -3,7 +3,6 @@ package com.beust.jcommander.dynamic;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.internal.Maps;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -15,10 +14,11 @@ public class DynamicParameterTest {
     new JCommander(new DSimpleBad()).parse("-D", "a=b", "-D", "c=d");
   }
 
-  @Test(expectedExceptions = ParameterException.class)
-  public void wrongSeparatorShouldThrow() {
+  @Test
+  public void paramWithoutValue() {
     DSimple ds = new DSimple();
-    new JCommander(ds).parse("-D", "a:b", "-D", "c=d");
+    new JCommander(ds).parse("-D", "a", "-D", "c=d");
+    Assert.assertEquals(ds.params, Maps.newHashMap("a", null, "c", "d"));
   }
 
   private void simple(String... parameters) {
@@ -51,10 +51,9 @@ public class DynamicParameterTest {
   public static void main(String[] args) {
     DynamicParameterTest dpt = new DynamicParameterTest();
     dpt.simpleWithSpaces();
-//    dpt.nonMapShouldThrow();
-//    dpt.wrongSeparatorShouldThrow();
-//    dpt.differentAssignment();
-//    dpt.arity0();
-//    dpt.usage();
+    // dpt.nonMapShouldThrow();
+    // dpt.differentAssignment();
+    // dpt.arity0();
+    // dpt.usage();
   }
 }
