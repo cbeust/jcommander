@@ -25,7 +25,7 @@ public class JDK6Console implements Console {
 			cWriter.write(b);			
 		}    	
     };
-    writer = new PrintWriter(new OutputStreamWriter(writerOS, "UTF-8"));
+    writer = new PrintWriter(new OutputStreamWriter(writerOS, "UTF-8"), true);
   }
 
   public void print(String msg) {
