@@ -802,7 +802,7 @@ public class JCommander {
     @Override
     public int processVariableArity(String optionName, String[] options) {
         int i = 0;
-        while (i < options.length && !isOption(options, options[i])) {
+        while (i < options.length && findParameterDescription(options[i]) == null) {
           i++;
         }
         return i;
