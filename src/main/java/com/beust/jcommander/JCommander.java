@@ -1358,7 +1358,7 @@ public class JCommander {
    * Add a command object and its aliases.
    */
   public void addCommand(String name, Object object, String... aliases) {
-    JCommander jc = new JCommander(object);
+    JCommander jc = new JCommander(object, m_bundle);
     jc.setProgramName(name, aliases);
     jc.setDefaultProvider(m_defaultProvider);
     ProgramName progName = jc.m_programName;
