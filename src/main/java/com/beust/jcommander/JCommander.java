@@ -32,9 +32,9 @@ import com.beust.jcommander.internal.Sets;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -184,21 +184,26 @@ public class JCommander {
    * Creates a new un-configured JCommander object.
    */
   public JCommander() {
+	  this.forceBooleanOneArity = false;
   }
 
   /**
    * @param object The arg object expected to contain {@link Parameter} annotations.
    */
   public JCommander(Object object) {
-    this(object, true);
+    this(object, true, false);
   }
-
+  
+  
+  private final boolean forceBooleanOneArity; 
   /**
    * @param object The arg object expected to contain {@link Parameter} annotations.
    */
-  public JCommander(Object object, boolean parseParameterFiles) {
-    addObject(object, parseParameterFiles);
+  public JCommander(Object object, boolean parseParameterFiles, boolean forceBooleanOneArity) {
+	  this.forceBooleanOneArity = forceBooleanOneArity;
+	addObject(object, parseParameterFiles);
     createDescriptions();
+    
   }
 
   /**
@@ -206,8 +211,10 @@ public class JCommander {
    * @param bundle The bundle to use for the descriptions. Can be null.
    */
   public JCommander(Object object, ResourceBundle bundle) {
+	this.forceBooleanOneArity = false;
     addObject(object);
     setDescriptionsBundle(bundle);
+
   }
 
   /**
@@ -216,9 +223,11 @@ public class JCommander {
    * @param args The arguments to parse (optional).
    */
   public JCommander(Object object, ResourceBundle bundle, String... args) {
+	this.forceBooleanOneArity = false;
     addObject(object);
     setDescriptionsBundle(bundle);
     parse(args);
+    
   }
 
   /**
@@ -226,6 +235,7 @@ public class JCommander {
    * @param args The arguments to parse (optional).
    */
   public JCommander(Object object, String... args) {
+	this.forceBooleanOneArity = false;
     addObject(object);
     parse(args);
   }
@@ -342,10 +352,21 @@ public class JCommander {
 	 */
 	public void getAllDelegates(Object objectToScan)
 			throws IllegalAccessException {
-		for (Field field : objectToScan.getClass().getFields()) {
-			if (field.isAnnotationPresent(ParametersDelegate.class)) {
-				m_parameterObjectForFiles.add(field.get(objectToScan));
-				getAllDelegates(field.get(objectToScan));
+		if(objectToScan.getClass().isArray())
+		{
+			for(int i=0; i < Array.getLength(objectToScan); i++)
+			{
+				getAllDelegates(Array.get(objectToScan, i));
+				
+			}
+		} else
+		{
+		
+			for (Field field : objectToScan.getClass().getFields()) {
+				if (field.isAnnotationPresent(ParametersDelegate.class)) {
+					m_parameterObjectForFiles.add(field.get(objectToScan));
+					getAllDelegates(field.get(objectToScan));
+				}
 			}
 		}
 
@@ -780,7 +801,7 @@ public class JCommander {
   
   private void parseValues(String[] args)
   {
-	  parseValues(args, false, false);
+	  parseValues(args, forceBooleanOneArity, false);
   }
   
   private void parseValues(String[] args, boolean treatBooleansAsArityOne, boolean skipAlreadyAssigned) {

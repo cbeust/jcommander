@@ -1,7 +1,5 @@
 package com.beust.jcommander;
 
-import java.net.URL;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
