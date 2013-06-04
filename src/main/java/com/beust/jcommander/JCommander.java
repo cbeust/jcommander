@@ -156,6 +156,8 @@ public class JCommander {
   private boolean m_acceptUnknownOptions = false;
   
   private static Console m_console;
+  
+  private boolean expandAmpersat = true;
 
   /**
    * The factories used to look up string converters.
@@ -207,6 +209,10 @@ public class JCommander {
   public JCommander(Object object, String... args) {
     addObject(object);
     parse(args);
+  }
+
+  public void setExpandAmpersat(boolean expandAmpersat){
+    this.expandAmpersat = expandAmpersat;
   }
   
   public static Console getConsole() {
@@ -351,7 +357,7 @@ public class JCommander {
     //
     for (String arg : originalArgv) {
 
-      if (arg.startsWith("@")) {
+      if (arg.startsWith("@") && expandAmpersat) {
         String fileName = arg.substring(1);
         vResult1.addAll(readFile(fileName));
       }
