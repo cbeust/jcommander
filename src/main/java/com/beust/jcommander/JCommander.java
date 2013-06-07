@@ -680,6 +680,7 @@ public class JCommander {
     while (i < args.length && ! commandParsed) {
       String arg = args[i];
       String a = trim(arg);
+      args[i] = a;
       p("Parsing arg: " + a);
 
       JCommander jc = findCommandByAlias(arg);
@@ -748,7 +749,7 @@ public class JCommander {
             // Regular (non-command) parsing
             //
             List mp = getMainParameter(arg);
-            String value = arg;
+            String value = a; // If there's a non-quoted version, prefer that one
             Object convertedValue = value;
 
             if (m_mainParameter.getGenericType() instanceof ParameterizedType) {
