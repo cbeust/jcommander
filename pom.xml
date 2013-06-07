@@ -131,7 +131,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.10</version>
         <configuration>
-          <skipTests>true</skipTests>
+          <skipTests>false</skipTests>
         </configuration>
         <dependencies>
           <dependency>

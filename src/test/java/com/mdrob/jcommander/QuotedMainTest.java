@@ -1,7 +1,6 @@
 package com.mdrob.jcommander;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.testng.Assert;
@@ -10,21 +9,20 @@ import org.testng.annotations.Test;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
-
 public class QuotedMainTest {
-  public static class Options {
-    @Parameter
-    List<String> args = new ArrayList<String>();
-    
-    @Parameter(names={"-f", "--foo"})
-    String other;
+  @Parameter
+  List<String> args = new ArrayList<String>();
+  
+  String quoted = "\" \"";
+
+  @Test
+  public void testMain() {
+    JCommander jc = new JCommander(this);
+    jc.parse(quoted);
+    Assert.assertEquals(args.size(), 1);
   }
   
-  @Test
-  public void testMain() {    
-    String quoted = "\"quoted\"";
-    Options options = new Options();
-    new JCommander(options).parse(quoted);
-    Assert.assertEquals(options.args, Collections.singletonList(quoted));
+  public static void main(String[] args) {
+    new QuotedMainTest().testMain();
   }
 }
