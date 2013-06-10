@@ -175,9 +175,16 @@ public class JCommander {
   private Map<Field, String> m_parameterFileNames = Maps.newHashMap();
   
   /**
-   * Stores a set of Fields that are 
+   * Stores a set of Fields that are allowed to not exist
    */
   private Set<Field> m_parameterFilesThatCanNotExist = new HashSet<Field>();
+  
+  private Set<String> m_parameterFilesToRead = new HashSet<String>();
+  
+  public Set<String> getParameterFilesToRead()
+  {
+	  return Collections.unmodifiableSet(this.m_parameterFilesToRead);
+  }
   
   /**
    * The factories used to look up string converters.
@@ -203,7 +210,9 @@ public class JCommander {
   }
   
   
-  private final boolean forceBooleanOneArity; 
+  private final boolean forceBooleanOneArity;
+
+
   /**
    * @param object The arg object expected to contain {@link Parameter} annotations.
    */
@@ -337,6 +346,11 @@ public class JCommander {
 	       				{
 	       					this.m_parameterFilesThatCanNotExist.add(field);
 	       				}
+	       				
+	       				if(field.get(obj) != null)
+	       				{
+	       					this.m_parameterFilesToRead.add(field.get(obj) + "");
+	       				}
 	    			   }
 	    			   
 	    			}
@@ -366,6 +380,7 @@ public class JCommander {
 	 */
 	public void getAllDelegates(Object objectToScan)
 			throws IllegalAccessException {
+		m_parameterObjectForFiles.add(objectToScan);
 		if(objectToScan.getClass().isArray())
 		{
 			for(int i=0; i < Array.getLength(objectToScan); i++)
@@ -378,7 +393,6 @@ public class JCommander {
 		
 			for (Field field : objectToScan.getClass().getFields()) {
 				if (field.isAnnotationPresent(ParametersDelegate.class)) {
-					m_parameterObjectForFiles.add(field.get(objectToScan));
 					getAllDelegates(field.get(objectToScan));
 				}
 			}
@@ -400,6 +414,7 @@ public class JCommander {
    */
   public void parse(String... args) {
     parse(true /* validate */, args);
+
   }
 
   /**
