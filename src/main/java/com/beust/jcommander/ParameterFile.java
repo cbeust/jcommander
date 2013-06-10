@@ -13,5 +13,6 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface ParameterFile {
 
+	boolean ignoreFileNotExists() default false;
 	
 }

@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,6 +84,7 @@ public class JCommander {
    */
   private List<Object> m_objects = Lists.newArrayList();
 
+  
   /**
    * This field/method will contain whatever command line parameter is not an option.
    * It is expected to be a List<String>.
@@ -171,6 +173,12 @@ public class JCommander {
    * Stores a mapping from Field to names
    */
   private Map<Field, String> m_parameterFileNames = Maps.newHashMap();
+  
+  /**
+   * Stores a set of Fields that are 
+   */
+  private Set<Field> m_parameterFilesThatCanNotExist = new HashSet<Field>();
+  
   /**
    * The factories used to look up string converters.
    */
@@ -323,6 +331,12 @@ public class JCommander {
 	    				   p("Adding ParameterFile Field " + name);
 	       				this.m_parameterFileOptions.put(field,  obj);
 	       				this.m_parameterFileNames.put(field, name);
+	       				
+	       				ParameterFile parameterFile = field.getAnnotation(ParameterFile.class);
+	       				if(parameterFile.ignoreFileNotExists())
+	       				{
+	       					this.m_parameterFilesThatCanNotExist.add(field);
+	       				}
 	    			   }
 	    			   
 	    			}
@@ -931,6 +945,7 @@ public class JCommander {
 	    	
 	    	if(!parameterFile.exists())
 	    	{
+	    		if(this.m_parameterFilesThatCanNotExist.contains(field)) continue;
 	    		throw new ParameterException("Parameter File does not exist: " + parameterFile.getName());
 	    	}
 	    	
