@@ -110,4 +110,17 @@ public class DefaultValueTest {
     set.add(value);
     return set;
   }
+  
+
+  @Test
+  public void missingRequiredParameterWithDefaultValueShouldNotRaiseParameterException() {
+    MyRequiredOptsWithDefaultValues opts = new MyRequiredOptsWithDefaultValues();
+    JCommander cmd = new JCommander(opts);
+    cmd.parse(new String[]{});
+  }
+
+  public static class MyRequiredOptsWithDefaultValues {
+    @Parameter(names = "-a", required = true)
+    public List<String> list = singletonList("defaultValue");
+  }
 }

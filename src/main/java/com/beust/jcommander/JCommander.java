@@ -796,6 +796,14 @@ public class JCommander {
       if (parameterDescription.isAssigned()) {
         m_fields.get(parameterDescription.getParameterized()).setAssigned(true);
       }
+      
+      // if the parameter has a default value (not the one assigned by DefaultProvider
+      // but the one assigned on the variable initialization), make it as assigned and
+      // remove it from the list of parameters to be required
+      if (parameterDescription.getDefault() != null) {
+          m_fields.get(parameterDescription.getParameterized()).setAssigned(true);
+          m_requiredFields.remove(parameterDescription.getParameterized());
+      }
     }
 
   }
