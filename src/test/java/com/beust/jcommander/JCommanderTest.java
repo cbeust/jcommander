@@ -562,12 +562,12 @@ public class JCommanderTest {
 
   public void enumArgs() {
     ArgsEnum args = new ArgsEnum();
-    String[] argv = { "-choice", "ONE", "-choices", "ONE", "TWO" };
+    String[] argv = { "-choice", "ONE", "-choices", "ONE", "Two" };
     JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
     
-    List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.TWO);
+    List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
     Assert.assertEquals(expected, args.choices);
     Assert.assertEquals(jc.getParameters().get(0).getDescription(),
         "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
@@ -964,9 +964,44 @@ public class JCommanderTest {
     Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
   }
 
+  /**
+   * GITHUB-137.
+   */
+  public void listArgShouldBeCleared() {
+    class Args {
+      @Parameter(description = "[endpoint]")
+      public List<String> endpoint = Lists.newArrayList("prod");
+    }
+    Args a = new Args();
+    new JCommander(a, new String[] { "dev" });
+    Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
+  }
+
+  public void a() {
+    class Arguments {
+        @Parameter(names = { "-help", "-h" }, arity = 0, description = "Show this help message")
+        public Boolean help = false;
+        
+        @Parameter(names = { "-verbose", "-v" }, arity = 0, description = "Verbose output mode")
+        public Boolean verbose = false;
+        
+        @Parameter(names = { "-target" }, arity = 1, description = "Target directory", required = true)
+        public File target;
+        
+        @Parameter(names = { "-input" }, variableArity = true, description = "Input paths", required = true)
+        public List<String> paths;
+    }
+    Arguments a = new Arguments();
+    new JCommander(a, new String[] {
+        "-input", "example_in1", "example_in2", "-target", "example_out" }
+    );
+    Assert.assertEquals(a.paths, Lists.newArrayList("example_in1", "example_in2"));
+    Assert.assertEquals(a.target, new File("example_out"));
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().parameterWithOneDoubleQuote();
+    new JCommanderTest().a();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

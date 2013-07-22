@@ -76,6 +76,8 @@ public class JCommander {
    */
   private List<Object> m_objects = Lists.newArrayList();
 
+  private boolean m_firstTimeMainParameter = true;
+
   /**
    * This field/method will contain whatever command line parameter is not an option.
    * It is expected to be a List<String>.
@@ -679,6 +681,7 @@ public class JCommander {
     while (i < args.length && ! commandParsed) {
       String arg = args[i];
       String a = trim(arg);
+      args[i] = a;
       p("Parsing arg: " + a);
 
       JCommander jc = findCommandByAlias(arg);
@@ -747,7 +750,7 @@ public class JCommander {
             // Regular (non-command) parsing
             //
             List mp = getMainParameter(arg);
-            String value = arg;
+            String value = a; // If there's a non-quoted version, prefer that one
             Object convertedValue = value;
 
             if (m_mainParameter.getGenericType() instanceof ParameterizedType) {
@@ -913,6 +916,10 @@ public class JCommander {
             + " needs to be of type List, not " + m_mainParameter.getType());
       }
       m_mainParameter.set(m_mainParameterObject, result);
+    }
+    if (m_firstTimeMainParameter) {
+      result.clear();
+      m_firstTimeMainParameter = false;
     }
     return result;
   }
@@ -1242,21 +1249,6 @@ public class JCommander {
       }
     }
 
-    //
-//    //
-//    // Try to find a converter in the factory
-//    //
-//    IStringConverter<?> converter = null;
-//    if (converterClass == null && m_converterFactories != null) {
-//      // Mmmh, javac requires a cast here
-//      converter = (IStringConverter) m_converterFactories.getConverter(type);
-//    }
-
-//    if (converterClass == null) {
-//      throw new ParameterException("Don't know how to convert " + value
-//          + " to type " + type + " (field: " + field.getName() + ")");
-//    }
-
     IStringConverter<?> converter;
     Object result = null;
     try {
@@ -1265,6 +1257,9 @@ public class JCommander {
       if (converterClass != null && converterClass.isEnum()) {
         try {
           result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
+          if (result == null) {
+            result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
+          }
         } catch (Exception e) {
           throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
                                        EnumSet.allOf((Class<? extends Enum>) converterClass));
