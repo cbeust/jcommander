@@ -585,7 +585,7 @@ public class JCommanderTest {
     ArgsList al = new ArgsList();
     JCommander j = new JCommander(al);
     j.parse("-groups", "a,b", "-ints", "41,42", "-hp", "localhost:1000;example.com:1001",
-        "-hp2", "localhost:1000,example.com:1001", "-uppercase", "ab,cd");
+        "-hp2", "localhost:1000,example.com:1001", "-hps", "localhost:1000;example.com:1001", "-uppercase", "ab,cd");
     Assert.assertEquals(al.groups.get(0), "a");
     Assert.assertEquals(al.groups.get(1), "b");
     Assert.assertEquals(al.ints.get(0).intValue(), 41);

@@ -1249,7 +1249,7 @@ public class JCommander {
       }
     }
 
-    IStringConverter<?> converter;
+    IStringConverter<?> converter = null;
     Object result = null;
     try {
       String[] names = annotation.names();
@@ -1265,7 +1265,9 @@ public class JCommander {
                                        EnumSet.allOf((Class<? extends Enum>) converterClass));
         }
       } else {
-        converter = instantiateConverter(optionName, converterClass);
+        if (converterClass != null) {
+          converter = instantiateConverter(optionName, converterClass);
+        }
         if (type.isAssignableFrom(List.class)
               && parameterized.getGenericType() instanceof ParameterizedType) {
 
