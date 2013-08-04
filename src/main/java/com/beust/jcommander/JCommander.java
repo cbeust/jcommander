@@ -30,6 +30,7 @@ import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -53,6 +54,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -391,9 +393,20 @@ public class JCommander {
 		} else
 		{
 		
-			for (Field field : objectToScan.getClass().getFields()) {
+			for (Field field : objectToScan.getClass().getDeclaredFields()) {
 				if (field.isAnnotationPresent(ParametersDelegate.class)) {
+					
+					boolean fmo = field.isAccessible();
+					if(!fmo)
+					{
+						field.setAccessible(true);
+					}
 					getAllDelegates(field.get(objectToScan));
+					
+					if(!fmo)
+					{
+						field.setAccessible(false);
+					}
 				}
 			}
 		}
@@ -1004,7 +1017,18 @@ public class JCommander {
 		try { 
 		Map<String, List<String>> arguments = Maps.newLinkedHashMap();
 		inStream = new FileInputStream(parameterFile);
-		p.load(inStream);
+		
+		BufferedReader fin = new BufferedReader(new FileReader(parameterFile));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while(( line = fin.readLine()) != null)
+		{
+			sb.append(line.replaceAll("\\\\",Matcher.quoteReplacement("\\\\"))).append("\n");
+		}
+		
+		fin.close();
+		
+		p.load(new ByteArrayInputStream(sb.toString().getBytes()));
 		inStream.close();
 		for(Entry<Object, Object> obj : p.entrySet())
 		{
