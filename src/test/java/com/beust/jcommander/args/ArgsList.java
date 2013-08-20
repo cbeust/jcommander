@@ -2,6 +2,7 @@ package com.beust.jcommander.args;
 
 import com.beust.jcommander.HostPort;
 import com.beust.jcommander.HostPortConverter;
+import com.beust.jcommander.HostPortListConverter;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.IParameterSplitter;
@@ -23,6 +24,9 @@ public class ArgsList {
 
   @Parameter(names = "-hp2", converter = HostPortConverter.class)
   public List<HostPort> hp2;
+
+  @Parameter(names = "-hps", listConverter = HostPortListConverter.class)
+  public List<HostPort> hps;
 
   @Parameter(names = "-uppercase", listConverter = UppercaseConverter.class)
   public List<String> uppercase;
