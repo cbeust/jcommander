@@ -974,12 +974,12 @@ public class JCommander {
 	    	if(!parameterFile.exists())
 	    	{
 	    		if(this.m_parameterFilesThatCanNotExist.contains(field)) continue;
-	    		throw new ParameterException("Parameter File does not exist: " + parameterFile.getName());
+	    		throw new ParameterException("Option File (JCommander @ParameterFile) does not exist: " + parameterFile.getName());
 	    	}
 	    	
 			if(!parameterFile.canRead())
 			{
-				throw new ParameterException("Parameter File is not readable: " + parameterFile.getName());
+				throw new ParameterException("Option File (JCommander @ParameterFile) file is not readable: " + parameterFile.getName());
 			}
 	    	
 			String[] paramFileContents = parseParameterFile(parameterFile);
