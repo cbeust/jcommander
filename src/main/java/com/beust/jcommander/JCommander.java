@@ -50,6 +50,8 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Nullable;
 
+import javax.annotation.PostConstruct;
+
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
  * all the annotated fields, parse the command line and assign the fields with the correct
@@ -74,6 +76,8 @@ public class JCommander {
    * The objects that contain fields annotated with @Parameter.
    */
   private List<Object> m_objects = Lists.newArrayList();
+
+  private Map<Method, Object> m_postConstructs = Maps.newHashMap();
 
   private boolean m_firstTimeMainParameter = true;
 
@@ -279,6 +283,7 @@ public class JCommander {
     if (m_descriptions == null) createDescriptions();
     initializeDefaultValues();
     parseValues(expandArgs(args), validate);
+    postConstruct();
     if (validate) validateOptions();
   }
 
@@ -299,6 +304,16 @@ public class JCommander {
 
       for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
         entry.getValue().initializeDefaultValues();
+      }
+    }
+  }
+
+  private void postConstruct() {
+    for (Map.Entry<Method, Object> postConstruct : m_postConstructs.entrySet()) {
+      try {
+        postConstruct.getKey().invoke(postConstruct.getValue());
+      } catch (IllegalAccessException e) {
+      } catch (InvocationTargetException e) {
       }
     }
   }
@@ -655,6 +670,21 @@ public class JCommander {
 //      // Traverse the super class until we find Object.class
 //      cls = cls.getSuperclass();
 //    }
+
+    Method postConstruct = findPostConstructMethod(cls);
+    if (postConstruct != null) {
+      m_postConstructs.put(postConstruct, object);
+    }
+  }
+
+  private static Method findPostConstructMethod(Class<?> clazz) {
+    for(Method method : clazz.getDeclaredMethods()) {
+      if(method.getAnnotation(PostConstruct.class) != null) {
+        method.setAccessible(true);
+        return method;
+      }
+    }
+    return null;
   }
 
   private void initializeDefaultValue(ParameterDescription pd) {
