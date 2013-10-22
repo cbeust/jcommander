@@ -729,11 +729,6 @@ public class JCommander {
         } else {
           if (m_acceptUnknownOptions) {
             m_unknownArgs.add(arg);
-            i++;
-            while (i < args.length && ! isOption(args, args[i])) {
-              m_unknownArgs.add(args[i++]);
-            }
-            increment = 0;
           } else {
             throw new ParameterException("Unknown option: " + arg);
           }
@@ -748,24 +743,28 @@ public class JCommander {
             //
             // Regular (non-command) parsing
             //
-            List mp = getMainParameter(arg);
-            String value = a; // If there's a non-quoted version, prefer that one
-            Object convertedValue = value;
+            if (m_acceptUnknownOptions && m_mainParameter == null) {
+              m_unknownArgs.add(arg);
+            } else {
+              List mp = getMainParameter(arg);
+              String value = a; // If there's a non-quoted version, prefer that one
+              Object convertedValue = value;
 
-            if (m_mainParameter.getGenericType() instanceof ParameterizedType) {
-              ParameterizedType p = (ParameterizedType) m_mainParameter.getGenericType();
-              Type cls = p.getActualTypeArguments()[0];
-              if (cls instanceof Class) {
-                convertedValue = convertValue(m_mainParameter, (Class) cls, value);
+              if (m_mainParameter.getGenericType() instanceof ParameterizedType) {
+                ParameterizedType p = (ParameterizedType) m_mainParameter.getGenericType();
+                Type cls = p.getActualTypeArguments()[0];
+                if (cls instanceof Class) {
+                  convertedValue = convertValue(m_mainParameter, (Class) cls, value);
+                }
               }
+
+              ParameterDescription.validateParameter(m_mainParameterDescription,
+                  m_mainParameterAnnotation.validateWith(),
+                  "Default", value);
+
+              m_mainParameterDescription.setAssigned(true);
+              mp.add(convertedValue);
             }
-
-            ParameterDescription.validateParameter(m_mainParameterDescription,
-                m_mainParameterAnnotation.validateWith(),
-                "Default", value);
-
-            m_mainParameterDescription.setAssigned(true);
-            mp.add(convertedValue);
           }
           else {
             //
