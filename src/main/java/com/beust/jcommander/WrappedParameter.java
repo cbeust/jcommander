@@ -109,4 +109,11 @@ public class WrappedParameter {
     return m_parameter != null && m_parameter.help();
   }
 
+  public int usageOrder() {
+    return m_parameter != null ? m_parameter.usageOrder() : m_dynamicParameter.usageOrder();
+  }
+
+  public String argValueDesc() {
+    return m_parameter != null ? m_parameter.argValueDesc() : m_dynamicParameter.argValueDesc();
+  }
 }

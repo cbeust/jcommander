@@ -47,4 +47,14 @@ public @interface DynamicParameter {
   String assignment() default "=";
 
   Class<? extends IValueValidator> validateValueWith() default NoValueValidator.class;
+
+  /**
+   * The usage order.
+   */
+  int usageOrder() default -1;
+
+  /**
+   * The description of the arg value.
+   */
+  String argValueDesc() default "";
 }
