@@ -119,4 +119,14 @@ public @interface Parameter {
    * required parameters are no longer checked for their presence.
    */
   boolean help() default false;
+
+  /**
+   * The usage order.
+   */
+  int usageOrder() default -1;
+
+  /**
+   * The description of the arg value.
+   */
+  String argValueDesc() default "";
 }
