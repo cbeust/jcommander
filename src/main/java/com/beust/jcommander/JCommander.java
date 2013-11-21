@@ -208,7 +208,56 @@ public class JCommander {
     addObject(object);
     parse(args);
   }
-  
+
+  /**
+   * Convenience method for parsing arguments in a functional manner - i.e. without using an output parameter.
+   *
+   * @param argumentsDescriptor The arg class expected to contain {@link Parameter} annotations.
+   * @param args The arguments to parse
+   * @return The args parsed into an instance of parameterDescriptorClass
+   */
+  public static <T> T parse(Class<T> parameterDescriptorClass, String[] args) {
+
+    T parameterCarrier = instantiateArgumentsCarrier(parameterDescriptorClass);
+
+    new JCommander(parameterCarrier, args);
+
+    return parameterCarrier;
+  }
+
+  private static <T> T instantiateArgumentsCarrier(final Class<T> parameterDescriptorClass) {
+
+    try {
+      return parameterDescriptorClass.newInstance();
+    } catch (InstantiationException e) {
+      throw new RuntimeException(e);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Convenience method for getting the usage text in a functional manner - i.e. without using an output parameter.
+   *
+   * @param argumentsDescriptor The arg class expected to contain {@link Parameter} annotations.
+   * @param args The name of the program
+   * @return The usage description
+   */
+  public static <T> String usage(Class<T> parameterDescriptorClass, String programName) {
+
+    T parameterCarrier = instantiateArgumentsCarrier(parameterDescriptorClass);
+
+    JCommander parser = new JCommander(parameterCarrier);
+
+    parser.setProgramName(programName);
+
+    StringBuilder builder = new StringBuilder();
+
+    parser.usage(builder);
+
+    return builder.toString();
+  }
+
   public static Console getConsole() {
     if (m_console == null) {
       try {
