@@ -200,7 +200,7 @@ For example, here is a converter that turns a string into a <tt>File</tt>:
 <pre class="brush: java">
 public class FileConverter implements IStringConverter&lt;File&gt; {
   @Override
-  private File convert(String value) {
+  public File convert(String value) {
     return new File(value);
   }
 }
