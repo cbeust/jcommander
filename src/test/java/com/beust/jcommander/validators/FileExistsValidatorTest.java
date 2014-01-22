@@ -23,36 +23,36 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 import org.mockito.Mockito;
 
 import com.beust.jcommander.ParameterException;
 
 public class FileExistsValidatorTest {
 
-  @Test(expected=ParameterException.class) 
+  @Test(expectedExceptions=ParameterException.class)
   public void throwsParameterExceptionIfFileDoesNotExist() {
     FileExistsValidator validator = Mockito.spy(new FileExistsValidator());
-    
+
     File mockFile = Mockito.mock(File.class);
     Mockito.doReturn(mockFile).when(validator).getFile(Mockito.anyString());
-    
+
     validator.validate(randomString(), randomString());
   }
-  
+
   @Test
   public void validatesThatTheFileExists() throws IOException {
     File tmpFile = new File("target/"+randomString());
-    Assert.assertTrue("Failed to create temp file to perform test.",tmpFile.createNewFile());
-    
+    Assert.assertTrue(tmpFile.createNewFile(), "Failed to create temp file to perform test.");
+
     FileExistsValidator validator = new FileExistsValidator();
-    
+
     validator.validate(randomString(), tmpFile.getAbsolutePath());
   }
-  
+
   private String randomString() {
     return UUID.randomUUID().toString();
   }
-  
+
 }
