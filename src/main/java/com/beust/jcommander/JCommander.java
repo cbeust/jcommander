@@ -1228,14 +1228,12 @@ public class JCommander {
     //
     // Try to find a converter on the annotation
     //
-    if (converterClass == null || converterClass == NoConverter.class) {
-      // If no converter specified and type is enum, used enum values to convert
-      if (type.isEnum()){
-        converterClass = type;
-      } else {
+    if (converterClass == null || converterClass == NoConverter.class)
         converterClass = findConverter(type);
-      }
-    }
+
+    // If no converter was found and type is enum, use enum values to convert
+    if (converterClass == null && type.isEnum())
+        converterClass = type;
 
     if (converterClass == null) {
       Type elementType = parameterized.findFieldGenericType();
