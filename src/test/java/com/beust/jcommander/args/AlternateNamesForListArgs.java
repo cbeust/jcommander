@@ -1,5 +1,7 @@
 /*
- * Copyright 2014 alaw3.
+ * Copyright (C) 2014 the original author or authors.
+ * See the notice.md file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +23,7 @@ import java.util.List;
 
 /**
  *
- * @author alaw3
+ * @author Andy Law <andy.law@roslin.ed.ac.uk>
  */
 public class AlternateNamesForListArgs {
 
