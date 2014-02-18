@@ -544,13 +544,13 @@ public class JCommander {
           m_mainParameterDescription =
               new ParameterDescription(object, p, parameterized, m_bundle, this);
         } else {
+          ParameterDescription pd =
+              new ParameterDescription(object, p, parameterized, m_bundle, this);
           for (String name : p.names()) {
             if (m_descriptions.containsKey(new StringKey(name))) {
               throw new ParameterException("Found the option " + name + " multiple times");
             }
             p("Adding description for " + name);
-            ParameterDescription pd =
-                new ParameterDescription(object, p, parameterized, m_bundle, this);
             m_fields.put(parameterized, pd);
             m_descriptions.put(new StringKey(name), pd);
 

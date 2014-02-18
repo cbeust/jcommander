@@ -18,6 +18,7 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.args.AlternateNamesForListArgs;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
@@ -96,6 +97,35 @@ public class JCommanderTest {
     Assert.assertEquals(args.date, new SimpleDateFormat("yyyy-MM-dd").parse("2011-10-26"));
   }
 
+  @DataProvider
+  public Object[][] alternateNamesListArgs() {
+    return new Object[][] {
+        new String[][] {new String[] {"--servers", "1", "-s", "2", "--servers", "3"}},
+        new String[][] {new String[] {"-s", "1", "-s", "2", "--servers", "3"}},
+        new String[][] {new String[] {"--servers", "1", "--servers", "2", "-s", "3"}},
+        new String[][] {new String[] {"-s", "1", "--servers", "2", "-s", "3"}},
+        new String[][] {new String[] {"-s", "1", "-s", "2", "--servers", "3"}},
+    };
+  }
+  
+  /**
+   *  Confirm that List<?> parameters with alternate names return the correct
+   * List regardless of how the arguments are specified
+   */
+  
+  @Test(dataProvider = "alternateNamesListArgs")
+  public void testAlternateNamesForListArguments(String[] argv) {
+      AlternateNamesForListArgs args = new AlternateNamesForListArgs();
+      
+      new JCommander(args, argv);
+      
+      Assert.assertEquals(args.serverNames.size(), 3);
+      Assert.assertEquals(args.serverNames.get(0), argv[1]);
+      Assert.assertEquals(args.serverNames.get(1), argv[3]);
+      Assert.assertEquals(args.serverNames.get(2), argv[5]);
+  }
+  
+  
   /**
    * Make sure that if there are args with multiple names (e.g. "-log" and "-verbose"),
    * the usage will only display it once.
