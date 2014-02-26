@@ -37,42 +37,12 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 
+import com.beust.jcommander.args.*;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.beust.jcommander.args.Args1;
-import com.beust.jcommander.args.Args1Setter;
-import com.beust.jcommander.args.Args2;
-import com.beust.jcommander.args.ArgsArityString;
-import com.beust.jcommander.args.ArgsBooleanArity;
-import com.beust.jcommander.args.ArgsBooleanArity0;
-import com.beust.jcommander.args.ArgsConverter;
-import com.beust.jcommander.args.ArgsEnum;
 import com.beust.jcommander.args.ArgsEnum.ChoiceType;
-import com.beust.jcommander.args.ArgsEquals;
-import com.beust.jcommander.args.ArgsHelp;
-import com.beust.jcommander.args.ArgsI18N1;
-import com.beust.jcommander.args.ArgsI18N2;
-import com.beust.jcommander.args.ArgsI18N2New;
-import com.beust.jcommander.args.ArgsInherited;
-import com.beust.jcommander.args.ArgsList;
-import com.beust.jcommander.args.ArgsMainParameter1;
-import com.beust.jcommander.args.ArgsMaster;
-import com.beust.jcommander.args.ArgsMultipleUnparsed;
-import com.beust.jcommander.args.ArgsOutOfMemory;
-import com.beust.jcommander.args.ArgsPrivate;
-import com.beust.jcommander.args.ArgsRequired;
-import com.beust.jcommander.args.ArgsSlave;
-import com.beust.jcommander.args.ArgsSlaveBogus;
-import com.beust.jcommander.args.ArgsValidate1;
-import com.beust.jcommander.args.ArgsWithSet;
-import com.beust.jcommander.args.Arity1;
-import com.beust.jcommander.args.SeparatorColon;
-import com.beust.jcommander.args.SeparatorEqual;
-import com.beust.jcommander.args.SeparatorMixed;
-import com.beust.jcommander.args.SlashSeparator;
-import com.beust.jcommander.args.VariableArity;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
@@ -540,6 +510,21 @@ public class JCommanderTest {
   @Test(expectedExceptions = ParameterException.class)
   public void validationShouldWork2() {
     ArgsValidate1 a = new ArgsValidate1();
+    JCommander jc = new JCommander(a);
+    jc.parse(new String[] { "-age", "-2 "});
+  }
+
+  @Test
+  public void beanValidationShouldWork1() {
+    ArgsBeanValidation1 a = new ArgsBeanValidation1();
+    JCommander jc = new JCommander(a);
+    jc.parse(new String[] { "-age", "2 "});
+    Assert.assertEquals(a.age, new Integer(2));
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void beanValidationShouldWork2() {
+    ArgsBeanValidation1 a = new ArgsBeanValidation1();
     JCommander jc = new JCommander(a);
     jc.parse(new String[] { "-age", "-2 "});
   }

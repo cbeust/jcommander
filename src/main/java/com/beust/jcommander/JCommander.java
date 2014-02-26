@@ -26,17 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import com.beust.jcommander.FuzzyMap.IKey;
 import com.beust.jcommander.converters.IParameterSplitter;
@@ -49,6 +39,11 @@ import com.beust.jcommander.internal.JDK6Console;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Nullable;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -110,7 +105,7 @@ public class JCommander {
    */
   private Map<Parameterized, ParameterDescription> m_fields = Maps.newHashMap();
 
-  private ResourceBundle m_bundle;
+  private java.util.ResourceBundle m_bundle;
 
   /**
    * A default provider returns default values for the parameters.
@@ -161,10 +156,12 @@ public class JCommander {
    * The factories used to look up string converters.
    */
   private static LinkedList<IStringConverterFactory> CONVERTER_FACTORIES = Lists.newLinkedList();
+  private static final Validator VALIDATOR;
 
   static {
     CONVERTER_FACTORIES.addFirst(new DefaultConverterFactory());
-  };
+    VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
+  }
 
   /**
    * Creates a new un-configured JCommander object.
@@ -184,7 +181,7 @@ public class JCommander {
    * @param object The arg object expected to contain {@link Parameter} annotations.
    * @param bundle The bundle to use for the descriptions. Can be null.
    */
-  public JCommander(Object object, @Nullable ResourceBundle bundle) {
+  public JCommander(Object object, @Nullable java.util.ResourceBundle bundle) {
     addObject(object);
     setDescriptionsBundle(bundle);
   }
@@ -194,7 +191,7 @@ public class JCommander {
    * @param bundle The bundle to use for the descriptions. Can be null.
    * @param args The arguments to parse (optional).
    */
-  public JCommander(Object object, ResourceBundle bundle, String... args) {
+  public JCommander(Object object, java.util.ResourceBundle bundle, String... args) {
     addObject(object);
     setDescriptionsBundle(bundle);
     parse(args);
@@ -249,11 +246,11 @@ public class JCommander {
   }
 
   /**
-   * Sets the {@link ResourceBundle} to use for looking up descriptions.
+   * Sets the {@link java.util.ResourceBundle} to use for looking up descriptions.
    * Set this to <code>null</code> to use description text directly.
    */
   // declared final since this is invoked from constructors
-  public final void setDescriptionsBundle(ResourceBundle bundle) {
+  public final void setDescriptionsBundle(java.util.ResourceBundle bundle) {
     m_bundle = bundle;
   }
 
@@ -328,6 +325,14 @@ public class JCommander {
         throw new ParameterException("Main parameters are required (\""
             + m_mainParameterDescription.getDescription() + "\")");
       }
+    }
+
+    Set<ConstraintViolation> violations = new HashSet<ConstraintViolation>();
+    for (Object object : m_objects) {
+      violations.addAll(VALIDATOR.validate(object));
+    }
+    if (!violations.isEmpty()) {
+      throw new ParameterException(violations.toString());
     }
   }
 
@@ -997,13 +1002,13 @@ public class JCommander {
 
     Object arg = jc.getObjects().get(0);
     Parameters p = arg.getClass().getAnnotation(Parameters.class);
-    ResourceBundle bundle = null;
+    java.util.ResourceBundle bundle = null;
     String result = null;
     if (p != null) {
       result = p.commandDescription();
       String bundleName = p.resourceBundle();
       if (!"".equals(bundleName)) {
-        bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+        bundle = java.util.ResourceBundle.getBundle(bundleName, Locale.getDefault());
       } else {
         bundle = m_bundle;
       }
@@ -1020,7 +1025,7 @@ public class JCommander {
    * @return The internationalized version of the string if available, otherwise
    * return def.
    */
-  private String getI18nString(ResourceBundle bundle, String key, String def) {
+  private String getI18nString(java.util.ResourceBundle bundle, String key, String def) {
     String s = bundle != null ? bundle.getString(key) : null;
     return s != null ? s : def;
   }
