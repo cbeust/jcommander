@@ -1256,9 +1256,8 @@ public class JCommander {
       if (converterClass != null && converterClass.isEnum()) {
         try {
           result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
-          if (result == null) {
-            result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
-          }
+        } catch ( IllegalArgumentException e ) {
+          result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
         } catch (Exception e) {
           throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
                                        EnumSet.allOf((Class<? extends Enum>) converterClass));
