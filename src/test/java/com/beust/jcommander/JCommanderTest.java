@@ -596,12 +596,20 @@ public class JCommanderTest {
     JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
-    
+
     List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
     Assert.assertEquals(expected, args.choices);
     Assert.assertEquals(jc.getParameters().get(0).getDescription(),
         "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
-    
+
+  }
+
+  public void enumArgsCaseInsensitive() {
+      ArgsEnum args = new ArgsEnum();
+      String[] argv = { "-choice", "one"};
+      JCommander jc = new JCommander(args, argv);
+
+      Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
   }
 
   @Test(expectedExceptions = ParameterException.class)
