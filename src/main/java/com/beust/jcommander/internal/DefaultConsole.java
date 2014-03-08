@@ -18,11 +18,10 @@ public class DefaultConsole implements Console {
 
   public char[] readPassword(boolean echoInput) {
     try {
+      // Do not close the readers since System.in should not be closed
       InputStreamReader isr = new InputStreamReader(System.in);
       BufferedReader in = new BufferedReader(isr);
       String result = in.readLine();
-      in.close();
-      isr.close();
       return result.toCharArray();
     }
     catch (IOException e) {
