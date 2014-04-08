@@ -18,7 +18,6 @@
 
 package com.beust.jcommander;
 
-import com.beust.jcommander.args.AlternateNamesForListArgs;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
@@ -41,6 +40,7 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.beust.jcommander.args.AlternateNamesForListArgs;
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args1Setter;
 import com.beust.jcommander.args.Args2;
@@ -1015,31 +1015,27 @@ public class JCommanderTest {
     Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
   }
 
-  public void a() {
+  public void dashDashParameter() {
     class Arguments {
-        @Parameter(names = { "-help", "-h" }, arity = 0, description = "Show this help message")
-        public Boolean help = false;
-        
-        @Parameter(names = { "-verbose", "-v" }, arity = 0, description = "Verbose output mode")
-        public Boolean verbose = false;
-        
-        @Parameter(names = { "-target" }, arity = 1, description = "Target directory", required = true)
-        public File target;
-        
-        @Parameter(names = { "-input" }, variableArity = true, description = "Input paths", required = true)
-        public List<String> paths;
+        @Parameter(names = { "-name" })
+        public String name;
+        @Parameter
+        public List<String> mainParameters;
     }
+
     Arguments a = new Arguments();
     new JCommander(a, new String[] {
-        "-input", "example_in1", "example_in2", "-target", "example_out" }
+        "-name", "theName", "--", "param1", "param2"}
     );
-    Assert.assertEquals(a.paths, Lists.newArrayList("example_in1", "example_in2"));
-    Assert.assertEquals(a.target, new File("example_out"));
+    Assert.assertEquals(a.name, "theName");
+    Assert.assertEquals(a.mainParameters.size(), 2);
+    Assert.assertEquals(a.mainParameters.get(0), "param1");
+    Assert.assertEquals(a.mainParameters.get(1), "param2");
   }
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().a();
+//    new JCommanderTest().a();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

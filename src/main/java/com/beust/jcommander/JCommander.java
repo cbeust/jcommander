@@ -685,7 +685,7 @@ public class JCommander {
 
       JCommander jc = findCommandByAlias(arg);
       int increment = 1;
-      if (isOption(args, a) && jc == null) {
+      if (! "--".equals(a) && isOption(args, a) && jc == null) {
         //
         // Option
         //
@@ -744,6 +744,9 @@ public class JCommander {
         // Main parameter
         //
         if (! Strings.isStringEmpty(arg)) {
+          if ("--".equals(arg)) {
+              a = trim(args[++i]);
+          }
           if (m_commands.isEmpty()) {
             //
             // Regular (non-command) parsing
