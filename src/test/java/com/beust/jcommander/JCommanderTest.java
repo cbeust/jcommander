@@ -57,6 +57,7 @@ import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
 import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsList;
+import com.beust.jcommander.args.ArgsLongDescription;
 import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
@@ -430,6 +431,16 @@ public class JCommanderTest {
     jc.usage(sb);
     String actual = sb.toString();
     Assert.assertEquals(actual, expected);
+  }
+
+  public void usageLongDescription() {
+    JCommander jc = new JCommander(new ArgsLongDescription(), new String[]{"-c", "foo"});
+    StringBuilder sb = new StringBuilder();
+    jc.usage(sb);
+    String expected = sb.toString();
+    for (String line : expected.split("\n")) {
+      Assert.assertTrue(line.length() <= jc.getColumnSize(), line);
+    }
   }
 
   private void verifyCommandOrdering(String[] commandNames, Object[] commands) {

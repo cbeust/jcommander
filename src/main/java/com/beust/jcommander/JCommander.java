@@ -1158,7 +1158,7 @@ public class JCommander {
         current += word.length() + 1;
       } else {
         out.append("\n").append(s(indent + 1)).append(word);
-        current = indent;
+        current = indent + word.length() + 1;
       }
       i++;
     }
