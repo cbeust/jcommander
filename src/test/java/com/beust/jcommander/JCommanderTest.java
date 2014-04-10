@@ -1043,14 +1043,15 @@ public class JCommanderTest {
 
     Arguments a = new Arguments();
     new JCommander(a, new String[] {
-        "param1", "param2", "--", "-name", "theName"}
+        "param1", "param2", "--", "param3", "-name", "theName"}
     );
     Assert.assertNull(a.name);
-    Assert.assertEquals(a.mainParameters.size(), 4);
+    Assert.assertEquals(a.mainParameters.size(), 5);
     Assert.assertEquals(a.mainParameters.get(0), "param1");
     Assert.assertEquals(a.mainParameters.get(1), "param2");
-    Assert.assertEquals(a.mainParameters.get(2), "-name");
-    Assert.assertEquals(a.mainParameters.get(3), "theName");
+    Assert.assertEquals(a.mainParameters.get(2), "param3");
+    Assert.assertEquals(a.mainParameters.get(3), "-name");
+    Assert.assertEquals(a.mainParameters.get(4), "theName");
   }
 
   @Test(enabled = false)
