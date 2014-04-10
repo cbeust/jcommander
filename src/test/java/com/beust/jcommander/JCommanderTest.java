@@ -1033,6 +1033,27 @@ public class JCommanderTest {
     Assert.assertEquals(a.mainParameters.get(1), "param2");
   }
 
+  public void dashDashParameter2() {
+    class Arguments {
+        @Parameter(names = { "-name" })
+        public String name;
+        @Parameter
+        public List<String> mainParameters;
+    }
+
+    Arguments a = new Arguments();
+    new JCommander(a, new String[] {
+        "param1", "param2", "--", "param3", "-name", "theName"}
+    );
+    Assert.assertNull(a.name);
+    Assert.assertEquals(a.mainParameters.size(), 5);
+    Assert.assertEquals(a.mainParameters.get(0), "param1");
+    Assert.assertEquals(a.mainParameters.get(1), "param2");
+    Assert.assertEquals(a.mainParameters.get(2), "param3");
+    Assert.assertEquals(a.mainParameters.get(3), "-name");
+    Assert.assertEquals(a.mainParameters.get(4), "theName");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
 //    new JCommanderTest().a();
