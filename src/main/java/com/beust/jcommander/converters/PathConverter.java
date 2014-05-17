@@ -29,9 +29,9 @@ import java.nio.file.Paths;
  * @author samvv
  */
 public class PathConverter implements IStringConverter<Path> {
-
+  
   public Path convert(String value) {
     return Paths.get(value);
   }
-
+  
 }

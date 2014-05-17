@@ -29,18 +29,17 @@ import java.net.URISyntaxException;
  * @author samvv
  */
 public class URIConverter extends BaseConverter<URI> {
-
-	public URIConverter(String optionName) {
-		super(optionName);
-	}
-
-	public URI convert(String value) {
-		try {
-			return new URI(value);
-		} catch (URISyntaxException e) {
-			throw new ParameterException(
-					getErrorString(value, "a RFC 2396 and RFC 2732 compliant URI"));
-		}
-	}
-
+  
+  public URIConverter(String optionName) {
+    super(optionName);
+  }
+  
+  public URI convert(String value) {
+    try {
+      return new URI(value);
+    } catch (URISyntaxException e) {
+      throw new ParameterException(getErrorString(value, "a RFC 2396 and RFC 2732 compliant URI"));
+    }
+  }
+  
 }
