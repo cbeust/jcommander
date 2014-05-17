@@ -20,6 +20,7 @@ package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;
+import com.beust.jcommander.converters.PathConverter;
 import com.beust.jcommander.converters.URIConverter;
 import com.beust.jcommander.converters.URLConverter;
 
@@ -27,6 +28,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 
 public class ArgsConverter {
@@ -39,6 +41,9 @@ public class ArgsConverter {
   
   @Parameter(names = "-uri", converter = URIConverter.class)
   public URI uri;
+  
+  @Parameter(names = "-path", converter = PathConverter.class)
+  public Path path;
   
   @Parameter(names = "-listStrings")
   public List<String> listStrings;
