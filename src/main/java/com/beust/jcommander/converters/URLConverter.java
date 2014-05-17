@@ -16,31 +16,31 @@
  * limitations under the License.
  */
 
-package com.beust.jcommander.args;
+package com.beust.jcommander.converters;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.converters.FileConverter;
+import com.beust.jcommander.ParameterException;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.util.List;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-public class ArgsConverter {
+/**
+ * Convert a string into a URI.
+ * 
+ * @author samvv
+ */
+public class URLConverter extends BaseConverter<URL> {
 
-  @Parameter(names = "-file", converter = FileConverter.class)
-  public File file;
-  
-//  @Parameter(names = "-uri")
-//  public URI uri;
-  
-  @Parameter(names = "-listStrings")
-  public List<String> listStrings;
+	public URLConverter(String optionName) {
+		super(optionName);
+	}
 
-  @Parameter(names = "-listInts")
-  public List<Integer> listInts;
-
-  @Parameter(names = "-listBigDecimals")
-  public List<BigDecimal> listBigDecimals;
-  
+	public URL convert(String value) {
+		try {
+			return new URL(value);
+		} catch (MalformedURLException e) {
+			throw new ParameterException(
+					getErrorString(value, "a RFC 2396 and RFC 2732 compliant URL"));
+			
+		}
+	}
 }
