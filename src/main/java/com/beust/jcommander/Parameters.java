@@ -67,4 +67,9 @@ public @interface Parameters {
    * An array of allowed command names.
    */
   String[] commandNames() default {};
+
+  /**
+   * If true, this command won't appear in the usage().
+   */
+  boolean hidden() default false;
 }

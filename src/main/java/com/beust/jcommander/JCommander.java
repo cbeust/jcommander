@@ -1119,13 +1119,17 @@ public class JCommander {
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
-        ProgramName progName = commands.getKey();
-        String dispName = progName.getDisplayName();
-        out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
+        Object arg = commands.getValue().getObjects().get(0);
+        Parameters p = arg.getClass().getAnnotation(Parameters.class);
+        if (!p.hidden()) {
+          ProgramName progName = commands.getKey();
+          String dispName = progName.getDisplayName();
+          out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
 
-        // Options for this command
-        usage(progName.getName(), out, "      ");
-        out.append("\n");
+          // Options for this command
+          usage(progName.getName(), out, "      ");
+          out.append("\n");
+        }
       }
     }
   }
