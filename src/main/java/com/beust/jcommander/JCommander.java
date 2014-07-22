@@ -154,6 +154,7 @@ public class JCommander {
 
   private List<String> m_unknownArgs = Lists.newArrayList();
   private boolean m_acceptUnknownOptions = false;
+  private boolean m_allowParameterOverwriting = false;
   
   private static Console m_console;
 
@@ -1567,7 +1568,13 @@ public class JCommander {
   public List<String> getUnknownOptions() {
     return m_unknownArgs;
   }
+  public void setAllowParameterOverwriting(boolean b) {
+    m_allowParameterOverwriting = b;
+  }
 
+  public boolean isParameterOverwritingAllowed() {
+    return m_allowParameterOverwriting;
+  }
 //  public void setCaseSensitiveCommands(boolean b) {
 //    m_caseSensitiveCommands = b;
 //  }
