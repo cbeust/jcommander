@@ -109,4 +109,7 @@ public class WrappedParameter {
     return m_parameter != null && m_parameter.help();
   }
 
+  public boolean isNonOverwritableForced() {
+      return m_parameter != null && m_parameter.forceNonOverwritable();
+  }
 }

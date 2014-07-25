@@ -119,4 +119,12 @@ public @interface Parameter {
    * required parameters are no longer checked for their presence.
    */
   boolean help() default false;
+  
+  /**
+   * If true, this parameter can be overwritten through a file or another appearance of the parameter
+   * @return 
+   */
+  boolean forceNonOverwritable() default false;
+
+  
 }

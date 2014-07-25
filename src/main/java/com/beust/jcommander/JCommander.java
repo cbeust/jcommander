@@ -154,6 +154,7 @@ public class JCommander {
 
   private List<String> m_unknownArgs = Lists.newArrayList();
   private boolean m_acceptUnknownOptions = false;
+  private boolean m_allowParameterOverwriting = false;
   
   private static Console m_console;
 
@@ -485,8 +486,10 @@ public class JCommander {
 
       // Read through file one line at time. Print line # and line
       while ((line = bufRead.readLine()) != null) {
-        // Allow empty lines in these at files
-        if (line.length() > 0) result.add(line);
+        // Allow empty lines and # comments in these at files
+        if (line.length() > 0 && ! line.trim().startsWith("#")) {
+            result.add(line);
+        }
       }
 
       bufRead.close();
@@ -1565,7 +1568,13 @@ public class JCommander {
   public List<String> getUnknownOptions() {
     return m_unknownArgs;
   }
+  public void setAllowParameterOverwriting(boolean b) {
+    m_allowParameterOverwriting = b;
+  }
 
+  public boolean isParameterOverwritingAllowed() {
+    return m_allowParameterOverwriting;
+  }
 //  public void setCaseSensitiveCommands(boolean b) {
 //    m_caseSensitiveCommands = b;
 //  }
