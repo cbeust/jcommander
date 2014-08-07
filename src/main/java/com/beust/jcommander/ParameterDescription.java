@@ -21,6 +21,8 @@ package com.beust.jcommander;
 import com.beust.jcommander.validators.NoValidator;
 import com.beust.jcommander.validators.NoValueValidator;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -298,9 +300,9 @@ public class ParameterDescription {
       if (validator != NoValidator.class) {
         p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
       }
-      validator.newInstance().validate(name, value);
+      pd.getValidatorInstance(validator).validate(name, value);
       if (IParameterValidator2.class.isAssignableFrom(validator)) {
-        IParameterValidator2 instance = (IParameterValidator2) validator.newInstance();
+        IParameterValidator2 instance = (IParameterValidator2) pd.getValidatorInstance(validator);
         instance.validate(name, value, pd);
       }
     } catch (InstantiationException e) {
@@ -313,6 +315,15 @@ public class ParameterDescription {
       throw new ParameterException(ex);
     }
   }
+
+  public IParameterValidator getValidatorInstance(Class<? extends IParameterValidator> validatorClass) throws InstantiationException, IllegalAccessException {
+	    try {
+	      Constructor<?> constructor = validatorClass.getDeclaredConstructor(getObject().getClass());
+	      return (IParameterValidator) constructor.newInstance(getObject());
+	    } catch (NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+	      return validatorClass.newInstance();
+	    }
+	  }
 
   /*
    * Creates a new collection for the field's type.
