@@ -1268,11 +1268,16 @@ public class JCommander {
       if (converterClass != null && converterClass.isEnum()) {
         try {
           result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
-        } catch ( IllegalArgumentException e ) {
-          result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            try {
+                result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
+                        EnumSet.allOf((Class<? extends Enum>) converterClass));
+            }
         } catch (Exception e) {
           throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-                                       EnumSet.allOf((Class<? extends Enum>) converterClass));
+                      EnumSet.allOf((Class<? extends Enum>) converterClass));
         }
       } else {
         converter = instantiateConverter(optionName, converterClass);
