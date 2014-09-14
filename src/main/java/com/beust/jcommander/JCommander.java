@@ -1371,6 +1371,7 @@ public class JCommander {
     JCommander jc = new JCommander(object);
     jc.setProgramName(name, aliases);
     jc.setDefaultProvider(m_defaultProvider);
+    jc.setAcceptUnknownOptions(m_acceptUnknownOptions);
     ProgramName progName = jc.m_programName;
     m_commands.put(progName, jc);
 
