@@ -680,6 +680,7 @@ public class JCommander {
     // object)
     boolean commandParsed = false;
     int i = 0;
+    boolean isDashDash = false; // once we encounter --, everything goes into the main parameter
     while (i < args.length && ! commandParsed) {
       String arg = args[i];
       String a = trim(arg);
@@ -688,7 +689,7 @@ public class JCommander {
 
       JCommander jc = findCommandByAlias(arg);
       int increment = 1;
-      if (! "--".equals(a) && isOption(args, a) && jc == null) {
+      if (! isDashDash && ! "--".equals(a) && isOption(args, a) && jc == null) {
         //
         // Option
         //
@@ -748,6 +749,7 @@ public class JCommander {
         //
         if (! Strings.isStringEmpty(arg)) {
           if ("--".equals(arg)) {
+              isDashDash = true;
               a = trim(args[++i]);
           }
           if (m_commands.isEmpty()) {
