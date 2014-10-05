@@ -24,7 +24,7 @@
   <artifactId>jcommander</artifactId>
   <packaging>jar</packaging>
   <name>JCommander</name>
-  <version>1.43-SNAPSHOT</version>
+  <version>1.43</version>
   <description>A Java framework to parse command line options with annotations.</description>
   <url>http://beust.com/jcommander</url>
   <licenses>
@@ -39,6 +39,14 @@
     <developerConnection>scm:git:git@github.com:cbeust/jcommander.git</developerConnection>
     <url>git@github.com:cbeust/jcommander.git</url>
   </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>nexus-site</id>
+      <name>Nexus Staging Repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
   <developers>
     <developer>
