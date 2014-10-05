@@ -40,6 +40,14 @@
     <url>git@github.com:cbeust/jcommander.git</url>
   </scm>
 
+  <distributionManagement>
+    <repository>
+      <id>nexus-site</id>
+      <name>Nexus Staging Repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
   <developers>
     <developer>
       <name>Cedric Beust</name>
