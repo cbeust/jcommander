@@ -40,6 +40,7 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.beust.jcommander.args.AlternateNamesForListArgs;
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args1Setter;
 import com.beust.jcommander.args.Args2;
@@ -96,6 +97,35 @@ public class JCommanderTest {
     Assert.assertEquals(args.date, new SimpleDateFormat("yyyy-MM-dd").parse("2011-10-26"));
   }
 
+  @DataProvider
+  public Object[][] alternateNamesListArgs() {
+    return new Object[][] {
+        new String[][] {new String[] {"--servers", "1", "-s", "2", "--servers", "3"}},
+        new String[][] {new String[] {"-s", "1", "-s", "2", "--servers", "3"}},
+        new String[][] {new String[] {"--servers", "1", "--servers", "2", "-s", "3"}},
+        new String[][] {new String[] {"-s", "1", "--servers", "2", "-s", "3"}},
+        new String[][] {new String[] {"-s", "1", "-s", "2", "--servers", "3"}},
+    };
+  }
+  
+  /**
+   *  Confirm that List<?> parameters with alternate names return the correct
+   * List regardless of how the arguments are specified
+   */
+  
+  @Test(dataProvider = "alternateNamesListArgs")
+  public void testAlternateNamesForListArguments(String[] argv) {
+      AlternateNamesForListArgs args = new AlternateNamesForListArgs();
+      
+      new JCommander(args, argv);
+      
+      Assert.assertEquals(args.serverNames.size(), 3);
+      Assert.assertEquals(args.serverNames.get(0), argv[1]);
+      Assert.assertEquals(args.serverNames.get(1), argv[3]);
+      Assert.assertEquals(args.serverNames.get(2), argv[5]);
+  }
+  
+  
   /**
    * Make sure that if there are args with multiple names (e.g. "-log" and "-verbose"),
    * the usage will only display it once.
@@ -566,12 +596,20 @@ public class JCommanderTest {
     JCommander jc = new JCommander(args, argv);
 
     Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
-    
+
     List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
     Assert.assertEquals(expected, args.choices);
     Assert.assertEquals(jc.getParameters().get(0).getDescription(),
         "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
-    
+
+  }
+
+  public void enumArgsCaseInsensitive() {
+      ArgsEnum args = new ArgsEnum();
+      String[] argv = { "-choice", "one"};
+      JCommander jc = new JCommander(args, argv);
+
+      Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
   }
 
   @Test(expectedExceptions = ParameterException.class)
@@ -977,31 +1015,48 @@ public class JCommanderTest {
     Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
   }
 
-  public void a() {
+  public void dashDashParameter() {
     class Arguments {
-        @Parameter(names = { "-help", "-h" }, arity = 0, description = "Show this help message")
-        public Boolean help = false;
-        
-        @Parameter(names = { "-verbose", "-v" }, arity = 0, description = "Verbose output mode")
-        public Boolean verbose = false;
-        
-        @Parameter(names = { "-target" }, arity = 1, description = "Target directory", required = true)
-        public File target;
-        
-        @Parameter(names = { "-input" }, variableArity = true, description = "Input paths", required = true)
-        public List<String> paths;
+        @Parameter(names = { "-name" })
+        public String name;
+        @Parameter
+        public List<String> mainParameters;
     }
+
     Arguments a = new Arguments();
     new JCommander(a, new String[] {
-        "-input", "example_in1", "example_in2", "-target", "example_out" }
+        "-name", "theName", "--", "param1", "param2"}
     );
-    Assert.assertEquals(a.paths, Lists.newArrayList("example_in1", "example_in2"));
-    Assert.assertEquals(a.target, new File("example_out"));
+    Assert.assertEquals(a.name, "theName");
+    Assert.assertEquals(a.mainParameters.size(), 2);
+    Assert.assertEquals(a.mainParameters.get(0), "param1");
+    Assert.assertEquals(a.mainParameters.get(1), "param2");
+  }
+
+  public void dashDashParameter2() {
+    class Arguments {
+        @Parameter(names = { "-name" })
+        public String name;
+        @Parameter
+        public List<String> mainParameters;
+    }
+
+    Arguments a = new Arguments();
+    new JCommander(a, new String[] {
+        "param1", "param2", "--", "param3", "-name", "theName"}
+    );
+    Assert.assertNull(a.name);
+    Assert.assertEquals(a.mainParameters.size(), 5);
+    Assert.assertEquals(a.mainParameters.get(0), "param1");
+    Assert.assertEquals(a.mainParameters.get(1), "param2");
+    Assert.assertEquals(a.mainParameters.get(2), "param3");
+    Assert.assertEquals(a.mainParameters.get(3), "-name");
+    Assert.assertEquals(a.mainParameters.get(4), "theName");
   }
 
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().a();
+    new JCommanderTest().enumArgsFail();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;

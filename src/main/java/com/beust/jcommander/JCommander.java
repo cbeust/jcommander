@@ -154,6 +154,7 @@ public class JCommander {
 
   private List<String> m_unknownArgs = Lists.newArrayList();
   private boolean m_acceptUnknownOptions = false;
+  private boolean m_allowParameterOverwriting = false;
   
   private static Console m_console;
 
@@ -485,8 +486,10 @@ public class JCommander {
 
       // Read through file one line at time. Print line # and line
       while ((line = bufRead.readLine()) != null) {
-        // Allow empty lines in these at files
-        if (line.length() > 0) result.add(line);
+        // Allow empty lines and # comments in these at files
+        if (line.length() > 0 && ! line.trim().startsWith("#")) {
+            result.add(line);
+        }
       }
 
       bufRead.close();
@@ -544,13 +547,13 @@ public class JCommander {
           m_mainParameterDescription =
               new ParameterDescription(object, p, parameterized, m_bundle, this);
         } else {
+          ParameterDescription pd =
+              new ParameterDescription(object, p, parameterized, m_bundle, this);
           for (String name : p.names()) {
             if (m_descriptions.containsKey(new StringKey(name))) {
               throw new ParameterException("Found the option " + name + " multiple times");
             }
             p("Adding description for " + name);
-            ParameterDescription pd =
-                new ParameterDescription(object, p, parameterized, m_bundle, this);
             m_fields.put(parameterized, pd);
             m_descriptions.put(new StringKey(name), pd);
 
@@ -677,6 +680,7 @@ public class JCommander {
     // object)
     boolean commandParsed = false;
     int i = 0;
+    boolean isDashDash = false; // once we encounter --, everything goes into the main parameter
     while (i < args.length && ! commandParsed) {
       String arg = args[i];
       String a = trim(arg);
@@ -685,7 +689,7 @@ public class JCommander {
 
       JCommander jc = findCommandByAlias(arg);
       int increment = 1;
-      if (isOption(args, a) && jc == null) {
+      if (! isDashDash && ! "--".equals(a) && isOption(args, a) && jc == null) {
         //
         // Option
         //
@@ -744,6 +748,10 @@ public class JCommander {
         // Main parameter
         //
         if (! Strings.isStringEmpty(arg)) {
+          if ("--".equals(arg)) {
+              isDashDash = true;
+              a = trim(args[++i]);
+          }
           if (m_commands.isEmpty()) {
             //
             // Regular (non-command) parsing
@@ -1116,13 +1124,17 @@ public class JCommander {
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
-        ProgramName progName = commands.getKey();
-        String dispName = progName.getDisplayName();
-        out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
+        Object arg = commands.getValue().getObjects().get(0);
+        Parameters p = arg.getClass().getAnnotation(Parameters.class);
+        if (!p.hidden()) {
+          ProgramName progName = commands.getKey();
+          String dispName = progName.getDisplayName();
+          out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
 
-        // Options for this command
-        usage(progName.getName(), out, "      ");
-        out.append("\n");
+          // Options for this command
+          usage(progName.getName(), out, "      ");
+          out.append("\n");
+        }
       }
     }
   }
@@ -1256,12 +1268,16 @@ public class JCommander {
       if (converterClass != null && converterClass.isEnum()) {
         try {
           result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
-          if (result == null) {
-            result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
-          }
+        } catch (IllegalArgumentException e) {
+            try {
+                result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
+                        EnumSet.allOf((Class<? extends Enum>) converterClass));
+            }
         } catch (Exception e) {
           throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-                                       EnumSet.allOf((Class<? extends Enum>) converterClass));
+                      EnumSet.allOf((Class<? extends Enum>) converterClass));
         }
       } else {
         converter = instantiateConverter(optionName, converterClass);
@@ -1362,6 +1378,7 @@ public class JCommander {
     JCommander jc = new JCommander(object);
     jc.setProgramName(name, aliases);
     jc.setDefaultProvider(m_defaultProvider);
+    jc.setAcceptUnknownOptions(m_acceptUnknownOptions);
     ProgramName progName = jc.m_programName;
     m_commands.put(progName, jc);
 
@@ -1563,7 +1580,13 @@ public class JCommander {
   public List<String> getUnknownOptions() {
     return m_unknownArgs;
   }
+  public void setAllowParameterOverwriting(boolean b) {
+    m_allowParameterOverwriting = b;
+  }
 
+  public boolean isParameterOverwritingAllowed() {
+    return m_allowParameterOverwriting;
+  }
 //  public void setCaseSensitiveCommands(boolean b) {
 //    m_caseSensitiveCommands = b;
 //  }
