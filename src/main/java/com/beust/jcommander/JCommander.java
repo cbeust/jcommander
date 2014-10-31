@@ -115,6 +115,12 @@ public class JCommander {
    */
   private Map<Parameterized, ParameterDescription> m_requiredFields = Maps.newHashMap();
 
+  
+  /**
+   * Stores a mapping of Parameterized objects to the first option name for it.
+   */
+  private Map<Parameterized, String> m_firstOptionNameForRequiredFields = Maps.newHashMap();
+  
   /**
    * A map of all the parameterized fields/methods/
    */
@@ -476,10 +482,17 @@ public class JCommander {
   private void validateOptions() {
     if (! m_requiredFields.isEmpty()) {
       StringBuilder missingFields = new StringBuilder();
-      for (ParameterDescription pd : m_requiredFields.values()) {
-        missingFields.append(pd.getNames()).append(" ");
+      StringBuilder sbMissingPrimaryFields = new StringBuilder();
+      for(Entry<Parameterized, ParameterDescription> ent : m_requiredFields.entrySet())
+      {
+    	  
+    	missingFields.append(ent.getValue().getNames().replaceAll(this.m_firstOptionNameForRequiredFields.get(ent.getKey()) + ", ", "")).append(", ");
+    	
+    	sbMissingPrimaryFields.append(this.m_firstOptionNameForRequiredFields.get(ent.getKey())).append(", ");
       }
       
+      missingFields.setLength(missingFields.length()-2);
+      sbMissingPrimaryFields.setLength(sbMissingPrimaryFields.length() - 2);
       StringBuilder parameterFileNames = new StringBuilder();
       for(Entry<Field, String> pFiles :  m_parameterFileNames.entrySet())
       {
@@ -487,8 +500,7 @@ public class JCommander {
       }
       throw new ParameterException("The following "
             + pluralize(m_requiredFields.size(), "option is required: ", "options are required: ")
-            + missingFields + ". Perhaps you forgot to set one of: "
-            + parameterFileNames);
+            + sbMissingPrimaryFields + ". (Aliases: " + missingFields + ")");
     }
 
     if (m_mainParameterDescription != null) {
@@ -723,7 +735,11 @@ public class JCommander {
             m_fields.put(parameterized, pd);
             m_descriptions.put(name, pd);
 
-            if (p.required()) m_requiredFields.put(parameterized, pd);
+            if (p.required()) 
+            {
+            	m_requiredFields.put(parameterized, pd);
+            	this.m_firstOptionNameForRequiredFields.put(parameterized, p.names()[0]);
+            }
           }
         }
       } else if (parameterized.getDelegateAnnotation() != null) {
@@ -1547,12 +1563,19 @@ private class DefaultVariableArity implements IVariableArity {
       String[] names = annotation.names();
       String optionName = names.length > 0 ? names[0] : "[Main class]";
       if (converterClass.isEnum()) {
-        try {
-          result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
-        } catch (Exception e) {
-          throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-                                       EnumSet.allOf((Class<? extends Enum>) converterClass));
-        }
+    	try   
+    	{
+    		result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
+    		
+    	} catch(IllegalArgumentException e2)
+    	{
+	        try {
+	          result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
+	        } catch (Exception e) {
+	          throw new ParameterException("Invalid value ("  + value +  ") for " + optionName + " parameter. Allowed values:" +
+	                                       EnumSet.allOf((Class<? extends Enum>) converterClass));
+	        }
+    	}
       } else {
         converter = instantiateConverter(optionName, converterClass);
         if (type.isAssignableFrom(List.class)
