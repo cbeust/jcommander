@@ -42,7 +42,7 @@
 
   <distributionManagement>
     <repository>
-      <id>nexus-site</id>
+      <id>sonatype-nexus-staging</id>
       <name>Nexus Staging Repository</name>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
