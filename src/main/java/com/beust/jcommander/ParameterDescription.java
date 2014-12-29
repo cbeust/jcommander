@@ -186,7 +186,6 @@ public class ParameterDescription {
     String[] names = m_wrappedParameter.names();
     for (int i = 0; i < names.length; i++) {
       if (i > 0) sb.append(", ");
-      if (names.length == 1 && names[i].startsWith("--")) sb.append("    ");
       sb.append(names[i]);
     }
     return sb.toString();
