@@ -1050,19 +1050,28 @@ public class JCommander {
   }
 
   public void usage(StringBuilder out, String indent) {
+    usage(out, indent, UsageOptions.values());
+  }
+
+  public void usage(StringBuilder out, String indent, UsageOptions... optionList) {
+    final EnumSet<UsageOptions> options = EnumSet.noneOf(UsageOptions.class);
+    options.addAll(Arrays.asList(optionList));
+
     if (m_descriptions == null) createDescriptions();
     boolean hasCommands = !m_commands.isEmpty();
 
     //
     // First line of the usage
     //
-    String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
-    out.append(indent).append("Usage: " + programName + " [options]");
-    if (hasCommands) out.append(indent).append(" [command] [command options]");
-    if (m_mainParameterDescription != null) {
-      out.append(" " + m_mainParameterDescription.getDescription());
+    if (options.contains(UsageOptions.DISPLAY_SYNTAX_LINE)) {
+      String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
+      out.append(indent).append("Usage: " + programName + " [options]");
+      if (hasCommands) out.append(indent).append(" [command] [command options]");
+      if (m_mainParameterDescription != null) {
+        out.append(" " + m_mainParameterDescription.getDescription());
+      }
+      out.append("\n");
     }
-    out.append("\n");
 
     //
     // Align the descriptions at the "longestName" column
@@ -1088,38 +1097,40 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    int descriptionIndent = 6;
-    if (sorted.size() > 0) out.append(indent).append("  Options:\n");
-    for (ParameterDescription pd : sorted) {
-      WrappedParameter parameter = pd.getParameter();
-      out.append(indent).append("  "
-          + (parameter.required() ? "* " : "  ")
-          + pd.getNames()
-          + "\n"
-          + indent + s(descriptionIndent));
-      int indentCount = indent.length() + descriptionIndent;
-      wrapDescription(out, indentCount, pd.getDescription());
-      Object def = pd.getDefault();
-      if (pd.isDynamicParameter()) {
-        out.append("\n" + s(indentCount + 1))
-            .append("Syntax: " + parameter.names()[0]
-                + "key" + parameter.getAssignment()
-                + "value");
+    if (options.contains(UsageOptions.DISPLAY_PARAMETERS)) {
+      int descriptionIndent = 6;
+      if (sorted.size() > 0) out.append(indent).append("  Options:\n");
+      for (ParameterDescription pd : sorted) {
+        WrappedParameter parameter = pd.getParameter();
+        out.append(indent).append("  "
+            + (parameter.required() ? "* " : "  ")
+            + pd.getNames()
+            + "\n"
+            + indent + s(descriptionIndent));
+        int indentCount = indent.length() + descriptionIndent;
+        wrapDescription(out, indentCount, pd.getDescription());
+        Object def = pd.getDefault();
+        if (pd.isDynamicParameter()) {
+          out.append("\n" + s(indentCount + 1))
+              .append("Syntax: " + parameter.names()[0]
+                  + "key" + parameter.getAssignment()
+                  + "value");
+        }
+        if (def != null) {
+          String displayedDef = Strings.isStringEmpty(def.toString())
+              ? "<empty string>"
+              : def.toString();
+          out.append("\n" + s(indentCount + 1))
+              .append("Default: " + (parameter.password()?"********" : displayedDef));
+        }
+        out.append("\n");
       }
-      if (def != null) {
-        String displayedDef = Strings.isStringEmpty(def.toString())
-            ? "<empty string>"
-            : def.toString();
-        out.append("\n" + s(indentCount + 1))
-            .append("Default: " + (parameter.password()?"********" : displayedDef));
-      }
-      out.append("\n");
     }
 
     //
     // If commands were specified, show them as well
     //
-    if (hasCommands) {
+    if (hasCommands && options.contains(UsageOptions.DISPLAY_COMMANDS)) {
       out.append("  Commands:\n");
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
@@ -1132,7 +1143,9 @@ public class JCommander {
           out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
 
           // Options for this command
-          usage(progName.getName(), out, "      ");
+          if (options.contains(UsageOptions.DISPLAY_OPTIONS_FOR_EACH_COMMAND)) {
+            usage(progName.getName(), out, "      ");
+          }
           out.append("\n");
         }
       }
