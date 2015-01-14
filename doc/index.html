@@ -52,7 +52,7 @@
   </tr>
   <tr>
     <td align="right">
-      Last updated: August 2nd, 2014
+      Last updated: January 14th, 2015
     </td>
   </tr>
   <tr><td align="right"><a href="mailto:cedric@beust.com">C&eacute;dric Beust</a></td></tr>
@@ -808,9 +808,25 @@ object Main {
 }
 </pre>
 
+<h2><a class="section" name="Groovy">JCommander in Groovy</a></h2>
+
+<pre class="brush: java">
+import com.beust.jcommander.*
+
+class Args {
+  @Parameter(names = ["-f", "--file"], description = "File to load. Can be specified multiple times.")
+  List&lt;String&gt; file
+}
+
+new Args().with {
+  new JCommander(it, args)
+  file.each { println "file: ${new File(it).name}" }
+}
+</pre>
+
 <h2><a class="section" name="More_examples">More examples</a></h2>
 
-TestNG uses JCommander to parse its command line, here is <a href="http://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">its definition file</a>.
+TestNG uses JCommander to parse its own command line, here is <a href="http://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">its definition file</a>.
 
 <h2><a class="section" name="Mailing_list">Mailing list</a></h2>
 
