@@ -1126,7 +1126,7 @@ public class JCommander {
       for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
         Object arg = commands.getValue().getObjects().get(0);
         Parameters p = arg.getClass().getAnnotation(Parameters.class);
-        if (!p.hidden()) {
+        if (p == null || !p.hidden()) {
           ProgramName progName = commands.getKey();
           String dispName = progName.getDisplayName();
           out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
