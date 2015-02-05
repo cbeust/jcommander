@@ -21,7 +21,7 @@ package com.beust.jcommander;
 /**
  * Thrown when a command was expected.
  *
- * @author Cedric Beust <cedric@beust.com>
+ * @author Cedric Beust &lt;cedric@beust.com&gt;
  */
 @SuppressWarnings("serial")
 public class MissingCommandException extends ParameterException {

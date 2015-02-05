@@ -24,7 +24,7 @@ import com.beust.jcommander.ParameterException;
 /**
  * A validator that makes sure the value of the parameter is a positive integer.
  *
- * @author Cedric Beust <cedric@beust.com>
+ * @author Cedric Beust &lt;cedric@beust.com&gt;
  */
 public class PositiveInteger implements IParameterValidator {
 

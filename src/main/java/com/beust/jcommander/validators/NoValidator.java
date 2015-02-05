@@ -24,7 +24,7 @@ import com.beust.jcommander.ParameterException;
 /**
  * This is the default value of the validateWith attribute.
  *
- * @author Cedric Beust <cedric@beust.com>
+ * @author Cedric Beust &lt;cedric@beust.com&gt;
  */
 public class NoValidator implements IParameterValidator {
 
