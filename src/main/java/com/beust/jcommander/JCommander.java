@@ -156,6 +156,8 @@ public class JCommander {
   private boolean m_acceptUnknownOptions = false;
   private boolean m_allowParameterOverwriting = false;
   
+  private boolean m_preserveSpaces;
+    
   private static Console m_console;
 
   /**
@@ -502,10 +504,13 @@ public class JCommander {
   }
 
   /**
-   * Remove spaces at both ends and handle double quotes.
+   * Remove spaces at both ends if needed and handle double quotes.
    */
-  private static String trim(String string) {
-    String result = string.trim();
+  private static String trim(String string, boolean preserveSpaces) {
+    String result = string;
+    if (!preserveSpaces) {
+      result = string.trim();
+    }
     if (result.startsWith("\"") && result.endsWith("\"") && result.length() > 1) {
       result = result.substring(1, result.length() - 1);
     }
@@ -683,7 +688,7 @@ public class JCommander {
     boolean isDashDash = false; // once we encounter --, everything goes into the main parameter
     while (i < args.length && ! commandParsed) {
       String arg = args[i];
-      String a = trim(arg);
+      String a = trim(arg, m_preserveSpaces);
       args[i] = a;
       p("Parsing arg: " + a);
 
@@ -750,7 +755,7 @@ public class JCommander {
         if (! Strings.isStringEmpty(arg)) {
           if ("--".equals(arg)) {
               isDashDash = true;
-              a = trim(args[++i]);
+              a = trim(args[++i], m_preserveSpaces);
           }
           if (m_commands.isEmpty()) {
             //
@@ -872,7 +877,7 @@ public class JCommander {
 
       if (index + arity < args.length) {
         for (int j = 1; j <= arity; j++) {
-          pd.addValue(trim(args[index + j + offset]));
+          pd.addValue(trim(args[index + j + offset], m_preserveSpaces));
           m_requiredFields.remove(pd.getParameterized());
         }
         index += arity + offset;
