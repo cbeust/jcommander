@@ -1592,6 +1592,14 @@ public class JCommander {
   public boolean isParameterOverwritingAllowed() {
     return m_allowParameterOverwriting;
   }
+  
+  public void setPreserveSpaces(boolean b) {
+      m_preserveSpaces = b;
+  }
+  
+  public boolean isPreserveSpaces() {
+      return m_preserveSpaces;
+  }
 //  public void setCaseSensitiveCommands(boolean b) {
 //    m_caseSensitiveCommands = b;
 //  }
