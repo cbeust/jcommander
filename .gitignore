@@ -1,6 +1,4 @@
 target
-.classpath
-.project
-.settings
 test-output
 src/test/java/com/beust/jcommander/ignore
+/bin/
