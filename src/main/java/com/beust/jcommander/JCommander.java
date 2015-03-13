@@ -1113,6 +1113,11 @@ public class JCommander {
         out.append("\n" + s(indentCount + 1))
             .append("Default: " + (parameter.password()?"********" : displayedDef));
       }
+      Class<?> type =  pd.getParameterized().getType();
+      if(type.isEnum()){
+          out.append("\n" + s(indentCount + 1))
+          .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
+      }
       out.append("\n");
     }
 

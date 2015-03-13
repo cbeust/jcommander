@@ -29,10 +29,16 @@ import com.beust.jcommander.converters.ISO8601DateConverter;
 import com.beust.jcommander.converters.IntegerConverter;
 import com.beust.jcommander.converters.LongConverter;
 import com.beust.jcommander.converters.StringConverter;
+import com.beust.jcommander.converters.PathConverter;
+import com.beust.jcommander.converters.URIConverter;
+import com.beust.jcommander.converters.URLConverter;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.Map;
 
 public class DefaultConverterFactory implements IStringConverterFactory {
@@ -57,6 +63,9 @@ public class DefaultConverterFactory implements IStringConverterFactory {
     m_classConverters.put(File.class, FileConverter.class);
     m_classConverters.put(BigDecimal.class, BigDecimalConverter.class);
     m_classConverters.put(Date.class, ISO8601DateConverter.class);
+    m_classConverters.put(Path.class, PathConverter.class);
+    m_classConverters.put(URI.class, URIConverter.class);
+    m_classConverters.put(URL.class, URLConverter.class);
   }
 
   public Class<? extends IStringConverter<?>> getConverter(Class forType) {
