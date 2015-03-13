@@ -38,6 +38,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import bsh.classpath.BshClassPath.GeneratedClassSource;
+
 import com.beust.jcommander.FuzzyMap.IKey;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
@@ -351,11 +353,28 @@ public class JCommander {
     // Expand @
     //
     for (String arg : originalArgv) {
-
       if (arg.startsWith("@")) {
         String fileName = arg.substring(1);
-        vResult1.addAll(readFile(fileName));
-      }
+        List<String> fileArgs = readFile(fileName);
+        List<String> splitFileArgs = Lists.newArrayList();
+        //special treatment for standard separator (" ")
+        String[] v1 = fileArgs.toArray(new String[0]);
+		for (int i = 0; i < fileArgs.size(); i++) {
+			String arg2 = fileArgs.get(i);
+			if (isOption(v1, arg2)) {
+				String sep = getSeparatorFor(v1, arg2);
+				if (" ".equals(sep)) {
+					String[] sp = arg2.split("[" + sep + "]", 2);
+					for (String ssp : sp) {
+						splitFileArgs.add(ssp);
+					}
+				}else{
+					splitFileArgs.add(arg2);
+				}
+			}
+		}
+		vResult1.addAll(splitFileArgs);
+	}
       else {
         List<String> expanded = expandDynamicArg(arg);
         vResult1.addAll(expanded);
@@ -481,9 +500,9 @@ public class JCommander {
 
     try {
       BufferedReader bufRead = new BufferedReader(new FileReader(fileName));
-
+      
       String line;
-
+      
       // Read through file one line at time. Print line # and line
       while ((line = bufRead.readLine()) != null) {
         // Allow empty lines and # comments in these at files
