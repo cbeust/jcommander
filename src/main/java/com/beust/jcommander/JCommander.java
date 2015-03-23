@@ -38,8 +38,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import bsh.classpath.BshClassPath.GeneratedClassSource;
-
 import com.beust.jcommander.FuzzyMap.IKey;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
@@ -364,7 +362,7 @@ public class JCommander {
 			if (isOption(v1, arg2)) {
 				String sep = getSeparatorFor(v1, arg2);
 				if (" ".equals(sep)) {
-					String[] sp = arg2.split("[" + sep + "]", 2);
+					String[] sp = arg2.split("[" + sep + "]+",2);
 					for (String ssp : sp) {
 						splitFileArgs.add(ssp);
 					}
@@ -390,7 +388,7 @@ public class JCommander {
       if (isOption(v1, arg)) {
         String sep = getSeparatorFor(v1, arg);
         if (! " ".equals(sep)) {
-          String[] sp = arg.split("[" + sep + "]", 2);
+          String[] sp = arg.split("[" + sep + "]+", 2);
           for (String ssp : sp) {
             vResult2.add(ssp);
           }
