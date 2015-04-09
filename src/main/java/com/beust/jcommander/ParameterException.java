@@ -34,5 +34,9 @@ public class ParameterException extends RuntimeException {
   public ParameterException(String string) {
     super(string);
   }
+  
+  public ParameterException(String string, Throwable t) {
+      super(string, t);
+  }   
 
 }
