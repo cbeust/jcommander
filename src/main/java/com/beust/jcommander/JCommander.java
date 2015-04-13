@@ -1109,6 +1109,7 @@ public class JCommander {
     if (sorted.size() > 0) out.append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       WrappedParameter parameter = pd.getParameter();
+      //TODO something is wrong here with a newline s.t. if there is no description a blank line is displayed
       out.append(indent).append("  "
           + (parameter.required() ? "* " : "  ")
           + pd.getNames()
@@ -1116,6 +1117,9 @@ public class JCommander {
           + indent + s(descriptionIndent));
       int indentCount = indent.length() + descriptionIndent;
       wrapDescription(out, indentCount, pd.getDescription());
+      if(pd.getDescription()==null || pd.getDescription().equals("")){
+    	  out.deleteCharAt(out.length()-1);
+      }
       Object def = pd.getDefault();
       if (pd.isDynamicParameter()) {
         out.append("\n" + s(indentCount + 1))
@@ -1130,11 +1134,11 @@ public class JCommander {
         out.append("\n" + s(indentCount + 1))
             .append("Default: " + (parameter.password()?"********" : displayedDef));
       }
-      Class<?> type =  pd.getParameterized().getType();
-      if(type.isEnum()){
-          out.append("\n" + s(indentCount + 1))
-          .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
-      }
+	   Class<?> type =  pd.getParameterized().getType();
+	    if(type.isEnum()){
+	        out.append("\n" + s(indentCount + 1))
+	        .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
+	    }
       out.append("\n");
     }
 
