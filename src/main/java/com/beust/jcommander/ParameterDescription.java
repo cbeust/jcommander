@@ -129,12 +129,12 @@ public class ParameterDescription {
 
     if (m_parameterAnnotation != null) {
       String description;
-      if (Enum.class.isAssignableFrom(parameterized.getType())
-          && m_parameterAnnotation.description().isEmpty()) {
-        description = "Options: " + EnumSet.allOf((Class<? extends Enum>) parameterized.getType());
-      }else {
+//      if (Enum.class.isAssignableFrom(parameterized.getType())
+//          && m_parameterAnnotation.description().isEmpty()) {
+//        description = "Options: " + EnumSet.allOf((Class<? extends Enum>) parameterized.getType());
+//      }else {
         description = m_parameterAnnotation.description();
-      }
+//      }
       initDescription(description, m_parameterAnnotation.descriptionKey(),
           m_parameterAnnotation.names());
     } else if (m_dynamicParameterAnnotation != null) {

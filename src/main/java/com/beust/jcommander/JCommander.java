@@ -351,11 +351,28 @@ public class JCommander {
     // Expand @
     //
     for (String arg : originalArgv) {
-
       if (arg.startsWith("@")) {
         String fileName = arg.substring(1);
-        vResult1.addAll(readFile(fileName));
-      }
+        List<String> fileArgs = readFile(fileName);
+        List<String> splitFileArgs = Lists.newArrayList();
+        //special treatment for standard separator (" ")
+        String[] v1 = fileArgs.toArray(new String[0]);
+		for (int i = 0; i < fileArgs.size(); i++) {
+			String arg2 = fileArgs.get(i);
+			if (isOption(v1, arg2)) {
+				String sep = getSeparatorFor(v1, arg2);
+				if (" ".equals(sep)) {
+					String[] sp = arg2.split("[" + sep + "]+",2);
+					for (String ssp : sp) {
+						splitFileArgs.add(ssp);
+					}
+				}else{
+					splitFileArgs.add(arg2);
+				}
+			}
+		}
+		vResult1.addAll(splitFileArgs);
+	}
       else {
         List<String> expanded = expandDynamicArg(arg);
         vResult1.addAll(expanded);
@@ -371,7 +388,7 @@ public class JCommander {
       if (isOption(v1, arg)) {
         String sep = getSeparatorFor(v1, arg);
         if (! " ".equals(sep)) {
-          String[] sp = arg.split("[" + sep + "]", 2);
+          String[] sp = arg.split("[" + sep + "]+", 2);
           for (String ssp : sp) {
             vResult2.add(ssp);
           }
@@ -481,9 +498,9 @@ public class JCommander {
 
     try {
       BufferedReader bufRead = new BufferedReader(new FileReader(fileName));
-
+      
       String line;
-
+      
       // Read through file one line at time. Print line # and line
       while ((line = bufRead.readLine()) != null) {
         // Allow empty lines and # comments in these at files
@@ -1092,6 +1109,7 @@ public class JCommander {
     if (sorted.size() > 0) out.append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       WrappedParameter parameter = pd.getParameter();
+      //TODO something is wrong here with a newline s.t. if there is no description a blank line is displayed
       out.append(indent).append("  "
           + (parameter.required() ? "* " : "  ")
           + pd.getNames()
@@ -1099,6 +1117,9 @@ public class JCommander {
           + indent + s(descriptionIndent));
       int indentCount = indent.length() + descriptionIndent;
       wrapDescription(out, indentCount, pd.getDescription());
+      if(pd.getDescription()==null || pd.getDescription().equals("")){
+    	  out.deleteCharAt(out.length()-1);
+      }
       Object def = pd.getDefault();
       if (pd.isDynamicParameter()) {
         out.append("\n" + s(indentCount + 1))
@@ -1113,11 +1134,11 @@ public class JCommander {
         out.append("\n" + s(indentCount + 1))
             .append("Default: " + (parameter.password()?"********" : displayedDef));
       }
-      Class<?> type =  pd.getParameterized().getType();
-      if(type.isEnum()){
-          out.append("\n" + s(indentCount + 1))
-          .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
-      }
+	   Class<?> type =  pd.getParameterized().getType();
+	    if(type.isEnum()){
+	        out.append("\n" + s(indentCount + 1))
+	        .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
+	    }
       out.append("\n");
     }
 

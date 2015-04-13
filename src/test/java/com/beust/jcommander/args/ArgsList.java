@@ -41,7 +41,7 @@ public class ArgsList {
   public static class SemiColonSplitter implements IParameterSplitter {
 
     public List<String> split(String value) {
-      return Arrays.asList(value.split(";"));
+      return Arrays.asList(value.split("\\s*;\\s*"));
     }
     
   }
