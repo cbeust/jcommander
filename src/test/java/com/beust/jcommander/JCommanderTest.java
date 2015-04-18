@@ -1054,9 +1054,26 @@ public class JCommanderTest {
     Assert.assertEquals(a.mainParameters.get(4), "theName");
   }
 
+  public void access() {
+    class Arguments {
+      private int bar;
+
+      @Parameter(names = "-bar")
+      private void setBar(int value) {
+        bar = value;
+      }
+    }
+    try {
+      Arguments a = new Arguments();
+      new JCommander(a, new String[] { "-bar", "1" });
+    } catch(ParameterException ex) {
+      Assert.assertTrue(ex.getMessage().contains("invoke"));
+    }
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
-    new JCommanderTest().enumArgsFail();
+    new JCommanderTest().access();
 //    class A {
 //      @Parameter(names = "-short", required = true)
 //      List<String> parameters;
