@@ -87,6 +87,28 @@ public class CommandTest {
     Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
   }
 
+    @Test
+    public void hiddenCommandTest() {
+        CommandMain cm = new CommandMain();
+        JCommander jc = new JCommander(cm);
+        CommandAdd add = new CommandAdd();
+        jc.addCommand("add", add);
+        CommandHidden hidden = new CommandHidden();
+        jc.addCommand("hidden", hidden);
+        jc.parse("hidden", "-i", "A.java");
+
+        Assert.assertEquals(jc.getParsedCommand(), "hidden");
+        Assert.assertEquals(hidden.interactive.booleanValue(), true);
+        Assert.assertEquals(hidden.patterns, Arrays.asList("A.java"));
+
+        jc.setProgramName("TestCommander");
+        StringBuilder out = new StringBuilder();
+        jc.usage(out);
+
+        Assert.assertTrue(out.toString().contains("add      Add file contents to the index"));
+        Assert.assertFalse(out.toString().contains("hidden      Hidden command to add file contents to the index"));
+    }
+
   public static void main(String[] args) {
     new CommandTest().shouldComplainIfNoAnnotations();
   }

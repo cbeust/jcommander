@@ -186,7 +186,6 @@ public class ParameterDescription {
     String[] names = m_wrappedParameter.names();
     for (int i = 0; i < names.length; i++) {
       if (i > 0) sb.append(", ");
-      if (names.length == 1 && names[i].startsWith("--")) sb.append("    ");
       sb.append(names[i]);
     }
     return sb.toString();
@@ -231,7 +230,7 @@ public class ParameterDescription {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_parameterized.getName());
     String name = m_wrappedParameter.names()[0];
-    if (m_assigned && ! isMultiOption()) {
+    if (m_assigned && ! isMultiOption() && !m_jCommander.isParameterOverwritingAllowed() || isNonOverwritableForced()) {
       throw new ParameterException("Can only specify option " + name + " once.");
     }
 
@@ -357,5 +356,9 @@ public class ParameterDescription {
 
   public boolean isHelp() {
     return m_wrappedParameter.isHelp();
+  }
+  
+  public boolean isNonOverwritableForced() {
+    return m_wrappedParameter.isNonOverwritableForced();
   }
 }

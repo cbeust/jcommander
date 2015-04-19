@@ -1,7 +1,5 @@
 package com.beust.jcommander;
 
-import com.beust.jcommander.internal.Lists;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +7,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+
+import com.beust.jcommander.internal.Lists;
 
 /**
  * Encapsulate a field or a method annotated with @Parameter or @DynamicParameter
@@ -181,6 +181,10 @@ public class Parameterized {
     }
   }
 
+  private static String errorMessage(Method m, Exception ex) {
+    return "Could not invoke " + m + "\n    Reason: " + ex.getMessage();
+  }
+
   public void set(Object object, Object value) {
     try {
       if (m_method != null) {
@@ -188,16 +192,14 @@ public class Parameterized {
       } else {
           m_field.set(object, value);
       }
-    } catch (IllegalArgumentException ex) {
-      throw new ParameterException(ex);
-    } catch (IllegalAccessException ex) {
-      throw new ParameterException(ex);
+    } catch (IllegalAccessException | IllegalArgumentException ex) {
+      throw new ParameterException(errorMessage(m_method, ex));
     } catch (InvocationTargetException ex) {
       // If a ParameterException was thrown, don't wrap it into another one
       if (ex.getTargetException() instanceof ParameterException) {
         throw (ParameterException) ex.getTargetException();
       } else {
-        throw new ParameterException(ex);
+        throw new ParameterException(errorMessage(m_method, ex));
       }
     }
   }

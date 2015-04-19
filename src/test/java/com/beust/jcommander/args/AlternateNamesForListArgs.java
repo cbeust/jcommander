@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2010 the original author or authors.
+/*
+ * Copyright (C) 2014 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,28 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.beust.jcommander.args;
 
-package com.beust.jcommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.internal.Lists;
+import java.util.List;
 
 /**
- * The main exception that JCommand will throw when something goes wrong while
- * parsing parameters.
  *
- * @author Cedric Beust <cedric@beust.com>
+ * @author Andy Law <andy.law@roslin.ed.ac.uk>
  */
-@SuppressWarnings("serial")
-public class ParameterException extends RuntimeException {
+public class AlternateNamesForListArgs {
 
-  public ParameterException(Throwable t) {
-    super(t);
-  }
-
-  public ParameterException(String string) {
-    super(string);
-  }
-  
-  public ParameterException(String string, Throwable t) {
-      super(string, t);
-  }   
-
+    @Parameter(names = {"-s", "--servers"}, description = "blah")
+    public List<String> serverNames = Lists.newLinkedList();
 }

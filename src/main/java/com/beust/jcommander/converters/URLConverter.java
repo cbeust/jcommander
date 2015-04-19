@@ -16,27 +16,31 @@
  * limitations under the License.
  */
 
-package com.beust.jcommander;
+package com.beust.jcommander.converters;
+
+import com.beust.jcommander.ParameterException;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
- * The main exception that JCommand will throw when something goes wrong while
- * parsing parameters.
- *
- * @author Cedric Beust <cedric@beust.com>
+ * Convert a string into a URI.
+ * 
+ * @author samvv
  */
-@SuppressWarnings("serial")
-public class ParameterException extends RuntimeException {
+public class URLConverter extends BaseConverter<URL> {
 
-  public ParameterException(Throwable t) {
-    super(t);
-  }
+	public URLConverter(String optionName) {
+		super(optionName);
+	}
 
-  public ParameterException(String string) {
-    super(string);
-  }
-  
-  public ParameterException(String string, Throwable t) {
-      super(string, t);
-  }   
-
+	public URL convert(String value) {
+		try {
+			return new URL(value);
+		} catch (MalformedURLException e) {
+			throw new ParameterException(
+					getErrorString(value, "a RFC 2396 and RFC 2732 compliant URL"));
+			
+		}
+	}
 }

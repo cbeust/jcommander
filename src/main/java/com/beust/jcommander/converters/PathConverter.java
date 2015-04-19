@@ -16,27 +16,22 @@
  * limitations under the License.
  */
 
-package com.beust.jcommander;
+package com.beust.jcommander.converters;
+
+import com.beust.jcommander.IStringConverter;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
- * The main exception that JCommand will throw when something goes wrong while
- * parsing parameters.
- *
- * @author Cedric Beust <cedric@beust.com>
+ * Convert a string into a path.
+ * 
+ * @author samvv
  */
-@SuppressWarnings("serial")
-public class ParameterException extends RuntimeException {
-
-  public ParameterException(Throwable t) {
-    super(t);
-  }
-
-  public ParameterException(String string) {
-    super(string);
+public class PathConverter implements IStringConverter<Path> {
+  
+  public Path convert(String value) {
+    return Paths.get(value);
   }
   
-  public ParameterException(String string, Throwable t) {
-      super(string, t);
-  }   
-
 }
