@@ -4,3 +4,7 @@ target
 .settings
 test-output
 src/test/java/com/beust/jcommander/ignore
+build
+.idea
+.gradle
+local.properties
