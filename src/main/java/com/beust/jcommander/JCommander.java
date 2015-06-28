@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
 import com.beust.jcommander.FuzzyMap.IKey;
@@ -155,6 +156,8 @@ public class JCommander {
   private List<String> m_unknownArgs = Lists.newArrayList();
   private boolean m_acceptUnknownOptions = false;
   private boolean m_allowParameterOverwriting = false;
+
+  private Map<Method,Object> m_processors = Maps.newHashMap();
   
   private static Console m_console;
 
@@ -280,7 +283,10 @@ public class JCommander {
     if (m_descriptions == null) createDescriptions();
     initializeDefaultValues();
     parseValues(expandArgs(args), validate);
-    if (validate) validateOptions();
+    if (validate) {
+      validateOptions();
+      postProcess();
+    }
   }
 
   private StringBuilder join(Object[] args) {
@@ -329,6 +335,43 @@ public class JCommander {
         throw new ParameterException("Main parameters are required (\""
             + m_mainParameterDescription.getDescription() + "\")");
       }
+    }
+  }
+
+  private void postProcess() {
+    for (Entry<Method,Object> process : m_processors.entrySet()) {
+      Method m = process.getKey();
+      Object o = process.getValue();
+
+      Object result = null;
+
+      try {
+        m.setAccessible(true);
+        result = m.invoke(o);
+      } catch (IllegalAccessException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (IllegalArgumentException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        throw new ParameterException(e.getCause());
+      }
+
+      Class<?> returnType = m.getReturnType();
+      if (returnType.equals(Void.TYPE) || result == null) {
+        return;
+      }
+
+      if (returnType.equals(Boolean.TYPE) || returnType.equals(Boolean.class)) {
+        if (Boolean.TRUE.equals(result)) {
+          return;
+        } else {
+          throw new ParameterException(m.getName() + " returned FALSE");
+        }
+      }
+
+      throw new ParameterException(result.toString());
     }
   }
 
@@ -587,6 +630,11 @@ public class JCommander {
     
           if (dp.required()) m_requiredFields.put(parameterized, pd);
         }
+      } else if (parameterized.getPostProcess() != null) {
+        //
+        // @PostProcess
+        //
+        m_processors.put(parameterized.getMethod(), object);
       }
     }
 

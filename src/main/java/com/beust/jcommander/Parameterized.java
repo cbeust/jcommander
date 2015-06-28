@@ -16,24 +16,51 @@ import com.beust.jcommander.internal.Lists;
 public class Parameterized {
 
   // Either a method or a field
-  private Field m_field;
-  private Method m_method;
-  private Method m_getter;
+  private Field m_field = null;
+  private Method m_method = null;
+  private Method m_getter = null;
 
-  // Either of these two
-  private WrappedParameter m_wrappedParameter;
-  private ParametersDelegate m_parametersDelegate;
+  // One of these three
+  private WrappedParameter m_wrappedParameter = null;
+  private ParametersDelegate m_parametersDelegate = null;
+  private PostProcess m_postProcess = null;
 
-  public Parameterized(WrappedParameter wp, ParametersDelegate pd,
-      Field field, Method method) {
+  @Deprecated
+  public Parameterized(WrappedParameter wp, ParametersDelegate pd, Field field, Method method) {
     m_wrappedParameter = wp;
+    m_parametersDelegate = pd;
     m_method = method;
     m_field = field;
-    if (m_field != null) {
-      m_field.setAccessible(true);
-    }
-    m_parametersDelegate = pd;
+    if (m_field != null) m_field.setAccessible(true);
   }
+
+  private Parameterized(WrappedParameter wp, Field field) {
+    m_wrappedParameter = wp;
+    m_field = field;
+    m_field.setAccessible(true);
+  }
+
+  private Parameterized(WrappedParameter wp, Method method) {
+    m_wrappedParameter = wp;
+    m_method = method;
+  }
+
+  private Parameterized(ParametersDelegate pd, Field field) {
+    m_parametersDelegate = pd;
+    m_field = field;
+    m_field.setAccessible(true);
+  }
+
+  private Parameterized(ParametersDelegate pd, Method method) {
+    m_parametersDelegate = pd;
+    m_method = method;
+  }
+
+  private Parameterized(PostProcess pp, Method method) {
+    m_postProcess = pp;
+    m_method = method;
+  }
+
 
   public static List<Parameterized> parseArg(Object arg) {
     List<Parameterized> result = Lists.newArrayList();
@@ -45,14 +72,11 @@ public class Parameterized {
         Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
         Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
         if (annotation != null) {
-          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-              f, null));
+          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), f));
         } else if (dynamicParameter != null) {
-          result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
-              f, null));
+          result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), f));
         } else if (delegateAnnotation != null) {
-          result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-              f, null));
+          result.add(new Parameterized((ParametersDelegate) delegateAnnotation, f));
         }
       }
       cls = cls.getSuperclass();
@@ -65,15 +89,15 @@ public class Parameterized {
         Annotation annotation = m.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
         Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
+        Annotation postProcess = m.getAnnotation(PostProcess.class);
         if (annotation != null) {
-          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-              null, m));
+          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), m));
         } else if (dynamicParameter != null) {
-          result.add(new Parameterized(new WrappedParameter((DynamicParameter) annotation), null,
-              null, m));
+          result.add(new Parameterized(new WrappedParameter((DynamicParameter) annotation), m));
         } else if (delegateAnnotation != null) {
-          result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-              null, m));
+          result.add(new Parameterized((ParametersDelegate) delegateAnnotation, m));
+        } else if (postProcess != null) {
+          result.add(new Parameterized((PostProcess) postProcess, m));
         }
       }
       cls = cls.getSuperclass();
@@ -84,6 +108,14 @@ public class Parameterized {
 
   public WrappedParameter getWrappedParameter() {
     return m_wrappedParameter;
+  }
+
+  public PostProcess getPostProcess() {
+    return m_postProcess;
+  }
+
+  protected Method getMethod() {
+    return m_method;
   }
 
   public Class<?> getType() {
