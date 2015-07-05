@@ -2,9 +2,13 @@ target
 .classpath
 .project
 .settings
+bin
 test-output
 src/test/java/com/beust/jcommander/ignore
 build
 .idea
+*.iml
+*.ipr
+*.iws
 .gradle
 local.properties
