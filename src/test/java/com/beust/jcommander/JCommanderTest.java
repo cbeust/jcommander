@@ -1063,34 +1063,8 @@ public class JCommanderTest {
         bar = value;
       }
     }
-    try {
-      Arguments a = new Arguments();
-      new JCommander(a, new String[] { "-bar", "1" });
-    } catch(ParameterException ex) {
-      Assert.assertTrue(ex.getMessage().contains("invoke"));
-    }
-  }
-
-  @Test(enabled = false)
-  public static void main(String[] args) throws Exception {
-    new JCommanderTest().access();
-//    class A {
-//      @Parameter(names = "-short", required = true)
-//      List<String> parameters;
-//
-//      @Parameter(names = "-long", required = true)
-//      public long l;
-//    }
-//    A a = new A();
-//    new JCommander(a).parse();
-//    System.out.println(a.l);
-//    System.out.println(a.parameters);
-//    ArgsList al = new ArgsList();
-//    JCommander j = new JCommander(al);
-//    j.setColumnSize(40);
-//    j.usage();
-//    new JCommanderTest().testListAndSplitters();
-//    new JCommanderTest().converterArgs();
+    Arguments a = new Arguments();
+    new JCommander(a, new String[] { "-bar", "1" });
   }
 
   // Tests:
