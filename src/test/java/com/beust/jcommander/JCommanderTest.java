@@ -68,6 +68,7 @@ import com.beust.jcommander.args.ArgsSlaveBogus;
 import com.beust.jcommander.args.ArgsValidate1;
 import com.beust.jcommander.args.ArgsWithSet;
 import com.beust.jcommander.args.Arity1;
+import com.beust.jcommander.args.HiddenArgs;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
@@ -310,6 +311,30 @@ public class JCommanderTest {
     Assert.assertEquals(args.listBigDecimals.size(), 2);
     Assert.assertEquals(args.listBigDecimals.get(0), new BigDecimal("-11.52"));
     Assert.assertEquals(args.listBigDecimals.get(1), new BigDecimal("100.12"));
+  }
+
+  public void hiddenConverter() {
+    class Args {
+      @Parameter(names = "--path", converter = HiddenConverter.class)
+      public String path;
+    }
+
+    new JCommander(new Args(), "--path", "/tmp/a");
+  }
+
+  public void hiddenArgs() {
+    new JCommander(new HiddenArgs(), "--input", "/tmp/a", "--output", "/tmp/b");
+  }
+
+  public void hiddenSplitter() {
+    class Args {
+      @Parameter(names = "--extensions", splitter = HiddenParameterSplitter.class)
+      public List<String> extensions;
+    }
+
+    Args args = new Args();
+    new JCommander(args, "--extensions", ".txt;.md");
+    Assert.assertEquals(Arrays.asList(".txt", ".md"), args.extensions);
   }
 
   private void argsBoolean1(String[] params, Boolean expected) {
