@@ -75,7 +75,7 @@ import com.beust.jcommander.Parameter;
 
 public class JCommanderExample {
   @Parameter
-  private List&lt;String&gt; parameters = new ArrayList&lt;String&gt;();
+  private List&lt;String&gt; parameters = new ArrayList&lt;&gt;();
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
   private Integer verbose = 1;
@@ -156,7 +156,7 @@ When a <tt>Parameter</tt> annotation is found on a field of type <tt>List</tt>, 
 
 <pre class="brush: java">
 @Parameter(names = "-host", description = "The host")
-private List&lt;String&gt; hosts = new ArrayList&lt;String&gt;();
+private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();
 </pre>
 
 will allow you to parse the following command line:
@@ -352,7 +352,7 @@ So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attr
 
 <pre class="brush: java">
 @Parameter(description = "Files")
-private List&lt;String&gt; files = new ArrayList&lt;String&gt;();
+private List&lt;String&gt; files = new ArrayList&lt;&gt;();
 
 @Parameter(names = "-debug", description = "Debugging level")
 private Integer debug = 1;
@@ -511,7 +511,7 @@ Such a parameter must be of type <tt>List&lt;String&gt;</tt> and have the boolea
 
 <pre class="brush: java">
 @Parameter(names = "-foo", variableArity = true)
-public List&lt;String&gt; foo = new ArrayList&lt;String&gt;();
+public List&lt;String&gt; foo = new ArrayList&lt;&gt;();
 </pre>
 
 <h2><a class="section" name="Multiple_option_names">Multiple option names</a></h2>
@@ -772,7 +772,7 @@ JCommander allows you to specify parameters that are not known at compile time, 
 
 <pre class="brush: java">
 @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
-private Map&lt;String, String&gt; params = new HashMap&lt;String, String&gt;();
+private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();
 </pre>
 
 You can specify a different assignment string than <tt>=</tt> by using the attribute <tt>assignment</tt>.
