@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 
+import com.beust.jcommander.args.ArgsLongDescription;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -81,6 +82,22 @@ import com.beust.jcommander.internal.Maps;
 
 @Test
 public class JCommanderTest {
+
+  @Test
+  public void testDescriptionWrappingLongWord() {
+    //setup
+    StringBuilder sb = new StringBuilder();
+    final JCommander jc = new JCommander(new ArgsLongDescription());
+
+    //action
+    jc.usage(sb);
+
+    //verify
+    for (String line: sb.toString().split("\n")) {
+      Assert.assertTrue(line.length() <=  jc.getColumnSize(), "line length < column size");
+    }
+  }
+
   public void simpleArgs() throws ParseException {
     Args1 args = new Args1();
     String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
