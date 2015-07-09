@@ -69,6 +69,7 @@ import com.beust.jcommander.args.ArgsSlaveBogus;
 import com.beust.jcommander.args.ArgsValidate1;
 import com.beust.jcommander.args.ArgsWithSet;
 import com.beust.jcommander.args.Arity1;
+import com.beust.jcommander.args.HiddenArgs;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
@@ -327,6 +328,30 @@ public class JCommanderTest {
     Assert.assertEquals(args.listBigDecimals.size(), 2);
     Assert.assertEquals(args.listBigDecimals.get(0), new BigDecimal("-11.52"));
     Assert.assertEquals(args.listBigDecimals.get(1), new BigDecimal("100.12"));
+  }
+
+  public void hiddenConverter() {
+    class Args {
+      @Parameter(names = "--path", converter = HiddenConverter.class)
+      public String path;
+    }
+
+    new JCommander(new Args(), "--path", "/tmp/a");
+  }
+
+  public void hiddenArgs() {
+    new JCommander(new HiddenArgs(), "--input", "/tmp/a", "--output", "/tmp/b");
+  }
+
+  public void hiddenSplitter() {
+    class Args {
+      @Parameter(names = "--extensions", splitter = HiddenParameterSplitter.class)
+      public List<String> extensions;
+    }
+
+    Args args = new Args();
+    new JCommander(args, "--extensions", ".txt;.md");
+    Assert.assertEquals(Arrays.asList(".txt", ".md"), args.extensions);
   }
 
   private void argsBoolean1(String[] params, Boolean expected) {
@@ -1080,34 +1105,8 @@ public class JCommanderTest {
         bar = value;
       }
     }
-    try {
-      Arguments a = new Arguments();
-      new JCommander(a, new String[] { "-bar", "1" });
-    } catch(ParameterException ex) {
-      Assert.assertTrue(ex.getMessage().contains("invoke"));
-    }
-  }
-
-  @Test(enabled = false)
-  public static void main(String[] args) throws Exception {
-    new JCommanderTest().access();
-//    class A {
-//      @Parameter(names = "-short", required = true)
-//      List<String> parameters;
-//
-//      @Parameter(names = "-long", required = true)
-//      public long l;
-//    }
-//    A a = new A();
-//    new JCommander(a).parse();
-//    System.out.println(a.l);
-//    System.out.println(a.parameters);
-//    ArgsList al = new ArgsList();
-//    JCommander j = new JCommander(al);
-//    j.setColumnSize(40);
-//    j.usage();
-//    new JCommanderTest().testListAndSplitters();
-//    new JCommanderTest().converterArgs();
+    Arguments a = new Arguments();
+    new JCommander(a, new String[] { "-bar", "1" });
   }
 
   // Tests:

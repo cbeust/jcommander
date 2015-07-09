@@ -1309,6 +1309,8 @@ public class JCommander {
       throw new ParameterException(e);
     } catch (InvocationTargetException e) {
       throw new ParameterException(e);
+    } catch (NoSuchMethodException e) {
+      throw new ParameterException(e);
     }
 
     return result;
@@ -1320,8 +1322,11 @@ public class JCommander {
    */
   private Object convertToList(String value, IStringConverter<?> converter,
       Class<? extends IParameterSplitter> splitterClass)
-          throws InstantiationException, IllegalAccessException {
-    IParameterSplitter splitter = splitterClass.newInstance();
+      throws InstantiationException, IllegalAccessException, NoSuchMethodException,
+      InvocationTargetException {
+    Constructor<? extends IParameterSplitter> constructor = splitterClass.getConstructor(new Class[0]);
+    constructor.setAccessible(true);
+    IParameterSplitter splitter = constructor.newInstance();
     List<Object> result = Lists.newArrayList();
     for (String param : splitter.split(value)) {
       result.add(converter.convert(param));
@@ -1331,13 +1336,14 @@ public class JCommander {
 
   private IStringConverter<?> instantiateConverter(String optionName,
       Class<? extends IStringConverter<?>> converterClass)
-      throws IllegalArgumentException, InstantiationException, IllegalAccessException,
+      throws InstantiationException, IllegalAccessException,
       InvocationTargetException {
     Constructor<IStringConverter<?>> ctor = null;
     Constructor<IStringConverter<?>> stringCtor = null;
     Constructor<IStringConverter<?>>[] ctors
         = (Constructor<IStringConverter<?>>[]) converterClass.getDeclaredConstructors();
     for (Constructor<IStringConverter<?>> c : ctors) {
+      c.setAccessible(true);
       Class<?>[] types = c.getParameterTypes();
       if (types.length == 1 && types[0].equals(String.class)) {
         stringCtor = c;
