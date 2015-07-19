@@ -41,6 +41,7 @@ public class Parameterized {
     Class<? extends Object> cls = arg.getClass();
     while (!Object.class.equals(cls)) {
       for (Field f : cls.getDeclaredFields()) {
+        f.setAccessible(true);
         Annotation annotation = f.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
         Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
@@ -62,6 +63,7 @@ public class Parameterized {
     cls = arg.getClass();
     while (!Object.class.equals(cls)) {
       for (Method m : cls.getDeclaredMethods()) {
+        m.setAccessible(true);
         Annotation annotation = m.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
         Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
