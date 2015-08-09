@@ -311,6 +311,17 @@ public class JCommanderTest {
     Assert.assertEquals(args.getVerbose().intValue(), 3);
   }
 
+  @Test(
+    expectedExceptions = ParameterException.class,
+    expectedExceptionsMessageRegExp = "Cannot use final field .*#_foo as a parameter;"
+      + " compile-time constant inlining may hide new values written to it.")
+  public void finalArgs() {
+    Object args = new Object() {
+      @Parameter(names = "-foo") final int _foo = 0;
+    };
+    new JCommander(args);
+  }
+
   public void converterArgs() {
     ArgsConverter args = new ArgsConverter();
     String fileName = "a";
