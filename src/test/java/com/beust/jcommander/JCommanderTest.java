@@ -311,6 +311,17 @@ public class JCommanderTest {
     Assert.assertEquals(args.getVerbose().intValue(), 3);
   }
 
+  @Test(
+    expectedExceptions = ParameterException.class,
+    expectedExceptionsMessageRegExp = "Cannot use final field .*#_foo as a parameter;"
+      + " compile-time constant inlining may hide new values written to it.")
+  public void finalArgs() {
+    Object args = new Object() {
+      @Parameter(names = "-foo") final int _foo = 0;
+    };
+    new JCommander(args);
+  }
+
   public void converterArgs() {
     ArgsConverter args = new ArgsConverter();
     String fileName = "a";
@@ -347,6 +358,9 @@ public class JCommanderTest {
     class Args {
       @Parameter(names = "--extensions", splitter = HiddenParameterSplitter.class)
       public List<String> extensions;
+    }
+    if (HiddenParameterSplitter.class.getConstructors().length == 0) {
+      return; // Compiler has optimised away the private constructor
     }
 
     Args args = new Args();
@@ -641,9 +655,16 @@ public class JCommanderTest {
 
     List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
     Assert.assertEquals(expected, args.choices);
-    Assert.assertEquals(jc.getParameters().get(0).getDescription(),
-        "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
 
+    for (ParameterDescription param : jc.getParameters()) {
+      // order can vary depending on JDK version
+      if (param.getLongestName().equals("-choice")) {
+        Assert.assertEquals(param.getDescription(),
+          "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
+        return;
+      }
+    }
+    Assert.fail("Could not find -choice parameter.");
   }
 
   public void enumArgsCaseInsensitive() {

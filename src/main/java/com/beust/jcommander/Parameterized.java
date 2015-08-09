@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -30,7 +31,7 @@ public class Parameterized {
     m_method = method;
     m_field = field;
     if (m_field != null) {
-      m_field.setAccessible(true);
+      setFieldAccessible(m_field);
     }
     m_parametersDelegate = pd;
   }
@@ -41,7 +42,6 @@ public class Parameterized {
     Class<? extends Object> cls = arg.getClass();
     while (!Object.class.equals(cls)) {
       for (Field f : cls.getDeclaredFields()) {
-        f.setAccessible(true);
         Annotation annotation = f.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
         Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
@@ -126,7 +126,7 @@ public class Parameterized {
       try {
         Field field = m_method.getDeclaringClass().getDeclaredField(fieldName);
         if (field != null) {
-          field.setAccessible(true);
+          setFieldAccessible(field);
           result = field.get(object);
         }
       } catch(NoSuchFieldException ex) {
@@ -181,6 +181,15 @@ public class Parameterized {
     } else {
       return m_field.getAnnotation(DynamicParameter.class) != null;
     }
+  }
+
+  private static void setFieldAccessible(Field f) {
+    if (Modifier.isFinal(f.getModifiers())) {
+      throw new ParameterException(
+        "Cannot use final field " + f.getDeclaringClass().getName() + "#" + f.getName() + " as a parameter;"
+        + " compile-time constant inlining may hide new values written to it.");
+    }
+    f.setAccessible(true);
   }
 
   private static String errorMessage(Method m, Exception ex) {
