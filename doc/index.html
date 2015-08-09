@@ -777,6 +777,33 @@ private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();
 
 You can specify a different assignment string than <tt>=</tt> by using the attribute <tt>assignment</tt>.
 
+<h2><a class="section" name="AdvancedValidation">Advanced Validation</a></h2>
+
+In addition to the basic parameter validation described above, JCommander also allows you to do more advanced validation. All methods annotated with <tt><a href="apidocs/com/beust/jcommander/PostProcess.html">@PostProcess</a></tt> annotation will be called after individual parameters have been processed. If there are multiple such methods, the calling order is non-deterministic.
+
+<pre class="brush: java">
+@PostProcess
+public void customValidate() {
+  // Custom validation logic goes here
+}
+</pre>
+
+If the validation method throws any exceptions, they will be wrapped in a <tt>ParameterException</tt> and re-thrown. Alternatively, returning a String from the method will cause it to be the description of a new <tt>ParameterException</tt>
+
+<pre class="brush: java">
+@PostProcess
+public void customValidateAndThrow() {
+  throw CustomException(); // Will be wrapped in a ParameterException and rethrown
+}
+
+@PostProcess
+public String customValidateAndReturn() {
+  return "Validation failed because..."; // Will be wrapped in ParameterException and thrown
+}
+</pre>
+
+All other objects returned will be first converted to Strings, and then treated the same.
+
 <h2><a class="section" name="Scala">JCommander in Scala</a></h2>
 
 Here is a quick example of how to use JCommander in Scala (courtesy of Patrick Linskey):
