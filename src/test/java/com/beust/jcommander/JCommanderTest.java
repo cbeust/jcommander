@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 
-import com.beust.jcommander.args.ArgsLongDescription;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -58,6 +57,7 @@ import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
 import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsList;
+import com.beust.jcommander.args.ArgsLongDescription;
 import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
@@ -1128,8 +1128,13 @@ public class JCommanderTest {
     }
     Arguments a = new Arguments();
     new JCommander(a, new String[] { "-bar", "1" });
+    Assert.assertEquals(a.bar, 1);
   }
 
+  @Test(enabled = false)
+  public static void main(String[] args) {
+    new JCommanderTest().access();
+  }
   // Tests:
   // required unparsed parameter
 }

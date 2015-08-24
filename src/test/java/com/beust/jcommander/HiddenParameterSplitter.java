@@ -24,9 +24,6 @@ import java.util.List;
 import com.beust.jcommander.converters.IParameterSplitter;
 
 public class HiddenParameterSplitter implements IParameterSplitter {
-  private HiddenParameterSplitter() {
-  }
-
   @Override
   public List<String> split(String value) {
     return Arrays.asList(value.split(";"));
