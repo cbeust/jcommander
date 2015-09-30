@@ -1,8 +1,7 @@
 import com.beust.kobalt.*
-import com.beust.kobalt.internal.testConfig
 import com.beust.kobalt.plugin.java.*
-import com.beust.kobalt.plugin.packaging.packaging
-import com.beust.kobalt.plugin.publish.jcenter
+import com.beust.kobalt.plugin.packaging.*
+import com.beust.kobalt.plugin.publish.*
 
 val jcommander = javaProject {
     name = "jcommander"
@@ -23,7 +22,7 @@ val jcommander = javaProject {
     }
 }
 
-val pack = packaging(jcommander) {
+val pack = assemble(jcommander) {
     jar {
     }
 }
