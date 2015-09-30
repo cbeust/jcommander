@@ -18,9 +18,6 @@ val jcommander = javaProject {
         path("src/test/java")
         path("src/test/resources")
     }
-    dependencies {
-        compile("com.beust:jcommander:1.48")
-    }
     dependenciesTest {
         compile("org.testng:testng:6.9.5")
     }
