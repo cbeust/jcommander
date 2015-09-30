@@ -26,3 +26,7 @@ val pack = assemble(jcommander) {
     mavenJars {
     }
 }
+
+val jcenter = jcenter(jcommander) {
+    publish = false
+}
