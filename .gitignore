@@ -12,3 +12,4 @@ build
 *.iws
 .gradle
 local.properties
+kobaltBuild
