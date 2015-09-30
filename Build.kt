@@ -7,7 +7,7 @@ val jcommander = javaProject {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.99"
+    version = "1.52"
     directory = homeDir("java/jcommander")
 
     sourceDirectories {
@@ -23,6 +23,6 @@ val jcommander = javaProject {
 }
 
 val pack = assemble(jcommander) {
-    jar {
+    mavenJars {
     }
 }
