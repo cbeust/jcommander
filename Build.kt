@@ -10,13 +10,6 @@ val jcommander = javaProject {
     version = "1.52"
     directory = homeDir("java/jcommander")
 
-    sourceDirectories {
-        path("src/main/java")
-    }
-    sourceDirectoriesTest {
-        path("src/test/java")
-        path("src/test/resources")
-    }
     dependenciesTest {
         compile("org.testng:testng:6.9.5")
     }
