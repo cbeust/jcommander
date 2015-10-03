@@ -8,7 +8,6 @@ val jcommander = javaProject {
     group = "com.beust"
     artifactId = name
     version = "1.52"
-    directory = homeDir("java/jcommander")
 
     dependenciesTest {
         compile("org.testng:testng:6.9.5")
