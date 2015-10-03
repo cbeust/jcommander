@@ -7,6 +7,6 @@ jdk:
 before_install:
   - touch local.properties
 
-script: bundle exec ./kobaltw assemble
+script: exec ./kobaltw assemble
 
 
