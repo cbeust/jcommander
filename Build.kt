@@ -8,7 +8,6 @@ val jcommander = javaProject {
     group = "com.beust"
     artifactId = name
     version = "1.54"
-    directory = homeDir("java/jcommander")
 
     dependencies {
         compile("com.google.code.gson:gson:2.4")
