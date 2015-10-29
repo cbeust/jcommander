@@ -9,5 +9,5 @@ before_install:
 
 install: true
 
-script: ./kobaltw --log 2 assemble test
+script: ./kobaltw assemble test
 
