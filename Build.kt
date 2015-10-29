@@ -15,7 +15,7 @@ val jcommander = javaProject {
     }
 
     dependenciesTest {
-        compile("org.testng:testng:6.9.5")
+        compile("org.testng:testng:6.9.9")
     }
 
 
