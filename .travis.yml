@@ -7,6 +7,7 @@ jdk:
 before_install:
   - touch local.properties
 
-script: exec ./kobaltw --log 2 assemble
+install: true
 
+script: ./kobaltw assemble test
 
