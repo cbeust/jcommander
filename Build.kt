@@ -7,18 +7,24 @@ val jcommander = javaProject {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.52"
+    version = "1.54"
+    directory = homeDir("java/jcommander")
+
+    dependencies {
+        compile("com.google.code.gson:gson:2.4")
+    }
 
     dependenciesTest {
         compile("org.testng:testng:6.9.5")
     }
-}
 
-val pack = assemble(jcommander) {
-    mavenJars {
+
+    assemble {
+        mavenJars {
+        }
     }
-}
 
-val jcenter = jcenter(jcommander) {
-    publish = false
+    jcenter {
+        publish = true
+    }
 }
