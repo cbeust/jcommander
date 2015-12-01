@@ -1,5 +1,8 @@
 package com.beust.jcommander;
 
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -7,9 +10,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
-
-import com.beust.jcommander.internal.Lists;
+import java.util.Set;
 
 /**
  * Encapsulate a field or a method annotated with @Parameter or @DynamicParameter
@@ -36,32 +39,87 @@ public class Parameterized {
     m_parametersDelegate = pd;
   }
 
+  /**
+   * Recursive handler for describing the set of classes while
+   * using the setOfClasses parameter as a collector
+   *
+   * @param inputClass the class to analyze
+   * @param setOfClasses the set collector to collect the results
+     */
+  private static void describeClassTree(Class<?> inputClass, Set<Class<?>> setOfClasses) {
+    // can't map null class
+    if(inputClass == null) {
+      return;
+    }
+
+    // don't further analyze a class that has been analyzed already
+    if(Object.class.equals(inputClass) || setOfClasses.contains(inputClass)) {
+      return;
+    }
+
+    // add to analysis set
+    setOfClasses.add(inputClass);
+
+    // perform super class analysis
+    describeClassTree(inputClass.getSuperclass(), setOfClasses);
+
+    // perform analysis on interfaces
+    for(Class<?> hasInterface : inputClass.getInterfaces()) {
+      describeClassTree(hasInterface, setOfClasses);
+    }
+  }
+
+  /**
+   * Given an object return the set of classes that it extends
+   * or implements.
+   *
+   * @param arg object to describe
+   * @return set of classes that are implemented or extended by that object
+   */
+  private static Set<Class<?>> describeClassTree(Class<?> inputClass) {
+    if(inputClass == null) {
+      return Collections.emptySet();
+    }
+
+    // create result collector
+    Set<Class<?>> classes = Sets.newLinkedHashSet();
+
+    // describe tree
+    describeClassTree(inputClass, classes);
+
+    return classes;
+  }
+
   public static List<Parameterized> parseArg(Object arg) {
     List<Parameterized> result = Lists.newArrayList();
 
-    Class<? extends Object> cls = arg.getClass();
-    while (!Object.class.equals(cls)) {
+    Class<? extends Object> rootClass = arg.getClass();
+
+    // get the list of types that are extended or implemented by the root class
+    // and all of its parent types
+    Set<Class<?>> types = describeClassTree(rootClass);
+
+    // analyze each type
+    for(Class<?> cls : types) {
+
+      // check fields
       for (Field f : cls.getDeclaredFields()) {
         Annotation annotation = f.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
         Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
         if (annotation != null) {
           result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-              f, null));
+                  f, null));
         } else if (dynamicParameter != null) {
           result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
-              f, null));
+                  f, null));
         } else if (delegateAnnotation != null) {
           result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-              f, null));
+                  f, null));
         }
       }
-      cls = cls.getSuperclass();
-    }
 
-    // Reassigning
-    cls = arg.getClass();
-    while (!Object.class.equals(cls)) {
+      // check methods
       for (Method m : cls.getDeclaredMethods()) {
         m.setAccessible(true);
         Annotation annotation = m.getAnnotation(Parameter.class);
@@ -69,16 +127,15 @@ public class Parameterized {
         Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
         if (annotation != null) {
           result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-              null, m));
+                  null, m));
         } else if (dynamicParameter != null) {
-          result.add(new Parameterized(new WrappedParameter((DynamicParameter) annotation), null,
-              null, m));
+          result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
+                  null, m));
         } else if (delegateAnnotation != null) {
           result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-              null, m));
+                  null, m));
         }
       }
-      cls = cls.getSuperclass();
     }
 
     return result;
