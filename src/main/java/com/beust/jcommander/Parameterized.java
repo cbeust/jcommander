@@ -147,7 +147,6 @@ public class Parameterized {
 
   public Class<?> getType() {
     if (m_method != null) {
-      final Class<?>[] types = m_method.getParameterTypes();
       return m_method.getParameterTypes()[0];
     } else {
       return m_field.getType();
