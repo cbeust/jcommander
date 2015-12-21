@@ -210,7 +210,7 @@ public class JCommander {
     parse(args);
   }
   
-  public static Console getConsole() {
+  public static synchronized Console getConsole() {
     if (m_console == null) {
       try {
         Method consoleMethod = System.class.getDeclaredMethod("console", new Class<?>[0]);

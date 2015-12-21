@@ -972,7 +972,7 @@ public class JCommanderTest {
   }
 
   static class V2 implements IParameterValidator2 {
-    final static List<String> names =  Lists.newArrayList();
+    static final List<String> names =  Lists.newArrayList();
     static boolean validateCalled = false;
 
     @Override

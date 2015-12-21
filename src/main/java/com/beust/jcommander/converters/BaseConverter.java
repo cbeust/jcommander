@@ -25,7 +25,7 @@ import com.beust.jcommander.IStringConverter;
  * 
  * @author cbeust
  */
-abstract public class BaseConverter<T> implements IStringConverter<T> {
+public abstract class BaseConverter<T> implements IStringConverter<T> {
 
   private String m_optionName;
 
