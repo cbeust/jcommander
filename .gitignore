@@ -13,3 +13,4 @@ build
 .gradle
 local.properties
 kobaltBuild
+.kobalt
