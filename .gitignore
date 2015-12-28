@@ -14,3 +14,6 @@ build
 local.properties
 kobaltBuild
 .kobalt
+
+*~
+.DS_Store
