@@ -98,6 +98,33 @@ new JCommander(jct, argv);
 Assert.assertEquals(jct.verbose.intValue(), 2);
 </pre>
 
+An example that mirrors more of what you might see in the "real world" might
+look like this:
+
+<pre class="brush: java">
+class Main {
+    @Parameter(names={"--length", "-l"})
+    int length;
+    @Parameter(names={"--pattern", "-p"})
+    int pattern;
+
+    public static void main(String ... args) {
+        Main main = new Main();
+        new JCommander(main, args);
+        main.run();
+    }
+
+    public void run() {
+        System.out.printf("%d %d", length, pattern);
+    }
+}
+</pre>
+
+If you were to run <code>java Main -l 512 --pattern 2</code>, this would
+output:
+
+<pre>512 2</pre>
+
 <h2><a class="section" name="Types_of_options">Types of options</a></h2>
 
 The fields representing your parameters can be of any type. Basic types (<tt>Integer</tt>, <tt>Boolean</tt/>., etc...) are supported by default and you can write type converters to support any other type (<tt>File</tt>, etc...).
