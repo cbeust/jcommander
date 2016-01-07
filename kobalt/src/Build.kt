@@ -10,7 +10,7 @@ val jcommander = javaProject {
     version = "1.54"
 
     dependenciesTest {
-        compile("org.testng:testng:6.9.9")
+        compile("org.testng:testng:6.9.10")
     }
 
     assemble {
