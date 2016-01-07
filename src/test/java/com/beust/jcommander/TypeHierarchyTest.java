@@ -1,6 +1,6 @@
 package com.beust.jcommander;
 
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
