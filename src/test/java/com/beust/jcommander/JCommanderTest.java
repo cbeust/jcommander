@@ -40,6 +40,8 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.beust.jcommander.args.ArgsLongCommandDescription;
+import com.beust.jcommander.args.ArgsLongMainParameterDescription;
 import com.beust.jcommander.args.AlternateNamesForListArgs;
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args1Setter;
@@ -83,6 +85,37 @@ import com.beust.jcommander.internal.Maps;
 
 @Test
 public class JCommanderTest {
+
+  @Test
+  public void testLongMainParameterDescription() {
+    //setup
+    JCommander jc = new JCommander(new ArgsLongMainParameterDescription());
+    StringBuilder sb = new StringBuilder();
+
+    //action
+    jc.usage(sb);
+
+    //verify
+    for (String line: sb.toString().split("\n")) {
+      Assert.assertTrue(line.length() <=  jc.getColumnSize(), "line length < column size");
+    }
+  }
+
+  @Test
+  public void testLongCommandDescription() throws Exception {
+    //setup
+    JCommander jc = new JCommander();
+    jc.addCommand(new ArgsLongCommandDescription());
+    StringBuilder sb = new StringBuilder();
+
+    //action
+    jc.usage(sb);
+
+    //verify
+    for (String line: sb.toString().split("\n")) {
+      Assert.assertTrue(line.length() <=  jc.getColumnSize(), "line length < column size");
+    }
+  }
 
   @Test
   public void testDescriptionWrappingLongWord() {
@@ -1023,7 +1056,7 @@ public class JCommanderTest {
     
     StringBuilder sb = new StringBuilder();
     c.usage(sb);
-    Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
+    Assert.assertTrue(sb.toString().contains("[command options] \n  Commands:"));
   }
 
   public void usageWithEmpytLine() {
@@ -1048,7 +1081,7 @@ public class JCommanderTest {
     
     StringBuilder sb = new StringBuilder();
     c.usage(sb);
-    Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
+    Assert.assertTrue(sb.toString().contains("command a parameters \n\n    b"));
   }
 
   public void partialValidation() {
