@@ -1053,15 +1053,21 @@ public class JCommander {
     if (m_descriptions == null) createDescriptions();
     boolean hasCommands = !m_commands.isEmpty();
 
+    //indenting
+    int descriptionIndent = 6;
+    int indentCount = indent.length() + descriptionIndent;
+
     //
     // First line of the usage
     //
     String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
-    out.append(indent).append("Usage: " + programName + " [options]");
-    if (hasCommands) out.append(indent).append(" [command] [command options]");
+    StringBuilder mainLine = new StringBuilder();
+    mainLine.append(indent).append("Usage: ").append(programName).append(" [options]");
+    if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
     if (m_mainParameterDescription != null) {
-      out.append(" " + m_mainParameterDescription.getDescription());
+      mainLine.append(" ").append(m_mainParameterDescription.getDescription());
     }
+    wrapDescription(out, indentCount, mainLine.toString());
     out.append("\n");
 
     //
@@ -1088,20 +1094,17 @@ public class JCommander {
     //
     // Display all the names and descriptions
     //
-    int descriptionIndent = 6;
     if (sorted.size() > 0) out.append(indent).append("  Options:\n");
     for (ParameterDescription pd : sorted) {
       WrappedParameter parameter = pd.getParameter();
       out.append(indent).append("  "
           + (parameter.required() ? "* " : "  ")
           + pd.getNames()
-          + "\n"
-          + indent + s(descriptionIndent));
-      int indentCount = indent.length() + descriptionIndent;
-      wrapDescription(out, indentCount, pd.getDescription());
+          + "\n");
+      wrapDescription(out, indentCount, s(indentCount) + pd.getDescription());
       Object def = pd.getDefault();
       if (pd.isDynamicParameter()) {
-        out.append("\n" + s(indentCount + 1))
+        out.append("\n" + s(indentCount))
             .append("Syntax: " + parameter.names()[0]
                 + "key" + parameter.getAssignment()
                 + "value");
@@ -1110,12 +1113,12 @@ public class JCommander {
         String displayedDef = Strings.isStringEmpty(def.toString())
             ? "<empty string>"
             : def.toString();
-        out.append("\n" + s(indentCount + 1))
+        out.append("\n" + s(indentCount))
             .append("Default: " + (parameter.password()?"********" : displayedDef));
       }
       Class<?> type =  pd.getParameterized().getType();
       if(type.isEnum()){
-          out.append("\n" + s(indentCount + 1))
+          out.append("\n" + s(indentCount))
           .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
       }
       out.append("\n");
@@ -1134,10 +1137,14 @@ public class JCommander {
         if (!p.hidden()) {
           ProgramName progName = commands.getKey();
           String dispName = progName.getDisplayName();
-          out.append(indent).append("    " + dispName); // + s(spaceCount) + getCommandDescription(progName.name) + "\n");
+          String description = getCommandDescription(progName.getName());
+          wrapDescription(out, indentCount + descriptionIndent,
+                  indent + "    " + dispName + "      " + description);
+          out.append("\n");
 
           // Options for this command
-          usage(progName.getName(), out, "      ");
+          JCommander jc = findCommandByAlias(progName.getName());
+          jc.usage(out, "      ");
           out.append("\n");
         }
       }
@@ -1160,18 +1167,27 @@ public class JCommander {
     return m_columnSize;
   }
 
+  /**
+   * Wrap a potentially long line to {@link #getColumnSize()}.
+   *
+   * @param out         the output
+   * @param indent      the indentation in spaces for lines after the first line.
+   * @param description the text to wrap. No extra spaces are inserted before {@code
+   *                    description}. If the first line needs to be indented prepend the
+   *                    correct number of spaces to {@code description}.
+   */
   private void wrapDescription(StringBuilder out, int indent, String description) {
     int max = getColumnSize();
     String[] words = description.split(" ");
-    int current = indent;
+    int current = 0;
     int i = 0;
     while (i < words.length) {
       String word = words[i];
-      if (word.length() > max || current + word.length() <= max) {
-        out.append(" ").append(word);
+      if (word.length() > max || current + 1 + word.length() <= max) {
+        out.append(word).append(" ");
         current += word.length() + 1;
       } else {
-        out.append("\n").append(s(indent + 1)).append(word);
+        out.append("\n").append(s(indent)).append(word).append(" ");
         current = indent + 1 + word.length();
       }
       i++;
