@@ -109,6 +109,20 @@ public class CommandTest {
         Assert.assertFalse(out.toString().contains("hidden      Hidden command to add file contents to the index"));
     }
 
+  @Test
+  public void noParametersAnnotationOnCommandTest() {
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+    CommandNoParametersAnnotation noParametersAnnotation = new CommandNoParametersAnnotation();
+    jc.addCommand("no-annotation", noParametersAnnotation);
+
+    jc.setProgramName("TestCommander");
+    StringBuilder out = new StringBuilder();
+    jc.usage(out);
+
+    Assert.assertTrue(out.toString().contains("no-annotation"));
+  }
+
   public static void main(String[] args) {
     new CommandTest().shouldComplainIfNoAnnotations();
   }
