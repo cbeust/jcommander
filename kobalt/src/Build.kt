@@ -3,7 +3,7 @@ import com.beust.kobalt.plugin.java.*
 import com.beust.kobalt.plugin.packaging.*
 import com.beust.kobalt.plugin.publish.*
 
-val jcommander = javaProject {
+val jcommander = project {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
@@ -18,7 +18,7 @@ val jcommander = javaProject {
         }
     }
 
-    jcenter {
+    bintray {
         publish = true
     }
 }
