@@ -839,6 +839,36 @@ public class JCommanderTest {
     Assert.assertEquals(arg2.host, "foo");
   }
 
+  @Test(enabled = true, description = "Disable top-level @/ampersand file expansion")
+  public void disabledAtSignExpansionTest() {
+    class Params {
+      @Parameter(names = { "-username" })
+      protected String username;
+    }
+
+    Params params = new Params();
+
+    JCommander jc = new JCommander(params);
+    jc.setExpandAtSign(false);
+    jc.parse(new String[] { "-username", "@tzellman" });
+    Assert.assertEquals(params.username, "@tzellman");
+  }
+
+  @Test(enabled = true, description = "Enable top-level @/ampersand file expansion, which should throw in this case",
+          expectedExceptions = ParameterException.class)
+  public void enabledAtSignExpansionTest() {
+    class Params {
+      @Parameter(names = { "-username" })
+      protected String username;
+    }
+
+    Params params = new Params();
+
+    JCommander jc = new JCommander(params);
+    jc.parse(new String[] { "-username", "@tzellman" });
+    Assert.assertEquals(params.username, "@tzellman");
+  }
+
   public void parameterWithOneDoubleQuote() {
     @Parameters(separators = "=")
     class Arg {
