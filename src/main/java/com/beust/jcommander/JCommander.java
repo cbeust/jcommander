@@ -157,6 +157,8 @@ public class JCommander {
   private boolean m_allowParameterOverwriting = false;
   
   private static Console m_console;
+  
+  private boolean expandAtSign = true;
 
   /**
    * The factories used to look up string converters.
@@ -208,6 +210,10 @@ public class JCommander {
   public JCommander(Object object, String... args) {
     addObject(object);
     parse(args);
+  }
+
+  public void setExpandAtSign(boolean expandAtSign){
+    this.expandAtSign = expandAtSign;
   }
   
   public static Console getConsole() {
@@ -352,7 +358,7 @@ public class JCommander {
     //
     for (String arg : originalArgv) {
 
-      if (arg.startsWith("@")) {
+      if (arg.startsWith("@") && expandAtSign) {
         String fileName = arg.substring(1);
         vResult1.addAll(readFile(fileName));
       }
