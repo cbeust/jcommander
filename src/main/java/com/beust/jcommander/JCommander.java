@@ -672,6 +672,8 @@ public class JCommander {
       if (def != null) {
         p("Initializing " + optionName + " with default value:" + def);
         pd.addValue(def, true /* default */);
+        // remove the parameter from the list of fields to be required
+        m_requiredFields.remove(pd.getParameterized());
         return;
       }
     }
@@ -807,6 +809,14 @@ public class JCommander {
     for (ParameterDescription parameterDescription : m_descriptions.values()) {
       if (parameterDescription.isAssigned()) {
         m_fields.get(parameterDescription.getParameterized()).setAssigned(true);
+      }
+      
+      // if the parameter has a default value (not the one assigned by DefaultProvider
+      // but the one assigned on the variable initialization), make it as assigned and
+      // remove it from the list of parameters to be required
+      if (parameterDescription.getDefault() != null) {
+          m_fields.get(parameterDescription.getParameterized()).setAssigned(true);
+          m_requiredFields.remove(parameterDescription.getParameterized());
       }
     }
 

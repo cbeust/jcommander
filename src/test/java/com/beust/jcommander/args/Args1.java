@@ -31,7 +31,7 @@ public class Args1 {
   public List<String> parameters = Lists.newArrayList();
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity", required = true)
-  public Integer verbose = 1;
+  public Integer verbose;
 
   @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
   public String groups;
