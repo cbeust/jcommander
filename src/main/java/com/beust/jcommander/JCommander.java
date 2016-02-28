@@ -672,6 +672,8 @@ public class JCommander {
       if (def != null) {
         p("Initializing " + optionName + " with default value:" + def);
         pd.addValue(def, true /* default */);
+        // remove the parameter from the list of fields to be required
+        m_requiredFields.remove(pd.getParameterized());
         return;
       }
     }
