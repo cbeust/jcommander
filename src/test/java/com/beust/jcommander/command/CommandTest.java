@@ -123,6 +123,21 @@ public class CommandTest {
     Assert.assertTrue(out.toString().contains("no-annotation"));
   }
 
+  @Test
+  public void noTrailingSpaceInUsageTest() {
+    CommandMain cm = new CommandMain();
+    JCommander jc = new JCommander(cm);
+    CommandAdd add = new CommandAdd();
+    jc.addCommand("add", add);
+    CommandCommit commit = new CommandCommit();
+    jc.addCommand("commit", commit);
+    jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
+    StringBuilder out = new StringBuilder();
+    jc.usage(out);
+    String firstLine = out.toString().split("\n")[0];
+    Assert.assertFalse(firstLine.endsWith(" "), "Usage should not have trailing spaces");
+  }
+
   public static void main(String[] args) {
     new CommandTest().shouldComplainIfNoAnnotations();
   }

@@ -1086,7 +1086,7 @@ public class JCommanderTest {
     
     StringBuilder sb = new StringBuilder();
     c.usage(sb);
-    Assert.assertTrue(sb.toString().contains("[command options] \n  Commands:"));
+    Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
   }
 
   public void usageWithEmpytLine() {
@@ -1111,7 +1111,7 @@ public class JCommanderTest {
     
     StringBuilder sb = new StringBuilder();
     c.usage(sb);
-    Assert.assertTrue(sb.toString().contains("command a parameters \n\n    b"));
+    Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
   }
 
   public void partialValidation() {
