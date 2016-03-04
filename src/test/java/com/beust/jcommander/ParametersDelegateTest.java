@@ -221,6 +221,24 @@ public class ParametersDelegateTest {
     cmd.parse("command main params".split(" "));
   }
 
+  @Test
+  public void testFinalFieldAsParameterDelegate() {
+    class Delegate1 {
+      @Parameter
+      public List<String> mainParams1 = new ArrayList<String>();
+    }
+    class Command {
+      @ParametersDelegate
+      public final Delegate1 delegate1 = new Delegate1();
+    }
+    Command c = new Command();
+
+    JCommander cmd = new JCommander();
+    cmd.addCommand("command", c);
+
+    cmd.parse("command main params".split(" "));
+  }
+
   public static void main(String[] args) {
     new ParametersDelegateTest().commandTest();
   }
