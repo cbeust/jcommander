@@ -1192,8 +1192,12 @@ public class JCommander {
     while (i < words.length) {
       String word = words[i];
       if (word.length() > max || current + 1 + word.length() <= max) {
-        out.append(word).append(" ");
-        current += word.length() + 1;
+        out.append(word);
+        current += word.length();
+        if(i != words.length -1) {
+          out.append(" ");
+          current++;
+        }
       } else {
         out.append("\n").append(s(indent)).append(word).append(" ");
         current = indent + 1 + word.length();
