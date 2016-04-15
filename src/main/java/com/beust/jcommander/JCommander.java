@@ -373,9 +373,8 @@ public class JCommander {
     List<String> vResult2 = Lists.newArrayList();
     for (int i = 0; i < vResult1.size(); i++) {
       String arg = vResult1.get(i);
-      String[] v1 = vResult1.toArray(new String[0]);
-      if (isOption(v1, arg)) {
-        String sep = getSeparatorFor(v1, arg);
+      if (isOption(arg)) {
+        String sep = getSeparatorFor(arg);
         if (! " ".equals(sep)) {
           String[] sp = arg.split("[" + sep + "]", 2);
           for (String ssp : sp) {
@@ -406,8 +405,8 @@ public class JCommander {
     return Arrays.asList(arg);
   }
 
-  private boolean isOption(String[] args, String arg) {
-    String prefixes = getOptionPrefixes(args, arg);
+  private boolean isOption(String arg) {
+    String prefixes = getOptionPrefixes(arg);
     return arg.length() > 0 && prefixes.indexOf(arg.charAt(0)) >= 0;
   }
 
@@ -423,21 +422,12 @@ public class JCommander {
    * If arg is an option, we can look it up directly, but if it's a value,
    * we need to find the description for the option that precedes it.
    */
-  private ParameterDescription getDescriptionFor(String[] args, String arg) {
-    ParameterDescription result = getPrefixDescriptionFor(arg);
-    if (result != null) return result;
-
-    for (String a : args) {
-      ParameterDescription pd = getPrefixDescriptionFor(arg);
-      if (pd != null) result = pd;
-      if (a.equals(arg)) return result;
-    }
-
-    throw new ParameterException("Unknown parameter: " + arg);
+  private ParameterDescription getDescriptionFor(String arg) {
+    return getPrefixDescriptionFor(arg);
   }
 
-  private String getSeparatorFor(String[] args, String arg) {
-    ParameterDescription pd = getDescriptionFor(args, arg);
+  private String getSeparatorFor(String arg) {
+    ParameterDescription pd = getDescriptionFor(arg);
 
     // Could be null if only main parameters were passed
     if (pd != null) {
@@ -448,8 +438,8 @@ public class JCommander {
     return " ";
   }
 
-  private String getOptionPrefixes(String[] args, String arg) {
-    ParameterDescription pd = getDescriptionFor(args, arg);
+  private String getOptionPrefixes(String arg) {
+    ParameterDescription pd = getDescriptionFor(arg);
 
     // Could be null if only main parameters were passed
     if (pd != null) {
@@ -697,7 +687,7 @@ public class JCommander {
 
       JCommander jc = findCommandByAlias(arg);
       int increment = 1;
-      if (! isDashDash && ! "--".equals(a) && isOption(args, a) && jc == null) {
+      if (! isDashDash && ! "--".equals(a) && isOption(a) && jc == null) {
         //
         // Option
         //
@@ -742,7 +732,7 @@ public class JCommander {
           if (m_acceptUnknownOptions) {
             m_unknownArgs.add(arg);
             i++;
-            while (i < args.length && ! isOption(args, args[i])) {
+            while (i < args.length && ! isOption(args[i])) {
               m_unknownArgs.add(args[i++]);
             }
             increment = 0;
@@ -819,7 +809,7 @@ public class JCommander {
     @Override
     public int processVariableArity(String optionName, String[] options) {
         int i = 0;
-        while (i < options.length && !isOption(options, options[i])) {
+        while (i < options.length && !isOption(options[i])) {
           i++;
         }
         return i;
