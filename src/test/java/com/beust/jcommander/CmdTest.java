@@ -70,7 +70,12 @@ public class CmdTest {
     public void testArgsWithoutDefaultCmdFail(String expected,
             boolean requireDefault, String[] args) {
         if (requireDefault) {
-            parseArgs(false, args);
+            try {
+                parseArgs(false, args);
+            } catch (MissingCommandException e) {
+                Assert.assertEquals(e.getUnknownCommand(), args[0]);
+                throw e;
+            }
         } else {
             throw new MissingCommandException("irrelevant test case");
         }
