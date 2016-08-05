@@ -778,7 +778,7 @@ public class JCommander {
             // Command parsing
             //
             if (jc == null && validate) {
-                throw new MissingCommandException("Expected a command, got " + arg);
+                throw new MissingCommandException("Expected a command, got " + arg, arg);
             } else if (jc != null){
                 m_parsedCommand = jc.m_programName.m_name;
                 m_parsedAlias = arg; //preserve the original form
