@@ -1,7 +1,6 @@
-import com.beust.kobalt.*
-import com.beust.kobalt.plugin.java.*
-import com.beust.kobalt.plugin.packaging.*
-import com.beust.kobalt.plugin.publish.*
+import com.beust.kobalt.plugin.packaging.assemble
+import com.beust.kobalt.plugin.publish.bintray
+import com.beust.kobalt.project
 
 val jcommander = project {
     name = "jcommander"
@@ -10,7 +9,7 @@ val jcommander = project {
     version = "1.55"
 
     dependenciesTest {
-        compile("org.testng:testng:6.9.10")
+        compile("org.testng:testng:6.9.11")
     }
 
     assemble {
