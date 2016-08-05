@@ -32,8 +32,7 @@ public class MissingCommandException extends ParameterException {
   private final String unknownCommand;
 
   public MissingCommandException(String message) {
-    super(message);
-    this.unknownCommand = null;
+    this(message, null);
   }
 
   public MissingCommandException(String message, String command) {
