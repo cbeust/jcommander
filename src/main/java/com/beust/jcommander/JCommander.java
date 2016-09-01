@@ -163,10 +163,10 @@ public class JCommander {
   /**
    * The factories used to look up string converters.
    */
-  private static LinkedList<IStringConverterFactory> CONVERTER_FACTORIES = Lists.newLinkedList();
+  private static LinkedList<IStringConverterInstanceFactory> CONVERTER_FACTORIES = Lists.newLinkedList();
 
   static {
-    CONVERTER_FACTORIES.addFirst(new DefaultConverterFactory());
+    addConverterFactory0(new DefaultConverterFactory());
   };
 
   /**
@@ -1229,13 +1229,49 @@ public class JCommander {
     }
   }
 
+  /**
+   * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
+   * @param converterFactory the factory determining string converters
+   */
   public void addConverterFactory(IStringConverterFactory converterFactory) {
-    CONVERTER_FACTORIES.addFirst(converterFactory);
+    // TODO method should be static, but breaks binary compatibility, see https://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html#jls-13.4.19
+    addConverterFactory0(converterFactory);
   }
 
-  public <T> Class<? extends IStringConverter<T>> findConverter(Class<T> cls) {
-    for (IStringConverterFactory f : CONVERTER_FACTORIES) {
-      Class<? extends IStringConverter<T>> result = f.getConverter(cls);
+  private static void addConverterFactory0(final IStringConverterFactory converterFactory) {
+    addConverterInstanceFactory(new IStringConverterInstanceFactory() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType) {
+        final Class<? extends IStringConverter<?>> converterClass = converterFactory.getConverter(forType);
+        try {
+          final String optionName = parameter.names().length > 0 ? parameter.names()[0] : "[Main class]";
+          return converterClass != null ? instantiateConverter(optionName, converterClass) : null;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+          throw new ParameterException(e);
+        }
+      }
+    });
+  }
+
+  /**
+   * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
+   * @param converterInstanceFactory the factory generating string converter instances
+   */
+  public static void addConverterInstanceFactory(final IStringConverterInstanceFactory converterInstanceFactory) {
+    CONVERTER_FACTORIES.addFirst(converterInstanceFactory);
+  }
+
+  protected static void clearConverterFactories() {
+    // used in unit tests. retain DefaultConverterFactory
+    while (CONVERTER_FACTORIES.size() > 1) {
+      CONVERTER_FACTORIES.remove(0);
+    }
+  }
+
+  private static IStringConverter<?> findConverterInstance(Parameter parameter, Class<?> forType) {
+    for (IStringConverterInstanceFactory f : CONVERTER_FACTORIES) {
+      IStringConverter<?> result = f.getConverterInstance(parameter, forType);
       if (result != null) return result;
     }
 
@@ -1258,13 +1294,18 @@ public class JCommander {
     if (annotation == null) return value;
 
     Class<? extends IStringConverter<?>> converterClass = annotation.converter();
-    boolean listConverterWasSpecified = annotation.listConverter() != NoConverter.class;
+    final String optionName = annotation.names().length > 0 ? annotation.names()[0] : "[Main class]";
 
     //
     // Try to find a converter on the annotation
     //
-    if (converterClass == null || converterClass == NoConverter.class)
-        converterClass = findConverter(type);
+    if (converterClass == NoConverter.class) {
+      final IStringConverter converter = findConverterInstance(annotation, type);
+      if (converter != null) {
+        return convertValue(parameterized, type, value, annotation, converter, optionName);
+      }
+      converterClass = null;
+    }
 
     // If no converter was found and type is enum, use enum values to convert
     if (converterClass == null && type.isEnum())
@@ -1272,9 +1313,15 @@ public class JCommander {
 
     if (converterClass == null) {
       Type elementType = parameterized.findFieldGenericType();
-      converterClass = elementType != null
-          ? findConverter((Class<? extends IStringConverter<?>>) elementType)
-          : StringConverter.class;
+      if (elementType instanceof Class) {
+        final IStringConverter converter = findConverterInstance(annotation, ((Class) elementType));
+        if (converter != null) {
+          return convertValue(parameterized, type, value, annotation, converter, optionName);
+        }
+        converterClass = null;
+      } else {
+        converterClass = StringConverter.class;
+      }
       // Check for enum type parameter
       if (converterClass == null && Enum.class.isAssignableFrom((Class) elementType)) {
         converterClass = (Class<? extends IStringConverter<?>>) elementType;
@@ -1284,8 +1331,6 @@ public class JCommander {
     IStringConverter<?> converter;
     Object result = null;
     try {
-      String[] names = annotation.names();
-      String optionName = names.length > 0 ? names[0] : "[Main class]";
       if (converterClass != null && converterClass.isEnum()) {
         try {
           result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
@@ -1302,36 +1347,33 @@ public class JCommander {
         }
       } else {
         converter = instantiateConverter(optionName, converterClass);
-        if (type.isAssignableFrom(List.class)
-              && parameterized.getGenericType() instanceof ParameterizedType) {
-
-          // The field is a List
-          if (listConverterWasSpecified) {
-            // If a list converter was specified, pass the value to it
-            // for direct conversion
-            IStringConverter<?> listConverter =
-                instantiateConverter(optionName, annotation.listConverter());
-            result = listConverter.convert(value);
-          } else {
-            // No list converter: use the single value converter and pass each
-            // parsed value to it individually
-            result = convertToList(value, converter, annotation.splitter());
-          }
-        } else {
-          result = converter.convert(value);
-        }
+        result = convertValue(parameterized, type, value, annotation, converter, optionName);
       }
-    } catch (InstantiationException e) {
-      throw new ParameterException(e);
-    } catch (IllegalAccessException e) {
-      throw new ParameterException(e);
-    } catch (InvocationTargetException e) {
-      throw new ParameterException(e);
-    } catch (NoSuchMethodException e) {
+    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
       throw new ParameterException(e);
     }
 
     return result;
+  }
+
+  private Object convertValue(Parameterized parameterized, Class type, String value, Parameter annotation, IStringConverter<?> converter, String optionName) {
+    try {
+      if (type.isAssignableFrom(List.class) && parameterized.getGenericType() instanceof ParameterizedType) {
+        // The field is a List
+        if (annotation.listConverter() != NoConverter.class) {
+          // If a list converter was specified, pass the value to it for direct conversion
+          IStringConverter<?> listConverter = instantiateConverter(optionName, annotation.listConverter());
+          return listConverter.convert(value);
+        } else {
+          // No list converter: use the single value converter and pass each parsed value to it individually
+          return convertToList(value, converter, annotation.splitter());
+        }
+      } else {
+        return converter.convert(value);
+      }
+    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+      throw new ParameterException(e);
+    }
   }
 
   /**
@@ -1352,7 +1394,7 @@ public class JCommander {
     return result;
   }
 
-  private IStringConverter<?> instantiateConverter(String optionName,
+  private static IStringConverter<?> instantiateConverter(String optionName,
       Class<? extends IStringConverter<?>> converterClass)
       throws InstantiationException, IllegalAccessException,
       InvocationTargetException {

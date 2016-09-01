@@ -24,6 +24,7 @@ package com.beust.jcommander;
  * your argument classes.
  * 
  * @author cbeust
+ * @see IStringConverterInstanceFactory
  */
 public interface IStringConverterFactory {
   <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType);
