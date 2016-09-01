@@ -51,6 +51,7 @@ public class ConverterFactoryTest {
   public void parameterWithHostPortParameters() {
     ArgsConverterFactory a = new ArgsConverterFactory();
     JCommander jc = new JCommander(a);
+    JCommander.clearConverterFactories();
     jc.addConverterFactory(CONVERTER_FACTORY);
     jc.parse("-hostport", "example.com:8080");
 
@@ -62,9 +63,11 @@ public class ConverterFactoryTest {
    * Test that main parameters can be used with string converters,
    * either with a factory or from the annotation.
    */
-  private void mainWithHostPortParameters(IStringConverterFactory f, IHostPorts a) {
+  private void mainWithHostPortParameters(IStringConverterFactory f, IStringConverterInstanceFactory f2, IHostPorts a) {
     JCommander jc = new JCommander(a);
+    JCommander.clearConverterFactories();
     if (f != null) jc.addConverterFactory(f);
+    if (f2 != null) JCommander.addConverterInstanceFactory(f2);
     jc.parse("a.com:10", "b.com:20");
     Assert.assertEquals(a.getHostPorts().get(0).host, "a.com");
     Assert.assertEquals(a.getHostPorts().get(0).port.intValue(), 10);
@@ -74,12 +77,27 @@ public class ConverterFactoryTest {
 
   @Test
   public void mainWithoutFactory() {
-    mainWithHostPortParameters(null, new ArgsMainParameter1());
+    mainWithHostPortParameters(null, null, new ArgsMainParameter2());
+  }
+
+  @Test(expectedExceptions = RuntimeException.class)
+  public void mainWithoutConverterWithoutFactory() {
+    mainWithHostPortParameters(null, null, new ArgsMainParameter1());
   }
 
   @Test
   public void mainWithFactory() {
-    mainWithHostPortParameters(CONVERTER_FACTORY, new ArgsMainParameter2());
+    mainWithHostPortParameters(CONVERTER_FACTORY, null, new ArgsMainParameter1());
+  }
+
+  @Test
+  public void mainWithInstanceFactory() {
+    mainWithHostPortParameters(null, new IStringConverterInstanceFactory() {
+      @Override
+      public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType) {
+        return HostPort.class.equals(forType) ? new HostPortConverter() : null;
+      }
+    }, new ArgsMainParameter1());
   }
 
 }
