@@ -1,8 +1,54 @@
 ## Changelog
 
-Current
+### Current
 
-Fixed: Better error message when there's a visibility problem.
+* Added: `IStringConverterInstanceFactory` to create converter instances, #279
+
+### 1.56
+2016-08-05
+
+* Added: Allow user to retrieve unknown command, #275
+
+### 1.55
+2016-02-28
+
+* Added: Support for disabling the `@file` expansion, #156
+* Fixed: Wrap usage for commands and main parameters, #258
+* Added: Read parameters from interfaces, #252
+* Added: Refuse to write to final fields, #243
+* Added: Access private fields/methods, #236
+* Fixed: Fix description line wrapping, #239 
+* Fixed: Prioritize registered converters for enums over generic enum conversion, #179
+* Added: Travis CI support, https://travis-ci.org/cbeust/jcommander
+* Added: Gradle build support
+* Fixed: Better error message when there's a visibility problem.
+* Require Java 7
+
+### 1.48
+2015-04-11
+
+* Added: Added support for URL, URI, Java NIO paths parameters, #189, #219
+* Fixed: Incorrect usage formatting with single long options, #200
+
+### 1.37
+2014-10-05
+
+* Added: Support for `hidden` commands (`Parameters`), #191 
+* Added: parameter overwriting (and even disallowing it for certain parameters)
+* Added: `#` mark comments in a `@file`, #199 
+* Added: Support for "--"
+* Fixed: Bug in enum parsing, #184 
+
+### 1.34
+2014-02-22
+
+* Fixed problem whereby Parameters returning Lists and with alternate names were being reset on the first use of an alternate name, #182
+
+### 1.32
+2013-09-09
+
+* Fixed: Main parameters with a default value should be overridden if a main parameter is specified, #137
+* Fixed: Allow enum values without converting them to uppercase, #107
 
 ### 1.30
 2012/10/27
