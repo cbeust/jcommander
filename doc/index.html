@@ -331,6 +331,22 @@ All you need to do is add the factory to your JCommander object:
 
 Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
 
+
+<h3>By instance factory</h3>
+
+Since version 1.57, instance factories are supported:
+
+<pre class="brush: java">
+public interface IStringConverterInstanceFactory {
+    IStringConverter&lt;?&gt; getConverterInstance(Parameter parameter, Class&lt;?&gt; forType);
+}
+</pre>
+
+This allows to return converters using
+<a href="https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html">anonymous classes</a>,
+<a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">Java 8 lambda expressions</a>,
+among others.
+
 <h2><a class="section" name="Parameter_validation">Parameter validation</a></h2>
 
 Parameter validation can be performed in two different ways: at the individual parameter level or globally.
