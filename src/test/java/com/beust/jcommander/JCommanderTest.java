@@ -700,6 +700,13 @@ public class JCommanderTest {
     Assert.fail("Could not find -choice parameter.");
   }
 
+  public void enumArgs2() {
+    // issue #266
+    ArgsEnum args = new ArgsEnum();
+    new JCommander(args, "-choices", "ONE,Two");
+    Assert.assertEquals(Arrays.asList(ChoiceType.ONE, ChoiceType.Two), args.choices);
+  }
+
   public void enumArgsCaseInsensitive() {
       ArgsEnum args = new ArgsEnum();
       String[] argv = { "-choice", "one"};
