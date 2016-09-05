@@ -18,12 +18,13 @@
 
 package com.beust.jcommander.command;
 
+import com.beust.jcommander.ArgsValidate2;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class CommandTest {
@@ -136,6 +137,26 @@ public class CommandTest {
     jc.usage(out);
     String firstLine = out.toString().split("\n")[0];
     Assert.assertFalse(firstLine.endsWith(" "), "Usage should not have trailing spaces");
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void validateSubCommand() throws Exception {
+    JCommander jc = new JCommander(new CommandMain());
+    final ArgsValidate2 sub = new ArgsValidate2();
+    sub.template = null;
+    jc.addCommand("sub", sub);
+    jc.parse("sub", "-template", "foo");
+  }
+
+  @Test
+  public void doNotValidateSubCommand() throws Exception {
+    JCommander jc = new JCommander(new CommandMain());
+    final ArgsValidate2 sub = new ArgsValidate2();
+    sub.template = null;
+    jc.addCommand("sub", sub);
+    jc.parseWithoutValidation("sub", "-template", "foo");
+    Assert.assertEquals(sub.template, new File("foo"));
+
   }
 
   public static void main(String[] args) {

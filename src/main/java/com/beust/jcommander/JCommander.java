@@ -672,7 +672,7 @@ public class JCommander {
   /**
    * Main method that parses the values and initializes the fields accordingly.
    */
-  private void parseValues(String[] args, boolean validate) {
+  private void parseValues(final String[] args, final boolean validate) {
     // This boolean becomes true if we encounter a command, which indicates we need
     // to stop parsing (the parsing of the command will be done in a sub JCommander
     // object)
@@ -706,7 +706,7 @@ public class JCommander {
               //
               // Variable arity?
               //
-              increment = processVariableArity(args, i, pd);
+              increment = processVariableArity(args, i, pd, validate);
             } else {
               //
               // Regular option
@@ -720,7 +720,7 @@ public class JCommander {
                 pd.addValue("true");
                 m_requiredFields.remove(pd.getParameterized());
               } else {
-                increment = processFixedArity(args, i, pd, fieldType);
+                increment = processFixedArity(args, i, pd, validate, fieldType);
               }
               // If it's a help option, remember for later
               if (pd.isHelp()) {
@@ -786,7 +786,7 @@ public class JCommander {
                 // Found a valid command, ask it to parse the remainder of the arguments.
                 // Setting the boolean commandParsed to true will force the current
                 // loop to end.
-                jc.parse(subArray(args, i + 1));
+                jc.parse(validate, subArray(args, i + 1));
                 commandParsed = true;
             }
           }
@@ -825,7 +825,7 @@ public class JCommander {
   /**
    * @return the number of options that were processed.
    */
-  private int processVariableArity(String[] args, int index, ParameterDescription pd) {
+  private int processVariableArity(String[] args, int index, ParameterDescription pd, boolean validate) {
     Object arg = pd.getObject();
     IVariableArity va;
     if (! (arg instanceof IVariableArity)) {
@@ -841,21 +841,21 @@ public class JCommander {
     int arity = va.processVariableArity(pd.getParameter().names()[0],
         currentArgs.toArray(new String[0]));
 
-    int result = processFixedArity(args, index, pd, List.class, arity);
+    int result = processFixedArity(args, index, pd, validate, List.class, arity);
     return result;
   }
 
-  private int processFixedArity(String[] args, int index, ParameterDescription pd,
+  private int processFixedArity(String[] args, int index, ParameterDescription pd, boolean validate,
       Class<?> fieldType) {
     // Regular parameter, use the arity to tell use how many values
     // we need to consume
     int arity = pd.getParameter().arity();
     int n = (arity != -1 ? arity : 1);
 
-    return processFixedArity(args, index, pd, fieldType, n);
+    return processFixedArity(args, index, pd, validate, fieldType, n);
   }
 
-  private int processFixedArity(String[] args, int originalIndex, ParameterDescription pd,
+  private int processFixedArity(String[] args, int originalIndex, ParameterDescription pd, boolean validate,
                                 Class<?> fieldType, int arity) {
     int index = originalIndex;
     String arg = args[index];
@@ -870,7 +870,7 @@ public class JCommander {
 
       if (index + arity < args.length) {
         for (int j = 1; j <= arity; j++) {
-          pd.addValue(trim(args[index + j + offset]));
+          pd.addValue(trim(args[index + j + offset]), false, validate);
           m_requiredFields.remove(pd.getParameterized());
         }
         index += arity + offset;
