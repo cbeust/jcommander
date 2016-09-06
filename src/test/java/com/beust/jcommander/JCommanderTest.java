@@ -352,7 +352,7 @@ public class JCommanderTest {
     Object args = new Object() {
       @Parameter(names = "-foo") final int _foo = 0;
     };
-    new JCommander(args);
+    new JCommander(args).usage();
   }
 
   public void converterArgs() {
@@ -623,7 +623,7 @@ public class JCommanderTest {
   @Test(expectedExceptions = ParameterException.class)
   public void validationShouldWorkWithDefaultValues() {
     ArgsValidate2 a = new ArgsValidate2();
-    new JCommander(a);
+    new JCommander(a).usage();
   }
 
   @Test(expectedExceptions = ParameterException.class)
