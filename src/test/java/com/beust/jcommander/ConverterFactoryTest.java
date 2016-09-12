@@ -51,7 +51,6 @@ public class ConverterFactoryTest {
   public void parameterWithHostPortParameters() {
     ArgsConverterFactory a = new ArgsConverterFactory();
     JCommander jc = new JCommander(a);
-    JCommander.clearConverterFactories();
     jc.addConverterFactory(CONVERTER_FACTORY);
     jc.parse("-hostport", "example.com:8080");
 
@@ -65,9 +64,8 @@ public class ConverterFactoryTest {
    */
   private void mainWithHostPortParameters(IStringConverterFactory f, IStringConverterInstanceFactory f2, IHostPorts a) {
     JCommander jc = new JCommander(a);
-    JCommander.clearConverterFactories();
     if (f != null) jc.addConverterFactory(f);
-    if (f2 != null) JCommander.addConverterInstanceFactory(f2);
+    if (f2 != null) jc.addConverterInstanceFactory(f2);
     jc.parse("a.com:10", "b.com:20");
     Assert.assertEquals(a.getHostPorts().get(0).host, "a.com");
     Assert.assertEquals(a.getHostPorts().get(0).port.intValue(), 10);
