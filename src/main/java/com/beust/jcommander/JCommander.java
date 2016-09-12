@@ -32,11 +32,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.beust.jcommander.FuzzyMap.IKey;
 import com.beust.jcommander.converters.IParameterSplitter;
@@ -167,22 +167,18 @@ public class JCommander {
     private int m_verbose = 0;
     private boolean m_caseSensitiveOptions = true;
     private boolean m_allowAbbreviatedOptions = false;
+    /**
+     * The factories used to look up string converters.
+     */
+    private final List<IStringConverterInstanceFactory> m_converterInstanceFactories = new CopyOnWriteArrayList<>();
   }
-
-  /**
-   * The factories used to look up string converters.
-   */
-  private static LinkedList<IStringConverterInstanceFactory> CONVERTER_FACTORIES = Lists.newLinkedList();
-
-  static {
-    addConverterFactory0(new DefaultConverterFactory());
-  };
 
   private JCommander(Options options) {
     if (options == null) {
       throw new NullPointerException("options");
     }
     this.options = options;
+    addConverterFactory(new DefaultConverterFactory());
   }
 
   /**
@@ -1240,12 +1236,7 @@ public class JCommander {
    * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
    * @param converterFactory the factory determining string converters
    */
-  public void addConverterFactory(IStringConverterFactory converterFactory) {
-    // TODO method should be static, but breaks binary compatibility, see https://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html#jls-13.4.19
-    addConverterFactory0(converterFactory);
-  }
-
-  private static void addConverterFactory0(final IStringConverterFactory converterFactory) {
+  public void addConverterFactory(final IStringConverterFactory converterFactory) {
     addConverterInstanceFactory(new IStringConverterInstanceFactory() {
       @SuppressWarnings("unchecked")
       @Override
@@ -1265,19 +1256,12 @@ public class JCommander {
    * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
    * @param converterInstanceFactory the factory generating string converter instances
    */
-  public static void addConverterInstanceFactory(final IStringConverterInstanceFactory converterInstanceFactory) {
-    CONVERTER_FACTORIES.addFirst(converterInstanceFactory);
+  public void addConverterInstanceFactory(final IStringConverterInstanceFactory converterInstanceFactory) {
+    options.m_converterInstanceFactories.add(0, converterInstanceFactory);
   }
 
-  protected static void clearConverterFactories() {
-    // used in unit tests. retain DefaultConverterFactory
-    while (CONVERTER_FACTORIES.size() > 1) {
-      CONVERTER_FACTORIES.remove(0);
-    }
-  }
-
-  private static IStringConverter<?> findConverterInstance(Parameter parameter, Class<?> forType) {
-    for (IStringConverterInstanceFactory f : CONVERTER_FACTORIES) {
+  private IStringConverter<?> findConverterInstance(Parameter parameter, Class<?> forType) {
+    for (IStringConverterInstanceFactory f : options.m_converterInstanceFactories) {
       IStringConverter<?> result = f.getConverterInstance(parameter, forType);
       if (result != null) return result;
     }
