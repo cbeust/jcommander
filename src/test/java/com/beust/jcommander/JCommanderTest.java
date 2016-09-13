@@ -20,10 +20,13 @@ package com.beust.jcommander;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -642,6 +645,29 @@ public class JCommanderTest {
     fw.write("2\n");
     fw.close();
     new JCommander(new Args1(), "@" + f.getAbsolutePath());
+  }
+
+  public void atFileWithInNonDefaultCharset() throws IOException {
+    final Charset utf32 = Charset.forName("UTF-32");
+    final File f = File.createTempFile("JCommander", null);
+    f.deleteOnExit();
+    try (OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), utf32)) {
+      fw.write("-log\n");
+      fw.write("2\n");
+      fw.write("-groups\n");
+      fw.write("\u9731\n");
+    }
+    final Args1 args1 = new Args1();
+    final JCommander jc = new JCommander(args1);
+    try {
+      jc.parse("@" + f.getAbsolutePath());
+      throw new IllegalStateException("Expected exception to be thrown");
+    } catch (ParameterException expected) {
+      Assert.assertTrue(expected.getMessage().startsWith("Could not read file"));
+    }
+    jc.setAtFileCharset(utf32);
+    jc.parse("@" + f.getAbsolutePath());
+    Assert.assertEquals("\u9731", args1.groups);
   }
 
   public void handleEqualSigns() {

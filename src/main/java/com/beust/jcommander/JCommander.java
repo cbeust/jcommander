@@ -19,13 +19,15 @@
 package com.beust.jcommander;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -171,6 +173,7 @@ public class JCommander {
      * The factories used to look up string converters.
      */
     private final List<IStringConverterInstanceFactory> m_converterInstanceFactories = new CopyOnWriteArrayList<>();
+    private Charset m_atFileCharset = Charset.defaultCharset();
   }
 
   private JCommander(Options options) {
@@ -224,6 +227,12 @@ public class JCommander {
     parse(args);
   }
 
+  /**
+   * Disables expanding {@code @file}.
+   *
+   * JCommander supports the {@code @file} syntax, which allows you to put all your options into a file and pass this file as parameter
+   * @param expandAtSign whether to expand {@code @file}.
+   */
   public void setExpandAtSign(boolean expandAtSign){
     options.expandAtSign = expandAtSign;
   }
@@ -484,14 +493,11 @@ public class JCommander {
    * @param fileName the command line filename
    * @return the file content as a string.
    */
-  private static List<String> readFile(String fileName) {
+  private List<String> readFile(String fileName) {
     List<String> result = Lists.newArrayList();
 
-    try {
-      BufferedReader bufRead = new BufferedReader(new FileReader(fileName));
-
+    try (BufferedReader bufRead = Files.newBufferedReader(Paths.get(fileName), options.m_atFileCharset)) {
       String line;
-
       // Read through file one line at time. Print line # and line
       while ((line = bufRead.readLine()) != null) {
         // Allow empty lines and # comments in these at files
@@ -499,8 +505,6 @@ public class JCommander {
             result.add(line);
         }
       }
-
-      bufRead.close();
     }
     catch (IOException e) {
       throw new ParameterException("Could not read file " + fileName + ": " + e);
@@ -1647,8 +1651,14 @@ public class JCommander {
   public boolean isParameterOverwritingAllowed() {
     return options.m_allowParameterOverwriting;
   }
-//  public void setCaseSensitiveCommands(boolean b) {
-//    m_caseSensitiveCommands = b;
-//  }
+
+  /**
+   * Sets the charset used to expand {@code @files}.
+   * @param charset the charset
+   */
+  public void setAtFileCharset(Charset charset) {
+    options.m_atFileCharset = charset;
+  }
+
 }
 
