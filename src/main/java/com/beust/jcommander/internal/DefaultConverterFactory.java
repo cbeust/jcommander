@@ -34,6 +34,7 @@ import com.beust.jcommander.converters.URIConverter;
 import com.beust.jcommander.converters.URLConverter;
 
 import java.io.File;
+import java.lang.NoClassDefFoundError;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.net.URI;
@@ -63,9 +64,14 @@ public class DefaultConverterFactory implements IStringConverterFactory {
     m_classConverters.put(File.class, FileConverter.class);
     m_classConverters.put(BigDecimal.class, BigDecimalConverter.class);
     m_classConverters.put(Date.class, ISO8601DateConverter.class);
-    m_classConverters.put(Path.class, PathConverter.class);
     m_classConverters.put(URI.class, URIConverter.class);
     m_classConverters.put(URL.class, URLConverter.class);
+
+    try {
+      m_classConverters.put(Path.class, PathConverter.class);
+    } catch (NoClassDefFoundError ex) {
+      // skip if class is not present (e.g. on Android)
+    }
   }
 
   public Class<? extends IStringConverter<?>> getConverter(Class forType) {
