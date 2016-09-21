@@ -16,16 +16,21 @@
  * limitations under the License.
  */
 
-package com.beust.jcommander;
+package com.beust.jcommander.args;
 
-/**
- * A factory for IStringConverter. This interface lets you specify your
- * converters in one place instead of having them repeated all over
- * your argument classes.
- * 
- * @author cbeust
- * @see IStringConverterInstanceFactory
- */
-public interface IStringConverterFactory {
-  <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType);
+import com.beust.jcommander.Parameter;
+
+public class HiddenArgs {
+  public HiddenArgs() {
+  }
+
+  @Parameter(names = "--input")
+  private String input;
+
+  private String output;
+
+  @Parameter(names = "--output")
+  private void setOutput(String output) {
+    this.output = output;
+  }
 }

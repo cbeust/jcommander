@@ -52,7 +52,7 @@
   </tr>
   <tr>
     <td align="right">
-      Last updated: January 14th, 2015
+      Last updated: July 6th, 2015
     </td>
   </tr>
   <tr><td align="right"><a href="mailto:cedric@beust.com">C&eacute;dric Beust</a></td></tr>
@@ -75,7 +75,7 @@ import com.beust.jcommander.Parameter;
 
 public class JCommanderExample {
   @Parameter
-  private List&lt;String&gt; parameters = new ArrayList&lt;String&gt;();
+  private List&lt;String&gt; parameters = new ArrayList&lt;&gt;();
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
   private Integer verbose = 1;
@@ -97,6 +97,33 @@ new JCommander(jct, argv);
 
 Assert.assertEquals(jct.verbose.intValue(), 2);
 </pre>
+
+An example that mirrors more of what you might see in the "real world" might
+look like this:
+
+<pre class="brush: java">
+class Main {
+    @Parameter(names={"--length", "-l"})
+    int length;
+    @Parameter(names={"--pattern", "-p"})
+    int pattern;
+
+    public static void main(String ... args) {
+        Main main = new Main();
+        new JCommander(main, args);
+        main.run();
+    }
+
+    public void run() {
+        System.out.printf("%d %d", length, pattern);
+    }
+}
+</pre>
+
+If you were to run <code>java Main -l 512 --pattern 2</code>, this would
+output:
+
+<pre>512 2</pre>
 
 <h2><a class="section" name="Types_of_options">Types of options</a></h2>
 
@@ -156,7 +183,7 @@ When a <tt>Parameter</tt> annotation is found on a field of type <tt>List</tt>, 
 
 <pre class="brush: java">
 @Parameter(names = "-host", description = "The host")
-private List&lt;String&gt; hosts = new ArrayList&lt;String&gt;();
+private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();
 </pre>
 
 will allow you to parse the following command line:
@@ -304,8 +331,27 @@ All you need to do is add the factory to your JCommander object:
 
 Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
 
+
+<h3>By instance factory</h3>
+
+Since version 1.57, instance factories are supported:
+
+<pre class="brush: java">
+public interface IStringConverterInstanceFactory {
+    IStringConverter&lt;?&gt; getConverterInstance(Parameter parameter, Class&lt;?&gt; forType);
+}
+</pre>
+
+This allows to return converters using
+<a href="https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html">anonymous classes</a>,
+<a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">Java 8 lambda expressions</a>,
+among others.
+
 <h2><a class="section" name="Parameter_validation">Parameter validation</a></h2>
 
+Parameter validation can be performed in two different ways: at the individual parameter level or globally.
+
+<h3><a class="section" indent=".." id="individual_validation">Individual parameter validation</a></h3>
 You can ask JCommander to perform early validation on your parameters by providing a class that implements the following interface:
 
 <pre class="brush:java">
@@ -347,12 +393,23 @@ private Integer age;
 Attempting to pass a negative integer to this option will cause a <tt>ParameterException</tt> to be thrown.
 
 
+<h3><a class="section" indent=".." id="global_validation">Global parameter validation</a></h3>
+
+After parsing your parameters with JCommander, you might want to perform additional validation
+across these parameters, such as making sure that two mutually exclusive parameters are not
+both specified. Because of all the potential combinations involved in such validation,
+JCommander does not provide any annotation-based solution to perform this validation because such
+an approach would necessarily be very limited by the very nature of Java annotations. Instead,
+you should simple perform this validation in Java on all the arguments that JCommander
+just parsed.
+
+
 <h2><a class="section" name="Main_parameter">Main parameter</a></h2>
 So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
 
 <pre class="brush: java">
 @Parameter(description = "Files")
-private List&lt;String&gt; files = new ArrayList&lt;String&gt;();
+private List&lt;String&gt; files = new ArrayList&lt;&gt;();
 
 @Parameter(names = "-debug", description = "Debugging level")
 private Integer debug = 1;
@@ -468,6 +525,10 @@ file3
 java Main @/tmp/parameters
 </pre>
 
+<p>The file is read using the default charset unless <code>JCommander#setAtFileCharset</code> had been called.</p>
+
+<p>Ths feature can be disabled by calling <code>JCommander#setExpandAtSign</code>.</p>
+
 <h2><a class="section" name="Arities">Arities (multiple values for parameters)</a></h2>
 
 <h3><a class="section" name="fixed-arities" indent="..">Fixed arities</a></h3>
@@ -511,7 +572,7 @@ Such a parameter must be of type <tt>List&lt;String&gt;</tt> and have the boolea
 
 <pre class="brush: java">
 @Parameter(names = "-foo", variableArity = true)
-public List&lt;String&gt; foo = new ArrayList&lt;String&gt;();
+public List&lt;String&gt; foo = new ArrayList&lt;&gt;();
 </pre>
 
 <h2><a class="section" name="Multiple_option_names">Multiple option names</a></h2>
@@ -772,7 +833,7 @@ JCommander allows you to specify parameters that are not known at compile time, 
 
 <pre class="brush: java">
 @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
-private Map&lt;String, String&gt; params = new HashMap&lt;String, String&gt;();
+private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();
 </pre>
 
 You can specify a different assignment string than <tt>=</tt> by using the attribute <tt>assignment</tt>.
@@ -850,14 +911,20 @@ You can download JCommander from the following locations:
 
 <ul>
   <li><a href="http://github.com/cbeust/jcommander">Source on github</a></li>
-  <li>If you are using Maven, add the following dependency to your <tt>pom.xml</tt>:
+  <li>Gradle
+  
+  <pre class="brush: plain">
+    compile "com.beust:jcommander:1.48"
+  </pre>
+
+  <li>Maven:
 
   <pre class="brush: xml">
 
 <dependency>
   &lt;groupId&gt;com.beust&lt;/groupId&gt;
   &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
-  &lt;version&gt;1.30&lt;/version&gt;
+  &lt;version&gt;1.48&lt;/version&gt;
 </dependency>
   </pre>
 

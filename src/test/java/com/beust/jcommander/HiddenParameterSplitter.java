@@ -18,14 +18,14 @@
 
 package com.beust.jcommander;
 
-/**
- * A factory for IStringConverter. This interface lets you specify your
- * converters in one place instead of having them repeated all over
- * your argument classes.
- * 
- * @author cbeust
- * @see IStringConverterInstanceFactory
- */
-public interface IStringConverterFactory {
-  <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType);
+import java.util.Arrays;
+import java.util.List;
+
+import com.beust.jcommander.converters.IParameterSplitter;
+
+public class HiddenParameterSplitter implements IParameterSplitter {
+  @Override
+  public List<String> split(String value) {
+    return Arrays.asList(value.split(";"));
+  }
 }

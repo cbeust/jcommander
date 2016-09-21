@@ -18,14 +18,12 @@
 
 package com.beust.jcommander;
 
-/**
- * A factory for IStringConverter. This interface lets you specify your
- * converters in one place instead of having them repeated all over
- * your argument classes.
- * 
- * @author cbeust
- * @see IStringConverterInstanceFactory
- */
-public interface IStringConverterFactory {
-  <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType);
+public class HiddenConverter implements IStringConverter<String> {
+  private HiddenConverter() {
+  }
+
+  @Override
+  public String convert(String value) {
+    return value;
+  }
 }

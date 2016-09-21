@@ -117,4 +117,24 @@ public class DefaultProviderTest {
     Assert.assertEquals(a.log.intValue(), 19);
   }
 
+  @Test
+  public void missingRequiredParameterWithDefaultValueProviderShouldNotRaiseParameterException() {
+    class ArgsRequired {
+      @Parameter(names = "-log", description = "Level of verbosity", required = true)
+      public Integer log;
+    };
+
+    IDefaultProvider defaultProvider = new IDefaultProvider() {
+      public String getDefaultValueFor(String optionName) {
+        return "-log".equals(optionName) ? "1" : "";
+      }
+    };
+
+    ArgsRequired a = new ArgsRequired();
+    JCommander jc = new JCommander(a);
+    jc.setDefaultProvider(defaultProvider);
+    jc.parse(new String[]{});
+
+    Assert.assertEquals(a.log.intValue(), 1);
+  }
 }

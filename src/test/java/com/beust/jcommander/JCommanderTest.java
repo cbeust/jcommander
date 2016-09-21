@@ -20,10 +20,13 @@ package com.beust.jcommander;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +43,8 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.beust.jcommander.args.ArgsLongCommandDescription;
+import com.beust.jcommander.args.ArgsLongMainParameterDescription;
 import com.beust.jcommander.args.AlternateNamesForListArgs;
 import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.Args1Setter;
@@ -57,6 +62,7 @@ import com.beust.jcommander.args.ArgsI18N2;
 import com.beust.jcommander.args.ArgsI18N2New;
 import com.beust.jcommander.args.ArgsInherited;
 import com.beust.jcommander.args.ArgsList;
+import com.beust.jcommander.args.ArgsLongDescription;
 import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMaster;
 import com.beust.jcommander.args.ArgsMultipleUnparsed;
@@ -68,6 +74,7 @@ import com.beust.jcommander.args.ArgsSlaveBogus;
 import com.beust.jcommander.args.ArgsValidate1;
 import com.beust.jcommander.args.ArgsWithSet;
 import com.beust.jcommander.args.Arity1;
+import com.beust.jcommander.args.HiddenArgs;
 import com.beust.jcommander.args.SeparatorColon;
 import com.beust.jcommander.args.SeparatorEqual;
 import com.beust.jcommander.args.SeparatorMixed;
@@ -81,6 +88,53 @@ import com.beust.jcommander.internal.Maps;
 
 @Test
 public class JCommanderTest {
+
+  @Test
+  public void testLongMainParameterDescription() {
+    //setup
+    JCommander jc = new JCommander(new ArgsLongMainParameterDescription());
+    StringBuilder sb = new StringBuilder();
+
+    //action
+    jc.usage(sb);
+
+    //verify
+    for (String line: sb.toString().split("\n")) {
+      Assert.assertTrue(line.length() <=  jc.getColumnSize(), "line length < column size");
+    }
+  }
+
+  @Test
+  public void testLongCommandDescription() throws Exception {
+    //setup
+    JCommander jc = new JCommander();
+    jc.addCommand(new ArgsLongCommandDescription());
+    StringBuilder sb = new StringBuilder();
+
+    //action
+    jc.usage(sb);
+
+    //verify
+    for (String line: sb.toString().split("\n")) {
+      Assert.assertTrue(line.length() <=  jc.getColumnSize(), "line length < column size");
+    }
+  }
+
+  @Test
+  public void testDescriptionWrappingLongWord() {
+    //setup
+    StringBuilder sb = new StringBuilder();
+    final JCommander jc = new JCommander(new ArgsLongDescription());
+
+    //action
+    jc.usage(sb);
+
+    //verify
+    for (String line: sb.toString().split("\n")) {
+      Assert.assertTrue(line.length() <=  jc.getColumnSize(), "line length < column size");
+    }
+  }
+
   public void simpleArgs() throws ParseException {
     Args1 args = new Args1();
     String[] argv = { "-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
@@ -293,6 +347,17 @@ public class JCommanderTest {
     Assert.assertEquals(args.getVerbose().intValue(), 3);
   }
 
+  @Test(
+    expectedExceptions = ParameterException.class,
+    expectedExceptionsMessageRegExp = "Cannot use final field .*#_foo as a parameter;"
+      + " compile-time constant inlining may hide new values written to it.")
+  public void finalArgs() {
+    Object args = new Object() {
+      @Parameter(names = "-foo") final int _foo = 0;
+    };
+    new JCommander(args).usage();
+  }
+
   public void converterArgs() {
     ArgsConverter args = new ArgsConverter();
     String fileName = "a";
@@ -310,6 +375,33 @@ public class JCommanderTest {
     Assert.assertEquals(args.listBigDecimals.size(), 2);
     Assert.assertEquals(args.listBigDecimals.get(0), new BigDecimal("-11.52"));
     Assert.assertEquals(args.listBigDecimals.get(1), new BigDecimal("100.12"));
+  }
+
+  public void hiddenConverter() {
+    class Args {
+      @Parameter(names = "--path", converter = HiddenConverter.class)
+      public String path;
+    }
+
+    new JCommander(new Args(), "--path", "/tmp/a");
+  }
+
+  public void hiddenArgs() {
+    new JCommander(new HiddenArgs(), "--input", "/tmp/a", "--output", "/tmp/b");
+  }
+
+  public void hiddenSplitter() {
+    class Args {
+      @Parameter(names = "--extensions", splitter = HiddenParameterSplitter.class)
+      public List<String> extensions;
+    }
+    if (HiddenParameterSplitter.class.getConstructors().length == 0) {
+      return; // Compiler has optimised away the private constructor
+    }
+
+    Args args = new Args();
+    new JCommander(args, "--extensions", ".txt;.md");
+    Assert.assertEquals(Arrays.asList(".txt", ".md"), args.extensions);
   }
 
   private void argsBoolean1(String[] params, Boolean expected) {
@@ -534,7 +626,7 @@ public class JCommanderTest {
   @Test(expectedExceptions = ParameterException.class)
   public void validationShouldWorkWithDefaultValues() {
     ArgsValidate2 a = new ArgsValidate2();
-    new JCommander(a);
+    new JCommander(a).usage();
   }
 
   @Test(expectedExceptions = ParameterException.class)
@@ -553,6 +645,29 @@ public class JCommanderTest {
     fw.write("2\n");
     fw.close();
     new JCommander(new Args1(), "@" + f.getAbsolutePath());
+  }
+
+  public void atFileWithInNonDefaultCharset() throws IOException {
+    final Charset utf32 = Charset.forName("UTF-32");
+    final File f = File.createTempFile("JCommander", null);
+    f.deleteOnExit();
+    try (OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), utf32)) {
+      fw.write("-log\n");
+      fw.write("2\n");
+      fw.write("-groups\n");
+      fw.write("\u9731\n");
+    }
+    final Args1 args1 = new Args1();
+    final JCommander jc = new JCommander(args1);
+    try {
+      jc.parse("@" + f.getAbsolutePath());
+      throw new IllegalStateException("Expected exception to be thrown");
+    } catch (ParameterException expected) {
+      Assert.assertTrue(expected.getMessage().startsWith("Could not read file"));
+    }
+    jc.setAtFileCharset(utf32);
+    jc.parse("@" + f.getAbsolutePath());
+    Assert.assertEquals("\u9731", args1.groups);
   }
 
   public void handleEqualSigns() {
@@ -599,9 +714,16 @@ public class JCommanderTest {
 
     List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
     Assert.assertEquals(expected, args.choices);
-    Assert.assertEquals(jc.getParameters().get(0).getDescription(),
-        "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
 
+    for (ParameterDescription param : jc.getParameters()) {
+      // order can vary depending on JDK version
+      if (param.getLongestName().equals("-choice")) {
+        Assert.assertEquals(param.getDescription(),
+          "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));
+        return;
+      }
+    }
+    Assert.fail("Could not find -choice parameter.");
   }
 
   public void enumArgsCaseInsensitive() {
@@ -877,6 +999,36 @@ public class JCommanderTest {
     Assert.assertEquals(arg2.host, "foo");
   }
 
+  @Test(enabled = true, description = "Disable top-level @/ampersand file expansion")
+  public void disabledAtSignExpansionTest() {
+    class Params {
+      @Parameter(names = { "-username" })
+      protected String username;
+    }
+
+    Params params = new Params();
+
+    JCommander jc = new JCommander(params);
+    jc.setExpandAtSign(false);
+    jc.parse(new String[] { "-username", "@tzellman" });
+    Assert.assertEquals(params.username, "@tzellman");
+  }
+
+  @Test(enabled = true, description = "Enable top-level @/ampersand file expansion, which should throw in this case",
+          expectedExceptions = ParameterException.class)
+  public void enabledAtSignExpansionTest() {
+    class Params {
+      @Parameter(names = { "-username" })
+      protected String username;
+    }
+
+    Params params = new Params();
+
+    JCommander jc = new JCommander(params);
+    jc.parse(new String[] { "-username", "@tzellman" });
+    Assert.assertEquals(params.username, "@tzellman");
+  }
+
   public void parameterWithOneDoubleQuote() {
     @Parameters(separators = "=")
     class Arg {
@@ -1063,36 +1215,15 @@ public class JCommanderTest {
         bar = value;
       }
     }
-    try {
-      Arguments a = new Arguments();
-      new JCommander(a, new String[] { "-bar", "1" });
-    } catch(ParameterException ex) {
-      Assert.assertTrue(ex.getMessage().contains("invoke"));
-    }
+    Arguments a = new Arguments();
+    new JCommander(a, new String[] { "-bar", "1" });
+    Assert.assertEquals(a.bar, 1);
   }
 
   @Test(enabled = false)
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     new JCommanderTest().access();
-//    class A {
-//      @Parameter(names = "-short", required = true)
-//      List<String> parameters;
-//
-//      @Parameter(names = "-long", required = true)
-//      public long l;
-//    }
-//    A a = new A();
-//    new JCommander(a).parse();
-//    System.out.println(a.l);
-//    System.out.println(a.parameters);
-//    ArgsList al = new ArgsList();
-//    JCommander j = new JCommander(al);
-//    j.setColumnSize(40);
-//    j.usage();
-//    new JCommanderTest().testListAndSplitters();
-//    new JCommanderTest().converterArgs();
   }
-
   // Tests:
   // required unparsed parameter
 }

@@ -227,6 +227,10 @@ public class ParameterDescription {
    * converter, and if we can't find any, throw an exception.
    */
   public void addValue(String value, boolean isDefault) {
+    addValue(value, isDefault, true);
+  }
+
+  void addValue(String value, boolean isDefault, boolean validate) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_parameterized.getName());
     String name = m_wrappedParameter.names()[0];
@@ -234,12 +238,16 @@ public class ParameterDescription {
       throw new ParameterException("Can only specify option " + name + " once.");
     }
 
-    validateParameter(name, value);
+    if (validate) {
+      validateParameter(name, value);
+    }
 
     Class<?> type = m_parameterized.getType();
 
     Object convertedValue = m_jCommander.convertValue(this, value);
-    validateValueParameter(name, convertedValue);
+    if (validate) {
+      validateValueParameter(name, convertedValue);
+    }
     boolean isCollection = Collection.class.isAssignableFrom(type);
 
     if (isCollection) {

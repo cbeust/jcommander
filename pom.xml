@@ -40,6 +40,26 @@
     <url>git@github.com:cbeust/jcommander.git</url>
   </scm>
 
+  <repositories>
+    <repository>
+      <id>jcenter</id>
+      <name>bintray</name>
+      <url>http://jcenter.bintray.com</url>
+    </repository>
+<!-- 
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <name>Nexus Staging Repository</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+    <repository>
+      <id>oss-jfrog-artifactory</id>
+      <name>oss-jfrog-artifactory-snapshots</name>
+      <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+    </repository>
+-->
+  </repositories>
+
   <distributionManagement>
     <repository>
       <id>sonatype-nexus-staging</id>

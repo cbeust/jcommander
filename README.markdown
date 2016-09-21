@@ -40,4 +40,4 @@ Assert.assertEquals("value", jct.dynamicParams.get("option"));
 Assert.assertEquals(Arrays.asList("a", "b", "c"), jct.parameters);
 ```
 
-The full doc is available at http://beust.com/jcommander
+The full doc is available at [http://jcommander.org](http://jcommander.org).
