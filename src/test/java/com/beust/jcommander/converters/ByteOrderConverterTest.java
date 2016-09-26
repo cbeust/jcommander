@@ -18,7 +18,6 @@
 
 package com.beust.jcommander.converters;
 
-import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 
 import org.testng.Assert;
@@ -40,7 +39,7 @@ public class ByteOrderConverterTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testGargabeInput() throws UnknownHostException {
+	public void testGargabeInput() {
 		CONVERTER.convert("!@#$%");
 	}
 
