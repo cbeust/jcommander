@@ -603,75 +603,6 @@ public class JCommander {
         }
       }
     }
-
-//    while (!Object.class.equals(cls)) {
-//      for (Field f : cls.getDeclaredFields()) {
-//        p("Field:" + cls.getSimpleName() + "." + f.getName());
-//        f.setAccessible(true);
-//        Annotation annotation = f.getAnnotation(Parameter.class);
-//        Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
-//        Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
-//        if (annotation != null) {
-//          //
-//          // @Parameter
-//          //
-//          Parameter p = (Parameter) annotation;
-//          if (p.names().length == 0) {
-//            p("Found main parameter:" + f);
-//            if (m_mainParameterField != null) {
-//              throw new ParameterException("Only one @Parameter with no names attribute is"
-//                  + " allowed, found:" + m_mainParameterField + " and " + f);
-//            }
-//            m_mainParameterField = parameterized;
-//            m_mainParameterObject = object;
-//            m_mainParameterAnnotation = p;
-//            m_mainParameterDescription = new ParameterDescription(object, p, f, m_bundle, this);
-//          } else {
-//            for (String name : p.names()) {
-//              if (m_descriptions.containsKey(name)) {
-//                throw new ParameterException("Found the option " + name + " multiple times");
-//              }
-//              p("Adding description for " + name);
-//              ParameterDescription pd = new ParameterDescription(object, p, f, m_bundle, this);
-//              m_fields.put(f, pd);
-//              m_descriptions.put(name, pd);
-//
-//              if (p.required()) m_requiredFields.put(f, pd);
-//            }
-//          }
-//        } else if (delegateAnnotation != null) {
-//          //
-//          // @ParametersDelegate
-//          //
-//          try {
-//            Object delegateObject = f.get(object);
-//            if (delegateObject == null){
-//              throw new ParameterException("Delegate field '" + f.getName() + "' cannot be null.");
-//            }
-//            addDescription(delegateObject);
-//          } catch (IllegalAccessException e) {
-//          }
-//        } else if (dynamicParameter != null) {
-//          //
-//          // @DynamicParameter
-//          //
-//          DynamicParameter dp = (DynamicParameter) dynamicParameter;
-//          for (String name : dp.names()) {
-//            if (m_descriptions.containsKey(name)) {
-//              throw new ParameterException("Found the option " + name + " multiple times");
-//            }
-//            p("Adding description for " + name);
-//            ParameterDescription pd = new ParameterDescription(object, dp, f, m_bundle, this);
-//            m_fields.put(f, pd);
-//            m_descriptions.put(name, pd);
-//
-//            if (dp.required()) m_requiredFields.put(f, pd);
-//          }
-//        }
-//      }
-//      // Traverse the super class until we find Object.class
-//      cls = cls.getSuperclass();
-//    }
   }
 
   private void initializeDefaultValue(ParameterDescription pd) {
@@ -947,16 +878,6 @@ public class JCommander {
     return m_mainParameterAnnotation != null ? m_mainParameterAnnotation.description()
         : null;
   }
-
-//  private int longestName(Collection<?> objects) {
-//    int result = 0;
-//    for (Object o : objects) {
-//      int l = o.toString().length();
-//      if (l > result) result = l;
-//    }
-//
-//    return result;
-//  }
 
   /**
    * Set the program name (used only in the usage).
@@ -1457,16 +1378,6 @@ public class JCommander {
   private JCommander findCommand(ProgramName name) {
     return FuzzyMap.findInMap(m_commands, name,
         options.m_caseSensitiveOptions, options.m_allowAbbreviatedOptions);
-//    if (! m_caseSensitiveOptions) {
-//      return m_commands.get(name);
-//    } else {
-//      for (ProgramName c : m_commands.keySet()) {
-//        if (c.getName().equalsIgnoreCase(name.getName())) {
-//          return m_commands.get(c);
-//        }
-//      }
-//    }
-//    return null;
   }
 
   private ProgramName findProgramName(String name) {
@@ -1580,6 +1491,7 @@ public class JCommander {
   public List<String> getUnknownOptions() {
     return m_unknownArgs;
   }
+
   public void setAllowParameterOverwriting(boolean b) {
     options.m_allowParameterOverwriting = b;
   }
