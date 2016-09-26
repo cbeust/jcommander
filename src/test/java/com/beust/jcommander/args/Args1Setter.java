@@ -19,9 +19,9 @@
 package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.internal.Lists;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class Args1Setter {
   public List<String> getParameters() {
     return this.parameters;
   }
-  public List<String> parameters = Lists.newArrayList();
+  public List<String> parameters = new ArrayList<>();
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity", required = true)
   public void setVerbose(Integer v) {

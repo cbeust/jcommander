@@ -19,13 +19,13 @@
 package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.internal.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArgsRequired {
 
   @Parameter(description = "List of files", required = true)
-  public List<String> parameters = Lists.newArrayList();
+  public List<String> parameters = new ArrayList<>();
 
 }

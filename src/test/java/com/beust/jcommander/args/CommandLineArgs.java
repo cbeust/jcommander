@@ -19,14 +19,14 @@
 package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.internal.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommandLineArgs {
 
   @Parameter(description = "The XML suite files to run")
-  public List<String> suiteFiles = Lists.newArrayList();
+  public List<String> suiteFiles = new ArrayList<>();
 
   @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
   public Integer verbose;

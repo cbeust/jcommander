@@ -39,7 +39,7 @@ public class ArgsEnum {
   public ChoiceType choice = ChoiceType.ONE;
   
   @Parameter(names = "-choices", variableArity = true)
-  public List<ChoiceType> choices = new ArrayList<ChoiceType>();
+  public List<ChoiceType> choices = new ArrayList<>();
 
   public static void main(String[] args1) {
     ArgsEnum args = new ArgsEnum();

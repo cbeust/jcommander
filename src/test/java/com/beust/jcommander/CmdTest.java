@@ -17,7 +17,7 @@ public class CmdTest {
     @Parameters(commandNames = "--cmd-two")
     class CmdTwo {
         @Parameter
-        List<String> params = new java.util.LinkedList<String>();
+        List<String> params = new java.util.LinkedList<>();
     }
 
     public String parseArgs(boolean withDefault, String[] args) {
@@ -35,7 +35,7 @@ public class CmdTest {
             // is named "WithoutValidation".
             jc.parseWithoutValidation(args);
             if (jc.getParsedCommand() == null) {
-                LinkedList<String> newArgs = new LinkedList<String>();
+                LinkedList<String> newArgs = new LinkedList<>();
                 newArgs.add("--cmd-two");
                 newArgs.addAll(Arrays.asList(args));
                 jc.parse(newArgs.toArray(new String[0]));

@@ -31,7 +31,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -83,8 +85,6 @@ import com.beust.jcommander.args.VariableArity;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
 
 @Test
 public class JCommanderTest {
@@ -594,7 +594,7 @@ public class JCommanderTest {
       public static final String NAME = "help";
 
       @Parameter(description = "List of commands.")
-      public List<String> commands=new ArrayList<String>();
+      public List<String> commands= new ArrayList<>();
   }
 
   @Test(expectedExceptions = ParameterException.class,
@@ -845,7 +845,7 @@ public class JCommanderTest {
   public void dynamicParameters() {
     class Command {
       @DynamicParameter(names = {"-P"}, description = "Additional command parameters")
-      private Map<String, String> params = Maps.newHashMap();
+      private Map<String, String> params = new HashMap<>();
     }
     JCommander commander = new JCommander();
     Command c = new Command();
@@ -868,10 +868,10 @@ public class JCommanderTest {
   public void multiVariableArityList() {
     class Params {
       @Parameter(names = "-paramA", description = "ParamA", variableArity = true)
-      private List<String> paramA = Lists.newArrayList();
+      private List<String> paramA = new ArrayList<>();
 
       @Parameter(names = "-paramB", description = "ParamB", variableArity = true)
-      private List<String> paramB = Lists.newArrayList();
+      private List<String> paramB = new ArrayList<>();
     }
 
     {
@@ -1060,7 +1060,7 @@ public class JCommanderTest {
   public void spaces() {
     class Arg {
       @Parameter(names = "-rule", description = "rule")
-      private List<String> rules = new ArrayList<String>();
+      private List<String> rules = new ArrayList<>();
     }
     Arg a = new Arg();
     new JCommander(a, "-rule", "some test");
@@ -1068,7 +1068,7 @@ public class JCommanderTest {
   }
 
   static class V2 implements IParameterValidator2 {
-    final static List<String> names =  Lists.newArrayList();
+    final static List<String> names = new ArrayList<>();
     static boolean validateCalled = false;
 
     @Override
@@ -1158,7 +1158,7 @@ public class JCommanderTest {
     jc.addObject(a);
     jc.parse("-a", "foo", "-h", "host");
     Assert.assertEquals(a.host, "host");
-    Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
+    Assert.assertEquals(jc.getUnknownOptions(), Arrays.asList("-a", "foo"));
   }
 
   /**
@@ -1167,11 +1167,11 @@ public class JCommanderTest {
   public void listArgShouldBeCleared() {
     class Args {
       @Parameter(description = "[endpoint]")
-      public List<String> endpoint = Lists.newArrayList("prod");
+      public List<String> endpoint = new ArrayList<>(Collections.singleton("prod"));
     }
     Args a = new Args();
     new JCommander(a, new String[] { "dev" });
-    Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
+    Assert.assertEquals(a.endpoint, Collections.singletonList("dev"));
   }
 
   public void dashDashParameter() {

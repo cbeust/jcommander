@@ -18,12 +18,12 @@
 
 package com.beust.jcommander;
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Sets;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -94,19 +94,19 @@ public class DefaultValueTest {
 
   public static final class MyOptsWithEmptyDefaults extends MyOpts {
     public MyOptsWithEmptyDefaults(){
-      this.list = Lists.newArrayList();
-      this.set = Sets.newLinkedHashSet();
+      this.list = new ArrayList<>();
+      this.set = new LinkedHashSet<>();
     }
   }
 
   public static final List<String> singletonList(String value) {
-    List<String> list = Lists.newArrayList();
+    List<String> list = new ArrayList<>();
     list.add(value);
     return list;
   }
 
   public static final Set<String> singletonSet(String value){
-    Set<String> set = Sets.newLinkedHashSet();
+    Set<String> set = new LinkedHashSet<>();
     set.add(value);
     return set;
   }

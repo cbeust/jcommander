@@ -2,10 +2,12 @@ package com.beust.jcommander.dynamic;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.internal.Maps;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.Collections;
+import java.util.HashMap;
 
 @Test
 public class DynamicParameterTest {
@@ -24,7 +26,10 @@ public class DynamicParameterTest {
   private void simple(String... parameters) {
     DSimple ds = new DSimple();
     new JCommander(ds).parse(parameters);
-    Assert.assertEquals(ds.params, Maps.newHashMap("a", "b", "c", "d"));
+    Assert.assertEquals(ds.params, new HashMap<String, String>() {{
+      put("a", "b");
+      put("c", "d");
+    }});
   }
 
   public void simpleWithSpaces() {
@@ -43,8 +48,8 @@ public class DynamicParameterTest {
   public void differentAssignment() {
     DSimple ds = new DSimple();
     new JCommander(ds).parse("-D", "a=b", "-A", "c@d");
-    Assert.assertEquals(ds.params, Maps.newHashMap("a", "b"));
-    Assert.assertEquals(ds.params2, Maps.newHashMap("c", "d"));
+    Assert.assertEquals(ds.params, Collections.singletonMap("a", "b"));
+    Assert.assertEquals(ds.params2, Collections.singletonMap("c", "d"));
   }
 
   @Test(enabled = false)

@@ -18,7 +18,8 @@
 package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.internal.Lists;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,5 +29,5 @@ import java.util.List;
 public class AlternateNamesForListArgs {
 
     @Parameter(names = {"-s", "--servers"}, description = "blah")
-    public List<String> serverNames = Lists.newLinkedList();
+    public List<String> serverNames = new ArrayList<>();
 }

@@ -33,7 +33,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,8 +52,6 @@ import com.beust.jcommander.internal.Console;
 import com.beust.jcommander.internal.DefaultConsole;
 import com.beust.jcommander.internal.DefaultConverterFactory;
 import com.beust.jcommander.internal.JDK6Console;
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Nullable;
 
 /**
@@ -77,7 +77,7 @@ public class JCommander {
   /**
    * The objects that contain fields annotated with @Parameter.
    */
-  private List<Object> m_objects = Lists.newArrayList();
+  private List<Object> m_objects = new ArrayList<>();
 
   private boolean m_firstTimeMainParameter = true;
 
@@ -107,22 +107,22 @@ public class JCommander {
    * then some required fields did not receive a value and an exception is
    * thrown.
    */
-  private Map<Parameterized, ParameterDescription> m_requiredFields = Maps.newHashMap();
+  private Map<Parameterized, ParameterDescription> m_requiredFields = new HashMap<>();
 
   /**
    * A map of all the parameterized fields/methods.
    */
-  private Map<Parameterized, ParameterDescription> m_fields = Maps.newHashMap();
+  private Map<Parameterized, ParameterDescription> m_fields = new HashMap<>();
 
   /**
    * List of commands and their instance.
    */
-  private Map<ProgramName, JCommander> m_commands = Maps.newLinkedHashMap();
+  private Map<ProgramName, JCommander> m_commands = new LinkedHashMap<>();
 
   /**
    * Alias database for reverse lookup
    */
-  private Map<IKey, ProgramName> aliasMap = Maps.newLinkedHashMap();
+  private Map<IKey, ProgramName> aliasMap = new LinkedHashMap<>();
 
   /**
    * The name of the command after the parsing has run.
@@ -139,8 +139,8 @@ public class JCommander {
 
   private boolean m_helpWasSpecified;
 
-  private List<String> m_unknownArgs = Lists.newArrayList();
-  
+  private List<String> m_unknownArgs = new ArrayList<>();
+
   private static Console m_console;
 
   private final Options options;
@@ -374,7 +374,7 @@ public class JCommander {
    * @return the new and enriched command line parameters
    */
   private String[] expandArgs(String[] originalArgv) {
-    List<String> vResult1 = Lists.newArrayList();
+    List<String> vResult1 = new ArrayList<>();
 
     //
     // Expand @
@@ -393,7 +393,7 @@ public class JCommander {
 
     // Expand separators
     //
-    List<String> vResult2 = Lists.newArrayList();
+    List<String> vResult2 = new ArrayList<>();
     for (int i = 0; i < vResult1.size(); i++) {
       String arg = vResult1.get(i);
       if (isOption(arg)) {
@@ -496,7 +496,7 @@ public class JCommander {
    * @return the file content as a string.
    */
   private List<String> readFile(String fileName) {
-    List<String> result = Lists.newArrayList();
+    List<String> result = new ArrayList<>();
 
     try (BufferedReader bufRead = Files.newBufferedReader(Paths.get(fileName), options.m_atFileCharset)) {
       String line;
@@ -530,7 +530,7 @@ public class JCommander {
    * Create the ParameterDescriptions for all the \@Parameter found.
    */
   private void createDescriptions() {
-    m_descriptions = Maps.newHashMap();
+    m_descriptions = new HashMap<>();
 
     for (Object object : m_objects) {
       addDescription(object);
@@ -847,7 +847,7 @@ public class JCommander {
         va = (IVariableArity) arg;
     }
 
-    List<String> currentArgs = Lists.newArrayList();
+    List<String> currentArgs = new ArrayList<>();
     for (int j = index + 1; j < args.length; j++) {
       currentArgs.add(args[j]);
     }
@@ -928,7 +928,7 @@ public class JCommander {
 
     List<?> result = (List<?>) m_mainParameter.get(m_mainParameterObject);
     if (result == null) {
-      result = Lists.newArrayList();
+      result = new ArrayList<Object>();
       if (! List.class.isAssignableFrom(m_mainParameter.getType())) {
         throw new ParameterException("Main parameter field " + m_mainParameter
             + " needs to be of type List, not " + m_mainParameter.getType());
@@ -1085,7 +1085,7 @@ public class JCommander {
     // Align the descriptions at the "longestName" column
     //
     int longestName = 0;
-    List<ParameterDescription> sorted = Lists.newArrayList();
+    List<ParameterDescription> sorted = new ArrayList<>();
     for (ParameterDescription pd : m_fields.values()) {
       if (! pd.getParameter().hidden()) {
         sorted.add(pd);
@@ -1215,7 +1215,7 @@ public class JCommander {
    * format (e.g. HTML).
    */
   public List<ParameterDescription> getParameters() {
-    return new ArrayList<ParameterDescription>(m_fields.values());
+    return new ArrayList<>(m_fields.values());
   }
 
   /**
@@ -1407,7 +1407,7 @@ public class JCommander {
   }
 
   public Map<String, JCommander> getCommands() {
-    Map<String, JCommander> res = Maps.newLinkedHashMap();
+    Map<String, JCommander> res = new LinkedHashMap<>();
     for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
       res.put(entry.getKey().m_name, entry.getValue());
     }
