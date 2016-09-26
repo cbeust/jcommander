@@ -41,6 +41,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.beust.jcommander.FuzzyMap.IKey;
+import com.beust.jcommander.converters.DefaultListConverter;
+import com.beust.jcommander.converters.EnumConverter;
 import com.beust.jcommander.converters.IParameterSplitter;
 import com.beust.jcommander.converters.NoConverter;
 import com.beust.jcommander.converters.StringConverter;
@@ -1273,131 +1275,67 @@ public class JCommander {
     return null;
   }
 
-  public Object convertValue(ParameterDescription pd, String value) {
-    return convertValue(pd.getParameterized(), pd.getParameterized().getType(), value);
-  }
-
   /**
    * @param type The type of the actual parameter
    * @param value The value to convert
    */
-  public Object convertValue(Parameterized parameterized, Class type,
-      String value) {
-    Parameter annotation = parameterized.getParameter();
+  public Object convertValue(final Parameterized parameterized, Class type, String value) {
+    final Parameter annotation = parameterized.getParameter();
 
     // Do nothing if it's a @DynamicParameter
     if (annotation == null) return value;
 
-    Class<? extends IStringConverter<?>> converterClass = annotation.converter();
     final String optionName = annotation.names().length > 0 ? annotation.names()[0] : "[Main class]";
 
-    //
-    // Try to find a converter on the annotation
-    //
-    if (converterClass == NoConverter.class) {
-      final IStringConverter converter = findConverterInstance(annotation, type);
-      if (converter != null) {
-        return convertValue(parameterized, type, value, annotation, converter, optionName);
-      }
-      converterClass = null;
+    IStringConverter<?> converter = null;
+    if (type.isAssignableFrom(List.class)) {
+      // If a list converter was specified, pass the value to it for direct conversion
+      converter = tryInstantiateConverter(optionName, annotation.listConverter());
     }
-
-    // If no converter was found and type is enum, use enum values to convert
-    if (converterClass == null && type.isEnum())
-        converterClass = type;
-
-    if (converterClass == null) {
-      Type elementType = parameterized.findFieldGenericType();
-      if (elementType instanceof Class) {
-        final IStringConverter converter = findConverterInstance(annotation, ((Class) elementType));
-        if (converter != null) {
-          return convertValue(parameterized, type, value, annotation, converter, optionName);
+    if (type.isAssignableFrom(List.class) && converter == null) {
+      // No list converter: use the single value converter and pass each parsed value to it individually
+      final IParameterSplitter splitter = tryInstantiateConverter(null, annotation.splitter());
+      converter = new DefaultListConverter(splitter, new IStringConverter() {
+        @Override
+        public Object convert(String value) {
+          final Type genericType = parameterized.findFieldGenericType();
+          return convertValue(parameterized, genericType instanceof Class ? (Class) genericType : String.class, value);
         }
-        converterClass = null;
-      } else {
-        converterClass = StringConverter.class;
-      }
-      // Check for enum type parameter
-      if (converterClass == null && Enum.class.isAssignableFrom((Class) elementType)) {
-        converterClass = (Class<? extends IStringConverter<?>>) elementType;
-      }
+      });
     }
 
-    IStringConverter<?> converter;
-    Object result = null;
+    if (converter == null) {
+      converter = tryInstantiateConverter(optionName, annotation.converter());
+    }
+    if (converter == null) {
+      converter = findConverterInstance(annotation, type);
+    }
+    if (converter == null && type.isEnum()) {
+      converter = new EnumConverter(optionName, type);
+    }
+    if (converter == null) {
+      converter = new StringConverter();
+    }
+    return converter.convert(value);
+  }
+
+  private static <T> T tryInstantiateConverter(String optionName, Class<T> converterClass) {
+    if (converterClass == NoConverter.class || converterClass == null) {
+      return null;
+    }
     try {
-      if (converterClass != null && converterClass.isEnum()) {
-        try {
-          result = Enum.valueOf((Class<? extends Enum>) converterClass, value);
-        } catch (IllegalArgumentException e) {
-            try {
-                result = Enum.valueOf((Class<? extends Enum>) converterClass, value.toUpperCase());
-            } catch (IllegalArgumentException ex) {
-                throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-                        EnumSet.allOf((Class<? extends Enum>) converterClass));
-            }
-        } catch (Exception e) {
-          throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-                      EnumSet.allOf((Class<? extends Enum>) converterClass));
-        }
-      } else {
-        converter = instantiateConverter(optionName, converterClass);
-        result = convertValue(parameterized, type, value, annotation, converter, optionName);
-      }
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new ParameterException(e);
-    }
-
-    return result;
-  }
-
-  private Object convertValue(Parameterized parameterized, Class type, String value, Parameter annotation, IStringConverter<?> converter, String optionName) {
-    try {
-      if (type.isAssignableFrom(List.class) && parameterized.getGenericType() instanceof ParameterizedType) {
-        // The field is a List
-        if (annotation.listConverter() != NoConverter.class) {
-          // If a list converter was specified, pass the value to it for direct conversion
-          IStringConverter<?> listConverter = instantiateConverter(optionName, annotation.listConverter());
-          return listConverter.convert(value);
-        } else {
-          // No list converter: use the single value converter and pass each parsed value to it individually
-          return convertToList(value, converter, annotation.splitter());
-        }
-      } else {
-        return converter.convert(value);
-      }
-    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-      throw new ParameterException(e);
+      return instantiateConverter(optionName, converterClass);
+    } catch (InstantiationException | IllegalAccessException | InvocationTargetException ignore) {
+      return null;
     }
   }
 
-  /**
-   * Use the splitter to split the value into multiple values and then convert
-   * each of them individually.
-   */
-  private Object convertToList(String value, IStringConverter<?> converter,
-      Class<? extends IParameterSplitter> splitterClass)
-      throws InstantiationException, IllegalAccessException, NoSuchMethodException,
-      InvocationTargetException {
-    Constructor<? extends IParameterSplitter> constructor = splitterClass.getConstructor(new Class[0]);
-    constructor.setAccessible(true);
-    IParameterSplitter splitter = constructor.newInstance();
-    List<Object> result = Lists.newArrayList();
-    for (String param : splitter.split(value)) {
-      result.add(converter.convert(param));
-    }
-    return result;
-  }
-
-  private static IStringConverter<?> instantiateConverter(String optionName,
-      Class<? extends IStringConverter<?>> converterClass)
+  private static <T> T instantiateConverter(String optionName, Class<? extends T> converterClass)
       throws InstantiationException, IllegalAccessException,
       InvocationTargetException {
-    Constructor<IStringConverter<?>> ctor = null;
-    Constructor<IStringConverter<?>> stringCtor = null;
-    Constructor<IStringConverter<?>>[] ctors
-        = (Constructor<IStringConverter<?>>[]) converterClass.getDeclaredConstructors();
-    for (Constructor<IStringConverter<?>> c : ctors) {
+    Constructor<T> ctor = null;
+    Constructor<T> stringCtor = null;
+    for (Constructor<T> c : (Constructor<T>[]) converterClass.getDeclaredConstructors()) {
       c.setAccessible(true);
       Class<?>[] types = c.getParameterTypes();
       if (types.length == 1 && types[0].equals(String.class)) {
@@ -1407,13 +1345,11 @@ public class JCommander {
       }
     }
 
-    IStringConverter<?> result = stringCtor != null
+    return stringCtor != null
         ? stringCtor.newInstance(optionName)
-        : (ctor != null
-            ? ctor.newInstance()
-            : null);
-
-    return result;
+        : ctor != null
+        ? ctor.newInstance()
+        : null;
   }
 
   /**

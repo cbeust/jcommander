@@ -244,7 +244,7 @@ public class ParameterDescription {
 
     Class<?> type = m_parameterized.getType();
 
-    Object convertedValue = m_jCommander.convertValue(this, value);
+    Object convertedValue = m_jCommander.convertValue(getParameterized(), getParameterized().getType(), value);
     if (validate) {
       validateValueParameter(name, convertedValue);
     }
