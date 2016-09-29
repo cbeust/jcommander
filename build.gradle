@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'org.testng:testng:6.9.5'
+    testCompile 'org.testng:testng:6.9.13'
 }
 
 task sourceJar(type: Jar) {
