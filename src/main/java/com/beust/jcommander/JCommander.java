@@ -695,11 +695,10 @@ public class JCommander {
                 //
                 // Main parameter
                 //
-                if ("--".equals(arg)) {
+                if ("--".equals(arg) && !isDashDash) {
                     isDashDash = true;
-                    a = trim(args[++i]);
                 }
-                if (m_commands.isEmpty()) {
+                else if (m_commands.isEmpty()) {
                     //
                     // Regular (non-command) parsing
                     //
