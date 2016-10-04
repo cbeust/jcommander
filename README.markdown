@@ -41,3 +41,10 @@ Assert.assertEquals(Arrays.asList("a", "b", "c"), jct.parameters);
 ```
 
 The full doc is available at [http://jcommander.org](http://jcommander.org).
+
+## Building JCommander
+
+```
+./kobaltw assemble
+```
+
