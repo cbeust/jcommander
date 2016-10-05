@@ -2,6 +2,9 @@
 
 ### Current
 
+### 1.58
+2016-09-29
+
 * Added: `IStringConverterInstanceFactory` to create converter instances, #279 (@simon04)
 * Added: Allow to specify the `@file` charset, #286 (@simon04)
 * Added: Converters `InetAddressConverter` (#288), `CharArrayConverter` (#289; @garydgregory) 
@@ -9,6 +12,7 @@
 * Fixed: Share all options (such as column size, allow abbreviated options, case sensitivity) with sub commands, see `JCommander.Options` class, #280 (fixes #155, #244, #261, #274; @simon04)
 * Fixed: Thread-safe and non-shared converter factories, #284 (@simon04)
 * Fixed: Skip `Path` converter when class is not available (Android), #287 (@JesusFreke)
+* Require Java 8
 
 ### 1.56
 2016-08-05
