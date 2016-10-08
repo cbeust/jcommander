@@ -11,7 +11,7 @@ import com.beust.jcommander.Parameter;
 
 public class QuotedMainTest {
   @Parameter
-  List<String> args = new ArrayList<String>();
+  List<String> args = new ArrayList<>();
   
   String quoted = "\" \"";
 

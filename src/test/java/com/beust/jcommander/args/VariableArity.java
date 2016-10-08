@@ -15,10 +15,10 @@ public class VariableArity implements IVariableArity {
   }
 
   @Parameter
-  public List<String> main = new ArrayList<String>();
+  public List<String> main = new ArrayList<>();
 
   @Parameter(names = "-variable", variableArity = true)
-  public List<String> var = new ArrayList<String>();
+  public List<String> var = new ArrayList<>();
 
   public int processVariableArity(String optionName, String[] options) {
     return m_count;

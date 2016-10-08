@@ -1,8 +1,5 @@
 package com.beust.jcommander;
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Sets;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -10,7 +7,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -82,7 +81,7 @@ public class Parameterized {
     }
 
     // create result collector
-    Set<Class<?>> classes = Sets.newLinkedHashSet();
+    Set<Class<?>> classes = new LinkedHashSet<>();
 
     // describe tree
     describeClassTree(inputClass, classes);
@@ -91,7 +90,7 @@ public class Parameterized {
   }
 
   public static List<Parameterized> parseArg(Object arg) {
-    List<Parameterized> result = Lists.newArrayList();
+    List<Parameterized> result = new ArrayList<>();
 
     Class<? extends Object> rootClass = arg.getClass();
 

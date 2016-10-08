@@ -1,8 +1,8 @@
 package com.beust.jcommander.converters;
 
 import com.beust.jcommander.IStringConverter;
-import com.beust.jcommander.internal.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ public class DefaultListConverter<T> implements IStringConverter<List<T>> {
 
   @Override
   public List<T> convert(String value) {
-    List<T> result = Lists.newArrayList();
+    List<T> result = new ArrayList<>();
     for (String param : splitter.split(value)) {
       result.add(converter.convert(param));
     }

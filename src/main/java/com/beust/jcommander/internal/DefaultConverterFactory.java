@@ -40,6 +40,7 @@ import java.util.Date;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultConverterFactory implements IStringConverterFactory {
@@ -49,7 +50,7 @@ public class DefaultConverterFactory implements IStringConverterFactory {
   private static Map<Class, Class<? extends IStringConverter<?>>> m_classConverters;
 
   static {
-    m_classConverters = Maps.newHashMap();
+    m_classConverters = new HashMap<>();
     m_classConverters.put(String.class, StringConverter.class);
     m_classConverters.put(Integer.class, IntegerConverter.class);
     m_classConverters.put(int.class, IntegerConverter.class);

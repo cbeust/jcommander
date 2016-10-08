@@ -1,7 +1,6 @@
 package com.beust.jcommander;
 
-import com.beust.jcommander.internal.Maps;
-
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +33,7 @@ public class FuzzyMap {
   private static <V> V findAbbreviatedValue(Map<? extends IKey, V> map, IKey name,
       boolean caseSensitive) {
     String string = name.getName();
-    Map<String, V> results = Maps.newHashMap();
+    Map<String, V> results = new HashMap<>();
     for (IKey c : map.keySet()) {
       String n = c.getName();
       boolean match = (caseSensitive && n.startsWith(string))
