@@ -104,10 +104,6 @@ public class ParameterDescription {
     if (! "".equals(descriptionKey)) {
       if (m_bundle != null) {
         m_description = m_bundle.getString(descriptionKey);
-      } else {
-//        JCommander.getConsole().println("Warning: field " + object.getClass() + "." + field.getName()
-//            + " has a descriptionKey but no bundle was defined with @ResourceBundle, using " +
-//            "default description:'" + m_description + "'");
       }
     }
 
@@ -259,10 +255,8 @@ public class ParameterDescription {
       }
       if (convertedValue instanceof Collection) {
         l.addAll((Collection) convertedValue);
-      } else { // if (isMainParameter || m_parameterAnnotation.arity() > 1) {
+      } else {
         l.add(convertedValue);
-//        } else {
-//          l.
       }
     } else {
       m_wrappedParameter.addValue(m_parameterized, m_object, convertedValue);

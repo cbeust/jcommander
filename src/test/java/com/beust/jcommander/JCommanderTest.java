@@ -236,7 +236,6 @@ public class JCommanderTest {
     ArgsI18N1 i18n = new ArgsI18N1();
     String[] argv = { "-host", "localhost" };
     JCommander jc = new JCommander(i18n, bundle, argv);
-//    jc.usage();
 
     ParameterDescription pd = jc.getParameters().get(0);
     Assert.assertEquals(pd.getDescription(), expectedString);
@@ -984,7 +983,6 @@ public class JCommanderTest {
     Arg arg = new Arg();
     JCommander jc = new JCommander(arg);
     jc.parse("-help");
-//    System.out.println("helpTest:" + arg.help);
   }
 
   @Test(enabled = false, description = "Should only be enable once multiple parameters are allowed")

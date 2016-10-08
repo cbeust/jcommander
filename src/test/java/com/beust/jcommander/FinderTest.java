@@ -27,7 +27,6 @@ public class FinderTest {
     JCommander jc = new JCommander(a);
     jc.addCommand(conf);
     jc.setCaseSensitiveOptions(false);
-//    jc.setCaseSensitiveCommands(false);
     jc.parse("--CONFIGURE");
     String command = jc.getParsedCommand();
     Assert.assertEquals(command, "--configure");

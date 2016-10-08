@@ -26,9 +26,6 @@ public class MethodSetterTest {
       public void setRest(List<String> rest) {
         this.rest = rest;
       }
-//      public List<String> getRest() {
-//        return this.rest;
-//      }
       public List<String> rest;
     }
     ArgsArityStringSetter args = new ArgsArityStringSetter();
