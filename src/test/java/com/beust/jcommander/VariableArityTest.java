@@ -13,15 +13,15 @@ public class VariableArityTest {
 
     @Parameter(names = { "-m", "--matrixData" }, variableArity = true,
         description = "File containing a list of instances and their runtimes on various configurations", required = false)
-    public List<String> modelMatrixFile = new LinkedList<String>();
+    public List<String> modelMatrixFile = new LinkedList<>();
 
     @Parameter(names = { "-f", "--featureData" }, variableArity = true,
         description = "File containing a list of instances and their corresponding features", required = true)
-    public List<String> featureFile = new LinkedList<String>();
+    public List<String> featureFile = new LinkedList<>();
 
     @Parameter(names = { "-c", "--configData" }, variableArity = true,
         description = "File containing a list of configuration parameter values")
-    public List<String> configFile = new LinkedList<String>();
+    public List<String> configFile = new LinkedList<>();
 
     @Parameter(names = { "-o", "--outputFile" },
         description = "File to output the resulting data to. Defaults to ./matrix-generation.zip", required = false)

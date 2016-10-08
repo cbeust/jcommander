@@ -173,7 +173,7 @@ public class Parameterized {
       } else {
         return m_field.get(object);
       }
-    } catch (SecurityException e) {
+    } catch (SecurityException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
       throw new ParameterException(e);
     } catch (NoSuchMethodException e) {
       // Try to find a field
@@ -186,18 +186,10 @@ public class Parameterized {
           setFieldAccessible(field);
           result = field.get(object);
         }
-      } catch(NoSuchFieldException ex) {
-        // ignore
-      } catch(IllegalAccessException ex) {
+      } catch(NoSuchFieldException | IllegalAccessException ex) {
         // ignore
       }
       return result;
-    } catch (IllegalArgumentException e) {
-      throw new ParameterException(e);
-    } catch (IllegalAccessException e) {
-      throw new ParameterException(e);
-    } catch (InvocationTargetException e) {
-      throw new ParameterException(e);
     }
   }
 

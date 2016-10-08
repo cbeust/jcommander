@@ -86,13 +86,7 @@ public class WrappedParameter {
       Method m;
       m = findPut(parameterized.getType());
       m.invoke(parameterized.get(object), key, value);
-    } catch (SecurityException e) {
-      e.printStackTrace();
-    } catch(IllegalAccessException e) {
-      e.printStackTrace();
-    } catch(InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (NoSuchMethodException e) {
+    } catch (SecurityException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
       e.printStackTrace();
     }
   }

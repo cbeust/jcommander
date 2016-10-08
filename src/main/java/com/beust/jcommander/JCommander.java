@@ -394,8 +394,7 @@ public class JCommander {
     // Expand separators
     //
     List<String> vResult2 = Lists.newArrayList();
-    for (int i = 0; i < vResult1.size(); i++) {
-      String arg = vResult1.get(i);
+    for (String arg : vResult1) {
       if (isOption(arg)) {
         String sep = getSeparatorFor(arg);
         if (! " ".equals(sep)) {
@@ -1136,7 +1135,7 @@ public class JCommander {
    * format (e.g. HTML).
    */
   public List<ParameterDescription> getParameters() {
-    return new ArrayList<ParameterDescription>(m_fields.values());
+    return new ArrayList<>(m_fields.values());
   }
 
   /**

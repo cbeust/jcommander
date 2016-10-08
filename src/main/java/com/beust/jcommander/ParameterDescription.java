@@ -291,9 +291,7 @@ public class ParameterDescription {
         p("Validating value parameter:" + name + " value:" + value + " validator:" + validator);
       }
       validator.newInstance().validate(name, value);
-    } catch (InstantiationException e) {
-      throw new ParameterException("Can't instantiate validator:" + e);
-    } catch (IllegalAccessException e) {
+    } catch (InstantiationException | IllegalAccessException e) {
       throw new ParameterException("Can't instantiate validator:" + e);
     }
   }
@@ -310,9 +308,7 @@ public class ParameterDescription {
         IParameterValidator2 instance = (IParameterValidator2) validator.newInstance();
         instance.validate(name, value, pd);
       }
-    } catch (InstantiationException e) {
-      throw new ParameterException("Can't instantiate validator:" + e);
-    } catch (IllegalAccessException e) {
+    } catch (InstantiationException | IllegalAccessException e) {
       throw new ParameterException("Can't instantiate validator:" + e);
     } catch(ParameterException ex) {
       throw ex;

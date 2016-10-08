@@ -594,7 +594,7 @@ public class JCommanderTest {
       public static final String NAME = "help";
 
       @Parameter(description = "List of commands.")
-      public List<String> commands=new ArrayList<String>();
+      public List<String> commands=new ArrayList<>();
   }
 
   @Test(expectedExceptions = ParameterException.class,
@@ -1060,7 +1060,7 @@ public class JCommanderTest {
   public void spaces() {
     class Arg {
       @Parameter(names = "-rule", description = "rule")
-      private List<String> rules = new ArrayList<String>();
+      private List<String> rules = new ArrayList<>();
     }
     Arg a = new Arg();
     new JCommander(a, "-rule", "some test");

@@ -25,11 +25,11 @@ import java.util.Map;
 public class Maps {
 
   public static <K, V> Map<K,V> newHashMap() {
-    return new HashMap<K, V>();
+    return new HashMap<>();
   }
 
   public static <K, V> Map<K,V> newLinkedHashMap() {
-    return new LinkedHashMap<K, V>();
+    return new LinkedHashMap<>();
   }
 
   public static <T> Map<T, T> newHashMap(T... parameters) {
