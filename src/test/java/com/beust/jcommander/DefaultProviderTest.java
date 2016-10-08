@@ -122,7 +122,7 @@ public class DefaultProviderTest {
     class ArgsRequired {
       @Parameter(names = "-log", description = "Level of verbosity", required = true)
       public Integer log;
-    };
+    }
 
     IDefaultProvider defaultProvider = new IDefaultProvider() {
       public String getDefaultValueFor(String optionName) {
@@ -133,7 +133,7 @@ public class DefaultProviderTest {
     ArgsRequired a = new ArgsRequired();
     JCommander jc = new JCommander(a);
     jc.setDefaultProvider(defaultProvider);
-    jc.parse(new String[]{});
+    jc.parse();
 
     Assert.assertEquals(a.log.intValue(), 1);
   }

@@ -236,7 +236,6 @@ public class JCommanderTest {
     ArgsI18N1 i18n = new ArgsI18N1();
     String[] argv = { "-host", "localhost" };
     JCommander jc = new JCommander(i18n, bundle, argv);
-//    jc.usage();
 
     ParameterDescription pd = jc.getParameters().get(0);
     Assert.assertEquals(pd.getDescription(), expectedString);
@@ -513,11 +512,11 @@ public class JCommanderTest {
   }
 
   public void usageShouldNotChange() {
-    JCommander jc = new JCommander(new Args1(), new String[]{"-log", "1"});
+    JCommander jc = new JCommander(new Args1(), "-log", "1");
     StringBuilder sb = new StringBuilder();
     jc.usage(sb);
     String expected = sb.toString();
-    jc = new JCommander(new Args1(), new String[]{"-debug", "-log", "2", "-long", "5"});
+    jc = new JCommander(new Args1(), "-debug", "-log", "2", "-long", "5");
     sb = new StringBuilder();
     jc.usage(sb);
     String actual = sb.toString();
@@ -594,14 +593,14 @@ public class JCommanderTest {
       public static final String NAME = "help";
 
       @Parameter(description = "List of commands.")
-      public List<String> commands=new ArrayList<String>();
+      public List<String> commands=new ArrayList<>();
   }
 
   @Test(expectedExceptions = ParameterException.class,
       description = "Verify that the main parameter's type is checked to be a List")
   public void wrongMainTypeShouldThrow() {
     JCommander jc = new JCommander(new ArgsRequiredWrongMain());
-    jc.parse(new String[] { "f1", "f2" });
+    jc.parse("f1", "f2");
   }
 
   @Test(description = "This used to run out of memory")
@@ -619,7 +618,7 @@ public class JCommanderTest {
   public void validationShouldWork1() {
     ArgsValidate1 a = new ArgsValidate1();
     JCommander jc = new JCommander(a);
-    jc.parse(new String[] { "-age", "2 "});
+    jc.parse("-age", "2 ");
     Assert.assertEquals(a.age, new Integer(2));
   }
 
@@ -633,7 +632,7 @@ public class JCommanderTest {
   public void validationShouldWork2() {
     ArgsValidate1 a = new ArgsValidate1();
     JCommander jc = new JCommander(a);
-    jc.parse(new String[] { "-age", "-2 "});
+    jc.parse("-age", "-2 ");
   }
 
   public void atFileCanContainEmptyLines() throws IOException {
@@ -673,14 +672,14 @@ public class JCommanderTest {
   public void handleEqualSigns() {
     ArgsEquals a = new ArgsEquals();
     JCommander jc = new JCommander(a);
-    jc.parse(new String[] { "-args=a=b,b=c" });
+    jc.parse("-args=a=b,b=c");
     Assert.assertEquals(a.args, "a=b,b=c");
   }
 
   @SuppressWarnings("serial")
   public void handleSets() {
     ArgsWithSet a = new ArgsWithSet();
-    new JCommander(a, new String[] { "-s", "3,1,2" });
+    new JCommander(a, "-s", "3,1,2");
     Assert.assertEquals(a.set, new TreeSet<Integer>() {{ add(1); add(2); add(3); }});
   }
 
@@ -834,7 +833,7 @@ public class JCommanderTest {
     InputStream stdin = System.in;
     try {
       System.setIn(new ByteArrayInputStream("password".getBytes()));      
-      new JCommander(a,new String[]{"--port", "7","--password"});
+      new JCommander(a, "--port", "7","--password");
       Assert.assertEquals(a.port, 7);
       Assert.assertEquals(a.password, "password");
     } finally {
@@ -850,7 +849,7 @@ public class JCommanderTest {
     JCommander commander = new JCommander();
     Command c = new Command();
     commander.addCommand("command", c);
-    commander.parse(new String[] { "command", "-Pparam='name=value'" });
+    commander.parse("command", "-Pparam='name=value'");
     Assert.assertEquals(c.params.get("param"), "'name=value'");
   }
 
@@ -878,16 +877,16 @@ public class JCommanderTest {
       String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3" };
       Params p = new Params();
       new JCommander(p, args).parse();
-      Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2" }));
-      Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1", "b2", "b3" }));
+      Assert.assertEquals(p.paramA, Arrays.asList("a1", "a2"));
+      Assert.assertEquals(p.paramB, Arrays.asList("b1", "b2", "b3"));
     }
 
     {
       String args[] = { "-paramA", "a1", "a2", "-paramB", "b1", "-paramA", "a3" };
       Params p = new Params();
       new JCommander(p, args).parse();
-      Assert.assertEquals(p.paramA, Arrays.asList(new String[] { "a1", "a2", "a3" }));
-      Assert.assertEquals(p.paramB, Arrays.asList(new String[] { "b1" }));
+      Assert.assertEquals(p.paramA, Arrays.asList("a1", "a2", "a3"));
+      Assert.assertEquals(p.paramB, Arrays.asList("b1"));
     }
   }
 
@@ -983,8 +982,7 @@ public class JCommanderTest {
     }
     Arg arg = new Arg();
     JCommander jc = new JCommander(arg);
-    jc.parse(new String[] { "-help" });
-//    System.out.println("helpTest:" + arg.help);
+    jc.parse("-help");
   }
 
   @Test(enabled = false, description = "Should only be enable once multiple parameters are allowed")
@@ -1001,7 +999,7 @@ public class JCommanderTest {
     Arg2 arg2 = new Arg2();
 
     JCommander jc = new JCommander(new Object[] { arg1, arg2});
-    jc.parse(new String[] { "-host", "foo" });
+    jc.parse("-host", "foo");
     Assert.assertEquals(arg1.host, "foo");
     Assert.assertEquals(arg2.host, "foo");
   }
@@ -1017,7 +1015,7 @@ public class JCommanderTest {
 
     JCommander jc = new JCommander(params);
     jc.setExpandAtSign(false);
-    jc.parse(new String[] { "-username", "@tzellman" });
+    jc.parse("-username", "@tzellman");
     Assert.assertEquals(params.username, "@tzellman");
   }
 
@@ -1032,7 +1030,7 @@ public class JCommanderTest {
     Params params = new Params();
 
     JCommander jc = new JCommander(params);
-    jc.parse(new String[] { "-username", "@tzellman" });
+    jc.parse("-username", "@tzellman");
     Assert.assertEquals(params.username, "@tzellman");
   }
 
@@ -1060,7 +1058,7 @@ public class JCommanderTest {
   public void spaces() {
     class Arg {
       @Parameter(names = "-rule", description = "rule")
-      private List<String> rules = new ArrayList<String>();
+      private List<String> rules = new ArrayList<>();
     }
     Arg a = new Arg();
     new JCommander(a, "-rule", "some test");
@@ -1093,7 +1091,7 @@ public class JCommanderTest {
     V2.validateCalled = false;
     JCommander jc = new JCommander(a, "--host", "h");
     jc.setAcceptUnknownOptions(true);
-    Assert.assertEquals(V2.names, Arrays.asList(new String[] { "-h", "--host" }));
+    Assert.assertEquals(V2.names, Arrays.asList("-h", "--host"));
     Assert.assertTrue(V2.validateCalled);
   }
   
@@ -1170,7 +1168,7 @@ public class JCommanderTest {
       public List<String> endpoint = Lists.newArrayList("prod");
     }
     Args a = new Args();
-    new JCommander(a, new String[] { "dev" });
+    new JCommander(a, "dev");
     Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
   }
 
@@ -1183,9 +1181,7 @@ public class JCommanderTest {
     }
 
     Arguments a = new Arguments();
-    new JCommander(a, new String[] {
-        "-name", "theName", "--", "param1", "param2"}
-    );
+    new JCommander(a, "-name", "theName", "--", "param1", "param2");
     Assert.assertEquals(a.name, "theName");
     Assert.assertEquals(a.mainParameters.size(), 2);
     Assert.assertEquals(a.mainParameters.get(0), "param1");
@@ -1201,9 +1197,7 @@ public class JCommanderTest {
     }
 
     Arguments a = new Arguments();
-    new JCommander(a, new String[] {
-        "param1", "param2", "--", "param3", "-name", "theName"}
-    );
+    new JCommander(a, "param1", "param2", "--", "param3", "-name", "theName");
     Assert.assertNull(a.name);
     Assert.assertEquals(a.mainParameters.size(), 5);
     Assert.assertEquals(a.mainParameters.get(0), "param1");
@@ -1223,7 +1217,7 @@ public class JCommanderTest {
       }
     }
     Arguments a = new Arguments();
-    new JCommander(a, new String[] { "-bar", "1" });
+    new JCommander(a, "-bar", "1");
     Assert.assertEquals(a.bar, 1);
   }
 

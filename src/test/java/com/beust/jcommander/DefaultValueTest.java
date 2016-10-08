@@ -36,7 +36,7 @@ public class DefaultValueTest {
   public void emptyDefaultValueForListParameterStaysEmptyIfNotAssignedOrIsSetOtherwise() {
     MyOptsWithEmptyDefaults opts = new MyOptsWithEmptyDefaults();
     JCommander cmd = new JCommander(opts);
-    cmd.parse(new String[]{"-a", "anotherValue"});
+    cmd.parse("-a", "anotherValue");
     Assert.assertEquals(opts.list.size(), 1);
     Assert.assertEquals(opts.list.get(0), "anotherValue");
     Assert.assertEquals(opts.set.size(), 0);
@@ -46,7 +46,7 @@ public class DefaultValueTest {
   public void defaultValueForListParametersGetsOverwrittenWithSpecifiedValueOrStaysAsDefaultOtherwise() {
     MyOptsWithDefaultValues opts = new MyOptsWithDefaultValues();
     JCommander cmd = new JCommander(opts);
-    cmd.parse(new String[]{"-a", "anotherValue"});
+    cmd.parse("-a", "anotherValue");
     Assert.assertEquals(opts.list.size(), 1);
     Assert.assertEquals(opts.list.get(0), "anotherValue");
     Assert.assertEquals(opts.set.size(), 1);
@@ -67,8 +67,8 @@ public class DefaultValueTest {
 
   private void testSettingMultipleValuesToListTypeParameters(MyOpts opts) {
     JCommander cmd = new JCommander(opts);
-    cmd.parse(new String[]{"-a", "anotherValue", "-a", "anotherValue2",
-                           "-b", "anotherValue3", "-b", "anotherValue4"});
+    cmd.parse("-a", "anotherValue", "-a", "anotherValue2",
+              "-b", "anotherValue3", "-b", "anotherValue4");
     Assert.assertEquals(opts.list.size(), 2);
     Assert.assertEquals(opts.list.get(0), "anotherValue");
     Assert.assertEquals(opts.list.get(1), "anotherValue2");

@@ -93,7 +93,7 @@ public class Parameterized {
   public static List<Parameterized> parseArg(Object arg) {
     List<Parameterized> result = Lists.newArrayList();
 
-    Class<? extends Object> rootClass = arg.getClass();
+    Class<?> rootClass = arg.getClass();
 
     // get the list of types that are extended or implemented by the root class
     // and all of its parent types
@@ -166,14 +166,13 @@ public class Parameterized {
       if (m_method != null) {
         if (m_getter == null) {
             m_getter = m_method.getDeclaringClass()
-                .getMethod("g" + m_method.getName().substring(1),
-                new Class[0]);
+                .getMethod("g" + m_method.getName().substring(1));
         }
         return m_getter.invoke(object);
       } else {
         return m_field.get(object);
       }
-    } catch (SecurityException e) {
+    } catch (SecurityException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
       throw new ParameterException(e);
     } catch (NoSuchMethodException e) {
       // Try to find a field
@@ -186,18 +185,10 @@ public class Parameterized {
           setFieldAccessible(field);
           result = field.get(object);
         }
-      } catch(NoSuchFieldException ex) {
-        // ignore
-      } catch(IllegalAccessException ex) {
+      } catch(NoSuchFieldException | IllegalAccessException ex) {
         // ignore
       }
       return result;
-    } catch (IllegalArgumentException e) {
-      throw new ParameterException(e);
-    } catch (IllegalAccessException e) {
-      throw new ParameterException(e);
-    } catch (InvocationTargetException e) {
-      throw new ParameterException(e);
     }
   }
 

@@ -26,9 +26,6 @@ public class MethodSetterTest {
       public void setRest(List<String> rest) {
         this.rest = rest;
       }
-//      public List<String> getRest() {
-//        return this.rest;
-//      }
       public List<String> rest;
     }
     ArgsArityStringSetter args = new ArgsArityStringSetter();
@@ -51,7 +48,7 @@ public class MethodSetterTest {
     }
     boolean passed = false;
     try {
-      new JCommander(new Arg(), new String[] { "--host", "host" });
+      new JCommander(new Arg(), "--host", "host");
     } catch(ParameterException ex) {
       Assert.assertEquals(ex.getCause(), null);
       passed = true;
@@ -73,7 +70,7 @@ public class MethodSetterTest {
       }
     }
     Arg arg = new Arg();
-    new JCommander(arg, new String[] { "--port", "42" });
+    new JCommander(arg, "--port", "42");
 
     Assert.assertEquals(arg.port, new Integer(42));
   }
@@ -88,7 +85,7 @@ public class MethodSetterTest {
       }
     }
     Arg arg = new Arg();
-    JCommander jc = new JCommander(arg, new String[] { "--port", "42" });
+    JCommander jc = new JCommander(arg, "--port", "42");
     ParameterDescription pd = jc.getParameters().get(0);
     Assert.assertEquals(pd.getDefault(), 43);
   }
