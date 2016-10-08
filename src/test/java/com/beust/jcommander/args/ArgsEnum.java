@@ -34,7 +34,7 @@ import com.beust.jcommander.Parameter;
  */
 public class ArgsEnum {
 
-  public enum ChoiceType { ONE, Two, THREE };
+  public enum ChoiceType { ONE, Two, THREE }
   @Parameter(names = "-choice")
   public ChoiceType choice = ChoiceType.ONE;
   

@@ -93,7 +93,7 @@ public class Parameterized {
   public static List<Parameterized> parseArg(Object arg) {
     List<Parameterized> result = Lists.newArrayList();
 
-    Class<? extends Object> rootClass = arg.getClass();
+    Class<?> rootClass = arg.getClass();
 
     // get the list of types that are extended or implemented by the root class
     // and all of its parent types

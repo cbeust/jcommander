@@ -122,7 +122,7 @@ public class DefaultProviderTest {
     class ArgsRequired {
       @Parameter(names = "-log", description = "Level of verbosity", required = true)
       public Integer log;
-    };
+    }
 
     IDefaultProvider defaultProvider = new IDefaultProvider() {
       public String getDefaultValueFor(String optionName) {
