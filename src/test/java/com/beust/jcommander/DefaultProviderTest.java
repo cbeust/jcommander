@@ -133,7 +133,7 @@ public class DefaultProviderTest {
     ArgsRequired a = new ArgsRequired();
     JCommander jc = new JCommander(a);
     jc.setDefaultProvider(defaultProvider);
-    jc.parse(new String[]{});
+    jc.parse();
 
     Assert.assertEquals(a.log.intValue(), 1);
   }

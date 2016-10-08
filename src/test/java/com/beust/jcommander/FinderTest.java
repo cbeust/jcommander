@@ -17,7 +17,7 @@ public class FinderTest {
     Arg a = new Arg();
     JCommander jc = new JCommander(a);
     jc.setCaseSensitiveOptions(false);
-    jc.parse(new String[] { "--PARAM", "foo" });
+    jc.parse("--PARAM", "foo");
     Assert.assertEquals(a.param, "foo");
   }
 
@@ -41,7 +41,7 @@ public class FinderTest {
     Arg a = new Arg();
     JCommander jc = new JCommander(a);
     jc.setAllowAbbreviatedOptions(true);
-    jc.parse(new String[] { "--par", "foo" });
+    jc.parse("--par", "foo");
     Assert.assertEquals(a.param, "foo");
   }
 
@@ -54,7 +54,7 @@ public class FinderTest {
     JCommander jc = new JCommander(a);
     jc.setCaseSensitiveOptions(false);
     jc.setAllowAbbreviatedOptions(true);
-    jc.parse(new String[] { "--PAR", "foo" });
+    jc.parse("--PAR", "foo");
     Assert.assertEquals(a.param, "foo");
   }
 
@@ -69,7 +69,7 @@ public class FinderTest {
     Arg a = new Arg();
     JCommander jc = new JCommander(a);
     jc.setAllowAbbreviatedOptions(true);
-    jc.parse(new String[] { "--par", "foo" });
+    jc.parse("--par", "foo");
     Assert.assertEquals(a.param, "foo");
   }
 
@@ -85,7 +85,7 @@ public class FinderTest {
     JCommander jc = new JCommander(a);
     jc.setCaseSensitiveOptions(false);
     jc.setAllowAbbreviatedOptions(true);
-    jc.parse(new String[] { "--PAR", "foo" });
+    jc.parse("--PAR", "foo");
     Assert.assertEquals(a.param, "foo");
   }
 

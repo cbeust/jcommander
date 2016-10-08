@@ -242,8 +242,8 @@ public class JCommander {
   public static Console getConsole() {
     if (m_console == null) {
       try {
-        Method consoleMethod = System.class.getDeclaredMethod("console", new Class<?>[0]);
-        Object console = consoleMethod.invoke(null, new Object[0]);
+        Method consoleMethod = System.class.getDeclaredMethod("console");
+        Object console = consoleMethod.invoke(null);
         m_console = new JDK6Console(console);
       } catch (Throwable t) {
         m_console = new DefaultConsole();

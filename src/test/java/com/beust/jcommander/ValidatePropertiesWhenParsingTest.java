@@ -12,7 +12,7 @@ public class ValidatePropertiesWhenParsingTest {
     cmd.addCommand("a", new A());
 //    cmd.addCommand("b", new B());
 
-    cmd.parse(new String[] { "a", "-path", "myPathToHappiness" });
+    cmd.parse("a", "-path", "myPathToHappiness");
   }
 
   public static class MyPathValidator implements IParameterValidator {

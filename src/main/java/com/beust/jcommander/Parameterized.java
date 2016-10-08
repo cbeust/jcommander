@@ -166,8 +166,7 @@ public class Parameterized {
       if (m_method != null) {
         if (m_getter == null) {
             m_getter = m_method.getDeclaringClass()
-                .getMethod("g" + m_method.getName().substring(1),
-                new Class[0]);
+                .getMethod("g" + m_method.getName().substring(1));
         }
         return m_getter.invoke(object);
       } else {

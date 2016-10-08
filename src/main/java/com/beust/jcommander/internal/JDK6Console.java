@@ -13,8 +13,8 @@ public class JDK6Console implements Console {
 
   public JDK6Console(Object console) throws Exception {
     this.console = console;
-    Method writerMethod = console.getClass().getDeclaredMethod("writer", new Class<?>[0]);
-    writer = (PrintWriter) writerMethod.invoke(console, new Object[0]);
+    Method writerMethod = console.getClass().getDeclaredMethod("writer");
+    writer = (PrintWriter) writerMethod.invoke(console);
   }
 
   public void print(String msg) {
@@ -30,11 +30,11 @@ public class JDK6Console implements Console {
       writer.flush();
       Method method;
       if (echoInput) {
-          method = console.getClass().getDeclaredMethod("readLine", new Class<?>[0]);
-          return ((String) method.invoke(console, new Object[0])).toCharArray();
+          method = console.getClass().getDeclaredMethod("readLine");
+          return ((String) method.invoke(console)).toCharArray();
       } else {
-          method = console.getClass().getDeclaredMethod("readPassword", new Class<?>[0]);
-          return (char[]) method.invoke(console, new Object[0]);
+          method = console.getClass().getDeclaredMethod("readPassword");
+          return (char[]) method.invoke(console);
       }
     }
     catch (Exception e) {

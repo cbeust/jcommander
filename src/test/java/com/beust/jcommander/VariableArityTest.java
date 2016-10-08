@@ -54,8 +54,8 @@ public class VariableArityTest {
 
 //    config.print();
     Assert.assertNotEquals(config.seed, 0);
-    Assert.assertEquals(config.modelMatrixFile, Arrays.asList(new String[] { "foo" }));
-    Assert.assertEquals(config.featureFile, Arrays.asList(new String[] { "foo" }));
+    Assert.assertEquals(config.modelMatrixFile, Arrays.asList("foo"));
+    Assert.assertEquals(config.featureFile, Arrays.asList("foo"));
     Assert.assertEquals(config.seed, 1024);
     Assert.assertEquals(config.outputFile, "foo");
   }
