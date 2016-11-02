@@ -1059,7 +1059,7 @@ public class JCommander {
     // If commands were specified, show them as well
     //
     if (hasCommands) {
-      out.append("  Commands:\n");
+      out.append(indent + "  Commands:\n");
       // The magic value 3 is the number of spaces between the name of the option
       // and its description
       for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
@@ -1075,7 +1075,7 @@ public class JCommander {
 
           // Options for this command
           JCommander jc = findCommandByAlias(progName.getName());
-          jc.usage(out, "      ");
+          jc.usage(out, indent + "      ");
           out.append("\n");
         }
       }

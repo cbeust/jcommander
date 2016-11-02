@@ -1145,6 +1145,36 @@ public class JCommanderTest {
     Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
   }
 
+  public void usageWithSubCommands() {
+    class Arg {
+    }
+    @Parameters(commandDescription = "command a")
+    class ArgCommandA {
+      @Parameter(description = "command a parameters")
+      List<String> parameters;
+    }
+    @Parameters(commandDescription = "command b")
+    class ArgCommandB {
+      @Parameter(description = "command b parameters")
+      List<String> parameters;
+    }
+
+    Arg a = new Arg();
+
+    JCommander c = new JCommander(a);
+    c.setColumnSize(100);
+    c.addCommand("a", new ArgCommandA());
+
+    // b is a sub-command of a
+    JCommander aCommand = c.getCommands().get("a");
+    aCommand.addCommand("b", new ArgCommandB());
+
+    StringBuilder sb = new StringBuilder();
+    c.usage(sb);
+    Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
+    Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
+  }
+
   public void partialValidation() {
     class Arg {
       @Parameter(names = { "-h", "--host" })
