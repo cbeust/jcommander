@@ -8,10 +8,10 @@ val jcommander = project {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.58"
+    version = "1.60"
 
     dependenciesTest {
-        compile("org.testng:testng:6.9.13")
+        compile("org.testng:testng:6.10")
     }
 
     assemble {
