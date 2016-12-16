@@ -635,6 +635,15 @@ public class JCommanderTest {
     jc.parse("-age", "-2 ");
   }
 
+  @Test
+  public void validationShouldReceiveRightParameterName() {
+    ArgMultiNameValidator validator = new ArgMultiNameValidator();
+    JCommander jc = new JCommander(validator);
+    String paramName = "-name2";
+    jc.parse(paramName, "param1");
+    Assert.assertEquals(ArgMultiNameValidator.MultiNameValidator.parsedName, paramName);
+  }
+
   public void atFileCanContainEmptyLines() throws IOException {
     File f = File.createTempFile("JCommander", null);
     f.deleteOnExit();

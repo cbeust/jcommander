@@ -813,7 +813,8 @@ public class JCommander {
 
       if (index + arity < args.length) {
         for (int j = 1; j <= arity; j++) {
-          pd.addValue(trim(args[index + j + offset]), false, validate);
+          String value = trim(args[index + j + offset]);
+          pd.addValue(arg, value, false, validate);
           m_requiredFields.remove(pd.getParameterized());
         }
         index += arity + offset;

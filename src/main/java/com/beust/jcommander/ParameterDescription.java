@@ -223,13 +223,15 @@ public class ParameterDescription {
    * converter, and if we can't find any, throw an exception.
    */
   public void addValue(String value, boolean isDefault) {
-    addValue(value, isDefault, true);
+    addValue(null, value, isDefault, true);
   }
 
-  void addValue(String value, boolean isDefault, boolean validate) {
+  void addValue(String name, String value, boolean isDefault, boolean validate) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + m_parameterized.getName());
-    String name = m_wrappedParameter.names()[0];
+    if(name == null) {
+      name = m_wrappedParameter.names()[0];
+    }
     if (m_assigned && ! isMultiOption() && !m_jCommander.isParameterOverwritingAllowed() || isNonOverwritableForced()) {
       throw new ParameterException("Can only specify option " + name + " once.");
     }
