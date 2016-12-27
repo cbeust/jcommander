@@ -1064,6 +1064,36 @@ public class JCommanderTest {
     Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
   }
 
+  @Test
+  public void emptyStringShouldBeConsideredAsParameter(){
+    class Arg {
+      @Parameter(description = "parameters")
+      List<String> params;
+    }
+
+    Arg a = new Arg();
+    String [] args = {""};
+
+    new JCommander(a).parse(args);
+    Assert.assertEquals(a.params.size(), 1);
+//    Assert.assertEquals();
+  }
+
+  @Test
+  public void doubleQuotedStringShouldBeConsideredAsParameter(){
+    class Arg {
+      @Parameter(description = "parameters")
+      List<String> params;
+    }
+
+    Arg a = new Arg();
+    String [] args = {"\"\""};
+
+    new JCommander(a).parse(args);
+    Assert.assertEquals(a.params.size(), 1);
+//    Assert.assertEquals();
+  }
+
   public void spaces() {
     class Arg {
       @Parameter(names = "-rule", description = "rule")
