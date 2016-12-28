@@ -32,7 +32,7 @@ import java.util.Date;
  */
 public class ISO8601DateConverter extends BaseConverter<Date> {
 
-  private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
   public ISO8601DateConverter(String optionName) {
     super(optionName);

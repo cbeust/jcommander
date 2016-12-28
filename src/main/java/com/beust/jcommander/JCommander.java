@@ -239,7 +239,7 @@ public class JCommander {
     options.expandAtSign = expandAtSign;
   }
   
-  public static Console getConsole() {
+  public static synchronized Console getConsole() {
     if (m_console == null) {
       try {
         Method consoleMethod = System.class.getDeclaredMethod("console");
