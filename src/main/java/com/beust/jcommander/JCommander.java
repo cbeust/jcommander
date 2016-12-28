@@ -1041,7 +1041,7 @@ public class JCommander {
                 + "key" + parameter.getAssignment()
                 + "value");
       }
-      if (def != null) {
+      if (def != null && !pd.isHelp()) {
         String displayedDef = Strings.isStringEmpty(def.toString())
             ? "<empty string>"
             : def.toString();
