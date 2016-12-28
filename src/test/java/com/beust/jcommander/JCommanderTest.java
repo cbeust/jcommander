@@ -913,6 +913,7 @@ public class JCommanderTest {
     j.usage();
   }
 
+  @Test(expectedExceptions = ParameterException.class, expectedExceptionsMessageRegExp = "Was passed main parameter '' but no main parameter was defined")
   public void tmp() {
     class A {
       @Parameter(names = "-b")
