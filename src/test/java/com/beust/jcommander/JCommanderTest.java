@@ -995,6 +995,23 @@ public class JCommanderTest {
     jc.parse("-help");
   }
 
+  @Test
+  public void doNotDisplayHelpDefaultValue(){
+    class Arg {
+      @Parameter(names = "--help", help = true)
+      public boolean help = false;
+    }
+    Arg arg = new Arg();
+    String[] argv = { "--help" };
+    JCommander jc = new JCommander(arg, argv);
+
+    StringBuilder sb = new StringBuilder();
+
+    jc.usage(sb);
+
+    Assert.assertFalse(sb.toString().contains("Default"));
+  }
+
   @Test(enabled = false, description = "Should only be enable once multiple parameters are allowed")
   public void duplicateParameterNames() {
     class ArgBase {
