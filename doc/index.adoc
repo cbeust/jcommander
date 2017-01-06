@@ -138,7 +138,7 @@ will cause the field verbose to receive the value 3. However:
 
 [source,bash]
 ----
-java Main -log test
+$ java Main -log test
 ----
 
 will cause an exception to be thrown.
@@ -157,7 +157,7 @@ will allow you to parse the following command line:
 
 [source,bash]
 ----
-java Main -host host1 -verbose -host host2
+$ java Main -host host1 -verbose -host host2
 ----
 
 When JCommander is done parsing the line above, the field hosts will contain the strings `"host1"` and `"host2"`.
@@ -245,7 +245,7 @@ For example, suppose you need to parse a string representing a host and a port:
 
 [source,bash]
 ----
-java App -target example.com:8080
+$ java App -target example.com:8080
 ----
 
 You define the holder class :
@@ -382,7 +382,7 @@ will allow you to parse:
 
 [source,bash]
 ----
-java Main -debug file1 file2
+$ java Main -debug file1 file2
 ----
 
 and the field files will receive the strings `"file1"` and `"file2"`.
@@ -412,14 +412,14 @@ By default, parameters are separated by spaces, but you can change this setting 
 
 [source,bash]
 ----
-java Main -log:3
+$ java Main -log:3
 ----
 
 or
 
 [source,bash]
 ----
-java Main -level=42
+$ java Main -level=42
 ----
 
 You define the separator with the @Parameters annotation:
@@ -490,7 +490,7 @@ If some of your parameters require more than one value, such as the following ex
 
 [source,bash]
 ----
-java Main -pairs slave master foo.xml
+$ java Main -pairs slave master foo.xml
 ----
 
 then you need to define your parameter with the arity attribute and make that parameter a `List<String>`:
@@ -536,8 +536,8 @@ will allow both following syntaxes:
 
 [source,bash]
 ----
-java Main -d /tmp
-java Main --outputDirectory /tmp
+$ java Main -d /tmp
+$ java Main --outputDirectory /tmp
 ----
 
 == Other option configurations
@@ -621,7 +621,7 @@ Complex tools such as `git` or `svn` understand a whole set of commands, each of
 
 [source,bash]
 ----
-git commit --amend -m "Bug fix"
+$ git commit --amend -m "Bug fix"
 ----
 
 Words such as `"commit"` above are called "commands" in JCommander, and you can specify them by creating one arg object per command:
