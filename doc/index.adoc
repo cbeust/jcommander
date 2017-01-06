@@ -3,7 +3,7 @@
 :author: Cédric Beust
 :email: cedric@beust.com
 :toc: left
-:source-highlighter: highlightjs
+:source-highlighter: prettify
 :sectnums:
 
 ++++
@@ -84,10 +84,10 @@ class Main {
 }
 ----
 
-[source,shell]
+[source,bash]
 ----
 $ java Main -l 512 --pattern 2
-   512 2
+512 2
 ----
 
 
@@ -115,7 +115,7 @@ private boolean debug = true;
 
 Invoke with either of:
 
-[source,shell]
+[source,bash]
 ----
 program -debug true
 program -debug false
@@ -129,14 +129,14 @@ When a Parameter annotation is found on a field of type `String`, `Integer`, `in
 private Integer verbose = 1;
 ----
 
-[source,shell]
+[source,bash]
 ----
 java Main -log 3
 ----
 
 will cause the field verbose to receive the value 3. However:
 
-[source,shell]
+[source,bash]
 ----
 java Main -log test
 ----
@@ -155,7 +155,7 @@ private List<String> hosts = new ArrayList<>();
 
 will allow you to parse the following command line:
 
-[source,shell]
+[source,bash]
 ----
 java Main -host host1 -verbose -host host2
 ----
@@ -176,7 +176,7 @@ public class ArgsPassword {
 
 When you run your program, you will get the following prompt:
 
-[source,shell]
+[source,bash]
 ----
 Value for -password (Connection password):
 ----
@@ -243,7 +243,7 @@ public interface IStringConverterFactory {
 
 For example, suppose you need to parse a string representing a host and a port:
 
-[source,shell]
+[source,bash]
 ----
 java App -target example.com:8080
 ----
@@ -380,7 +380,7 @@ private Integer debug = 1;
 
 will allow you to parse:
 
-[source,shell]
+[source,bash]
 ----
 java Main -debug file1 file2
 ----
@@ -410,14 +410,14 @@ Assert.assertEquals(args.getVerbose().intValue(), 3);
 
 By default, parameters are separated by spaces, but you can change this setting to allow different separators:
 
-[source,shell]
+[source,bash]
 ----
 java Main -log:3
 ----
 
 or
 
-[source,shell]
+[source,bash]
 ----
 java Main -level=42
 ----
@@ -467,7 +467,7 @@ Assert.assertEquals(s.slave, "slave");
 
 JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:
 
-[source,shell]
+[source,bash]
 ----
 /tmp/parameters
 -verbose
@@ -484,7 +484,7 @@ java Main @/tmp/parameters
 
 If some of your parameters require more than one value, such as the following example where two values are expected after -pairs:
 
-[source,shell]
+[source,bash]
 ----
 java Main -pairs slave master foo.xml
 ----
@@ -505,7 +505,7 @@ Also, note that only `List<String>` is allowed for parameters that define an ari
 
 You can specify that a parameter can receive an indefinite number of parameters, up to the next option. For example:
 
-[source,shell]
+[source,bash]
 ----
 program -foo a1 a2 a3 -bar
 program -foo a1 -bar
@@ -530,7 +530,7 @@ private String outputDirectory;
 
 will allow both following syntaxes:
 
-[source,shell]
+[source,bash]
 ----
 java Main -d /tmp
 java Main --outputDirectory /tmp
@@ -615,7 +615,7 @@ If you omit this boolean, JCommander will instead issue an error message when it
 
 Complex tools such as `git` or `svn` understand a whole set of commands, each of which with their own specific syntax:
 
-[source,shell]
+[source,bash]
 ----
 git commit --amend -m "Bug fix"
 ----
@@ -677,7 +677,7 @@ Whenever JCommander detects an error, it will throw a `ParameterException`. Note
 
 You can invoke `usage()` on the JCommander instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
 
-[source,shell]
+[source,bash]
 ----
 Usage: <main class> [options]
   Options:
@@ -715,7 +715,7 @@ private class ArgsI18N2 {
 
 Your bundle needs to define this key: 
 
-[source,shell]
+[source,bash]
 ----
 host: Hôte
 ----

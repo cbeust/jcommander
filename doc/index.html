@@ -810,7 +810,7 @@ You annotate fields with descriptions of your options:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">import com.beust.jcommander.Parameter;
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">import com.beust.jcommander.Parameter;
 
 public class JCommanderExample {
   @Parameter
@@ -832,7 +832,7 @@ public class JCommanderExample {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">JCommanderExample jct = new JCommanderExample();
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">JCommanderExample jct = new JCommanderExample();
 String[] argv = { "-log", "2", "-groups", "unit" };
 new JCommander(jct, argv);
 
@@ -844,7 +844,7 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">class Main {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class Main {
     @Parameter(names={"--length", "-l"})
     int length;
     @Parameter(names={"--pattern", "-p"})
@@ -864,8 +864,8 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">$ java Main -l 512 --pattern 2
-   512 2</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -l 512 --pattern 2
+512 2</code></pre>
 </div>
 </div>
 </div>
@@ -883,7 +883,7 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode")
 private boolean debug = false;</code></pre>
 </div>
 </div>
@@ -892,7 +892,7 @@ private boolean debug = false;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode", arity = 1)
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode", arity = 1)
 private boolean debug = true;</code></pre>
 </div>
 </div>
@@ -901,7 +901,7 @@ private boolean debug = true;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">program -debug true
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">program -debug true
 program -debug false</code></pre>
 </div>
 </div>
@@ -910,13 +910,13 @@ program -debug false</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-log", description = "Level of verbosity")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-log", description = "Level of verbosity")
 private Integer verbose = 1;</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -log 3</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -log 3</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -924,7 +924,7 @@ private Integer verbose = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -log test</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -log test</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -938,7 +938,7 @@ private Integer verbose = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-host", description = "The host")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-host", description = "The host")
 private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 </div>
@@ -947,7 +947,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -host host1 -verbose -host host2</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -host host1 -verbose -host host2</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -961,7 +961,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class ArgsPassword {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsPassword {
   @Parameter(names = "-password", description = "Connection password", password = true)
   private String password;
 }</code></pre>
@@ -972,7 +972,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">Value for -password (Connection password):</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">Value for -password (Connection password):</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -986,7 +986,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class ArgsPassword {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsPassword {
   @Parameter(names = "-password", description = "Connection password", password = true, echoInput = true)
   private String password;
 }</code></pre>
@@ -1005,7 +1005,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public interface IStringConverter&lt;T&gt; {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IStringConverter&lt;T&gt; {
   T convert(String value);
 }</code></pre>
 </div>
@@ -1015,7 +1015,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class FileConverter implements IStringConverter&lt;File&gt; {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class FileConverter implements IStringConverter&lt;File&gt; {
   @Override
   public File convert(String value) {
     return new File(value);
@@ -1028,7 +1028,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-file", converter = FileConverter.class)
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-file", converter = FileConverter.class)
 File file;</code></pre>
 </div>
 </div>
@@ -1043,7 +1043,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public interface IStringConverterFactory {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IStringConverterFactory {
   &lt;T&gt; Class&lt;? extends IStringConverter&lt;T&gt;&gt; getConverter(Class&lt;T&gt; forType);
 }</code></pre>
 </div>
@@ -1053,7 +1053,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java App -target example.com:8080</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java App -target example.com:8080</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1061,7 +1061,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class HostPort {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class HostPort {
   public HostPort(String host, String port) {
      this.host = host;
      this.port = port;
@@ -1077,7 +1077,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">class HostPortConverter implements IStringConverter&lt;HostPort&gt; {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class HostPortConverter implements IStringConverter&lt;HostPort&gt; {
   @Override
   public HostPort convert(String value) {
     String[] s = value.split(":");
@@ -1091,7 +1091,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class Factory implements IStringConverterFactory {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class Factory implements IStringConverterFactory {
   public Class&lt;? extends IStringConverter&lt;?&gt;&gt; getConverter(Class forType) {
     if (forType.equals(HostPort.class)) return HostPortConverter.class;
     else return null;
@@ -1103,7 +1103,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class ArgsConverterFactory {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsConverterFactory {
   @Parameter(names = "-hostport")
   private HostPort hostPort;
 }</code></pre>
@@ -1114,7 +1114,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">ArgsConverterFactory a = new ArgsConverterFactory();
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">ArgsConverterFactory a = new ArgsConverterFactory();
 JCommander jc = new JCommander(a);
 jc.addConverterFactory(new Factory());
 jc.parse("-hostport", "example.com:8080");
@@ -1142,7 +1142,7 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public interface IParameterValidator {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IParameterValidator {
  /**
    * Validate the parameter.
    *
@@ -1160,7 +1160,7 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class PositiveInteger implements IParameterValidator {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class PositiveInteger implements IParameterValidator {
  public void validate(String name, String value)
       throws ParameterException {
     int n = Integer.parseInt(value);
@@ -1176,7 +1176,7 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-age", validateWith = PositiveInteger.class)
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-age", validateWith = PositiveInteger.class)
 private Integer age;</code></pre>
 </div>
 </div>
@@ -1200,7 +1200,7 @@ private Integer age;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(description = "Files")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(description = "Files")
 private List&lt;String&gt; files = new ArrayList&lt;&gt;();
 
 @Parameter(names = "-debug", description = "Debugging level")
@@ -1212,7 +1212,7 @@ private Integer debug = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -debug file1 file2</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -debug file1 file2</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1228,7 +1228,7 @@ private Integer debug = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class ArgsPrivate {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsPrivate {
   @Parameter(names = "-verbose")
   private Integer verbose = 1;
 
@@ -1251,7 +1251,7 @@ Assert.assertEquals(args.getVerbose().intValue(), 3);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -log:3</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -log:3</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1259,7 +1259,7 @@ Assert.assertEquals(args.getVerbose().intValue(), 3);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -level=42</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -level=42</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1267,7 +1267,7 @@ Assert.assertEquals(args.getVerbose().intValue(), 3);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameters(separators = "=")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameters(separators = "=")
 public class SeparatorEqual {
   @Parameter(names = "-level")
   private Integer level = 2;
@@ -1284,7 +1284,7 @@ public class SeparatorEqual {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public class ArgsMaster {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsMaster {
   @Parameter(names = "-master")
   private String master;
 }
@@ -1300,7 +1300,7 @@ public class ArgsSlave {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">ArgsMaster m = new ArgsMaster();
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">ArgsMaster m = new ArgsMaster();
 ArgsSlave s = new ArgsSlave();
 String[] argv = { "-master", "master", "-slave", "slave" };
 new JCommander(new Object[] { m , s }, argv);
@@ -1319,7 +1319,7 @@ Assert.assertEquals(s.slave, "slave");</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">/tmp/parameters
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">/tmp/parameters
 -verbose
 file1
 file2
@@ -1340,7 +1340,7 @@ java Main @/tmp/parameters</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -pairs slave master foo.xml</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -pairs slave master foo.xml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1348,7 +1348,7 @@ java Main @/tmp/parameters</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-pairs", arity = 2, description = "Pairs")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-pairs", arity = 2, description = "Pairs")
 private List&lt;String&gt; pairs;</code></pre>
 </div>
 </div>
@@ -1366,7 +1366,7 @@ private List&lt;String&gt; pairs;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">program -foo a1 a2 a3 -bar
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">program -foo a1 a2 a3 -bar
 program -foo a1 -bar</code></pre>
 </div>
 </div>
@@ -1375,7 +1375,7 @@ program -foo a1 -bar</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-foo", variableArity = true)
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-foo", variableArity = true)
 public List&lt;String&gt; foo = new ArrayList&lt;&gt;();</code></pre>
 </div>
 </div>
@@ -1390,7 +1390,7 @@ public List&lt;String&gt; foo = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
 private String outputDirectory;</code></pre>
 </div>
 </div>
@@ -1399,7 +1399,7 @@ private String outputDirectory;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">java Main -d /tmp
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -d /tmp
 java Main --outputDirectory /tmp</code></pre>
 </div>
 </div>
@@ -1431,7 +1431,7 @@ java Main --outputDirectory /tmp</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-host", required = true)
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-host", required = true)
 private String host;</code></pre>
 </div>
 </div>
@@ -1448,7 +1448,7 @@ private String host;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">private Integer logLevel = 3;</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private Integer logLevel = 3;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1456,7 +1456,7 @@ private String host;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public interface IDefaultProvider {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IDefaultProvider {
   /**
    * @param optionName The name of the option as specified in the names() attribute
    * of the @Parameter option (e.g. "-file").
@@ -1475,7 +1475,7 @@ private String host;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
   @Override
   public String getDefaultValueFor(String optionName) {
     return "-debug".equals(optionName) ? "false" : "42";
@@ -1498,7 +1498,7 @@ jc.setDefaultProvider(DEFAULT_PROVIDER);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "--help", help = true)
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "--help", help = true)
 private boolean help;</code></pre>
 </div>
 </div>
@@ -1515,7 +1515,7 @@ private boolean help;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">git commit --amend -m "Bug fix"</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">git commit --amend -m "Bug fix"</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1523,7 +1523,7 @@ private boolean help;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameters(separators = "=", commandDescription = "Record changes to the repository")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameters(separators = "=", commandDescription = "Record changes to the repository")
 private class CommandCommit {
 
   @Parameter(description = "The list of files to commit")
@@ -1552,7 +1552,7 @@ public class CommandAdd {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">CommandMain cm = new CommandMain();
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">CommandMain cm = new CommandMain();
 JCommander jc = new JCommander(cm);
 
 CommandAdd add = new CommandAdd();
@@ -1587,7 +1587,7 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">Usage: &lt;main class&gt; [options]
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">Usage: &lt;main class&gt; [options]
   Options:
     -debug          Debug mode (default: false)
     -groups         Comma-separated list of group names to be run
@@ -1608,7 +1608,7 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode", hidden = true)
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode", hidden = true)
 private boolean debug = false;</code></pre>
 </div>
 </div>
@@ -1622,7 +1622,7 @@ private boolean debug = false;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Parameters(resourceBundle = "MessageBundle")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameters(resourceBundle = "MessageBundle")
 private class ArgsI18N2 {
   @Parameter(names = "-host", description = "Host", descriptionKey = "host")
   String hostName;
@@ -1634,7 +1634,7 @@ private class ArgsI18N2 {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">host: Hôte</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">host: Hôte</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1653,7 +1653,7 @@ private class ArgsI18N2 {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">class Delegate {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class Delegate {
   @Parameter(names = "-port")
   private int port;
 }
@@ -1672,7 +1672,7 @@ class MainParams {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">JCommander configuration in order to use the delegate:
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">JCommander configuration in order to use the delegate:
 MainParams p = new MainParams();
 new JCommander(p).parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);
@@ -1689,7 +1689,7 @@ Assert.assertEquals(p.delegate.port, 1234);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@DynamicParameter(names = "-D", description = "Dynamic parameters go here")
 private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 </div>
 </div>
@@ -1705,7 +1705,7 @@ private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 <h3 id="_kotlin">23.1. Kotlin</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin" data-lang="kotlin">class Args {
+<pre class="prettyprint highlight"><code class="language-kotlin" data-lang="kotlin">class Args {
     @Parameter
     var targets: List&lt;String&gt; = arrayListOf()
 
@@ -1726,7 +1726,7 @@ private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-scala" data-lang="scala">import java.io.File
+<pre class="prettyprint highlight"><code class="language-scala" data-lang="scala">import java.io.File
 import com.beust.jcommander.{JCommander, Parameter}
 import collection.JavaConversions._
 
@@ -1760,7 +1760,7 @@ object Main {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy" data-lang="groovy">import com.beust.jcommander.*
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">import com.beust.jcommander.*
 
 class Args {
   @Parameter(names = ["-f", "--file"], description = "File to load. Can be specified multiple times.")
@@ -1836,7 +1836,7 @@ new Args().with {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy" data-lang="groovy">compile "com.beust:jcommander:1.48"</code></pre>
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">compile "com.beust:jcommander:1.48"</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -1848,7 +1848,7 @@ new Args().with {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
   &lt;groupId&gt;com.beust&lt;/groupId&gt;
   &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
   &lt;version&gt;1.60&lt;/version&gt;
@@ -1860,11 +1860,11 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-01-06 12:35:39 PST
+Last updated 2017-01-06 12:39:25 PST
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
-<script>hljs.initHighlighting()</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>prettyPrint()</script>
 </body>
 </html>
