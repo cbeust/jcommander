@@ -1,0 +1,938 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>JCommander</title>
+
+<!--
+<link rel="stylesheet" href="testng.css" type="text/css" />
+-->
+
+      <link type="text/css" rel="stylesheet" href="http://beust.com/beust.css"  />
+      <link type="text/css" rel="stylesheet" href="http://jcommander.org/jcommander.css"  />
+      <script type="text/javascript" src="http://beust.com/prettify.js"></script>
+
+      <script type="text/javascript" src="http://beust.com/scripts/shCore.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushJava.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushXml.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushBash.js"></script>
+      <script type="text/javascript" src="http://beust.com/scripts/shBrushPlain.js"></script>
+      <link type="text/css" rel="stylesheet" href="http://beust.com/styles/shCore.css"/>
+      <link type="text/css" rel="stylesheet" href="http://beust.com/styles/shThemeCedric.css"/>
+      <script type="text/javascript" src="http://beust.com/toc.js"></script>
+      <script type="text/javascript">
+        SyntaxHighlighter.config.clipboardSwf = 'scripts/clipboard.swf';
+        SyntaxHighlighter.defaults['gutter'] = false;
+        SyntaxHighlighter.all();
+      </script>
+</head>
+
+<table width="100%">
+  <tr>
+    <td align="center">
+<h1>JCommander</h1>
+<h2>Because life is too short to parse command line parameters</h2>
+<h3>
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+  <input type="hidden" name="cmd" value="_donations">
+  <input type="hidden" name="business" value="cedric@beust.com">
+  <input type="hidden" name="lc" value="US">
+  <input type="hidden" name="item_name" value="Cedric Beust">
+  <input type="hidden" name="no_note" value="0">
+  <input type="hidden" name="currency_code" value="USD">
+  <input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
+  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+  <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+  </form>
+</h3>
+    </td>
+  </tr>
+  <tr>
+    <td align="right">
+      Created: July 13th, 2010
+    </td>
+  </tr>
+  <tr>
+    <td align="right">
+      Last updated: July 6th, 2015
+    </td>
+  </tr>
+  <tr><td align="right"><a href="mailto:cedric@beust.com">C&eacute;dric Beust</a></td></tr>
+</table>
+
+<h2>Table of contents</h2>
+<div id="table-of-contents">
+</div>
+
+
+
+<h2><a class="section" name="Overview">Overview</a></h2>
+
+JCommander is a very small Java framework that makes it trivial to parse command line parameters.
+<p>
+You annotate fields with descriptions of your options:
+
+<pre class="brush: java">
+import com.beust.jcommander.Parameter;
+
+public class JCommanderExample {
+  @Parameter
+  private List&lt;String&gt; parameters = new ArrayList&lt;&gt;();
+
+  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
+  private Integer verbose = 1;
+
+  @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
+  private String groups;
+
+  @Parameter(names = "-debug", description = "Debug mode")
+  private boolean debug = false;
+}
+</pre>
+
+and then you simply ask JCommander to parse:
+
+<pre class="brush: java">
+JCommanderExample jct = new JCommanderExample();
+String[] argv = { "-log", "2", "-groups", "unit" };
+new JCommander(jct, argv);
+
+Assert.assertEquals(jct.verbose.intValue(), 2);
+</pre>
+
+An example that mirrors more of what you might see in the "real world" might
+look like this:
+
+<pre class="brush: java">
+class Main {
+    @Parameter(names={"--length", "-l"})
+    int length;
+    @Parameter(names={"--pattern", "-p"})
+    int pattern;
+
+    public static void main(String ... args) {
+        Main main = new Main();
+        new JCommander(main, args);
+        main.run();
+    }
+
+    public void run() {
+        System.out.printf("%d %d", length, pattern);
+    }
+}
+</pre>
+
+If you were to run <code>java Main -l 512 --pattern 2</code>, this would
+output:
+
+<pre>512 2</pre>
+
+<h2><a class="section" name="Types_of_options">Types of options</a></h2>
+
+The fields representing your parameters can be of any type. Basic types (<tt>Integer</tt>, <tt>Boolean</tt/>., etc...) are supported by default and you can write type converters to support any other type (<tt>File</tt>, etc...).
+
+<h4>Boolean</h4>
+
+When a <tt>Parameter</tt> annotation is found on a field of type <tt>boolean</tt> or <tt>Boolean</tt>, JCommander interprets it as an option with an <em>arity</em> of 0:
+
+<pre class="brush: java">
+@Parameter(names = "-debug", description = "Debug mode")
+private boolean debug = false;
+</pre>
+
+Such a parameter does not require any additional parameter on the command line and if it's detected during parsing, the corresponding field will be set to <tt>true</tt>.
+
+<p>
+
+  If you want to define a boolean parameter that's <tt>true</tt> by default, you can declare it as having an arity of 1. Users will then have to specify the value they want explicitly:
+
+  <pre class="brush: java">
+    @Parameter(names = "-debug", description = "Debug mode", arity = 1)
+    private boolean debug = true;
+  </pre>
+
+  Invoke with either of:
+
+  <pre class="brush: plain">
+    program -debug true
+    program -debug false
+  </pre>
+
+<h4>String, Integer, Long</h4>
+
+When a <tt>Parameter</tt> annotation is found on a field of type <tt>String</tt>, <tt>Integer</tt>, <tt>int</tt>, <tt>Long</tt> or <tt>long</tt>, JCommander will parse the following parameter and it will attempt to cast it to the right type:
+
+<pre class="brush: java">
+@Parameter(names = "-log", description = "Level of verbosity")
+private Integer verbose = 1;
+</pre>
+
+<pre class="brush: plain">
+java Main -log 3
+</pre>
+
+will cause the field <tt>verbose</tt> to receive the value 3, however:
+
+<pre class="brush: plain">
+java Main -log test
+</pre>
+
+will cause an exception to be thrown.
+
+<h4>Lists</h4>
+
+When a <tt>Parameter</tt> annotation is found on a field of type <tt>List</tt>, JCommander will interpret it as an option that can occur multiple times:
+
+<pre class="brush: java">
+@Parameter(names = "-host", description = "The host")
+private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();
+</pre>
+
+will allow you to parse the following command line:
+
+<pre class="brush: plain">
+java Main -host host1 -verbose -host host2
+</pre>
+
+When JCommander is done parsing the line above, the field <tt>hosts</tt> will contain the strings "host1" and "host2".
+
+<h4>Password</h4>
+
+If one of your parameters is a password or some other value that you do not wish to appear in your history or in clear, you can declare it of type <tt>password</tt> and JCommander will then ask you to enter it in the console:
+
+<pre class="brush: java">
+public class ArgsPassword {
+  @Parameter(names = "-password", description = "Connection password", password = true)
+  private String password;
+}
+</pre>
+
+When you run your program, you will get the following prompt:
+
+<pre class="brush: plain">
+Value for -password (Connection password):
+</pre>
+
+You will need to type the value at this point before JCommander resumes.
+
+<h4>Echo Input</h4>
+
+In Java 6, by default, you will not be able to see what you type for passwords entered at the prompt (Java 5 and lower will always show the password).  However, you can override this by setting <tt>echoInput</tt> to "true" (default is "false" and this setting only has an effect when <tt>password</tt> is "true"):
+<pre class="brush: java">
+public class ArgsPassword {
+  @Parameter(names = "-password", description = "Connection password", password = true, echoInput = true)
+  private String password;
+}
+</pre>
+
+<h2><a class="section" name="Custom_types">Custom types</a></h2>
+
+<h3>By annotation</h3>
+
+By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types, such as files, host names, lists, etc... To achieve this, you can write a type converter by implementing the following interface:
+
+<pre class="brush: java">
+public interface IStringConverter&lt;T&gt; {
+  T convert(String value);
+}
+</pre>
+
+For example, here is a converter that turns a string into a <tt>File</tt>:
+
+<pre class="brush: java">
+public class FileConverter implements IStringConverter&lt;File&gt; {
+  @Override
+  public File convert(String value) {
+    return new File(value);
+  }
+}
+</pre>
+
+Then, all you need to do is declare your field with the correct type and specify the converter as an attribute:
+
+<pre class="brush: java">
+@Parameter(names = "-file", converter = FileConverter.class)
+File file;
+</pre>
+
+JCommander ships with a few common converters (e.g. one that turns a comma separated list into a <tt>List&lt;String&gt;)</tt>.
+
+<h3>By factory</h3>
+
+If the custom types you use appear multiple times in your application, having to specify the converter in each annotation can become tedious. To address this, you can use an <tt>IStringConverterFactory</tt>:
+
+<pre class="brush: java">
+public interface IStringConverterFactory {
+  &lt;T&gt; Class&lt;? extends IStringConverter&lt;T&gt;&gt; getConverter(Class&lt;T&gt; forType);
+}
+</pre>
+
+For example, suppose you need to parse a string representing a host and a port:
+
+<pre class="brush: plain">
+java App -target example.com:8080
+</pre>
+
+You define the holder class :
+
+<pre class="brush: java">
+public class HostPort {
+  private String host;
+  private Integer port;
+}
+</pre>
+
+and the string converter to create instances of this class:
+
+<pre class="brush: java">
+class HostPortConverter implements IStringConverter&lt;HostPort&gt; {
+  @Override
+  public HostPort convert(String value) {
+    HostPort result = new HostPort();
+    String[] s = value.split(":");
+    result.host = s[0];
+    result.port = Integer.parseInt(s[1]);
+
+    return result;
+  }
+}
+</pre>
+
+The factory is straightforward:
+
+<pre class="brush: java">
+public class Factory implements IStringConverterFactory {
+  public Class&lt;? extends IStringConverter&lt;?&gt;&gt; getConverter(Class forType) {
+    if (forType.equals(HostPort.class)) return HostPortConverter.class;
+    else return null;
+  }
+</pre>
+
+You can now use the type <tt>HostPort</tt> as a parameter without any <tt>converterClass</tt> attribute:
+
+<pre class="brush: java">
+public class ArgsConverterFactory {
+  @Parameter(names = "-hostport")
+  private HostPort hostPort;
+}
+</pre>
+
+
+All you need to do is add the factory to your JCommander object:
+
+<pre class="brush: java">
+  ArgsConverterFactory a = new ArgsConverterFactory();
+  JCommander jc = new JCommander(a);
+  jc.addConverterFactory(new Factory());
+  jc.parse("-hostport", "example.com:8080");
+
+  Assert.assertEquals(a.hostPort.host, "example.com");
+  Assert.assertEquals(a.hostPort.port.intValue(), 8080);
+</pre>
+
+
+Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
+
+
+<h3>By instance factory</h3>
+
+Since version 1.57, instance factories are supported:
+
+<pre class="brush: java">
+public interface IStringConverterInstanceFactory {
+    IStringConverter&lt;?&gt; getConverterInstance(Parameter parameter, Class&lt;?&gt; forType);
+}
+</pre>
+
+This allows to return converters using
+<a href="https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html">anonymous classes</a>,
+<a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">Java 8 lambda expressions</a>,
+among others.
+
+<h2><a class="section" name="Parameter_validation">Parameter validation</a></h2>
+
+Parameter validation can be performed in two different ways: at the individual parameter level or globally.
+
+<h3><a class="section" indent=".." id="individual_validation">Individual parameter validation</a></h3>
+You can ask JCommander to perform early validation on your parameters by providing a class that implements the following interface:
+
+<pre class="brush:java">
+public interface IParameterValidator {
+ /**
+   * Validate the parameter.
+   *
+   * @param name The name of the parameter (e.g. "-host").
+   * @param value The value of the parameter that we need to validate
+   *
+   * @throws ParameterException Thrown if the value of the parameter is invalid.
+   */
+  void validate(String name, String value) throws ParameterException;
+}
+
+</pre>
+
+Here is an example implementation that will make sure that the parameter is a positive integer:
+
+<pre class="brush:java">
+public class PositiveInteger implements IParameterValidator {
+ public void validate(String name, String value)
+      throws ParameterException {
+    int n = Integer.parseInt(value);
+    if (n < 0) {
+      throw new ParameterException("Parameter " + name + " should be positive (found " + value +")");
+    }
+  }
+}
+</pre>
+
+Specify the name of a class implementing this interface in the <tt>validateWith</tt> attribute of your <tt>@Parameter</tt> annotations:
+
+<pre class="brush:java">
+@Parameter(names = "-age", validateWith = PositiveInteger.class)
+private Integer age;
+</pre>
+
+Attempting to pass a negative integer to this option will cause a <tt>ParameterException</tt> to be thrown.
+
+
+<h3><a class="section" indent=".." id="global_validation">Global parameter validation</a></h3>
+
+After parsing your parameters with JCommander, you might want to perform additional validation
+across these parameters, such as making sure that two mutually exclusive parameters are not
+both specified. Because of all the potential combinations involved in such validation,
+JCommander does not provide any annotation-based solution to perform this validation because such
+an approach would necessarily be very limited by the very nature of Java annotations. Instead,
+you should simple perform this validation in Java on all the arguments that JCommander
+just parsed.
+
+
+<h2><a class="section" name="Main_parameter">Main parameter</a></h2>
+So far, all the <tt>@Parameter</tt> annotations we have seen had defined an attribute called <tt>names</tt>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <tt>List&lt;String&gt;</tt> and it will contain all the parameters that are not options:
+
+<pre class="brush: java">
+@Parameter(description = "Files")
+private List&lt;String&gt; files = new ArrayList&lt;&gt;();
+
+@Parameter(names = "-debug", description = "Debugging level")
+private Integer debug = 1;
+</pre>
+
+will allow you to parse:
+
+<pre class="brush: plain">
+java Main -debug file1 file2
+</pre>
+
+and the field <tt>files</tt> will receive the strings "file1" and "file2".
+
+<h2><a class="section" name="Private_parameters">Private parameters</a></h2>
+
+Parameters can be private:
+
+<pre class="brush: java">
+public class ArgsPrivate {
+  @Parameter(names = "-verbose")
+  private Integer verbose = 1;
+
+  public Integer getVerbose() {
+    return verbose;
+  }
+}
+</pre>
+
+<pre class="brush: java">
+ArgsPrivate args = new ArgsPrivate();
+new JCommander(args, "-verbose", "3");
+Assert.assertEquals(args.getVerbose().intValue(), 3);
+</pre>
+
+<h2><a class="section" name="Separators">Parameter separators</a></h2>
+
+By default, parameters are separated by spaces, but you can change this setting to allow different separators:
+
+<pre class="brush: plain">
+java Main -log:3
+</pre>
+
+or
+
+<pre class="brush: plain">
+java Main -level=42
+</pre>
+
+You define the separator with the <tt>@Parameters</tt> annotation:
+
+<pre class="brush: java">
+@Parameters(separators = "=")
+public class SeparatorEqual {
+  @Parameter(names = "-level")
+  private Integer level = 2;
+}
+</pre>
+
+
+
+
+
+<h2><a class="section" name="Multiple_descriptions">Multiple descriptions</a></h2>
+
+You can spread the description of your parameters on more than one
+class. For example, you can define the following two classes:
+
+<p>
+
+<h3 class="sourcetitle">ArgsMaster.java</h3>
+<pre class="brush: java">
+public class ArgsMaster {
+  @Parameter(names = "-master")
+  private String master;
+}
+</pre>
+
+<h3 class="sourcetitle">ArgsSlave.java</h3>
+<pre class="brush: java">
+public class ArgsSlave {
+  @Parameter(names = "-slave")
+  private String slave;
+}
+</pre>
+
+and pass these two objects to JCommander:
+
+<pre class="brush: java">
+ArgsMaster m = new ArgsMaster();
+ArgsSlave s = new ArgsSlave();
+String[] argv = { "-master", "master", "-slave", "slave" };
+new JCommander(new Object[] { m , s }, argv);
+
+Assert.assertEquals(m.master, "master");
+Assert.assertEquals(s.slave, "slave");
+</pre>
+
+
+<h2><a class="section" name="Syntax">@ syntax</a></h2>
+
+JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:
+
+<p>
+
+<div class="sourcetitle">/tmp/parameters</div>
+<pre class="brush: plain">
+-verbose
+file1
+file2
+file3
+</pre>
+<pre class="brush: plain">
+java Main @/tmp/parameters
+</pre>
+
+<p>The file is read using the default charset unless <code>JCommander#setAtFileCharset</code> had been called.</p>
+
+<p>Ths feature can be disabled by calling <code>JCommander#setExpandAtSign</code>.</p>
+
+<h2><a class="section" name="Arities">Arities (multiple values for parameters)</a></h2>
+
+<h3><a class="section" name="fixed-arities" indent="..">Fixed arities</a></h3>
+
+If some of your parameters require more than one value, such as the
+following example where two values are expected after <tt>-pairs</tt>:
+
+<pre class="brush: plain">
+java Main -pairs slave master foo.xml
+</pre>
+
+then you need to define your parameter with the <tt>arity</tt>
+attribute and make that parameter a <tt>List&lt;String&gt;</tt>:
+
+<pre class="brush: java">
+@Parameter(names = "-pairs", arity = 2, description = "Pairs")
+private List&lt;String&gt; pairs;
+</pre>
+
+You don't need to specify an arity for parameters of type
+<tt>boolean</tt> or <tt>Boolean</tt> (which have a default arity of 0)
+and of types <tt>String</tt>, <tt>Integer</tt>, <tt>int</tt>,
+<tt>Long</tt> and <tt>long</tt> (which have a default arity of 1).
+
+<p>
+Also, note that only <tt>List&lt;String&gt;</tt> is allowed for
+parameters that define an arity. You will have to convert these values
+yourself if the parameters you need are of type <tt>Integer</tt> or
+other (this limitation is due to Java's erasure).
+
+<h3><a class="section" name="variable-arities" indent="..">Variable arities</a></h3>
+
+You can specify that a parameter can receive an indefinite number of parameters, up to the next option. For example:
+
+<pre class="brush: java">
+program -foo a1 a2 a3 -bar
+program -foo a1 -bar
+</pre>
+
+Such a parameter must be of type <tt>List&lt;String&gt;</tt> and have the boolean <tt>variableArity</tt> set to <tt>true</tt>
+
+<pre class="brush: java">
+@Parameter(names = "-foo", variableArity = true)
+public List&lt;String&gt; foo = new ArrayList&lt;&gt;();
+</pre>
+
+<h2><a class="section" name="Multiple_option_names">Multiple option names</a></h2>
+
+You can specify more than one option name:
+
+<pre class="brush: java">
+
+  @Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
+  private String outputDirectory;
+
+</pre>
+
+will allow both following syntaxes:
+
+<pre class="brush: plain">
+java Main -d /tmp
+java Main --outputDirectory /tmp
+</pre>
+
+<h2><a class="section" name="Other option configurations">Other option configurations</a></h2>
+
+You can configure how options are looked up in a few different ways:
+
+<ul>
+  <li><tt>JCommander#setCaseSensitiveOptions(boolean)</tt>: specify whether options are case sensitive. If you call this method with <tt>false</tt>, then <tt>"-param"</tt> and
+    <tt>"-PARAM"</tt> are considered equal.
+  </li>
+  <li><tt>JCommander#setAllowAbbreviatedOptions(boolean)</tt>: specify whether users can
+    pass abbreviated options. If you call this method with <tt>true</tt> then users
+    can pass <tt>"-par"</tt> to specify an option called <tt>-param</tt>. JCommander will
+    throw a <tt>ParameterException</tt> if the abbreviated name is ambiguous.
+  </li>
+</ul>
+
+<h2><a class="section" name="Required_and_optional">Required and optional parameters</a></h2>
+
+If some of your parameters are mandatory, you can use the
+<tt>required</tt> attribute (which default to <tt>false</tt>):
+
+<pre class="brush: java">
+
+  @Parameter(names = "-host", required = true)
+  private String host;
+
+</pre>
+
+If this parameter is not specified, JCommander will throw an exception
+telling you which options are missing.
+
+<h2><a class="section" name="Default_values">Default values</a></h2>
+
+The most common way to specify a default value for your parameters is to initialize the field at declaration time:
+
+<pre class="brush: java">
+private Integer logLevel = 3;
+</pre>
+
+For more complicated cases, you might want to be able to reuse identical default values across several main classes or be able to specify these default values in a centralized location such as a .properties or an XML fie. In this case, you can use an <tt>IDefaultProvider</tt>
+
+<pre class="brush: java">
+public interface IDefaultProvider {
+  /**
+   * @param optionName The name of the option as specified in the names() attribute
+   * of the @Parameter option (e.g. "-file").
+   * 
+   * @return the default value for this option.
+   */
+  String getDefaultValueFor(String optionName);
+}
+</pre>
+
+By passing an implementation of this interface to your <tt>JCommander</tt> object, you can now control which default value will be used for your options. Note that the value returned by this method will then be passed to a string converter, if any is applicable, thereby allowing you to specify default values for any types you need.
+
+<p>
+
+For example, here is a default provider that will assign a default value of 42 for all your parameters except "-debug":
+
+<pre class="brush: java">
+private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
+  @Override
+  public String getDefaultValueFor(String optionName) {
+    return "-debug".equals(optionName) ? "false" : "42";
+  }
+};
+
+// ...
+
+JCommander jc = new JCommander(new Args());
+jc.setDefaultProvider(DEFAULT_PROVIDER);
+</pre>
+
+<h2><a class="section" name="Help_parameter">Help parameter</a></h2>
+
+If one of your parameters is used to display some help or usage, you need use the <tt>help</tt> attribute:
+
+<pre class="brush: java">
+  @Parameter(names = "--help", help = true)
+  private boolean help;
+</pre>
+
+If you omit this boolean, JCommander will instead issue an error message when it tries to validate your command and it finds that you didn't specify some of the required parameters.
+
+<h2><a class="section" name="Complex">More complex syntaxes (commands)</a></h2>
+
+Complex tools such as <tt>git</tt> or <tt>svn</tt> understand a whole set of commands, each of which with their own specific syntax:
+
+<pre class="brush: plain">
+  git commit --amend -m "Bug fix"
+</pre>
+
+Words such as "commit" above are called "commands" in JCommander, and you can specify them by creating one arg object per command:
+
+<pre class="brush: java">
+@Parameters(separators = "=", commandDescription = "Record changes to the repository")
+private class CommandCommit {
+
+  @Parameter(description = "The list of files to commit")
+  private List&lt;String&gt; files;
+
+  @Parameter(names = "--amend", description = "Amend")
+  private Boolean amend = false;
+
+  @Parameter(names = "--author")
+  private String author;
+}
+</pre>
+
+<pre class="brush: java">
+@Parameters(commandDescription = "Add file contents to the index")
+public class CommandAdd {
+
+  @Parameter(description = "File patterns to add to the index")
+  private List&lt;String&gt; patterns;
+
+  @Parameter(names = "-i")
+  private Boolean interactive = false;
+}
+</pre>
+
+Then you register these commands with your JCommander object. After the parsing phase, you call <tt>getParsedCommand()</tt> on your JCommander object, and based on the command that is returned, you know which arg object to inspect (you can still use a main arg object if you want to support options before the first command appears on the command line):
+
+<pre class="brush: java">
+CommandMain cm = new CommandMain();
+JCommander jc = new JCommander(cm);
+
+CommandAdd add = new CommandAdd();
+jc.addCommand("add", add);
+CommandCommit commit = new CommandCommit();
+jc.addCommand("commit", commit);
+
+jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
+
+Assert.assertTrue(cm.verbose);
+Assert.assertEquals(jc.getParsedCommand(), "commit");
+Assert.assertTrue(commit.amend);
+Assert.assertEquals(commit.author, "cbeust");
+Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+</pre>
+
+<h2><a class="section" name="Exceptions">Exception</a></h2>
+
+Whenever JCommander detects an error, it will throw a
+<tt>ParameterException</tt>. Note that this is a Runtime Exception,
+since your application is probably not initialized correctly at this
+point.
+
+
+<h2><a class="section" name="Usage">Usage</a></h2>
+
+You can invoke <tt>usage()</tt> on the <tt>JCommander</tt> instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
+
+<pre class="brush: plain">
+Usage: &lt;main class&gt; [options] 
+  Options:
+    -debug          Debug mode (default: false)
+    -groups         Comma-separated list of group names to be run
+  * -log, -verbose  Level of verbosity (default: 1)
+    -long           A long number (default: 0)
+</pre>
+
+You can customize the name of your program by calling <tt>setProgramName()</tt> on your <tt>JCommander</tt> object.
+
+Options preceded by an asterisk are required.
+
+<h2><a class="section" name="Hiding">Hiding parameters</a></h2>
+
+If you don't want certain parameters to appear in the usage, you can mark them as "hidden":
+
+<pre class="brush: java">
+@Parameter(names = "-debug", description = "Debug mode", hidden = true)
+private boolean debug = false;
+</pre>
+
+<h2><a class="section" name="Internationalization">Internationalization</a></h2>
+
+You can internationalize the descriptions of your parameters.
+
+<p>
+
+First you use the <tt>@Parameters</tt> annotation at the top of your class to define the name of your message bundle, and then you use the <tt>descriptionKey</tt> attribute instead of <tt>description</tt> on all the <tt>@Parameters</tt> that require translations. This <tt>descriptionKey</tt> is the key to the string into your message bundle:
+
+<h3 class="sourcetitle">I18N.java</h3>
+<pre class="brush:java">
+@Parameters(resourceBundle = "MessageBundle")
+private class ArgsI18N2 {
+  @Parameter(names = "-host", description = "Host", descriptionKey = "host")
+  String hostName;
+}
+</pre>
+
+Your bundle needs to define this key:
+
+<br>
+
+<h3 class="sourcetitle">MessageBundle_fr_FR.properties</h3>
+<pre class="brush: plain">
+host: H&ocirc;te
+</pre>
+
+JCommander will then use the default locale to resolve your descriptions.
+
+<h2><a class="section" name="Parameter_delegates">Parameter delegates</a></h2>
+
+If you are writing many different tools in the same project, you will probably find that most of these tools can share configurations. While you can use inheritance with your objects to avoid repeating this code, the restriction to single inheritance of implementation might limit your flexibility. To address this problem, JCommander supports parameter delegates.
+
+<p>
+
+When JCommander encounters an object annotated with <tt>@ParameterDelegate</tt> in one of your objects, it acts as if this object had been added as a description object itself:
+
+<pre class="brush: java">
+class Delegate {
+  @Parameter(names = "-port")
+  private int port;
+}
+
+class MainParams {
+  @Parameter(names = "-v")
+  private boolean verbose;
+
+  @ParametersDelegate
+  private Delegate delegate = new Delegate();
+}
+</pre>
+
+The example above specifies a delegate parameter <tt>Delegate</tt> which is then referenced in <tt>MainParams</tt>. You only need to add a <tt>MainParams</tt> object to your JCommander configuration in order to use the delegate:
+
+<pre class="brush: java">
+MainParams p = new MainParams();
+new JCommander(p).parse("-v", "-port", "1234");
+Assert.assertTrue(p.isVerbose);
+Assert.assertEquals(p.delegate.port, 1234);
+</pre>
+
+<h2><a class="section" name="DynamicParameters">Dynamic parameters</a></h2>
+
+JCommander allows you to specify parameters that are not known at compile time, such as <tt>"-Da=b -Dc=d"</tt>. Such parameters are specified with the <tt><a href="apidocs/com/beust/jcommander/DynamicParameter.html">@DynamicParameter</a></tt> annotation and must be of type <tt>Map&lt;String, String&gt;</tt>. Dynamic parameters are allowed to appear multiple times on the command line:
+
+<pre class="brush: java">
+@DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();
+</pre>
+
+You can specify a different assignment string than <tt>=</tt> by using the attribute <tt>assignment</tt>.
+
+<h2><a class="section" name="Scala">JCommander in Scala</a></h2>
+
+Here is a quick example of how to use JCommander in Scala (courtesy of Patrick Linskey):
+
+<pre class="brush: java">
+import java.io.File
+import com.beust.jcommander.{JCommander, Parameter}
+import collection.JavaConversions._
+
+object Main {
+  object Args {
+    // Declared as var because JCommander assigns a new collection declared
+    // as java.util.List because that's what JCommander will replace it with.
+    // It'd be nice if JCommander would just use the provided List so this
+    // could be a val and a Scala LinkedList.
+    @Parameter(
+      names = Array("-f", "--file"),
+      description = "File to load. Can be specified multiple times.")
+    var file: java.util.List[String] = null
+  }
+
+  def main(args: Array[String]): Unit = {
+    new JCommander(Args, args.toArray: _*)
+    for (filename <- Args.file) {
+      val f = new File(filename)
+      printf("file: %s\n", f.getName)
+    }
+  }
+}
+</pre>
+
+<h2><a class="section" name="Groovy">JCommander in Groovy</a></h2>
+
+Here is a quick example of how to use JCommander in Groovy (courtesy of Paul King):
+
+
+<pre class="brush: java">
+import com.beust.jcommander.*
+
+class Args {
+  @Parameter(names = ["-f", "--file"], description = "File to load. Can be specified multiple times.")
+  List&lt;String&gt; file
+}
+
+new Args().with {
+  new JCommander(it, args)
+  file.each { println "file: ${new File(it).name}" }
+}
+</pre>
+
+<h2><a class="section" name="More_examples">More examples</a></h2>
+
+TestNG uses JCommander to parse its own command line, here is <a href="http://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">its definition file</a>.
+
+<h2><a class="section" name="Mailing_list">Mailing list</a></h2>
+
+Join the <a href="http://groups.google.com/group/jcommander">JCommander Google group</a> if you are interested in discussions about JCommander.
+
+<h2><a class="section" name="Javadocs">Javadocs</a></h2>
+
+The Javadocs for JCommander can be found <a href="apidocs/">here</a>.
+
+<h2><a class="section" name="License">License</a></h2>
+
+JCommander is released under the <a
+href="https://github.com/cbeust/jcommander/blob/master/license.txt">Apache 2.0</a> license.
+
+<h2><a class="section" name="Download">Download</a></h2>
+
+You can download JCommander from the following locations:
+
+<ul>
+  <li><a href="http://github.com/cbeust/jcommander">Source on github</a></li>
+  <li>Gradle
+  
+  <pre class="brush: plain">
+    compile "com.beust:jcommander:1.48"
+  </pre>
+
+  <li>Maven:
+
+  <pre class="brush: xml">
+
+<dependency>
+  &lt;groupId&gt;com.beust&lt;/groupId&gt;
+  &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
+  &lt;version&gt;1.48&lt;/version&gt;
+</dependency>
+  </pre>
+
+</ul>
+
+</body>
+
+<script type="text/javascript" src="http://beust.com/toc.js"></script>
+<script type="text/javascript"> generateToc(); </script>
+
+</html>
