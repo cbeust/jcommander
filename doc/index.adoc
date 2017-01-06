@@ -84,11 +84,12 @@ class Main {
 }
 ----
 
-If you were to run java Main -l 512 --pattern 2, this would output:
+[source,shell]
+----
+$ java Main -l 512 --pattern 2
+   512 2
+----
 
-```
-512 2
-```
 
 == Types of options
 
