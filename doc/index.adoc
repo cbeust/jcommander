@@ -467,15 +467,19 @@ Assert.assertEquals(s.slave, "slave");
 
 JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:
 
+[[app-listing]]
 [source,bash]
+./tmp/parameters
 ----
-/tmp/parameters
 -verbose
 file1
 file2
 file3
-view sourceprint?
-java Main @/tmp/parameters
+----
+
+[source,bash]
+----
+$ java Main @/tmp/parameters
 ----
 
 == Arities (multiple values for parameters)
