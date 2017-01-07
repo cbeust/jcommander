@@ -790,38 +790,6 @@ class Args {
 }
 ----
 
-=== Scala
-
-Courtesy of Patrick Linskey:
-
-[source,scala]
-----
-import java.io.File
-import com.beust.jcommander.{JCommander, Parameter}
-import collection.JavaConversions._
- 
-object Main {
-  object Args {
-    // Declared as var because JCommander assigns a new collection declared
-    // as java.util.List because that's what JCommander will replace it with.
-    // It'd be nice if JCommander would just use the provided List so this
-    // could be a val and a Scala LinkedList.
-    @Parameter(
-      names = Array("-f", "--file"),
-      description = "File to load. Can be specified multiple times.")
-    var file: java.util.List[String] = null
-  }
- 
-  def main(args: Array[String]): Unit = {
-    new JCommander(Args, args.toArray: _*)
-    for (filename <- Args.file) {
-      val f = new File(filename)
-      printf("file: %s\n", f.getName)
-    }
-  }
-}
-----
-
 === Groovy
 
 Courtesy of Paul King:
