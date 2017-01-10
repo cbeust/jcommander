@@ -269,6 +269,17 @@ public class JCommanderTest {
     i18n2(new ArgsI18N2New());
   }
 
+  public void i18MissingKeyForCommand() {
+    ResourceBundle bundle = ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
+    JCommander jc = new JCommander(new ArgsHelp(), bundle);
+    jc.addCommand(new ArgsLongCommandDescription());
+    StringBuilder sb = new StringBuilder();
+    jc.usage(sb);
+    jc.usage();
+    String usage = sb.toString();
+    Assert.assertTrue(usage.contains("text"));
+  }
+
   public void noParseConstructor() {
     JCommander jCommander = new JCommander(new ArgsMainParameter1());
     jCommander.usage(new StringBuilder());
