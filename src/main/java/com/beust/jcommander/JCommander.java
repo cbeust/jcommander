@@ -944,7 +944,10 @@ public class JCommander {
             }
 
             if (bundle != null) {
-                result = getI18nString(bundle, p.commandDescriptionKey(), p.commandDescription());
+                String descriptionKey = p.commandDescriptionKey();
+                if (!"".equals(descriptionKey)) {
+                    result = getI18nString(bundle, descriptionKey, p.commandDescription());
+                }
             }
         }
 
