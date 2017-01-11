@@ -37,3 +37,8 @@ task sourceJar(type: Jar) {
 artifacts {
     sourceJar
 }
+
+test {
+    // enable TestNG support (default is JUnit)
+    useTestNG()
+}
