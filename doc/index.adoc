@@ -62,7 +62,7 @@ new JCommander(jct, argv);
 Assert.assertEquals(jct.verbose.intValue(), 2);
 ----
 
-An example that mirrors more of what you might see in the "real world" might look like this:
+Here is another example:
 
 [source,java]
 ----

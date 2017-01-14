@@ -770,8 +770,7 @@ pre.pygments.highlight { background-color: rgba(16, 195, 196, 0.05); }
 <li><a href="#_jcommander_in_other_languages">23. JCommander in other languages</a>
 <ul class="sectlevel2">
 <li><a href="#_kotlin">23.1. Kotlin</a></li>
-<li><a href="#_scala">23.2. Scala</a></li>
-<li><a href="#_groovy">23.3. Groovy</a></li>
+<li><a href="#_groovy">23.2. Groovy</a></li>
 </ul>
 </li>
 <li><a href="#_more_examples">24. More examples</a></li>
@@ -844,7 +843,7 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>An example that mirrors more of what you might see in the "real world" might look like this:</p>
+<p>Here is another example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1727,41 +1726,7 @@ private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_scala">23.2. Scala</h3>
-<div class="paragraph">
-<p>Courtesy of Patrick Linskey:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-scala" data-lang="scala">import java.io.File
-import com.beust.jcommander.{JCommander, Parameter}
-import collection.JavaConversions._
-
-object Main {
-  object Args {
-    // Declared as var because JCommander assigns a new collection declared
-    // as java.util.List because that's what JCommander will replace it with.
-    // It'd be nice if JCommander would just use the provided List so this
-    // could be a val and a Scala LinkedList.
-    @Parameter(
-      names = Array("-f", "--file"),
-      description = "File to load. Can be specified multiple times.")
-    var file: java.util.List[String] = null
-  }
-
-  def main(args: Array[String]): Unit = {
-    new JCommander(Args, args.toArray: _*)
-    for (filename &lt;- Args.file) {
-      val f = new File(filename)
-      printf("file: %s\n", f.getName)
-    }
-  }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_groovy">23.3. Groovy</h3>
+<h3 id="_groovy">23.2. Groovy</h3>
 <div class="paragraph">
 <p>Courtesy of Paul King:</p>
 </div>
@@ -1867,7 +1832,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-01-06 13:02:06 PST
+Last updated 2017-01-13 09:33:54 PST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

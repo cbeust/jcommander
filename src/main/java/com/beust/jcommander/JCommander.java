@@ -197,8 +197,7 @@ public class JCommander {
      * @param object The arg object expected to contain {@link Parameter} annotations.
      */
     public JCommander(Object object) {
-        this();
-        addObject(object);
+        this(object, (ResourceBundle) null);
     }
 
     /**
@@ -206,8 +205,7 @@ public class JCommander {
      * @param bundle The bundle to use for the descriptions. Can be null.
      */
     public JCommander(Object object, @Nullable ResourceBundle bundle) {
-        this(object);
-        setDescriptionsBundle(bundle);
+        this(object, bundle, (String[]) null);
     }
 
     /**
@@ -215,9 +213,16 @@ public class JCommander {
      * @param bundle The bundle to use for the descriptions. Can be null.
      * @param args The arguments to parse (optional).
      */
-    public JCommander(Object object, ResourceBundle bundle, String... args) {
-        this(object, bundle);
-        parse(args);
+    public JCommander(Object object, @Nullable  ResourceBundle bundle, String... args) {
+        this();
+        addObject(object);
+        if (bundle != null) {
+            setDescriptionsBundle(bundle);
+        }
+        createDescriptions();
+        if (args != null) {
+            parse(args);
+        }
     }
 
     /**
