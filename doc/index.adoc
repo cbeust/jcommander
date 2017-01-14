@@ -240,16 +240,7 @@ JCommander ships with a few common converters (for more info please see the impl
 
 ===== Note
 
-If a converter is used for a List field, JCommander tries to use this converter on the value provided.
-
-For example, suppose you provide a string representing a list of files:
-
-[source,bash]
-----
-$ java App -files file1,file2,file3
-----
-
-And you declared your field as List and specified the converter as an attribute:
+If a converter is used for a `List` field:
 
 [source,java]
 ----
@@ -257,9 +248,16 @@ And you declared your field as List and specified the converter as an attribute:
 List<File> files;
 ----
 
+And the application is called as follows:
+
+[source,bash]
+----
+$ java App -files file1,file2,file3
+----
+
 JCommander will split the string `file1,file2,file3` into `file1`, `file2`, `file3` and feed it one by one to the converter.
 
-For an alternative solution to parse a list of values see <<list-value>>.
+For an alternative solution to parse a list of values, see <<list-value>>.
 
 ==== By factory
 
@@ -350,7 +348,7 @@ Use the `listConverter=` attribute of the `@Parameter` annotation and assign a c
 
 ==== By annotation
 
-If your application needs a list of complex types write a list type converter by implementing the same interface as before:
+If your application needs a list of complex types, write a list type converter by implementing the same interface as before:
 
 [source,java]
 ----
@@ -400,11 +398,11 @@ JCommander ships with a default converter for `String` values.
 
 === Splitting
 
-Use the `splitter=` attribute of the `@Parameter` annotation and assign a custom `IParameterSplitter` implementation to handle how parameters are split in sub-parts
+Use the `splitter=` attribute of the `@Parameter` annotation and assign a custom `IParameterSplitter` implementation to handle how parameters are split in sub-parts.
 
 ==== By annotation
 
-As already mentioned in <<single-value>>, by default, JCommander tries to split parameters for List field types on comma.
+By default, JCommander tries to split parameters for `List` field types on commas.
 
 To split parameters on other characters, you can write a custom splitter by implementing the following interface:
 
