@@ -2,6 +2,9 @@
 
 ### Current
 
+2017-01-14
+* Added: Documentation for `listConverter` and `splitter`, #253, (@jeremysolarz)
+
 2017-01-13
 * Fixed: `JCommander#getParameters` returning nothing, #315, (@simon04)
 
