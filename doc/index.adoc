@@ -201,7 +201,7 @@ To bind parameters to custom types or change the way how JCommander splits param
 interfaces `IStringConverter` and `IParameterSplitter`.
 
 [[single-value]]
-=== Single value
+=== Custom types - Single value
 
 Use either the `converter=` attribute of the `@Parameter` or implement `IStringConverterFactory`.
 
@@ -344,9 +344,9 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);
 Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
 
 [[list-value]]
-=== List value
+=== Custom types - List value
 
-Use the `listConverter=` attribute of the `@Parameter` annotation and assign a custom `IStringConverter` implementation to convert a `String` into a `List` of values
+Use the `listConverter=` attribute of the `@Parameter` annotation and assign a custom `IStringConverter` implementation to convert a `String` into a `List` of values.
 
 ==== By annotation
 
