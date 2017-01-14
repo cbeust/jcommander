@@ -386,6 +386,15 @@ Then, all you need to do is declare your field with the correct type and specify
 List<File> file;
 ----
 
+Now if you call for application as in the following example:
+
+[source,bash]
+----
+$ java App -files file1,file2,file3
+----
+
+The parameter `file1,file2,file3` is given to the `listConverter` and will the properly processed.
+
 JCommander ships with a default converter for `String` values.
 
 
