@@ -1,14 +1,11 @@
 ## Changelog
 
 ### Current
-
 2017-01-14
+
 * Added: Documentation for `listConverter` and `splitter`, #253, (@jeremysolarz)
-
-2017-01-13
+* Fixed: Return right parameter name in exception, #227, (@jeremysolarz)
 * Fixed: `JCommander#getParameters` returning nothing, #315, (@simon04)
-
-2016-12-27
 * Fixed: Allow empty string (e.g. `java -jar jcommander-program.jar param1 ""`) as part of main parameter, #306 (@jeremysolarz)
 * Fixed: Default value for `@Parameter(help=true)` parameter is not displayed in output of `JCommander.usage()`, #305 (@jeremysolarz) 
 
