@@ -13,7 +13,8 @@ public interface IStringConverterInstanceFactory {
      * Obtain a converter instance for parsing {@code parameter} as type {@code forType}
      * @param parameter the parameter to parse
      * @param forType the type class
+     * @param optionName the name of the option used on the command line
      * @return a converter instance
      */
-    IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType);
+    IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType, String optionName);
 }
