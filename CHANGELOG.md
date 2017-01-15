@@ -2,6 +2,9 @@
 
 ### Current
 
+2017-01-14
+* Fixed: Return right parameter name in exception, #227, (@jeremysolarz)
+
 2017-01-13
 * Fixed: `JCommander#getParameters` returning nothing, #315, (@simon04)
 
