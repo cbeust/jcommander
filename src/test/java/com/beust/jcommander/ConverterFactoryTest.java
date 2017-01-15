@@ -92,7 +92,7 @@ public class ConverterFactoryTest {
   public void mainWithInstanceFactory() {
     mainWithHostPortParameters(null, new IStringConverterInstanceFactory() {
       @Override
-      public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType) {
+      public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType, String optionName) {
         return HostPort.class.equals(forType) ? new HostPortConverter() : null;
       }
     }, new ArgsMainParameter1());

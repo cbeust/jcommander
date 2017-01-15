@@ -961,6 +961,15 @@ public class JCommanderTest {
     new JCommander(new A()).parse("");
   }
 
+  @Test(expectedExceptions = ParameterException.class, expectedExceptionsMessageRegExp = "\"--b\": couldn't convert \"ThisIsATest\" to an integer")
+  public void multipleParameterNames() {
+    class MultipleParameterNames {
+      @Parameter(names = {"-b", "--b"})
+      public Integer b;
+    }
+    new JCommander(new MultipleParameterNames()).parse("--b", "ThisIsATest");
+  }
+
   public void unknownOptionWithDifferentPrefix() {
     @Parameters(optionPrefixes = "/")
     class SlashSeparator {
