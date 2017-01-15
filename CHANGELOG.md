@@ -8,8 +8,6 @@
 * Fixed: `JCommander#getParameters` returning nothing, #315, (@simon04)
 * Fixed: Allow empty string (e.g. `java -jar jcommander-program.jar param1 ""`) as part of main parameter, #306 (@jeremysolarz)
 * Fixed: Default value for `@Parameter(help=true)` parameter is not displayed in output of `JCommander.usage()`, #305 (@jeremysolarz) 
-
-2016-12-16
 * Fixed: When providing two names in `@Parameter` always first name is given to `IValueValidator`, #309 (@jeremysolarz) 
 
 ### 1.58
