@@ -711,7 +711,7 @@ public class JCommander {
                         ParameterizedType p = (ParameterizedType) m_mainParameter.getGenericType();
                         Type cls = p.getActualTypeArguments()[0];
                         if (cls instanceof Class) {
-                            convertedValue = convertValue(m_mainParameter, (Class) cls, value);
+                            convertedValue = convertValue(m_mainParameter, (Class) cls, null, value);
                         }
                     }
 
@@ -1170,10 +1170,12 @@ public class JCommander {
         addConverterInstanceFactory(new IStringConverterInstanceFactory() {
             @SuppressWarnings("unchecked")
             @Override
-            public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType) {
+            public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType, String optionName) {
                 final Class<? extends IStringConverter<?>> converterClass = converterFactory.getConverter(forType);
                 try {
-                    final String optionName = parameter.names().length > 0 ? parameter.names()[0] : "[Main class]";
+                    if(optionName == null) {
+                        optionName = parameter.names().length > 0 ? parameter.names()[0] : "[Main class]";
+                    }
                     return converterClass != null ? instantiateConverter(optionName, converterClass) : null;
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     throw new ParameterException(e);
@@ -1190,9 +1192,9 @@ public class JCommander {
         options.m_converterInstanceFactories.add(0, converterInstanceFactory);
     }
 
-    private IStringConverter<?> findConverterInstance(Parameter parameter, Class<?> forType) {
+    private IStringConverter<?> findConverterInstance(Parameter parameter, Class<?> forType, String optionName) {
         for (IStringConverterInstanceFactory f : options.m_converterInstanceFactories) {
-            IStringConverter<?> result = f.getConverterInstance(parameter, forType);
+            IStringConverter<?> result = f.getConverterInstance(parameter, forType, optionName);
             if (result != null) return result;
         }
 
@@ -1201,15 +1203,18 @@ public class JCommander {
 
     /**
      * @param type The type of the actual parameter
+     * @param optionName
      * @param value The value to convert
      */
-    public Object convertValue(final Parameterized parameterized, Class type, String value) {
+    public Object convertValue(final Parameterized parameterized, Class type, String optionName, String value) {
         final Parameter annotation = parameterized.getParameter();
 
         // Do nothing if it's a @DynamicParameter
         if (annotation == null) return value;
 
-        final String optionName = annotation.names().length > 0 ? annotation.names()[0] : "[Main class]";
+        if(optionName == null) {
+            optionName = annotation.names().length > 0 ? annotation.names()[0] : "[Main class]";
+        }
 
         IStringConverter<?> converter = null;
         if (type.isAssignableFrom(List.class)) {
@@ -1223,7 +1228,7 @@ public class JCommander {
                 @Override
                 public Object convert(String value) {
                     final Type genericType = parameterized.findFieldGenericType();
-                    return convertValue(parameterized, genericType instanceof Class ? (Class) genericType : String.class, value);
+                    return convertValue(parameterized, genericType instanceof Class ? (Class) genericType : String.class, null, value);
                 }
             });
         }
@@ -1232,7 +1237,7 @@ public class JCommander {
             converter = tryInstantiateConverter(optionName, annotation.converter());
         }
         if (converter == null) {
-            converter = findConverterInstance(annotation, type);
+            converter = findConverterInstance(annotation, type, optionName);
         }
         if (converter == null && type.isEnum()) {
             converter = new EnumConverter(optionName, type);
