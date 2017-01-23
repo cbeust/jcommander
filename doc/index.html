@@ -1051,18 +1051,7 @@ File file;</code></pre>
 <div class="sect4">
 <h5 id="_note">Note</h5>
 <div class="paragraph">
-<p>If a converter is used for a List field, JCommander tries to use this converter on the value provided.</p>
-</div>
-<div class="paragraph">
-<p>For example, suppose you provide a string representing a list of files:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java App -files file1,file2,file3</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And you declared your field as List and specified the converter as an attribute:</p>
+<p>If a converter is used for a <code>List</code> field:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1071,10 +1060,18 @@ List&lt;File&gt; files;</code></pre>
 </div>
 </div>
 <div class="paragraph">
+<p>And the application is called as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java App -files file1,file2,file3</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>JCommander will split the string <code>file1,file2,file3</code> into <code>file1</code>, <code>file2</code>, <code>file3</code> and feed it one by one to the converter.</p>
 </div>
 <div class="paragraph">
-<p>For an alternative solution to parse a list of values see <a href="#list-value">Custom types - List value</a>.</p>
+<p>For an alternative solution to parse a list of values, see <a href="#list-value">Custom types - List value</a>.</p>
 </div>
 </div>
 </div>
@@ -1178,7 +1175,7 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 <div class="sect3">
 <h4 id="_by_annotation_2">3.2.1. By annotation</h4>
 <div class="paragraph">
-<p>If your application needs a list of complex types write a list type converter by implementing the same interface as before:</p>
+<p>If your application needs a list of complex types, write a list type converter by implementing the same interface as before:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1236,12 +1233,12 @@ List&lt;File&gt; file;</code></pre>
 <div class="sect2">
 <h3 id="_splitting">3.3. Splitting</h3>
 <div class="paragraph">
-<p>Use the <code>splitter=</code> attribute of the <code>@Parameter</code> annotation and assign a custom <code>IParameterSplitter</code> implementation to handle how parameters are split in sub-parts</p>
+<p>Use the <code>splitter=</code> attribute of the <code>@Parameter</code> annotation and assign a custom <code>IParameterSplitter</code> implementation to handle how parameters are split in sub-parts.</p>
 </div>
 <div class="sect3">
 <h4 id="_by_annotation_3">3.3.1. By annotation</h4>
 <div class="paragraph">
-<p>As already mentioned in <a href="#single-value">Custom types - Single value</a>, by default, JCommander tries to split parameters for List field types on comma.</p>
+<p>By default, JCommander tries to split parameters for <code>List</code> field types on commas.</p>
 </div>
 <div class="paragraph">
 <p>To split parameters on other characters, you can write a custom splitter by implementing the following interface:</p>
@@ -1981,7 +1978,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-01-14 22:28:10 CET
+Last updated 2017-01-22 18:55:26 Pacific Standard Time
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
