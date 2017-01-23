@@ -732,10 +732,11 @@ pre.pygments.highlight { background-color: rgba(16, 195, 196, 0.05); }
 <li><a href="#_echo_input">2.4. Echo Input</a></li>
 </ul>
 </li>
-<li><a href="#_custom_types">3. Custom types</a>
+<li><a href="#_custom_types_converters_and_splitters">3. Custom types (converters and splitters)</a>
 <ul class="sectlevel2">
-<li><a href="#_by_annotation">3.1. By annotation</a></li>
-<li><a href="#_by_factory">3.2. By factory</a></li>
+<li><a href="#single-value">3.1. Custom types - Single value</a></li>
+<li><a href="#list-value">3.2. Custom types - List value</a></li>
+<li><a href="#_splitting">3.3. Splitting</a></li>
 </ul>
 </li>
 <li><a href="#_parameter_validation">4. Parameter validation</a>
@@ -999,12 +1000,21 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_custom_types">3. Custom types</h2>
+<h2 id="_custom_types_converters_and_splitters">3. Custom types (converters and splitters)</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_by_annotation">3.1. By annotation</h3>
 <div class="paragraph">
-<p>By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types, such as files, host names, lists, etc&#8230;&#8203; To achieve this, you can write a type converter by implementing the following interface:</p>
+<p>To bind parameters to custom types or change the way how JCommander splits parameters (default is to split via comma) JCommander provides two
+interfaces <code>IStringConverter</code> and <code>IParameterSplitter</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="single-value">3.1. Custom types - Single value</h3>
+<div class="paragraph">
+<p>Use either the <code>converter=</code> attribute of the <code>@Parameter</code> or implement <code>IStringConverterFactory</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="_by_annotation">3.1.1. By annotation</h4>
+<div class="paragraph">
+<p>By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types (such as files, host names, lists, etc.). To achieve this, you can write a type converter by implementing the following interface:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1036,11 +1046,40 @@ File file;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>JCommander ships with a few common converters (e.g. one that turns a comma separated list into a List&lt;String&gt;).</p>
+<p>JCommander ships with a few common converters (for more info please see the implementations of <code>IStringConverter</code>).</p>
+</div>
+<div class="sect4">
+<h5 id="_note">Note</h5>
+<div class="paragraph">
+<p>If a converter is used for a List field, JCommander tries to use this converter on the value provided.</p>
+</div>
+<div class="paragraph">
+<p>For example, suppose you provide a string representing a list of files:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java App -files file1,file2,file3</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_by_factory">3.2. By factory</h3>
+<div class="paragraph">
+<p>And you declared your field as List and specified the converter as an attribute:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-files", converter = FileConverter.class)
+List&lt;File&gt; files;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JCommander will split the string <code>file1,file2,file3</code> into <code>file1</code>, <code>file2</code>, <code>file3</code> and feed it one by one to the converter.</p>
+</div>
+<div class="paragraph">
+<p>For an alternative solution to parse a list of values see <a href="#list-value">Custom types - List value</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_by_factory">3.1.2. By factory</h4>
 <div class="paragraph">
 <p>If the custom types you use appear multiple times in your application, having to specify the converter in each annotation can become tedious. To address this, you can use an <code>IStringConverterFactory</code>:</p>
 </div>
@@ -1128,6 +1167,116 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 </div>
 <div class="paragraph">
 <p>Another advantage of using string converter factories is that your factories can come from a dependency injection framework.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-value">3.2. Custom types - List value</h3>
+<div class="paragraph">
+<p>Use the <code>listConverter=</code> attribute of the <code>@Parameter</code> annotation and assign a custom <code>IStringConverter</code> implementation to convert a <code>String</code> into a <code>List</code> of values.</p>
+</div>
+<div class="sect3">
+<h4 id="_by_annotation_2">3.2.1. By annotation</h4>
+<div class="paragraph">
+<p>If your application needs a list of complex types write a list type converter by implementing the same interface as before:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IStringConverter&lt;T&gt; {
+  T convert(String value);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>T</code> is a <code>List</code>.</p>
+</div>
+<div class="paragraph">
+<p>For example, here is a list converter that turns a string into a <code>List&lt;File&gt;</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class FileListConverter implements IStringConverter&lt;List&lt;File&gt;&gt; {
+  @Override
+  public File convert(String files) {
+    String [] paths = files.split(",");
+    List&lt;File&gt; files = new ArrayList&lt;&gt;();
+    for(String path : paths){
+        files.add(new File(path));
+    }
+    return files;
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, all you need to do is declare your field with the correct type and specify the list converter as an attribute:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-files", listConverter = FileListConverter.class)
+List&lt;File&gt; file;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now if you call for application as in the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java App -files file1,file2,file3</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The parameter <code>file1,file2,file3</code> is given to the <code>listConverter</code> and will the properly processed.</p>
+</div>
+<div class="paragraph">
+<p>JCommander ships with a default converter for <code>String</code> values.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_splitting">3.3. Splitting</h3>
+<div class="paragraph">
+<p>Use the <code>splitter=</code> attribute of the <code>@Parameter</code> annotation and assign a custom <code>IParameterSplitter</code> implementation to handle how parameters are split in sub-parts</p>
+</div>
+<div class="sect3">
+<h4 id="_by_annotation_3">3.3.1. By annotation</h4>
+<div class="paragraph">
+<p>As already mentioned in <a href="#single-value">Custom types - Single value</a>, by default, JCommander tries to split parameters for List field types on comma.</p>
+</div>
+<div class="paragraph">
+<p>To split parameters on other characters, you can write a custom splitter by implementing the following interface:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IParameterSplitter {
+  List&lt;String&gt; split(String value);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For example, here is a splitter that splits a string on semicolon:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public static class SemiColonSplitter implements IParameterSplitter {
+    public List&lt;String&gt; split(String value) {
+      return Arrays.asList(value.split(";"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, all you need to do is declare your field with the correct type and specify the splitter as an attribute:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-files", converter = FileConverter.class, splitter = SemiColonSplitter.class)
+List&lt;File&gt; files;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JCommander will split the string <code>file1;file2;file3</code> into <code>file1</code>, <code>file2</code>, <code>file3</code> and feed it one by one to the converter.</p>
+</div>
 </div>
 </div>
 </div>
@@ -1832,7 +1981,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-01-13 09:33:54 PST
+Last updated 2017-01-14 22:28:10 CET
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

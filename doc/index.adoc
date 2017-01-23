@@ -195,11 +195,19 @@ public class ArgsPassword {
 }
 ----
 
-== Custom types
+== Custom types (converters and splitters)
 
-=== By annotation
+To bind parameters to custom types or change the way how JCommander splits parameters (default is to split via comma) JCommander provides two
+interfaces `IStringConverter` and `IParameterSplitter`.
 
-By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types, such as files, host names, lists, etc... To achieve this, you can write a type converter by implementing the following interface:
+[[single-value]]
+=== Custom types - Single value
+
+Use either the `converter=` attribute of the `@Parameter` or implement `IStringConverterFactory`.
+
+==== By annotation
+
+By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types (such as files, host names, lists, etc.). To achieve this, you can write a type converter by implementing the following interface:
 
 [source,java]
 ----
@@ -228,9 +236,30 @@ Then, all you need to do is declare your field with the correct type and specify
 File file;
 ----
 
-JCommander ships with a few common converters (e.g. one that turns a comma separated list into a List<String>).
+JCommander ships with a few common converters (for more info please see the implementations of `IStringConverter`).
 
-=== By factory
+===== Note
+
+If a converter is used for a `List` field:
+
+[source,java]
+----
+@Parameter(names = "-files", converter = FileConverter.class)
+List<File> files;
+----
+
+And the application is called as follows:
+
+[source,bash]
+----
+$ java App -files file1,file2,file3
+----
+
+JCommander will split the string `file1,file2,file3` into `file1`, `file2`, `file3` and feed it one by one to the converter.
+
+For an alternative solution to parse a list of values, see <<list-value>>.
+
+==== By factory
 
 If the custom types you use appear multiple times in your application, having to specify the converter in each annotation can become tedious. To address this, you can use an `IStringConverterFactory`:
 
@@ -311,6 +340,100 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);
 ----
 
 Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
+
+[[list-value]]
+=== Custom types - List value
+
+Use the `listConverter=` attribute of the `@Parameter` annotation and assign a custom `IStringConverter` implementation to convert a `String` into a `List` of values.
+
+==== By annotation
+
+If your application needs a list of complex types, write a list type converter by implementing the same interface as before:
+
+[source,java]
+----
+public interface IStringConverter<T> {
+  T convert(String value);
+}
+----
+where `T` is a `List`.
+
+
+For example, here is a list converter that turns a string into a `List<File>`:
+
+[source,java]
+----
+public class FileListConverter implements IStringConverter<List<File>> {
+  @Override
+  public File convert(String files) {
+    String [] paths = files.split(",");
+    List<File> files = new ArrayList<>();
+    for(String path : paths){
+        files.add(new File(path));
+    }
+    return files;
+  }
+}
+----
+
+Then, all you need to do is declare your field with the correct type and specify the list converter as an attribute:
+
+[source,java]
+----
+@Parameter(names = "-files", listConverter = FileListConverter.class)
+List<File> file;
+----
+
+Now if you call for application as in the following example:
+
+[source,bash]
+----
+$ java App -files file1,file2,file3
+----
+
+The parameter `file1,file2,file3` is given to the `listConverter` and will the properly processed.
+
+JCommander ships with a default converter for `String` values.
+
+
+=== Splitting
+
+Use the `splitter=` attribute of the `@Parameter` annotation and assign a custom `IParameterSplitter` implementation to handle how parameters are split in sub-parts.
+
+==== By annotation
+
+By default, JCommander tries to split parameters for `List` field types on commas.
+
+To split parameters on other characters, you can write a custom splitter by implementing the following interface:
+
+[source,java]
+----
+public interface IParameterSplitter {
+  List<String> split(String value);
+}
+----
+
+For example, here is a splitter that splits a string on semicolon:
+
+[source,java]
+----
+public static class SemiColonSplitter implements IParameterSplitter {
+    public List<String> split(String value) {
+      return Arrays.asList(value.split(";"));
+    }
+}
+----
+
+Then, all you need to do is declare your field with the correct type and specify the splitter as an attribute:
+
+[source,java]
+----
+@Parameter(names = "-files", converter = FileConverter.class, splitter = SemiColonSplitter.class)
+List<File> files;
+----
+
+JCommander will split the string `file1;file2;file3` into `file1`, `file2`, `file3` and feed it one by one to the converter.
+
 
 == Parameter validation
 

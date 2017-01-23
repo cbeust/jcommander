@@ -767,21 +767,49 @@ public class JCommanderTest {
     new JCommander(args, argv);
   }
 
-  public void testListAndSplitters() {
+  @Test
+  public void testDefaultListConverterForString() {
     ArgsList al = new ArgsList();
     JCommander j = new JCommander(al);
-    j.parse("-groups", "a,b", "-ints", "41,42", "-hp", "localhost:1000;example.com:1001",
-        "-hp2", "localhost:1000,example.com:1001", "-uppercase", "ab,cd");
+    j.parse("-groups", "a,b");
     Assert.assertEquals(al.groups.get(0), "a");
     Assert.assertEquals(al.groups.get(1), "b");
+  }
+
+  @Test
+  public void testDefaultListConverterForStandardType() {
+    ArgsList al = new ArgsList();
+    JCommander j = new JCommander(al);
+    j.parse("-ints", "41,42");
     Assert.assertEquals(al.ints.get(0).intValue(), 41);
     Assert.assertEquals(al.ints.get(1).intValue(), 42);
+  }
+
+  @Test
+  public void testDefaultListConverterWithCustomConverterAndSplitter() {
+    ArgsList al = new ArgsList();
+    JCommander j = new JCommander(al);
+    j.parse("-hp", "localhost:1000;example.com:1001");
     Assert.assertEquals(al.hostPorts.get(0).host, "localhost");
     Assert.assertEquals(al.hostPorts.get(0).port.intValue(), 1000);
     Assert.assertEquals(al.hostPorts.get(1).host, "example.com");
     Assert.assertEquals(al.hostPorts.get(1).port.intValue(), 1001);
+  }
+
+  @Test
+  public void testDefaultListConverterWithCustomConverterAndDefaultSplitter() {
+    ArgsList al = new ArgsList();
+    JCommander j = new JCommander(al);
+    j.parse("-hp2", "localhost:1000,example.com:1001");
     Assert.assertEquals(al.hp2.get(1).host, "example.com");
     Assert.assertEquals(al.hp2.get(1).port.intValue(), 1001);
+  }
+
+  @Test
+  public void testCustomListConverter() {
+    ArgsList al = new ArgsList();
+    JCommander j = new JCommander(al);
+    j.parse("-uppercase", "ab,cd");
     Assert.assertEquals(al.uppercase.get(0), "AB");
     Assert.assertEquals(al.uppercase.get(1), "CD");
   }
