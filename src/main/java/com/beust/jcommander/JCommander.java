@@ -50,32 +50,32 @@ public class JCommander {
     /**
      * A map to look up parameter description per option name.
      */
-    private Map<IKey, ParameterDescription> m_descriptions;
+    private Map<IKey, ParameterDescription> descriptions;
 
     /**
      * The objects that contain fields annotated with @Parameter.
      */
-    private List<Object> m_objects = Lists.newArrayList();
+    private List<Object> objects = Lists.newArrayList();
 
-    private boolean m_firstTimeMainParameter = true;
+    private boolean firstTimeMainParameter = true;
 
     /**
      * This field/method will contain whatever command line parameter is not an option.
      * It is expected to be a List<String>.
      */
-    private Parameterized m_mainParameter = null;
+    private Parameterized mainParameter = null;
 
     /**
      * The object on which we found the main parameter field.
      */
-    private Object m_mainParameterObject;
+    private Object mainParameterObject;
 
     /**
      * The annotation found on the main parameter field.
      */
-    private Parameter m_mainParameterAnnotation;
+    private Parameter mainParameterAnnotation;
 
-    private ParameterDescription m_mainParameterDescription;
+    private ParameterDescription mainParameterDescription;
 
     /**
      * A set of all the parameterizeds that are required. During the reflection phase,
@@ -85,17 +85,17 @@ public class JCommander {
      * then some required fields did not receive a value and an exception is
      * thrown.
      */
-    private Map<Parameterized, ParameterDescription> m_requiredFields = Maps.newHashMap();
+    private Map<Parameterized, ParameterDescription> requiredFields = Maps.newHashMap();
 
     /**
      * A map of all the parameterized fields/methods.
      */
-    private Map<Parameterized, ParameterDescription> m_fields = Maps.newHashMap();
+    private Map<Parameterized, ParameterDescription> fields = Maps.newHashMap();
 
     /**
      * List of commands and their instance.
      */
-    private Map<ProgramName, JCommander> m_commands = Maps.newLinkedHashMap();
+    private Map<ProgramName, JCommander> commands = Maps.newLinkedHashMap();
 
     /**
      * Alias database for reverse lookup
@@ -105,21 +105,21 @@ public class JCommander {
     /**
      * The name of the command after the parsing has run.
      */
-    private String m_parsedCommand;
+    private String parsedCommand;
 
     /**
      * The name of command or alias as it was passed to the
      * command line
      */
-    private String m_parsedAlias;
+    private String parsedAlias;
 
-    private ProgramName m_programName;
+    private ProgramName programName;
 
-    private boolean m_helpWasSpecified;
+    private boolean helpWasSpecified;
 
-    private List<String> m_unknownArgs = Lists.newArrayList();
+    private List<String> unknownArgs = Lists.newArrayList();
 
-    private static Console m_console;
+    private static Console console;
 
     private final Options options;
 
@@ -128,32 +128,32 @@ public class JCommander {
      */
     private static class Options {
 
-        private ResourceBundle m_bundle;
+        private ResourceBundle bundle;
 
         /**
          * A default provider returns default values for the parameters.
          */
-        private IDefaultProvider m_defaultProvider;
+        private IDefaultProvider defaultProvider;
 
-        private Comparator<? super ParameterDescription> m_parameterDescriptionComparator
+        private Comparator<? super ParameterDescription> parameterDescriptionComparator
                 = new Comparator<ParameterDescription>() {
             @Override
             public int compare(ParameterDescription p0, ParameterDescription p1) {
                 return p0.getLongestName().compareTo(p1.getLongestName());
             }
         };
-        private int m_columnSize = 79;
-        private boolean m_acceptUnknownOptions = false;
-        private boolean m_allowParameterOverwriting = false;
+        private int columnSize = 79;
+        private boolean acceptUnknownOptions = false;
+        private boolean allowParameterOverwriting = false;
         private boolean expandAtSign = true;
-        private int m_verbose = 0;
-        private boolean m_caseSensitiveOptions = true;
-        private boolean m_allowAbbreviatedOptions = false;
+        private int verbose = 0;
+        private boolean caseSensitiveOptions = true;
+        private boolean allowAbbreviatedOptions = false;
         /**
          * The factories used to look up string converters.
          */
-        private final List<IStringConverterInstanceFactory> m_converterInstanceFactories = new CopyOnWriteArrayList<>();
-        private Charset m_atFileCharset = Charset.defaultCharset();
+        private final List<IStringConverterInstanceFactory> converterInstanceFactories = new CopyOnWriteArrayList<>();
+        private Charset atFileCharset = Charset.defaultCharset();
     }
 
     private JCommander(Options options) {
@@ -223,16 +223,16 @@ public class JCommander {
     }
 
     public static Console getConsole() {
-        if (m_console == null) {
+        if (console == null) {
             try {
                 Method consoleMethod = System.class.getDeclaredMethod("console");
                 Object console = consoleMethod.invoke(null);
-                m_console = new JDK6Console(console);
+                JCommander.console = new JDK6Console(console);
             } catch (Throwable t) {
-                m_console = new DefaultConsole();
+                console = new DefaultConsole();
             }
         }
-        return m_console;
+        return console;
     }
 
     /**
@@ -248,16 +248,16 @@ public class JCommander {
         if (object instanceof Iterable) {
             // Iterable
             for (Object o : (Iterable<?>) object) {
-                m_objects.add(o);
+                objects.add(o);
             }
         } else if (object.getClass().isArray()) {
             // Array
             for (Object o : (Object[]) object) {
-                m_objects.add(o);
+                objects.add(o);
             }
         } else {
             // Single object
-            m_objects.add(object);
+            objects.add(object);
         }
     }
 
@@ -267,7 +267,7 @@ public class JCommander {
      */
     // declared final since this is invoked from constructors
     public final void setDescriptionsBundle(ResourceBundle bundle) {
-        options.m_bundle = bundle;
+        options.bundle = bundle;
     }
 
     /**
@@ -286,10 +286,10 @@ public class JCommander {
 
     private void parse(boolean validate, String... args) {
         StringBuilder sb = new StringBuilder("Parsing \"");
-        sb.append(join(args).append("\"\n  with:").append(join(m_objects.toArray())));
+        sb.append(join(args).append("\"\n  with:").append(join(objects.toArray())));
         p(sb.toString());
 
-        if (m_descriptions == null) createDescriptions();
+        if (descriptions == null) createDescriptions();
         initializeDefaultValues();
         parseValues(expandArgs(args), validate);
         if (validate) validateOptions();
@@ -305,12 +305,12 @@ public class JCommander {
     }
 
     private void initializeDefaultValues() {
-        if (options.m_defaultProvider != null) {
-            for (ParameterDescription pd : m_descriptions.values()) {
+        if (options.defaultProvider != null) {
+            for (ParameterDescription pd : descriptions.values()) {
                 initializeDefaultValue(pd);
             }
 
-            for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
+            for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
                 entry.getValue().initializeDefaultValues();
             }
         }
@@ -321,25 +321,25 @@ public class JCommander {
      */
     private void validateOptions() {
         // No validation if we found a help parameter
-        if (m_helpWasSpecified) {
+        if (helpWasSpecified) {
             return;
         }
 
-        if (!m_requiredFields.isEmpty()) {
+        if (!requiredFields.isEmpty()) {
             StringBuilder missingFields = new StringBuilder();
-            for (ParameterDescription pd : m_requiredFields.values()) {
+            for (ParameterDescription pd : requiredFields.values()) {
                 missingFields.append(pd.getNames()).append(" ");
             }
             throw new ParameterException("The following "
-                    + pluralize(m_requiredFields.size(), "option is required: ", "options are required: ")
+                    + pluralize(requiredFields.size(), "option is required: ", "options are required: ")
                     + missingFields);
         }
 
-        if (m_mainParameterDescription != null) {
-            if (m_mainParameterDescription.getParameter().required() &&
-                    !m_mainParameterDescription.isAssigned()) {
+        if (mainParameterDescription != null) {
+            if (mainParameterDescription.getParameter().required() &&
+                    !mainParameterDescription.isAssigned()) {
                 throw new ParameterException("Main parameters are required (\""
-                        + m_mainParameterDescription.getDescription() + "\")");
+                        + mainParameterDescription.getDescription() + "\")");
             }
         }
     }
@@ -396,7 +396,7 @@ public class JCommander {
     }
 
     private List<String> expandDynamicArg(String arg) {
-        for (ParameterDescription pd : m_descriptions.values()) {
+        for (ParameterDescription pd : descriptions.values()) {
             if (pd.isDynamicParameter()) {
                 for (String name : pd.getParameter().names()) {
                     if (arg.startsWith(name) && !arg.equals(name)) {
@@ -410,13 +410,13 @@ public class JCommander {
     }
 
     private boolean matchArg(String arg, IKey key) {
-        String kn = options.m_caseSensitiveOptions
+        String kn = options.caseSensitiveOptions
                 ? key.getName()
                 : key.getName().toLowerCase();
-        if (options.m_allowAbbreviatedOptions) {
+        if (options.allowAbbreviatedOptions) {
             if (kn.startsWith(arg)) return true;
         } else {
-            ParameterDescription pd = m_descriptions.get(key);
+            ParameterDescription pd = descriptions.get(key);
             if (pd != null) {
                 // It's an option. If the option has a separator (e.g. -author==foo) then
                 // we only do a beginsWith match
@@ -435,14 +435,14 @@ public class JCommander {
     }
 
     private boolean isOption(String passedArg) {
-        if (options.m_acceptUnknownOptions) return true;
+        if (options.acceptUnknownOptions) return true;
 
-        String arg = options.m_caseSensitiveOptions ? passedArg : passedArg.toLowerCase();
+        String arg = options.caseSensitiveOptions ? passedArg : passedArg.toLowerCase();
 
-        for (IKey key : m_descriptions.keySet()) {
+        for (IKey key : descriptions.keySet()) {
             if (matchArg(arg, key)) return true;
         }
-        for (IKey key : m_commands.keySet()) {
+        for (IKey key : commands.keySet()) {
             if (matchArg(arg, key)) return true;
         }
 
@@ -450,7 +450,7 @@ public class JCommander {
     }
 
     private ParameterDescription getPrefixDescriptionFor(String arg) {
-        for (Map.Entry<IKey, ParameterDescription> es : m_descriptions.entrySet()) {
+        for (Map.Entry<IKey, ParameterDescription> es : descriptions.entrySet()) {
             if (arg.startsWith(es.getKey().getName())) return es.getValue();
         }
 
@@ -487,7 +487,7 @@ public class JCommander {
     private List<String> readFile(String fileName) {
         List<String> result = Lists.newArrayList();
 
-        try (BufferedReader bufRead = Files.newBufferedReader(Paths.get(fileName), options.m_atFileCharset)) {
+        try (BufferedReader bufRead = Files.newBufferedReader(Paths.get(fileName), options.atFileCharset)) {
             String line;
             // Read through file one line at time. Print line # and line
             while ((line = bufRead.readLine()) != null) {
@@ -518,9 +518,9 @@ public class JCommander {
      * Create the ParameterDescriptions for all the \@Parameter found.
      */
     private void createDescriptions() {
-        m_descriptions = Maps.newHashMap();
+        descriptions = Maps.newHashMap();
 
-        for (Object object : m_objects) {
+        for (Object object : objects) {
             addDescription(object);
         }
     }
@@ -539,27 +539,27 @@ public class JCommander {
                 Parameter p = annotation;
                 if (p.names().length == 0) {
                     p("Found main parameter:" + parameterized);
-                    if (m_mainParameter != null) {
+                    if (mainParameter != null) {
                         throw new ParameterException("Only one @Parameter with no names attribute is"
-                                + " allowed, found:" + m_mainParameter + " and " + parameterized);
+                                + " allowed, found:" + mainParameter + " and " + parameterized);
                     }
-                    m_mainParameter = parameterized;
-                    m_mainParameterObject = object;
-                    m_mainParameterAnnotation = p;
-                    m_mainParameterDescription =
-                            new ParameterDescription(object, p, parameterized, options.m_bundle, this);
+                    mainParameter = parameterized;
+                    mainParameterObject = object;
+                    mainParameterAnnotation = p;
+                    mainParameterDescription =
+                            new ParameterDescription(object, p, parameterized, options.bundle, this);
                 } else {
                     ParameterDescription pd =
-                            new ParameterDescription(object, p, parameterized, options.m_bundle, this);
+                            new ParameterDescription(object, p, parameterized, options.bundle, this);
                     for (String name : p.names()) {
-                        if (m_descriptions.containsKey(new StringKey(name))) {
+                        if (descriptions.containsKey(new StringKey(name))) {
                             throw new ParameterException("Found the option " + name + " multiple times");
                         }
                         p("Adding description for " + name);
-                        m_fields.put(parameterized, pd);
-                        m_descriptions.put(new StringKey(name), pd);
+                        fields.put(parameterized, pd);
+                        descriptions.put(new StringKey(name), pd);
 
-                        if (p.required()) m_requiredFields.put(parameterized, pd);
+                        if (p.required()) requiredFields.put(parameterized, pd);
                     }
                 }
             } else if (parameterized.getDelegateAnnotation() != null) {
@@ -578,16 +578,16 @@ public class JCommander {
                 //
                 DynamicParameter dp = wp.getDynamicParameter();
                 for (String name : dp.names()) {
-                    if (m_descriptions.containsKey(name)) {
+                    if (descriptions.containsKey(name)) {
                         throw new ParameterException("Found the option " + name + " multiple times");
                     }
                     p("Adding description for " + name);
                     ParameterDescription pd =
-                            new ParameterDescription(object, dp, parameterized, options.m_bundle, this);
-                    m_fields.put(parameterized, pd);
-                    m_descriptions.put(new StringKey(name), pd);
+                            new ParameterDescription(object, dp, parameterized, options.bundle, this);
+                    fields.put(parameterized, pd);
+                    descriptions.put(new StringKey(name), pd);
 
-                    if (dp.required()) m_requiredFields.put(parameterized, pd);
+                    if (dp.required()) requiredFields.put(parameterized, pd);
                 }
             }
         }
@@ -595,12 +595,12 @@ public class JCommander {
 
     private void initializeDefaultValue(ParameterDescription pd) {
         for (String optionName : pd.getParameter().names()) {
-            String def = options.m_defaultProvider.getDefaultValueFor(optionName);
+            String def = options.defaultProvider.getDefaultValueFor(optionName);
             if (def != null) {
                 p("Initializing " + optionName + " with default value:" + def);
                 pd.addValue(def, true /* default */);
                 // remove the parameter from the list of fields to be required
-                m_requiredFields.remove(pd.getParameterized());
+                requiredFields.remove(pd.getParameterized());
                 return;
             }
         }
@@ -637,7 +637,7 @@ public class JCommander {
                         //
                         char[] password = readPassword(pd.getDescription(), pd.getParameter().echoInput());
                         pd.addValue(new String(password));
-                        m_requiredFields.remove(pd.getParameterized());
+                        requiredFields.remove(pd.getParameterized());
                     } else {
                         if (pd.getParameter().variableArity()) {
                             //
@@ -655,22 +655,22 @@ public class JCommander {
                             if ((fieldType == boolean.class || fieldType == Boolean.class)
                                     && pd.getParameter().arity() == -1) {
                                 pd.addValue("true");
-                                m_requiredFields.remove(pd.getParameterized());
+                                requiredFields.remove(pd.getParameterized());
                             } else {
                                 increment = processFixedArity(args, i, pd, validate, fieldType);
                             }
                             // If it's a help option, remember for later
                             if (pd.isHelp()) {
-                                m_helpWasSpecified = true;
+                                helpWasSpecified = true;
                             }
                         }
                     }
                 } else {
-                    if (options.m_acceptUnknownOptions) {
-                        m_unknownArgs.add(arg);
+                    if (options.acceptUnknownOptions) {
+                        unknownArgs.add(arg);
                         i++;
                         while (i < args.length && !isOption(args[i])) {
-                            m_unknownArgs.add(args[i++]);
+                            unknownArgs.add(args[i++]);
                         }
                         increment = 0;
                     } else {
@@ -685,7 +685,7 @@ public class JCommander {
                     isDashDash = true;
                     a = trim(args[++i]);
                 }
-                if (m_commands.isEmpty()) {
+                if (commands.isEmpty()) {
                     //
                     // Regular (non-command) parsing
                     //
@@ -693,19 +693,19 @@ public class JCommander {
                     String value = a; // If there's a non-quoted version, prefer that one
                     Object convertedValue = value;
 
-                    if (m_mainParameter.getGenericType() instanceof ParameterizedType) {
-                        ParameterizedType p = (ParameterizedType) m_mainParameter.getGenericType();
+                    if (mainParameter.getGenericType() instanceof ParameterizedType) {
+                        ParameterizedType p = (ParameterizedType) mainParameter.getGenericType();
                         Type cls = p.getActualTypeArguments()[0];
                         if (cls instanceof Class) {
-                            convertedValue = convertValue(m_mainParameter, (Class) cls, null, value);
+                            convertedValue = convertValue(mainParameter, (Class) cls, null, value);
                         }
                     }
 
-                    ParameterDescription.validateParameter(m_mainParameterDescription,
-                            m_mainParameterAnnotation.validateWith(),
+                    ParameterDescription.validateParameter(mainParameterDescription,
+                            mainParameterAnnotation.validateWith(),
                             "Default", value);
 
-                    m_mainParameterDescription.setAssigned(true);
+                    mainParameterDescription.setAssigned(true);
                     mp.add(convertedValue);
                 } else {
                     //
@@ -714,8 +714,8 @@ public class JCommander {
                     if (jc == null && validate) {
                         throw new MissingCommandException("Expected a command, got " + arg, arg);
                     } else if (jc != null) {
-                        m_parsedCommand = jc.m_programName.m_name;
-                        m_parsedAlias = arg; //preserve the original form
+                        parsedCommand = jc.programName.name;
+                        parsedAlias = arg; //preserve the original form
 
                         // Found a valid command, ask it to parse the remainder of the arguments.
                         // Setting the boolean commandParsed to true will force the current
@@ -728,10 +728,10 @@ public class JCommander {
             i += increment;
         }
 
-        // Mark the parameter descriptions held in m_fields as assigned
-        for (ParameterDescription parameterDescription : m_descriptions.values()) {
+        // Mark the parameter descriptions held in fields as assigned
+        for (ParameterDescription parameterDescription : descriptions.values()) {
             if (parameterDescription.isAssigned()) {
-                m_fields.get(parameterDescription.getParameterized()).setAssigned(true);
+                fields.get(parameterDescription.getParameterized()).setAssigned(true);
             }
         }
 
@@ -793,7 +793,7 @@ public class JCommander {
                 (Boolean.class.isAssignableFrom(fieldType)
                         || boolean.class.isAssignableFrom(fieldType))) {
             pd.addValue("true");
-            m_requiredFields.remove(pd.getParameterized());
+            requiredFields.remove(pd.getParameterized());
         } else if (index < args.length - 1) {
             int offset = "--".equals(args[index + 1]) ? 1 : 0;
 
@@ -801,7 +801,7 @@ public class JCommander {
                 for (int j = 1; j <= arity; j++) {
                     String value = trim(args[index + j + offset]);
                     pd.addValue(arg, value, false, validate);
-                    m_requiredFields.remove(pd.getParameterized());
+                    requiredFields.remove(pd.getParameterized());
                 }
                 index += arity + offset;
             } else {
@@ -838,30 +838,30 @@ public class JCommander {
      * error message).
      */
     private List<?> getMainParameter(String arg) {
-        if (m_mainParameter == null) {
+        if (mainParameter == null) {
             throw new ParameterException(
                     "Was passed main parameter '" + arg + "' but no main parameter was defined in your arg class");
         }
 
-        List<?> result = (List<?>) m_mainParameter.get(m_mainParameterObject);
+        List<?> result = (List<?>) mainParameter.get(mainParameterObject);
         if (result == null) {
             result = Lists.newArrayList();
-            if (!List.class.isAssignableFrom(m_mainParameter.getType())) {
-                throw new ParameterException("Main parameter field " + m_mainParameter
-                        + " needs to be of type List, not " + m_mainParameter.getType());
+            if (!List.class.isAssignableFrom(mainParameter.getType())) {
+                throw new ParameterException("Main parameter field " + mainParameter
+                        + " needs to be of type List, not " + mainParameter.getType());
             }
-            m_mainParameter.set(m_mainParameterObject, result);
+            mainParameter.set(mainParameterObject, result);
         }
-        if (m_firstTimeMainParameter) {
+        if (firstTimeMainParameter) {
             result.clear();
-            m_firstTimeMainParameter = false;
+            firstTimeMainParameter = false;
         }
         return result;
     }
 
     public String getMainParameterDescription() {
-        if (m_descriptions == null) createDescriptions();
-        return m_mainParameterAnnotation != null ? m_mainParameterAnnotation.description()
+        if (descriptions == null) createDescriptions();
+        return mainParameterAnnotation != null ? mainParameterAnnotation.description()
                 : null;
     }
 
@@ -879,7 +879,7 @@ public class JCommander {
      * @param aliases aliases to the program name
      */
     public void setProgramName(String name, String... aliases) {
-        m_programName = new ProgramName(name, Arrays.asList(aliases));
+        programName = new ProgramName(name, Arrays.asList(aliases));
     }
 
     /**
@@ -931,7 +931,7 @@ public class JCommander {
             if (!"".equals(bundleName)) {
                 bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
             } else {
-                bundle = options.m_bundle;
+                bundle = options.bundle;
             }
 
             if (bundle != null) {
@@ -971,8 +971,8 @@ public class JCommander {
     }
 
     public void usage(StringBuilder out, String indent) {
-        if (m_descriptions == null) createDescriptions();
-        boolean hasCommands = !m_commands.isEmpty();
+        if (descriptions == null) createDescriptions();
+        boolean hasCommands = !commands.isEmpty();
 
         //indenting
         int descriptionIndent = 6;
@@ -981,12 +981,12 @@ public class JCommander {
         //
         // First line of the usage
         //
-        String programName = m_programName != null ? m_programName.getDisplayName() : "<main class>";
+        String programName = this.programName != null ? this.programName.getDisplayName() : "<main class>";
         StringBuilder mainLine = new StringBuilder();
         mainLine.append(indent).append("Usage: ").append(programName).append(" [options]");
         if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
-        if (m_mainParameterDescription != null) {
-            mainLine.append(" ").append(m_mainParameterDescription.getDescription());
+        if (mainParameterDescription != null) {
+            mainLine.append(" ").append(mainParameterDescription.getDescription());
         }
         wrapDescription(out, indentCount, mainLine.toString());
         out.append("\n");
@@ -996,7 +996,7 @@ public class JCommander {
         //
         int longestName = 0;
         List<ParameterDescription> sorted = Lists.newArrayList();
-        for (ParameterDescription pd : m_fields.values()) {
+        for (ParameterDescription pd : fields.values()) {
             if (!pd.getParameter().hidden()) {
                 sorted.add(pd);
                 // + to have an extra space between the name and the description
@@ -1052,7 +1052,7 @@ public class JCommander {
             out.append("  Commands:\n");
             // The magic value 3 is the number of spaces between the name of the option
             // and its description
-            for (Map.Entry<ProgramName, JCommander> commands : m_commands.entrySet()) {
+            for (Map.Entry<ProgramName, JCommander> commands : this.commands.entrySet()) {
                 Object arg = commands.getValue().getObjects().get(0);
                 Parameters p = arg.getClass().getAnnotation(Parameters.class);
                 if (p == null || !p.hidden()) {
@@ -1073,19 +1073,19 @@ public class JCommander {
     }
 
     private Comparator<? super ParameterDescription> getParameterDescriptionComparator() {
-        return options.m_parameterDescriptionComparator;
+        return options.parameterDescriptionComparator;
     }
 
     public void setParameterDescriptionComparator(Comparator<? super ParameterDescription> c) {
-        options.m_parameterDescriptionComparator = c;
+        options.parameterDescriptionComparator = c;
     }
 
     public void setColumnSize(int columnSize) {
-        options.m_columnSize = columnSize;
+        options.columnSize = columnSize;
     }
 
     public int getColumnSize() {
-        return options.m_columnSize;
+        return options.columnSize;
     }
 
     /**
@@ -1125,18 +1125,18 @@ public class JCommander {
      * format (e.g. HTML).
      */
     public List<ParameterDescription> getParameters() {
-        return new ArrayList<>(m_fields.values());
+        return new ArrayList<>(fields.values());
     }
 
     /**
      * @return the main parameter description or null if none is defined.
      */
     public ParameterDescription getMainParameter() {
-        return m_mainParameterDescription;
+        return mainParameterDescription;
     }
 
     private void p(String string) {
-        if (options.m_verbose > 0 || System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
+        if (options.verbose > 0 || System.getProperty(JCommander.DEBUG_PROPERTY) != null) {
             getConsole().println("[JCommander] " + string);
         }
     }
@@ -1145,7 +1145,7 @@ public class JCommander {
      * Define the default provider for this instance.
      */
     public void setDefaultProvider(IDefaultProvider defaultProvider) {
-        options.m_defaultProvider = defaultProvider;
+        options.defaultProvider = defaultProvider;
     }
 
     /**
@@ -1175,11 +1175,11 @@ public class JCommander {
      * @param converterInstanceFactory the factory generating string converter instances
      */
     public void addConverterInstanceFactory(final IStringConverterInstanceFactory converterInstanceFactory) {
-        options.m_converterInstanceFactories.add(0, converterInstanceFactory);
+        options.converterInstanceFactories.add(0, converterInstanceFactory);
     }
 
     private IStringConverter<?> findConverterInstance(Parameter parameter, Class<?> forType, String optionName) {
-        for (IStringConverterInstanceFactory f : options.m_converterInstanceFactories) {
+        for (IStringConverterInstanceFactory f : options.converterInstanceFactories) {
             IStringConverter<?> result = f.getConverterInstance(parameter, forType, optionName);
             if (result != null) return result;
         }
@@ -1294,8 +1294,8 @@ public class JCommander {
         jc.addObject(object);
         jc.createDescriptions();
         jc.setProgramName(name, aliases);
-        ProgramName progName = jc.m_programName;
-        m_commands.put(progName, jc);
+        ProgramName progName = jc.programName;
+        commands.put(progName, jc);
 
     /*
     * Register aliases
@@ -1314,7 +1314,7 @@ public class JCommander {
                     throw new ParameterException("Cannot set alias " + alias
                             + " for " + name
                             + " command because it has already been defined for "
-                            + mappedName.m_name + " command");
+                            + mappedName.name + " command");
                 }
                 aliasMap.put(alias, progName);
             }
@@ -1323,14 +1323,14 @@ public class JCommander {
 
     public Map<String, JCommander> getCommands() {
         Map<String, JCommander> res = Maps.newLinkedHashMap();
-        for (Map.Entry<ProgramName, JCommander> entry : m_commands.entrySet()) {
-            res.put(entry.getKey().m_name, entry.getValue());
+        for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
+            res.put(entry.getKey().name, entry.getValue());
         }
         return res;
     }
 
     public String getParsedCommand() {
-        return m_parsedCommand;
+        return parsedCommand;
     }
 
     /**
@@ -1341,7 +1341,7 @@ public class JCommander {
      * @return Name of command or alias passed to command line. If none passed: <code>null</code>.
      */
     public String getParsedAlias() {
-        return m_parsedAlias;
+        return parsedAlias;
     }
 
     /**
@@ -1361,22 +1361,22 @@ public class JCommander {
      * parsing the command line.
      */
     public List<Object> getObjects() {
-        return m_objects;
+        return objects;
     }
 
     private ParameterDescription findParameterDescription(String arg) {
-        return FuzzyMap.findInMap(m_descriptions, new StringKey(arg),
-                options.m_caseSensitiveOptions, options.m_allowAbbreviatedOptions);
+        return FuzzyMap.findInMap(descriptions, new StringKey(arg),
+                options.caseSensitiveOptions, options.allowAbbreviatedOptions);
     }
 
     private JCommander findCommand(ProgramName name) {
-        return FuzzyMap.findInMap(m_commands, name,
-                options.m_caseSensitiveOptions, options.m_allowAbbreviatedOptions);
+        return FuzzyMap.findInMap(commands, name,
+                options.caseSensitiveOptions, options.allowAbbreviatedOptions);
     }
 
     private ProgramName findProgramName(String name) {
         return FuzzyMap.findInMap(aliasMap, new StringKey(name),
-                options.m_caseSensitiveOptions, options.m_allowAbbreviatedOptions);
+                options.caseSensitiveOptions, options.allowAbbreviatedOptions);
     }
 
     /*
@@ -1400,25 +1400,25 @@ public class JCommander {
      * Encapsulation of either a main application or an individual command.
      */
     private static final class ProgramName implements IKey {
-        private final String m_name;
-        private final List<String> m_aliases;
+        private final String name;
+        private final List<String> aliases;
 
         ProgramName(String name, List<String> aliases) {
-            m_name = name;
-            m_aliases = aliases;
+            this.name = name;
+            this.aliases = aliases;
         }
 
         @Override
         public String getName() {
-            return m_name;
+            return name;
         }
 
         private String getDisplayName() {
             StringBuilder sb = new StringBuilder();
-            sb.append(m_name);
-            if (!m_aliases.isEmpty()) {
+            sb.append(name);
+            if (!aliases.isEmpty()) {
                 sb.append("(");
-                Iterator<String> aliasesIt = m_aliases.iterator();
+                Iterator<String> aliasesIt = aliases.iterator();
                 while (aliasesIt.hasNext()) {
                     sb.append(aliasesIt.next());
                     if (aliasesIt.hasNext()) {
@@ -1434,7 +1434,7 @@ public class JCommander {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((m_name == null) ? 0 : m_name.hashCode());
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
             return result;
         }
 
@@ -1447,10 +1447,10 @@ public class JCommander {
             if (getClass() != obj.getClass())
                 return false;
             ProgramName other = (ProgramName) obj;
-            if (m_name == null) {
-                if (other.m_name != null)
+            if (name == null) {
+                if (other.name != null)
                     return false;
-            } else if (!m_name.equals(other.m_name))
+            } else if (!name.equals(other.name))
                 return false;
             return true;
         }
@@ -1467,31 +1467,31 @@ public class JCommander {
     }
 
     public void setVerbose(int verbose) {
-        options.m_verbose = verbose;
+        options.verbose = verbose;
     }
 
     public void setCaseSensitiveOptions(boolean b) {
-        options.m_caseSensitiveOptions = b;
+        options.caseSensitiveOptions = b;
     }
 
     public void setAllowAbbreviatedOptions(boolean b) {
-        options.m_allowAbbreviatedOptions = b;
+        options.allowAbbreviatedOptions = b;
     }
 
     public void setAcceptUnknownOptions(boolean b) {
-        options.m_acceptUnknownOptions = b;
+        options.acceptUnknownOptions = b;
     }
 
     public List<String> getUnknownOptions() {
-        return m_unknownArgs;
+        return unknownArgs;
     }
 
     public void setAllowParameterOverwriting(boolean b) {
-        options.m_allowParameterOverwriting = b;
+        options.allowParameterOverwriting = b;
     }
 
     public boolean isParameterOverwritingAllowed() {
-        return options.m_allowParameterOverwriting;
+        return options.allowParameterOverwriting;
     }
 
     /**
@@ -1499,7 +1499,7 @@ public class JCommander {
      * @param charset the charset
      */
     public void setAtFileCharset(Charset charset) {
-        options.m_atFileCharset = charset;
+        options.atFileCharset = charset;
     }
 
 }

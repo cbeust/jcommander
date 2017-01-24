@@ -4,27 +4,27 @@ import com.beust.jcommander.FuzzyMap.IKey;
 
 public class StringKey implements IKey {
 
-  private String m_name;
+  private String name;
 
   public StringKey(String name) {
-    m_name = name;
+    this.name = name;
   }
 
   @Override
   public String getName() {
-    return m_name;
+    return name;
   }
 
   @Override
   public String toString() {
-    return m_name;
+    return name;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((m_name == null) ? 0 : m_name.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
     return result;
   }
 
@@ -37,10 +37,10 @@ public class StringKey implements IKey {
     if (getClass() != obj.getClass())
       return false;
     StringKey other = (StringKey) obj;
-    if (m_name == null) {
-      if (other.m_name != null)
+    if (name == null) {
+      if (other.name != null)
         return false;
-    } else if (!m_name.equals(other.m_name))
+    } else if (!name.equals(other.name))
       return false;
     return true;
   }
