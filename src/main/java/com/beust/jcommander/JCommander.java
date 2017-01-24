@@ -18,41 +18,19 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.FuzzyMap.IKey;
+import com.beust.jcommander.converters.*;
+import com.beust.jcommander.internal.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.beust.jcommander.FuzzyMap.IKey;
-import com.beust.jcommander.converters.DefaultListConverter;
-import com.beust.jcommander.converters.EnumConverter;
-import com.beust.jcommander.converters.IParameterSplitter;
-import com.beust.jcommander.converters.NoConverter;
-import com.beust.jcommander.converters.StringConverter;
-import com.beust.jcommander.internal.Console;
-import com.beust.jcommander.internal.DefaultConsole;
-import com.beust.jcommander.internal.DefaultConverterFactory;
-import com.beust.jcommander.internal.JDK6Console;
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
-import com.beust.jcommander.internal.Nullable;
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -431,9 +409,44 @@ public class JCommander {
         return Arrays.asList(arg);
     }
 
-    private boolean isOption(String arg) {
-        String prefixes = getOptionPrefixes(arg);
-        return arg.length() > 0 && prefixes.indexOf(arg.charAt(0)) >= 0;
+    private boolean matchArg(String arg, IKey key) {
+        String kn = options.m_caseSensitiveOptions
+                ? key.getName()
+                : key.getName().toLowerCase();
+        if (options.m_allowAbbreviatedOptions) {
+            if (kn.startsWith(arg)) return true;
+        } else {
+            ParameterDescription pd = m_descriptions.get(key);
+            if (pd != null) {
+                // It's an option. If the option has a separator (e.g. -author==foo) then
+                // we only do a beginsWith match
+                String separator = getSeparatorFor(arg);
+                if (! " ".equals(separator)) {
+                    if (arg.startsWith(kn)) return true;
+                } else {
+                    if (kn.equals(arg)) return true;
+                }
+            } else {
+                // It's a command do a strict equality check
+                if (kn.equals(arg)) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isOption(String passedArg) {
+        if (options.m_acceptUnknownOptions) return true;
+
+        String arg = options.m_caseSensitiveOptions ? passedArg : passedArg.toLowerCase();
+
+        for (IKey key : m_descriptions.keySet()) {
+            if (matchArg(arg, key)) return true;
+        }
+        for (IKey key : m_commands.keySet()) {
+            if (matchArg(arg, key)) return true;
+        }
+
+        return false;
     }
 
     private ParameterDescription getPrefixDescriptionFor(String arg) {
@@ -462,33 +475,6 @@ public class JCommander {
         }
 
         return " ";
-    }
-
-    private String getOptionPrefixes(String arg) {
-        ParameterDescription pd = getDescriptionFor(arg);
-
-        // Could be null if only main parameters were passed
-        if (pd != null) {
-            Parameters p = pd.getObject().getClass()
-                    .getAnnotation(Parameters.class);
-            if (p != null) return p.optionPrefixes();
-        }
-        String result = Parameters.DEFAULT_OPTION_PREFIXES;
-
-        // See if any of the objects contains a @Parameters(optionPrefixes)
-        StringBuilder sb = new StringBuilder();
-        for (Object o : m_objects) {
-            Parameters p = o.getClass().getAnnotation(Parameters.class);
-            if (p != null && !Parameters.DEFAULT_OPTION_PREFIXES.equals(p.optionPrefixes())) {
-                sb.append(p.optionPrefixes());
-            }
-        }
-
-        if (!Strings.isStringEmpty(sb.toString())) {
-            result = sb.toString();
-        }
-
-        return result;
     }
 
     /**
@@ -854,7 +840,7 @@ public class JCommander {
     private List<?> getMainParameter(String arg) {
         if (m_mainParameter == null) {
             throw new ParameterException(
-                    "Was passed main parameter '" + arg + "' but no main parameter was defined");
+                    "Was passed main parameter '" + arg + "' but no main parameter was defined in your arg class");
         }
 
         List<?> result = (List<?>) m_mainParameter.get(m_mainParameterObject);
