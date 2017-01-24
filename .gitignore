@@ -19,4 +19,5 @@ kobaltBuild
 .DS_Store
 out
 update-documentation.sh
+classes
 
