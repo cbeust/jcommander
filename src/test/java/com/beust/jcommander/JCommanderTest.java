@@ -1305,10 +1305,36 @@ public class JCommanderTest {
     Assert.assertEquals(cc.author, "cedric");
   }
 
+  static class CommandTemplate {
+    @Parameter
+    private List<String> parameters = new ArrayList<>();
+
+    @Parameter(names = "help", help = true)
+    private boolean help;
+  }
+
+  public void noDashCommand() {
+    class P1 {
+      @Parameter(names = "hello")
+      private int test;
+    }
+    P1 p1 = new P1();
+    JCommander j = new JCommander();
+    j.addCommand("p1", p1);
+    j.parse("p1", "hello", "47");
+    Assert.assertEquals(p1.test, 47);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) {
-    new JCommanderTest().noDash();
+
+    CommandTemplate template = new CommandTemplate();
+    JCommander jcommander = new JCommander(template);
+    jcommander.setProgramName("prog");
+    jcommander.parse("help");
+
+    if (template.help) {
+      jcommander.usage();
+    }
   }
-  // Tests:
-  // required unparsed parameter
 }
