@@ -978,6 +978,7 @@ public class JCommander {
     public void usage(StringBuilder out, String indent) {
         if (descriptions == null) createDescriptions();
         boolean hasCommands = !commands.isEmpty();
+        boolean hasOptions = !descriptions.isEmpty();
 
         //indenting
         int descriptionIndent = 6;
@@ -988,7 +989,8 @@ public class JCommander {
         //
         String programName = this.programName != null ? this.programName.getDisplayName() : "<main class>";
         StringBuilder mainLine = new StringBuilder();
-        mainLine.append(indent).append("Usage: ").append(programName).append(" [options]");
+        mainLine.append(indent).append("Usage: ").append(programName);
+        if (hasOptions) mainLine.append(" [options]");
         if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
         if (mainParameterDescription != null) {
             mainLine.append(" ").append(mainParameterDescription.getDescription());

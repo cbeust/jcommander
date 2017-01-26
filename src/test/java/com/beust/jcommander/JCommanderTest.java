@@ -1353,6 +1353,20 @@ public class JCommanderTest {
     new JCommander(arg, commands);
   }
 
+  public void dontShowOptionUsageIfThereAreNoOptions() {
+    class CommandTemplate {
+      @Parameter
+      List<String> parameters = new ArrayList<>();
+    }
+
+    CommandTemplate template = new CommandTemplate();
+    JCommander jcommander = new JCommander(template);
+    jcommander.setProgramName("main");
+    StringBuilder sb = new StringBuilder();
+    jcommander.usage(sb);
+    Assert.assertEquals(sb.toString().indexOf("options"), -1);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) {
 
