@@ -797,11 +797,16 @@ public class JCommander {
         } else if (index < args.length - 1) {
             int offset = "--".equals(args[index + 1]) ? 1 : 0;
 
+            Object finalValue = null;
             if (index + arity < args.length) {
                 for (int j = 1; j <= arity; j++) {
                     String value = trim(args[index + j + offset]);
-                    pd.addValue(arg, value, false, validate);
+                    finalValue = pd.addValue(arg, value, false, validate);
                     requiredFields.remove(pd.getParameterized());
+                }
+
+                if (finalValue != null && validate) {
+                  pd.validateValueParameter(arg, finalValue);
                 }
                 index += arity + offset;
             } else {

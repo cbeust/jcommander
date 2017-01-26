@@ -226,7 +226,7 @@ public class ParameterDescription {
     addValue(null, value, isDefault, true);
   }
 
-  void addValue(String name, String value, boolean isDefault, boolean validate) {
+  Object addValue(String name, String value, boolean isDefault, boolean validate) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + parameterized.getName());
     if(name == null) {
@@ -248,22 +248,27 @@ public class ParameterDescription {
     }
     boolean isCollection = Collection.class.isAssignableFrom(type);
 
+    Object finalValue;
     if (isCollection) {
       @SuppressWarnings("unchecked")
       Collection<Object> l = (Collection<Object>) parameterized.get(object);
       if (l == null || fieldIsSetForTheFirstTime(isDefault)) {
-        l = newCollection(type);
-        parameterized.set(object, l);
+          l = newCollection(type);
+          parameterized.set(object, l);
       }
       if (convertedValue instanceof Collection) {
-        l.addAll((Collection) convertedValue);
+          l.addAll((Collection) convertedValue);
       } else {
-        l.add(convertedValue);
+          l.add(convertedValue);
       }
+      finalValue = l;
     } else {
       wrappedParameter.addValue(parameterized, object, convertedValue);
+      finalValue = convertedValue;
     }
     if (! isDefault) assigned = true;
+
+    return finalValue;
   }
 
   private void validateParameter(String name, String value) {
@@ -273,7 +278,7 @@ public class ParameterDescription {
     }
   }
 
-  private void validateValueParameter(String name, Object value) {
+  void validateValueParameter(String name, Object value) {
     Class<? extends IValueValidator> validator = wrappedParameter.validateValueWith();
     if (validator != null) {
       validateValueParameter(validator, name, value);

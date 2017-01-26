@@ -1325,6 +1325,34 @@ public class JCommanderTest {
     Assert.assertEquals(p1.test, 47);
   }
 
+  static class ValuesValidator implements IValueValidator<List<Integer>> {
+    @Override
+    public void validate(String name, List<Integer> values) throws ParameterException {
+      int previous = Integer.MIN_VALUE;
+      for (Integer i : values) {
+        if (i <= previous) {
+          throw new ParameterException("Invalid: values should be strictly increasing.");
+        }
+        previous = i;
+      }
+    }
+  }
+
+  @Test(expectedExceptions = ParameterException.class, expectedExceptionsMessageRegExp = ".*strictly.*")
+  public void issue() {
+    class Arguments {
+      @Parameter(names = {"-v", "--values"},
+              required = true,
+              variableArity = true,
+              validateValueWith = ValuesValidator.class)
+      private List<Integer> values;
+  }
+
+    String[] commands = "-v 1 5 2".split("\\s+");
+    Arguments arg = new Arguments();
+    new JCommander(arg, commands);
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) {
 
