@@ -609,7 +609,7 @@ public class JCommander {
     /**
      * Main method that parses the values and initializes the fields accordingly.
      */
-    private void parseValues(final String[] args, final boolean validate) {
+    private void parseValues(String[] args, boolean validate) {
         // This boolean becomes true if we encounter a command, which indicates we need
         // to stop parsing (the parsing of the command will be done in a sub JCommander
         // object)
@@ -1284,7 +1284,7 @@ public class JCommander {
      * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
      * @param converterFactory the factory determining string converters
      */
-    public void addConverterFactory(final IStringConverterFactory converterFactory) {
+    public void addConverterFactory(IStringConverterFactory converterFactory) {
         addConverterInstanceFactory(new IStringConverterInstanceFactory() {
             @SuppressWarnings("unchecked")
             @Override
@@ -1306,7 +1306,7 @@ public class JCommander {
      * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
      * @param converterInstanceFactory the factory generating string converter instances
      */
-    public void addConverterInstanceFactory(final IStringConverterInstanceFactory converterInstanceFactory) {
+    public void addConverterInstanceFactory(IStringConverterInstanceFactory converterInstanceFactory) {
         options.converterInstanceFactories.add(0, converterInstanceFactory);
     }
 
@@ -1324,7 +1324,7 @@ public class JCommander {
      * @param optionName
      * @param value The value to convert
      */
-    public Object convertValue(final Parameterized parameterized, Class type, String optionName, String value) {
+    public Object convertValue(Parameterized parameterized, Class type, String optionName, String value) {
         final Parameter annotation = parameterized.getParameter();
 
         // Do nothing if it's a @DynamicParameter
