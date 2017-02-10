@@ -16,6 +16,7 @@ val jcommander = project {
 
     dependenciesTest {
         compile("org.testng:testng:6.10")
+        exclude("com.beust:jcommander:1.48")
     }
 
     assemble {
