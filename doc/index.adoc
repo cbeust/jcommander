@@ -855,6 +855,18 @@ Usage: <main class> [options]
 
 You can customize the name of your program by calling `setProgramName()` on your JCommander object. Options preceded by an asterisk are required.
 
+You can also specify the order in which each option should be displayed when calling `usage()` by setting the `order` attribute of the `@Parameter` annotation:
+
+[source,java]
+----
+class Parameters {
+    @Parameter(names = "--importantOption", order = 0)
+    private boolean a;
+
+    @Parameter(names = "--lessImportantOption", order = 3)
+    private boolean b;
+----
+
 == Hiding parameters
 
 If you don't want certain parameters to appear in the usage, you can mark them as "hidden":
