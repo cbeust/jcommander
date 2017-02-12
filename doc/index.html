@@ -1541,32 +1541,36 @@ public List&lt;String&gt; foo = new ArrayList&lt;&gt;();</code></pre>
 <div class="sect3">
 <h4 id="_with_a_class">10.2.2. With a class</h4>
 <div class="paragraph">
-<p>Alternatively, you can define a class in which the following parameters will be stored, based on the order
+<p>Alternatively, you can define a class in which the following parameters will be stored, based on their order
 of appearance:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">  static class MvParameters {
-    @SubParameter(order = 0)
-    String from;
-    @SubParameter(order = 1)
-    String to;
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">static class MvParameters {
+  @SubParameter(order = 0)
+  String from;
+
+  @SubParameter(order = 1)
+  String to;
+}
+
+@Test
+public void arity() {
+  class Parameters {
+    @Parameter(names = {"--mv"}, arity = 2)
+    private MvParameters mvParameters;
   }
 
-  @Test
-  public void arity() {
-    class Parameters {
-      @Parameter(names = {"--mv"}, arity = 2)
-      private MvParameters mvParameters;
-    }
+  Parameters args = new Parameters();
+  JCommander.newBuilder()
+          .addObject(args)
+          .args(new String[]{"--mv", "from", "to"})
+          .build();
 
-    Parameters args = new Parameters();
-    new JCommander(args, new String[]{"--mv", "from", "to"});
-
-    Assert.assertNotNull(args.mvParameters);
-    Assert.assertEquals(args.mvParameters.from, "from");
-    Assert.assertEquals(args.mvParameters.to, "to");
-  }</code></pre>
+  Assert.assertNotNull(args.mvParameters);
+  Assert.assertEquals(args.mvParameters.from, "from");
+  Assert.assertEquals(args.mvParameters.to, "to");
+}</code></pre>
 </div>
 </div>
 </div>
@@ -2017,7 +2021,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-02-12 09:34:51 Pacific Standard Time
+Last updated 2017-02-12 09:47:37 Pacific Standard Time
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

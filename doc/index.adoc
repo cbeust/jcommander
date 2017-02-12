@@ -658,29 +658,32 @@ of appearance:
 
 [source,java]
 ----
-  static class MvParameters {
-    @SubParameter(order = 0)
-    String from;
-    @SubParameter(order = 1)
-    String to;
+static class MvParameters {
+  @SubParameter(order = 0)
+  String from;
+
+  @SubParameter(order = 1)
+  String to;
+}
+
+@Test
+public void arity() {
+  class Parameters {
+    @Parameter(names = {"--mv"}, arity = 2)
+    private MvParameters mvParameters;
   }
 
-  @Test
-  public void arity() {
-    class Parameters {
-      @Parameter(names = {"--mv"}, arity = 2)
-      private MvParameters mvParameters;
-    }
+  Parameters args = new Parameters();
+  JCommander.newBuilder()
+          .addObject(args)
+          .args(new String[]{"--mv", "from", "to"})
+          .build();
 
-    Parameters args = new Parameters();
-    new JCommander(args, new String[]{"--mv", "from", "to"});
-
-    Assert.assertNotNull(args.mvParameters);
-    Assert.assertEquals(args.mvParameters.from, "from");
-    Assert.assertEquals(args.mvParameters.to, "to");
-  }
+  Assert.assertNotNull(args.mvParameters);
+  Assert.assertEquals(args.mvParameters.from, "from");
+  Assert.assertEquals(args.mvParameters.to, "to");
+}
 ----
-
 
 == Multiple option names
 
