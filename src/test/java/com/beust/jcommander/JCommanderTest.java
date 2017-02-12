@@ -119,7 +119,7 @@ public class JCommanderTest {
    */
   
   @Test(dataProvider = "alternateNamesListArgs")
-  public void testAlternateNamesForListArguments(String[] argv) {
+  public void testAlternateNamesForListParameters(String[] argv) {
       AlternateNamesForListArgs args = new AlternateNamesForListArgs();
       
       new JCommander(args, argv);
@@ -1229,14 +1229,14 @@ public class JCommanderTest {
   }
 
   public void dashDashParameter() {
-    class Arguments {
+    class Parameters {
         @Parameter(names = { "-name" })
         public String name;
         @Parameter
         public List<String> mainParameters;
     }
 
-    Arguments a = new Arguments();
+    Parameters a = new Parameters();
     new JCommander(a, "-name", "theName", "--", "param1", "param2");
     Assert.assertEquals(a.name, "theName");
     Assert.assertEquals(a.mainParameters.size(), 2);
@@ -1245,14 +1245,14 @@ public class JCommanderTest {
   }
 
   public void dashDashParameter2() {
-    class Arguments {
+    class Parameters {
         @Parameter(names = { "-name" })
         public String name;
         @Parameter
         public List<String> mainParameters;
     }
 
-    Arguments a = new Arguments();
+    Parameters a = new Parameters();
     new JCommander(a, "param1", "param2", "--", "param3", "-name", "theName");
     Assert.assertNull(a.name);
     Assert.assertEquals(a.mainParameters.size(), 5);
@@ -1264,7 +1264,7 @@ public class JCommanderTest {
   }
 
   public void access() {
-    class Arguments {
+    class Parameters {
       private int bar;
 
       @Parameter(names = { "-bar", "-foo" })
@@ -1276,13 +1276,13 @@ public class JCommanderTest {
       private String otherName;
     }
 
-    Arguments a = new Arguments();
+    Parameters a = new Parameters();
     new JCommander(a, "-bar", "1");
     Assert.assertEquals(a.bar, 1);
   }
 
   public void noDash() {
-    class Arguments {
+    class Parameters {
       private int bar;
 
       @Parameter(names = { "bar", "foo" })
@@ -1294,7 +1294,7 @@ public class JCommanderTest {
       private String otherName;
     }
 
-    Arguments a = new Arguments();
+    Parameters a = new Parameters();
     new JCommander(a, "bar", "1");
     Assert.assertEquals(a.bar, 1);
   }
@@ -1340,7 +1340,7 @@ public class JCommanderTest {
 
   @Test(expectedExceptions = ParameterException.class, expectedExceptionsMessageRegExp = ".*strictly.*")
   public void issue() {
-    class Arguments {
+    class Parameters {
       @Parameter(names = {"-v", "--values"},
               required = true,
               variableArity = true,
@@ -1349,7 +1349,7 @@ public class JCommanderTest {
   }
 
     String[] commands = "-v 1 5 2".split("\\s+");
-    Arguments arg = new Arguments();
+    Parameters arg = new Parameters();
     new JCommander(arg, commands);
   }
 
@@ -1362,12 +1362,12 @@ public class JCommanderTest {
 
   @Test
   public void arity() {
-    class Arguments {
+    class Parameters {
       @Parameter(names = {"--mv"}, arity = 2)
       private MvParameters mvParameters;
     }
 
-    Arguments args = new Arguments();
+    Parameters args = new Parameters();
     new JCommander(args, new String[]{"--mv", "from", "to"});
 
     Assert.assertNotNull(args.mvParameters);
