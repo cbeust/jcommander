@@ -638,13 +638,49 @@ program -foo a1 a2 a3 -bar
 program -foo a1 -bar
 ----
 
-Such a parameter must be of type `List<String>` and have the boolean `variableArity` set to `true`:
+Such a parameter can be parsed in two different ways.
+
+==== With a list
+
+If the number of following parameters is unknown, your parameter must be of type `List<String>` and you
+need to set the boolean `variableArity` to `true`:
 
 [source,java]
 ----
 @Parameter(names = "-foo", variableArity = true)
 public List<String> foo = new ArrayList<>();
 ----
+
+==== With a class
+
+Alternatively, you can define a class in which the following parameters will be stored, based on their order
+of appearance:
+
+[source,java]
+----
+  static class MvParameters {
+    @SubParameter(order = 0)
+    String from;
+    @SubParameter(order = 1)
+    String to;
+  }
+
+  @Test
+  public void arity() {
+    class Parameters {
+      @Parameter(names = {"--mv"}, arity = 2)
+      private MvParameters mvParameters;
+    }
+
+    Parameters args = new Parameters();
+    new JCommander(args, new String[]{"--mv", "from", "to"});
+
+    Assert.assertNotNull(args.mvParameters);
+    Assert.assertEquals(args.mvParameters.from, "from");
+    Assert.assertEquals(args.mvParameters.to, "to");
+  }
+----
+
 
 == Multiple option names
 
