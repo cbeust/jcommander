@@ -1368,7 +1368,10 @@ public class JCommanderTest {
     }
 
     Parameters args = new Parameters();
-    new JCommander(args, new String[]{"--mv", "from", "to"});
+    JCommander.newBuilder()
+            .addObject(args)
+            .args(new String[]{"--mv", "from", "to"})
+            .build();
 
     Assert.assertNotNull(args.mvParameters);
     Assert.assertEquals(args.mvParameters.from, "from");

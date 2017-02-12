@@ -968,6 +968,10 @@ public class JCommander {
         getConsole().println(sb.toString());
     }
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     static class Builder {
         private JCommander jCommander = new JCommander();
         private String[] args = null;
@@ -1084,11 +1088,10 @@ public class JCommander {
         }
 
         public JCommander build() {
-            JCommander result = new JCommander();
             if (args != null) {
-                result.parse(args);
+                jCommander.parse(args);
             }
-            return result;
+            return jCommander;
         }
     }
 
