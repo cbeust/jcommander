@@ -313,9 +313,9 @@ public class ParameterDescription {
   private List<SubParameterIndex> findSubParameters(Class<?> type) {
     List<SubParameterIndex> result = new ArrayList<>();
     for (Field field: type.getDeclaredFields()) {
-      Annotation subArgument = field.getAnnotation(SubParameter.class);
-      if (subArgument != null) {
-        SubParameter sa = (SubParameter) subArgument;
+      Annotation subParameter = field.getAnnotation(SubParameter.class);
+      if (subParameter != null) {
+        SubParameter sa = (SubParameter) subParameter;
         result.add(new SubParameterIndex(sa.order(), field));
       }
     }
