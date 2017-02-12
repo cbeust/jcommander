@@ -141,11 +141,11 @@ public class JCommander {
             public int compare(ParameterDescription p0, ParameterDescription p1) {
                 Parameter a0 = p0.getParameterAnnotation();
                 Parameter a1 = p1.getParameterAnnotation();
-                if (a0.order() != -1 && a1.order() != -1) {
+                if (a0 != null && a0.order() != -1 && a1 != null && a1.order() != -1) {
                     return Integer.compare(a0.order(), a1.order());
-                } else if (a0.order() != -1) {
+                } else if (a0 != null && a0.order() != -1) {
                     return -1;
-                } else if (a1.order() != -1) {
+                } else if (a1 != null && a1.order() != -1) {
                     return 1;
                 } else {
                     return p0.getLongestName().compareTo(p1.getLongestName());
