@@ -215,8 +215,8 @@ public class JCommander {
     /**
      * Disables expanding {@code @file}.
      *
-     * JCommander supports the {@code @file} syntax, which allows you to put all your options into a file and pass this file as parameter
-     * @param expandAtSign whether to expand {@code @file}.
+     * JCommander supports the {@code @file} syntax, which allows you to put all your options
+     * into a file and pass this file as parameter @param expandAtSign whether to expand {@code @file}.
      */
     public void setExpandAtSign(boolean expandAtSign) {
         options.expandAtSign = expandAtSign;
@@ -609,7 +609,7 @@ public class JCommander {
     /**
      * Main method that parses the values and initializes the fields accordingly.
      */
-    private void parseValues(final String[] args, final boolean validate) {
+    private void parseValues(String[] args, boolean validate) {
         // This boolean becomes true if we encounter a command, which indicates we need
         // to stop parsing (the parsing of the command will be done in a sub JCommander
         // object)
@@ -968,6 +968,131 @@ public class JCommander {
         getConsole().println(sb.toString());
     }
 
+    static class Builder {
+        private JCommander jCommander = new JCommander();
+        private String[] args = null;
+
+        public Builder() {
+        }
+
+        /**
+         * Adds the provided arg object to the set of objects that this commander
+         * will parse arguments into.
+         *
+         * @param object The arg object expected to contain {@link Parameter}
+         * annotations. If <code>object</code> is an array or is {@link Iterable},
+         * the child objects will be added instead.
+         */
+        public Builder addObject(Object o) {
+            jCommander.addObject(o);
+            return this;
+        }
+
+        /**
+         * Sets the {@link ResourceBundle} to use for looking up descriptions.
+         * Set this to <code>null</code> to use description text directly.
+         */
+        public Builder resourceBundle(ResourceBundle bundle) {
+            jCommander.setDescriptionsBundle(bundle);
+            return this;
+        }
+
+        public Builder args(String[] args) {
+            this.args = args;
+            return this;
+        }
+
+        /**
+         * Disables expanding {@code @file}.
+         *
+         * JCommander supports the {@code @file} syntax, which allows you to put all your options
+         * into a file and pass this file as parameter @param expandAtSign whether to expand {@code @file}.
+         */
+        public Builder expandAtSign(Boolean expand) {
+            jCommander.setExpandAtSign(expand);
+            return this;
+        }
+
+        /**
+         * Set the program name (used only in the usage).
+         */
+        public Builder programName(String name) {
+            jCommander.setProgramName(name);
+            return this;
+        }
+
+        public Builder columnSize(int columnSize) {
+            jCommander.setColumnSize(columnSize);
+            return this;
+        }
+
+        /**
+         * Define the default provider for this instance.
+         */
+        public Builder defaultProvider(IDefaultProvider provider) {
+            jCommander.setDefaultProvider(provider);
+            return this;
+        }
+
+        /**
+         * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
+         * @param converterFactory the factory determining string converters
+         */
+        public Builder addConverterFactory(IStringConverterFactory factory) {
+            jCommander.addConverterFactory(factory);
+            return this;
+        }
+
+        public Builder verbose(int verbose) {
+            jCommander.setVerbose(verbose);
+            return this;
+        }
+
+        public Builder allowAbbreviatedOptions(boolean b) {
+            jCommander.setAllowAbbreviatedOptions(b);
+            return this;
+        }
+
+        public Builder acceptUnknownOptions(boolean b) {
+            jCommander.setAcceptUnknownOptions(b);
+            return this;
+        }
+
+        public Builder allowParameterOverwriting(boolean b) {
+            jCommander.setAllowParameterOverwriting(b);
+            return this;
+        }
+
+        public Builder atFileCharset(Charset charset) {
+            jCommander.setAtFileCharset(charset);
+            return this;
+        }
+
+        public Builder addConverterInstanceFactory(IStringConverterInstanceFactory factory) {
+            jCommander.addConverterInstanceFactory(factory);
+            return this;
+        }
+
+        public Builder addCommand(Object command) {
+            jCommander.addCommand(command);
+            return this;
+        }
+
+        public Builder addCommand(String name, Object command, String... aliases) {
+            jCommander.addCommand(name, command, aliases);
+            return this;
+        }
+
+        public JCommander build() {
+            JCommander result = new JCommander();
+            if (args != null) {
+                result.parse(args);
+            }
+            return result;
+        }
+    }
+
+
     /**
      * Store the help in the passed string builder.
      */
@@ -978,6 +1103,7 @@ public class JCommander {
     public void usage(StringBuilder out, String indent) {
         if (descriptions == null) createDescriptions();
         boolean hasCommands = !commands.isEmpty();
+        boolean hasOptions = !descriptions.isEmpty();
 
         //indenting
         int descriptionIndent = 6;
@@ -988,7 +1114,8 @@ public class JCommander {
         //
         String programName = this.programName != null ? this.programName.getDisplayName() : "<main class>";
         StringBuilder mainLine = new StringBuilder();
-        mainLine.append(indent).append("Usage: ").append(programName).append(" [options]");
+        mainLine.append(indent).append("Usage: ").append(programName);
+        if (hasOptions) mainLine.append(" [options]");
         if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
         if (mainParameterDescription != null) {
             mainLine.append(" ").append(mainParameterDescription.getDescription());
@@ -1157,7 +1284,7 @@ public class JCommander {
      * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
      * @param converterFactory the factory determining string converters
      */
-    public void addConverterFactory(final IStringConverterFactory converterFactory) {
+    public void addConverterFactory(IStringConverterFactory converterFactory) {
         addConverterInstanceFactory(new IStringConverterInstanceFactory() {
             @SuppressWarnings("unchecked")
             @Override
@@ -1179,7 +1306,7 @@ public class JCommander {
      * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
      * @param converterInstanceFactory the factory generating string converter instances
      */
-    public void addConverterInstanceFactory(final IStringConverterInstanceFactory converterInstanceFactory) {
+    public void addConverterInstanceFactory(IStringConverterInstanceFactory converterInstanceFactory) {
         options.converterInstanceFactories.add(0, converterInstanceFactory);
     }
 
@@ -1197,7 +1324,7 @@ public class JCommander {
      * @param optionName
      * @param value The value to convert
      */
-    public Object convertValue(final Parameterized parameterized, Class type, String optionName, String value) {
+    public Object convertValue(Parameterized parameterized, Class type, String optionName, String value) {
         final Parameter annotation = parameterized.getParameter();
 
         // Do nothing if it's a @DynamicParameter
