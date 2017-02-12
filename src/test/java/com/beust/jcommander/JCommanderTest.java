@@ -1353,6 +1353,28 @@ public class JCommanderTest {
     new JCommander(arg, commands);
   }
 
+  static class MvParameters {
+    @SubParameter(order = 0)
+    String from;
+    @SubParameter(order = 1)
+    String to;
+  }
+
+  @Test
+  public void arity() {
+    class Arguments {
+      @Parameter(names = { "--mv"}, arity = 2)
+      private MvParameters mvParameters;
+    }
+
+    Arguments args = new Arguments();
+    new JCommander(args, new String[] { "--mv", "from", "to" });
+
+    Assert.assertNotNull(args.mvParameters);
+    Assert.assertEquals(args.mvParameters.from, "from");
+    Assert.assertEquals(args.mvParameters.to, "to");
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) {
 

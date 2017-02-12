@@ -1,5 +1,6 @@
 package com.beust.jcommander;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -65,8 +66,21 @@ public class WrappedParameter {
   }
 
   public void addValue(Parameterized parameterized, Object object, Object value) {
+    try {
+      addValue(parameterized, object, value, null);
+    } catch (IllegalAccessException e) {
+      throw new ParameterException("Couldn't set " + object + " to " + value, e);
+    }
+  }
+
+  public void addValue(Parameterized parameterized, Object object, Object value, Field field)
+          throws IllegalAccessException {
     if (parameter != null) {
-      parameterized.set(object, value);
+      if (field != null) {
+        field.set(object, value);
+      } else {
+        parameterized.set(object, value);
+      }
     } else {
       String a = dynamicParameter.assignment();
       String sv = value.toString();

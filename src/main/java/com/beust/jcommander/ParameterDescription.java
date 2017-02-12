@@ -21,18 +21,10 @@ package com.beust.jcommander;
 import com.beust.jcommander.validators.NoValidator;
 import com.beust.jcommander.validators.NoValueValidator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class ParameterDescription {
   private Object object;
@@ -223,16 +215,17 @@ public class ParameterDescription {
    * converter, and if we can't find any, throw an exception.
    */
   public void addValue(String value, boolean isDefault) {
-    addValue(null, value, isDefault, true);
+    addValue(null, value, isDefault, true, -1);
   }
 
-  Object addValue(String name, String value, boolean isDefault, boolean validate) {
+  Object addValue(String name, String value, boolean isDefault, boolean validate, int currentIndex) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
         + " to parameter:" + parameterized.getName());
     if(name == null) {
       name = wrappedParameter.names()[0];
     }
-    if (assigned && ! isMultiOption() && !jCommander.isParameterOverwritingAllowed() || isNonOverwritableForced()) {
+    if (currentIndex == 00 && assigned && ! isMultiOption() && !jCommander.isParameterOverwritingAllowed()
+            || isNonOverwritableForced()) {
       throw new ParameterException("Can only specify option " + name + " once.");
     }
 
@@ -263,12 +256,70 @@ public class ParameterDescription {
       }
       finalValue = l;
     } else {
-      wrappedParameter.addValue(parameterized, object, convertedValue);
-      finalValue = convertedValue;
+      // If the field type is not a collection, see if it's a type that contains @SubParameters annotations
+      List<SubParameterIndex> subParameters = findSubParameters(type);
+      if (! subParameters.isEmpty()) {
+        // @SubParameters found
+        finalValue = handleSubParameters(value, currentIndex, type, subParameters);
+      } else {
+        // No, regular parameter
+        wrappedParameter.addValue(parameterized, object, convertedValue);
+        finalValue = convertedValue;
+      }
     }
     if (! isDefault) assigned = true;
 
     return finalValue;
+  }
+
+  private Object handleSubParameters(String value, int currentIndex, Class<?> type,
+      List<SubParameterIndex> subParameters) {
+    Object finalValue;// Yes, assign each following argument to the corresponding field of that object
+    SubParameterIndex sai = null;
+    for (SubParameterIndex si: subParameters) {
+      if (si.order == currentIndex) {
+        sai = si;
+        break;
+      }
+    }
+    if (sai != null) {
+      Object objectValue = parameterized.get(object);
+      try {
+        if (objectValue == null) {
+          objectValue = type.newInstance();
+          parameterized.set(object, objectValue);
+        }
+        wrappedParameter.addValue(parameterized, objectValue, value, sai.field);
+        finalValue = objectValue;
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new ParameterException("Couldn't instantiate " + type, e);
+      }
+    } else {
+      throw new ParameterException("Couldn't find where to assign parameter " + value + " in " + type);
+    }
+    return finalValue;
+  }
+
+  class SubParameterIndex {
+    int order = -1;
+    Field field;
+
+    public SubParameterIndex(int order, Field field) {
+      this.order = order;
+      this.field = field;
+    }
+  }
+
+  private List<SubParameterIndex> findSubParameters(Class<?> type) {
+    List<SubParameterIndex> result = new ArrayList<>();
+    for (Field field: type.getDeclaredFields()) {
+      Annotation subArgument = field.getAnnotation(SubParameter.class);
+      if (subArgument != null) {
+        SubParameter sa = (SubParameter) subArgument;
+        result.add(new SubParameterIndex(sa.order(), field));
+      }
+    }
+    return result;
   }
 
   private void validateParameter(String name, String value) {
