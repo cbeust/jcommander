@@ -300,6 +300,10 @@ public class ParameterDescription {
     return finalValue;
   }
 
+  public Parameter getParameterAnnotation() {
+    return parameterAnnotation;
+  }
+
   class SubParameterIndex {
     int order = -1;
     Field field;
