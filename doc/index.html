@@ -1863,12 +1863,12 @@ class MainParams {
 </div>
 </div>
 <div class="paragraph">
-<p>The example above specifies a delegate parameter Delegate which is then referenced in MainParams. You only need to add a <code>MainParams</code> object to your</p>
+<p>The example above specifies a delegate parameter Delegate which is then referenced in MainParams. You only need to add a <code>MainParams</code> object to your
+JCommander configuration in order to use the delegate:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">JCommander configuration in order to use the delegate:
-MainParams p = new MainParams();
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">MainParams p = new MainParams();
 new JCommander(p).parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);
 Assert.assertEquals(p.delegate.port, 1234);</code></pre>
@@ -2021,7 +2021,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-02-12 09:47:37 Pacific Standard Time
+Last updated 2017-02-13 09:26:44 PST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

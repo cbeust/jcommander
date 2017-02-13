@@ -911,10 +911,10 @@ class MainParams {
 ----
 
 The example above specifies a delegate parameter Delegate which is then referenced in MainParams. You only need to add a `MainParams` object to your 
+JCommander configuration in order to use the delegate:
 
 [source,java]
 ----
-JCommander configuration in order to use the delegate:
 MainParams p = new MainParams();
 new JCommander(p).parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);
