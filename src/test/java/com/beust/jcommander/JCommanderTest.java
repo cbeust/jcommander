@@ -1392,6 +1392,19 @@ public class JCommanderTest {
     Assert.assertEquals(sb.toString().indexOf("options"), -1);
   }
 
+  @Test
+  public void annotationsAndDynamicParameters() {
+    class DSimple {
+      @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+      public Map<String, String> params = Maps.newHashMap();
+
+      @DynamicParameter(names = "-A", assignment = "@")
+      public Map<String, String> params2 = Maps.newHashMap();
+    }
+
+    new JCommander(new DSimple()).usage(new StringBuilder());
+  }
+
   @Test(enabled = false)
   public static void main(String[] args) {
 
