@@ -485,7 +485,7 @@ Attempting to pass a negative integer to this option will cause a ParameterExcep
 
 === Global parameter validation
 
-After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simple perform this validation in Java on all the arguments that JCommander just parsed.
+After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simply perform this validation in Java on all the arguments that JCommander just parsed.
 
 
 == Main parameter
@@ -923,10 +923,10 @@ class MainParams {
 ----
 
 The example above specifies a delegate parameter Delegate which is then referenced in MainParams. You only need to add a `MainParams` object to your 
+JCommander configuration in order to use the delegate:
 
 [source,java]
 ----
-JCommander configuration in order to use the delegate:
 MainParams p = new MainParams();
 new JCommander(p).parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);
