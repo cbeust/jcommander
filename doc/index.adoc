@@ -365,13 +365,13 @@ For example, here is a list converter that turns a string into a `List<File>`:
 ----
 public class FileListConverter implements IStringConverter<List<File>> {
   @Override
-  public File convert(String files) {
+  public List<File> convert(String files) {
     String [] paths = files.split(",");
-    List<File> files = new ArrayList<>();
+    List<File> fileList = new ArrayList<>();
     for(String path : paths){
-        files.add(new File(path));
+        fileList.add(new File(path));
     }
-    return files;
+    return fileList;
   }
 }
 ----
