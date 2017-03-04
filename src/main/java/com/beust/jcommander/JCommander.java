@@ -888,6 +888,13 @@ public class JCommander {
     }
 
     /**
+     * Get the program name (used only in the usage).
+     */
+    public String getProgramName(){
+        return programName == null ? null : programName.getName();
+    }
+
+    /**
      * Set the program name
      *
      * @param name    program name
@@ -993,7 +1000,7 @@ public class JCommander {
          * Adds the provided arg object to the set of objects that this commander
          * will parse arguments into.
          *
-         * @param object The arg object expected to contain {@link Parameter}
+         * @param o The arg object expected to contain {@link Parameter}
          * annotations. If <code>object</code> is an array or is {@link Iterable},
          * the child objects will be added instead.
          */
@@ -1050,7 +1057,7 @@ public class JCommander {
 
         /**
          * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
-         * @param converterFactory the factory determining string converters
+         * @param factory the factory determining string converters
          */
         public Builder addConverterFactory(IStringConverterFactory factory) {
             jCommander.addConverterFactory(factory);
