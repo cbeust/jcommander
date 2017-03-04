@@ -20,23 +20,23 @@ import java.util.Set;
 public class Parameterized {
 
   // Either a method or a field
-  private Field m_field;
-  private Method m_method;
-  private Method m_getter;
+  private Field field;
+  private Method method;
+  private Method getter;
 
   // Either of these two
-  private WrappedParameter m_wrappedParameter;
-  private ParametersDelegate m_parametersDelegate;
+  private WrappedParameter wrappedParameter;
+  private ParametersDelegate parametersDelegate;
 
   public Parameterized(WrappedParameter wp, ParametersDelegate pd,
       Field field, Method method) {
-    m_wrappedParameter = wp;
-    m_method = method;
-    m_field = field;
-    if (m_field != null) {
-      setFieldAccessible(m_field);
+    wrappedParameter = wp;
+    this.method = method;
+    this.field = field;
+    if (this.field != null) {
+      setFieldAccessible(this.field);
     }
-    m_parametersDelegate = pd;
+    parametersDelegate = pd;
   }
 
   /**
@@ -142,45 +142,45 @@ public class Parameterized {
   }
 
   public WrappedParameter getWrappedParameter() {
-    return m_wrappedParameter;
+    return wrappedParameter;
   }
 
   public Class<?> getType() {
-    if (m_method != null) {
-      return m_method.getParameterTypes()[0];
+    if (method != null) {
+      return method.getParameterTypes()[0];
     } else {
-      return m_field.getType();
+      return field.getType();
     }
   }
 
   public String getName() {
-    if (m_method != null) {
-      return m_method.getName();
+    if (method != null) {
+      return method.getName();
     } else {
-      return m_field.getName();
+      return field.getName();
     }
   }
 
   public Object get(Object object) {
     try {
-      if (m_method != null) {
-        if (m_getter == null) {
-            m_getter = m_method.getDeclaringClass()
-                .getMethod("g" + m_method.getName().substring(1));
+      if (method != null) {
+        if (getter == null) {
+            getter = method.getDeclaringClass()
+                .getMethod("g" + method.getName().substring(1));
         }
-        return m_getter.invoke(object);
+        return getter.invoke(object);
       } else {
-        return m_field.get(object);
+        return field.get(object);
       }
     } catch (SecurityException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
       throw new ParameterException(e);
     } catch (NoSuchMethodException e) {
       // Try to find a field
-      String name = m_method.getName();
+      String name = method.getName();
       String fieldName = Character.toLowerCase(name.charAt(3)) + name.substring(4);
       Object result = null;
       try {
-        Field field = m_method.getDeclaringClass().getDeclaredField(fieldName);
+        Field field = method.getDeclaringClass().getDeclaredField(fieldName);
         if (field != null) {
           setFieldAccessible(field);
           result = field.get(object);
@@ -196,8 +196,8 @@ public class Parameterized {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((m_field == null) ? 0 : m_field.hashCode());
-    result = prime * result + ((m_method == null) ? 0 : m_method.hashCode());
+    result = prime * result + ((field == null) ? 0 : field.hashCode());
+    result = prime * result + ((method == null) ? 0 : method.hashCode());
     return result;
   }
 
@@ -210,24 +210,24 @@ public class Parameterized {
     if (getClass() != obj.getClass())
       return false;
     Parameterized other = (Parameterized) obj;
-    if (m_field == null) {
-      if (other.m_field != null)
+    if (field == null) {
+      if (other.field != null)
         return false;
-    } else if (!m_field.equals(other.m_field))
+    } else if (!field.equals(other.field))
       return false;
-    if (m_method == null) {
-      if (other.m_method != null)
+    if (method == null) {
+      if (other.method != null)
         return false;
-    } else if (!m_method.equals(other.m_method))
+    } else if (!method.equals(other.method))
       return false;
     return true;
   }
 
   public boolean isDynamicParameter(Field field) {
-    if (m_method != null) {
-      return m_method.getAnnotation(DynamicParameter.class) != null;
+    if (method != null) {
+      return method.getAnnotation(DynamicParameter.class) != null;
     } else {
-      return m_field.getAnnotation(DynamicParameter.class) != null;
+      return this.field.getAnnotation(DynamicParameter.class) != null;
     }
   }
 
@@ -246,48 +246,48 @@ public class Parameterized {
 
   public void set(Object object, Object value) {
     try {
-      if (m_method != null) {
-        m_method.invoke(object, value);
+      if (method != null) {
+        method.invoke(object, value);
       } else {
-          m_field.set(object, value);
+          field.set(object, value);
       }
     } catch (IllegalAccessException | IllegalArgumentException ex) {
-      throw new ParameterException(errorMessage(m_method, ex));
+      throw new ParameterException(errorMessage(method, ex));
     } catch (InvocationTargetException ex) {
       // If a ParameterException was thrown, don't wrap it into another one
       if (ex.getTargetException() instanceof ParameterException) {
         throw (ParameterException) ex.getTargetException();
       } else {
-        throw new ParameterException(errorMessage(m_method, ex));
+        throw new ParameterException(errorMessage(method, ex));
       }
     }
   }
 
   public ParametersDelegate getDelegateAnnotation() {
-    return m_parametersDelegate;
+    return parametersDelegate;
   }
 
   public Type getGenericType() {
-    if (m_method != null) {
-      return m_method.getGenericParameterTypes()[0];
+    if (method != null) {
+      return method.getGenericParameterTypes()[0];
     } else {
-      return m_field.getGenericType();
+      return field.getGenericType();
     }
   }
 
   public Parameter getParameter() {
-    return m_wrappedParameter.getParameter();
+    return wrappedParameter.getParameter();
   }
 
   /**
    * @return the generic type of the collection for this field, or null if not applicable.
    */
   public Type findFieldGenericType() {
-    if (m_method != null) {
+    if (method != null) {
       return null;
     } else {
-      if (m_field.getGenericType() instanceof ParameterizedType) {
-        ParameterizedType p = (ParameterizedType) m_field.getGenericType();
+      if (field.getGenericType() instanceof ParameterizedType) {
+        ParameterizedType p = (ParameterizedType) field.getGenericType();
         Type cls = p.getActualTypeArguments()[0];
         if (cls instanceof Class) {
           return cls;
@@ -299,7 +299,7 @@ public class Parameterized {
   }
 
   public boolean isDynamicParameter() {
-    return m_wrappedParameter.getDynamicParameter() != null;
+    return wrappedParameter.getDynamicParameter() != null;
   }
 
 }

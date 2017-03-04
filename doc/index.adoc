@@ -1,0 +1,1029 @@
+
+= JCommander
+:author: Cédric Beust
+:email: cedric@beust.com
+:toc: left
+:source-highlighter: prettify
+:sectnums:
+
+++++
+<div style="float:right">
+<div style="display:inline-block">
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+  <input type="hidden" name="cmd" value="_donations">
+  <input type="hidden" name="business" value="cedric@beust.com">
+  <input type="hidden" name="lc" value="US">
+  <input type="hidden" name="item_name" value="Cedric Beust">
+  <input type="hidden" name="no_note" value="0">
+  <input type="hidden" name="currency_code" value="USD">
+  <input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
+  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+  <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" hidden="" style="display: none !important;">
+  </form>
+</div>
+</div>
+++++
+
+
+__"Because life is too short to parse command line parameters"__
+
+== Overview
+
+JCommander is a very small Java framework that makes it trivial to parse command line parameters.
+You annotate fields with descriptions of your options:
+
+[source,java]
+----
+import com.beust.jcommander.Parameter;
+ 
+public class JCommanderExample {
+  @Parameter
+  private List<String> parameters = new ArrayList<>();
+ 
+  @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
+  private Integer verbose = 1;
+ 
+  @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
+  private String groups;
+ 
+  @Parameter(names = "-debug", description = "Debug mode")
+  private boolean debug = false;
+}
+----
+
+and then you simply ask JCommander to parse:
+
+[source,java]
+----
+JCommanderExample jct = new JCommanderExample();
+String[] argv = { "-log", "2", "-groups", "unit" };
+new JCommander(jct, argv);
+ 
+Assert.assertEquals(jct.verbose.intValue(), 2);
+----
+
+Here is another example:
+
+[source,java]
+----
+class Main {
+    @Parameter(names={"--length", "-l"})
+    int length;
+    @Parameter(names={"--pattern", "-p"})
+    int pattern;
+ 
+    public static void main(String ... args) {
+        Main main = new Main();
+        new JCommander(main, args);
+        main.run();
+    }
+ 
+    public void run() {
+        System.out.printf("%d %d", length, pattern);
+    }
+}
+----
+
+[source,bash]
+----
+$ java Main -l 512 --pattern 2
+512 2
+----
+
+
+== Types of options
+
+The fields representing your parameters can be of any type. Basic types (`Integer`, `Boolean`, etc...) are supported by default and you can write type converters to support any other type (`File`, etc...).
+
+=== Boolean
+
+When a Parameter annotation is found on a field of type `boolean` or `Boolean`, JCommander interprets it as an option with an arity of 0:
+
+[source,java]
+----
+@Parameter(names = "-debug", description = "Debug mode")
+private boolean debug = false;
+----
+
+Such a parameter does not require any additional parameter on the command line and if it's detected during parsing, the corresponding field will be set to true. If you want to define a boolean parameter that's true by default, you can declare it as having an arity of 1. Users will then have to specify the value they want explicitly:
+
+[source,java]
+----
+@Parameter(names = "-debug", description = "Debug mode", arity = 1)
+private boolean debug = true;
+----
+
+Invoke with either of:
+
+[source,bash]
+----
+program -debug true
+program -debug false
+----
+
+When a Parameter annotation is found on a field of type `String`, `Integer`, `int`, `Long` or `long`, JCommander will parse the following parameter and it will attempt to cast it to the right type:
+
+[source,java]
+----
+@Parameter(names = "-log", description = "Level of verbosity")
+private Integer verbose = 1;
+----
+
+[source,bash]
+----
+java Main -log 3
+----
+
+will cause the field verbose to receive the value 3. However:
+
+[source,bash]
+----
+$ java Main -log test
+----
+
+will cause an exception to be thrown.
+
+=== Lists
+
+When a Parameter annotation is found on a field of type `List`, JCommander will interpret it as an option that can occur multiple times:
+
+[source,java]
+----
+@Parameter(names = "-host", description = "The host")
+private List<String> hosts = new ArrayList<>();
+----
+
+will allow you to parse the following command line:
+
+[source,bash]
+----
+$ java Main -host host1 -verbose -host host2
+----
+
+When JCommander is done parsing the line above, the field hosts will contain the strings `"host1"` and `"host2"`.
+
+=== Password
+
+If one of your parameters is a password or some other value that you do not wish to appear in your history or in clear, you can declare it of type password and JCommander will then ask you to enter it in the console:
+
+[source,java]
+----
+public class ArgsPassword {
+  @Parameter(names = "-password", description = "Connection password", password = true)
+  private String password;
+}
+----
+
+When you run your program, you will get the following prompt:
+
+[source,bash]
+----
+Value for -password (Connection password):
+----
+
+You will need to type the value at this point before JCommander resumes.
+
+=== Echo Input
+
+In Java 6, by default, you will not be able to see what you type for passwords entered at the prompt (Java 5 and lower will always show the password). However, you can override this by setting echoInput to `true` (default is `false` and this setting only has an effect when password is `true`):
+
+[source,java]
+----
+public class ArgsPassword {
+  @Parameter(names = "-password", description = "Connection password", password = true, echoInput = true)
+  private String password;
+}
+----
+
+== Custom types (converters and splitters)
+
+To bind parameters to custom types or change the way how JCommander splits parameters (default is to split via comma) JCommander provides two
+interfaces `IStringConverter` and `IParameterSplitter`.
+
+[[single-value]]
+=== Custom types - Single value
+
+Use either the `converter=` attribute of the `@Parameter` or implement `IStringConverterFactory`.
+
+==== By annotation
+
+By default, JCommander parses the command line into basic types only (strings, booleans, integers and longs). Very often, your application actually needs more complex types (such as files, host names, lists, etc.). To achieve this, you can write a type converter by implementing the following interface:
+
+[source,java]
+----
+public interface IStringConverter<T> {
+  T convert(String value);
+}
+----
+
+For example, here is a converter that turns a string into a File:
+
+[source,java]
+----
+public class FileConverter implements IStringConverter<File> {
+  @Override
+  public File convert(String value) {
+    return new File(value);
+  }
+}
+----
+
+Then, all you need to do is declare your field with the correct type and specify the converter as an attribute:
+
+[source,java]
+----
+@Parameter(names = "-file", converter = FileConverter.class)
+File file;
+----
+
+JCommander ships with a few common converters (for more info please see the implementations of `IStringConverter`).
+
+===== Note
+
+If a converter is used for a `List` field:
+
+[source,java]
+----
+@Parameter(names = "-files", converter = FileConverter.class)
+List<File> files;
+----
+
+And the application is called as follows:
+
+[source,bash]
+----
+$ java App -files file1,file2,file3
+----
+
+JCommander will split the string `file1,file2,file3` into `file1`, `file2`, `file3` and feed it one by one to the converter.
+
+For an alternative solution to parse a list of values, see <<list-value>>.
+
+==== By factory
+
+If the custom types you use appear multiple times in your application, having to specify the converter in each annotation can become tedious. To address this, you can use an `IStringConverterFactory`:
+
+[source,java]
+----
+public interface IStringConverterFactory {
+  <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType);
+}
+----
+
+For example, suppose you need to parse a string representing a host and a port:
+
+[source,bash]
+----
+$ java App -target example.com:8080
+----
+
+You define the holder class :
+
+[source,java]
+----
+public class HostPort {
+  public HostPort(String host, String port) {
+     this.host = host;
+     this.port = port;
+  }
+
+  final String host;
+  final Integer port;
+}
+----
+
+and the string converter to create instances of this class:
+
+[source,java]
+----
+class HostPortConverter implements IStringConverter<HostPort> {
+  @Override
+  public HostPort convert(String value) {
+    String[] s = value.split(":");
+    return new HostPort(s[0], Integer.parseInt(s[1]));
+  }
+}
+----
+
+The factory is straightforward:
+
+[source,java]
+----
+public class Factory implements IStringConverterFactory {
+  public Class<? extends IStringConverter<?>> getConverter(Class forType) {
+    if (forType.equals(HostPort.class)) return HostPortConverter.class;
+    else return null;
+  }
+----
+
+You can now use the type `HostPort` as a parameter without any converterClass attribute:
+
+[source,java]
+----
+public class ArgsConverterFactory {
+  @Parameter(names = "-hostport")
+  private HostPort hostPort;
+}
+----
+
+All you need to do is add the factory to your JCommander object:
+
+[source,java]
+----
+ArgsConverterFactory a = new ArgsConverterFactory();
+JCommander jc = new JCommander(a);
+jc.addConverterFactory(new Factory());
+jc.parse("-hostport", "example.com:8080");
+
+Assert.assertEquals(a.hostPort.host, "example.com");
+Assert.assertEquals(a.hostPort.port.intValue(), 8080);
+----
+
+Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
+
+[[list-value]]
+=== Custom types - List value
+
+Use the `listConverter=` attribute of the `@Parameter` annotation and assign a custom `IStringConverter` implementation to convert a `String` into a `List` of values.
+
+==== By annotation
+
+If your application needs a list of complex types, write a list type converter by implementing the same interface as before:
+
+[source,java]
+----
+public interface IStringConverter<T> {
+  T convert(String value);
+}
+----
+where `T` is a `List`.
+
+
+For example, here is a list converter that turns a string into a `List<File>`:
+
+[source,java]
+----
+public class FileListConverter implements IStringConverter<List<File>> {
+  @Override
+  public List<File> convert(String files) {
+    String [] paths = files.split(",");
+    List<File> fileList = new ArrayList<>();
+    for(String path : paths){
+        fileList.add(new File(path));
+    }
+    return fileList;
+  }
+}
+----
+
+Then, all you need to do is declare your field with the correct type and specify the list converter as an attribute:
+
+[source,java]
+----
+@Parameter(names = "-files", listConverter = FileListConverter.class)
+List<File> file;
+----
+
+Now if you call for application as in the following example:
+
+[source,bash]
+----
+$ java App -files file1,file2,file3
+----
+
+The parameter `file1,file2,file3` is given to the `listConverter` and will the properly processed.
+
+JCommander ships with a default converter for `String` values.
+
+
+=== Splitting
+
+Use the `splitter=` attribute of the `@Parameter` annotation and assign a custom `IParameterSplitter` implementation to handle how parameters are split in sub-parts.
+
+==== By annotation
+
+By default, JCommander tries to split parameters for `List` field types on commas.
+
+To split parameters on other characters, you can write a custom splitter by implementing the following interface:
+
+[source,java]
+----
+public interface IParameterSplitter {
+  List<String> split(String value);
+}
+----
+
+For example, here is a splitter that splits a string on semicolon:
+
+[source,java]
+----
+public static class SemiColonSplitter implements IParameterSplitter {
+    public List<String> split(String value) {
+      return Arrays.asList(value.split(";"));
+    }
+}
+----
+
+Then, all you need to do is declare your field with the correct type and specify the splitter as an attribute:
+
+[source,java]
+----
+@Parameter(names = "-files", converter = FileConverter.class, splitter = SemiColonSplitter.class)
+List<File> files;
+----
+
+JCommander will split the string `file1;file2;file3` into `file1`, `file2`, `file3` and feed it one by one to the converter.
+
+
+== Parameter validation
+
+Parameter validation can be performed in two different ways: at the individual parameter level or globally.
+
+=== Individual parameter validation
+
+You can ask JCommander to perform early validation on your parameters by providing a class that implements the following interface:
+
+[source,java]
+----
+public interface IParameterValidator {
+ /**
+   * Validate the parameter.
+   *
+   * @param name The name of the parameter (e.g. "-host").
+   * @param value The value of the parameter that we need to validate
+   *
+   * @throws ParameterException Thrown if the value of the parameter is invalid.
+   */
+  void validate(String name, String value) throws ParameterException;
+}
+----
+
+Here is an example implementation that will make sure that the parameter is a positive integer:
+
+[source,java]
+----
+public class PositiveInteger implements IParameterValidator {
+ public void validate(String name, String value)
+      throws ParameterException {
+    int n = Integer.parseInt(value);
+    if (n < 0) {
+      throw new ParameterException("Parameter " + name + " should be positive (found " + value +")");
+    }
+  }
+}
+----
+
+Specify the name of a class implementing this interface in the `validateWith` attribute of your `@Parameter` annotations:
+
+[source,java]
+----
+@Parameter(names = "-age", validateWith = PositiveInteger.class)
+private Integer age;
+----
+
+Attempting to pass a negative integer to this option will cause a ParameterException to be thrown.
+
+=== Global parameter validation
+
+After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simply perform this validation in Java on all the arguments that JCommander just parsed.
+
+
+== Main parameter
+
+So far, all the `@Parameter` annotations we have seen had defined an attribute called `names`. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a `List<String>` and it will contain all the parameters that are not options:
+
+[source,java]
+----
+@Parameter(description = "Files")
+private List<String> files = new ArrayList<>();
+ 
+@Parameter(names = "-debug", description = "Debugging level")
+private Integer debug = 1;
+----
+
+will allow you to parse:
+
+[source,bash]
+----
+$ java Main -debug file1 file2
+----
+
+and the field files will receive the strings `"file1"` and `"file2"`.
+
+== Private parameters
+
+Parameters can be private:
+
+[source,java]
+----
+public class ArgsPrivate {
+  @Parameter(names = "-verbose")
+  private Integer verbose = 1;
+ 
+  public Integer getVerbose() {
+    return verbose;
+  }
+}
+ArgsPrivate args = new ArgsPrivate();
+new JCommander(args, "-verbose", "3");
+Assert.assertEquals(args.getVerbose().intValue(), 3);
+----
+
+== Parameter separators
+
+By default, parameters are separated by spaces, but you can change this setting to allow different separators:
+
+[source,bash]
+----
+$ java Main -log:3
+----
+
+or
+
+[source,bash]
+----
+$ java Main -level=42
+----
+
+You define the separator with the @Parameters annotation:
+
+[source,java]
+----
+@Parameters(separators = "=")
+public class SeparatorEqual {
+  @Parameter(names = "-level")
+  private Integer level = 2;
+}
+----
+
+== Multiple descriptions
+
+You can spread the description of your parameters on more than one class. For example, you can define the following two classes:
+
+[source,java]
+----
+public class ArgsMaster {
+  @Parameter(names = "-master")
+  private String master;
+}
+
+public class ArgsSlave {
+  @Parameter(names = "-slave")
+  private String slave;
+}
+----
+
+and pass these two objects to JCommander:
+
+[source,java]
+----
+ArgsMaster m = new ArgsMaster();
+ArgsSlave s = new ArgsSlave();
+String[] argv = { "-master", "master", "-slave", "slave" };
+new JCommander(new Object[] { m , s }, argv);
+ 
+Assert.assertEquals(m.master, "master");
+Assert.assertEquals(s.slave, "slave");
+----
+
+== @ syntax
+
+JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:
+
+[[app-listing]]
+[source,bash]
+./tmp/parameters
+----
+-verbose
+file1
+file2
+file3
+----
+
+[source,bash]
+----
+$ java Main @/tmp/parameters
+----
+
+== Arities (multiple values for parameters)
+
+=== Fixed arities
+
+If some of your parameters require more than one value, such as the following example where two values are expected after -pairs:
+
+[source,bash]
+----
+$ java Main -pairs slave master foo.xml
+----
+
+then you need to define your parameter with the arity attribute and make that parameter a `List<String>`:
+
+[source,java]
+----
+@Parameter(names = "-pairs", arity = 2, description = "Pairs")
+private List<String> pairs;
+----
+
+You don't need to specify an arity for parameters of type `boolean` or `Boolean` (which have a default arity of 0) and of types `String`, `Integer`, `int`, `Long` and `long` (which have a default arity of 1).
+
+Also, note that only `List<String>` is allowed for parameters that define an arity. You will have to convert these values yourself if the parameters you need are of type `Integer` or other (this limitation is due to Java's erasure).
+
+=== Variable arities
+
+You can specify that a parameter can receive an indefinite number of parameters, up to the next option. For example:
+
+[source,bash]
+----
+program -foo a1 a2 a3 -bar
+program -foo a1 -bar
+----
+
+Such a parameter can be parsed in two different ways.
+
+==== With a list
+
+If the number of following parameters is unknown, your parameter must be of type `List<String>` and you
+need to set the boolean `variableArity` to `true`:
+
+[source,java]
+----
+@Parameter(names = "-foo", variableArity = true)
+public List<String> foo = new ArrayList<>();
+----
+
+==== With a class
+
+Alternatively, you can define a class in which the following parameters will be stored, based on their order
+of appearance:
+
+[source,java]
+----
+static class MvParameters {
+  @SubParameter(order = 0)
+  String from;
+
+  @SubParameter(order = 1)
+  String to;
+}
+
+@Test
+public void arity() {
+  class Parameters {
+    @Parameter(names = {"--mv"}, arity = 2)
+    private MvParameters mvParameters;
+  }
+
+  Parameters args = new Parameters();
+  JCommander.newBuilder()
+          .addObject(args)
+          .args(new String[]{"--mv", "from", "to"})
+          .build();
+
+  Assert.assertNotNull(args.mvParameters);
+  Assert.assertEquals(args.mvParameters.from, "from");
+  Assert.assertEquals(args.mvParameters.to, "to");
+}
+----
+
+== Multiple option names
+
+You can specify more than one option name:
+[source,java]
+----
+@Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
+private String outputDirectory;
+----
+
+will allow both following syntaxes:
+
+[source,bash]
+----
+$ java Main -d /tmp
+$ java Main --outputDirectory /tmp
+----
+
+== Other option configurations
+
+You can configure how options are looked up in a few different ways:
+
+- `JCommander#setCaseSensitiveOptions(boolean)`: specify whether options are case sensitive. If you call this method with `false`, then `"-param"` and `"-PARAM"` are considered equal.
+- `JCommander#setAllowAbbreviatedOptions(boolean)`: specify whether users can pass abbreviated options. If you call this method with `true` then users can pass `"-par"` to specify an option called `-param`. JCommander will throw a `ParameterException` if the abbreviated name is ambiguous.
+
+== Required and optional parameters
+
+If some of your parameters are mandatory, you can use the `required` attribute (which default to `false`):
+
+[source,java]
+----
+@Parameter(names = "-host", required = true)
+private String host;
+----
+
+If this parameter is not specified, JCommander will throw an exception telling you which options are missing.
+
+== Default values
+
+The most common way to specify a default value for your parameters is to initialize the field at declaration time:
+
+[source,java]
+----
+private Integer logLevel = 3;
+----
+
+For more complicated cases, you might want to be able to reuse identical default values across several main classes or be able to specify these default values in a centralized location such as a `.properties` or an XML file. In this case, you can use an `IDefaultProvider`:
+
+[source,java]
+----
+public interface IDefaultProvider {
+  /**
+   * @param optionName The name of the option as specified in the names() attribute
+   * of the @Parameter option (e.g. "-file").
+   *
+   * @return the default value for this option.
+   */
+  String getDefaultValueFor(String optionName);
+}
+----
+
+By passing an implementation of this interface to your JCommander object, you can now control which default value will be used for your options. Note that the value returned by this method will then be passed to a string converter, if any is applicable, thereby allowing you to specify default values for any types you need.
+
+For example, here is a default provider that will assign a default value of 42 for all your parameters except `"-debug"`:
+
+[source,java]
+----
+private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
+  @Override
+  public String getDefaultValueFor(String optionName) {
+    return "-debug".equals(optionName) ? "false" : "42";
+  }
+};
+
+// ...
+ 
+JCommander jc = new JCommander(new Args());
+jc.setDefaultProvider(DEFAULT_PROVIDER);
+----
+
+
+== Help parameter
+
+If one of your parameters is used to display some help or usage, you need use the help attribute:
+
+[source,java]
+----
+@Parameter(names = "--help", help = true)
+private boolean help;
+----
+
+If you omit this boolean, JCommander will instead issue an error message when it tries to validate your command and it finds that you didn't specify some of the required parameters.
+
+== More complex syntaxes (commands)
+
+Complex tools such as `git` or `svn` understand a whole set of commands, each of which with their own specific syntax:
+
+[source,bash]
+----
+$ git commit --amend -m "Bug fix"
+----
+
+Words such as `"commit"` above are called "commands" in JCommander, and you can specify them by creating one arg object per command:
+
+[source,java]
+----
+@Parameters(separators = "=", commandDescription = "Record changes to the repository")
+private class CommandCommit {
+ 
+  @Parameter(description = "The list of files to commit")
+  private List<String> files;
+ 
+  @Parameter(names = "--amend", description = "Amend")
+  private Boolean amend = false;
+ 
+  @Parameter(names = "--author")
+  private String author;
+}
+
+@Parameters(commandDescription = "Add file contents to the index")
+public class CommandAdd {
+ 
+  @Parameter(description = "File patterns to add to the index")
+  private List<String> patterns;
+ 
+  @Parameter(names = "-i")
+  private Boolean interactive = false;
+}
+----
+
+Then you register these commands with your JCommander object. After the parsing phase, you call `getParsedCommand()` on your JCommander object, and based on the command that is returned, you know which arg object to inspect (you can still use a main arg object if you want to support options before the first command appears on the command line):
+
+[source,java]
+----
+CommandMain cm = new CommandMain();
+JCommander jc = new JCommander(cm);
+ 
+CommandAdd add = new CommandAdd();
+jc.addCommand("add", add);
+CommandCommit commit = new CommandCommit();
+jc.addCommand("commit", commit);
+ 
+jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
+ 
+Assert.assertTrue(cm.verbose);
+Assert.assertEquals(jc.getParsedCommand(), "commit");
+Assert.assertTrue(commit.amend);
+Assert.assertEquals(commit.author, "cbeust");
+Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+----
+
+== Exception
+
+Whenever JCommander detects an error, it will throw a `ParameterException`. Note that this is a Runtime Exception, since your application is probably not initialized correctly at this point.
+
+== Usage
+
+You can invoke `usage()` on the JCommander instance that you used to parse your command line in order to generate a summary of all the options that your program understands:
+
+[source,bash]
+----
+Usage: <main class> [options]
+  Options:
+    -debug          Debug mode (default: false)
+    -groups         Comma-separated list of group names to be run
+  * -log, -verbose  Level of verbosity (default: 1)
+    -long           A long number (default: 0)
+----
+
+You can customize the name of your program by calling `setProgramName()` on your JCommander object. Options preceded by an asterisk are required.
+
+You can also specify the order in which each option should be displayed when calling `usage()` by setting the `order` attribute of the `@Parameter` annotation:
+
+[source,java]
+----
+class Parameters {
+    @Parameter(names = "--importantOption", order = 0)
+    private boolean a;
+
+    @Parameter(names = "--lessImportantOption", order = 3)
+    private boolean b;
+----
+
+== Hiding parameters
+
+If you don't want certain parameters to appear in the usage, you can mark them as "hidden":
+
+[source,java]
+----
+@Parameter(names = "-debug", description = "Debug mode", hidden = true)
+private boolean debug = false;
+----
+
+
+== Internationalization
+
+You can internationalize the descriptions of your parameters. First you use the `@Parameters` annotation at the top of your class to define the name of your message bundle, and then you use the `descriptionKey` attribute instead of description on all the `@Parameters` that require translations. This `descriptionKey` is the key to the string into your message bundle:
+
+[source,java]
+----
+@Parameters(resourceBundle = "MessageBundle")
+private class ArgsI18N2 {
+  @Parameter(names = "-host", description = "Host", descriptionKey = "host")
+  String hostName;
+}
+----
+
+Your bundle needs to define this key: 
+
+[source,bash]
+----
+host: Hôte
+----
+
+JCommander will then use the default locale to resolve your descriptions.
+
+== Parameter delegates
+
+If you are writing many different tools in the same project, you will probably find that most of these tools can share configurations. While you can use inheritance with your objects to avoid repeating this code, the restriction to single inheritance of implementation might limit your flexibility. To address this problem, JCommander supports parameter delegates.
+
+When JCommander encounters an object annotated with `@ParameterDelegate` in one of your objects, it acts as if this object had been added as a description object itself:
+
+[source,java]
+----
+class Delegate {
+  @Parameter(names = "-port")
+  private int port;
+}
+ 
+class MainParams {
+  @Parameter(names = "-v")
+  private boolean verbose;
+ 
+  @ParametersDelegate
+  private Delegate delegate = new Delegate();
+}
+----
+
+The example above specifies a delegate parameter Delegate which is then referenced in MainParams. You only need to add a `MainParams` object to your 
+JCommander configuration in order to use the delegate:
+
+[source,java]
+----
+MainParams p = new MainParams();
+new JCommander(p).parse("-v", "-port", "1234");
+Assert.assertTrue(p.isVerbose);
+Assert.assertEquals(p.delegate.port, 1234);
+----
+
+== Dynamic parameters
+
+JCommander allows you to specify parameters that are not known at compile time, such as "-Da=b -Dc=d". Such parameters are specified with the `@DynamicParameter` annotation and must be of type `Map<String, String>`. Dynamic parameters are allowed to appear multiple times on the command line:
+
+[source,java]
+----
+@DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+private Map<String, String> params = new HashMap<>();
+----
+
+You can specify a different assignment string than = by using the attribute assignment.
+
+== JCommander in other languages
+
+=== Kotlin
+
+[source,kotlin]
+----
+class Args {
+    @Parameter
+    var targets: List<String> = arrayListOf()
+
+    @Parameter(names = arrayOf("-bf", "--buildFile"), description = "The build file")
+    var buildFile: String? = null
+
+    @Parameter(names = arrayOf("--checkVersions"),
+               description = "Check if there are any newer versions of the dependencies")
+    var checkVersions = false
+}
+----
+
+=== Groovy
+
+Courtesy of Paul King:
+
+[source,groovy]
+----
+import com.beust.jcommander.*
+ 
+class Args {
+  @Parameter(names = ["-f", "--file"], description = "File to load. Can be specified multiple times.")
+  List<String> file
+}
+ 
+new Args().with {
+  new JCommander(it, args)
+  file.each { println "file: ${new File(it).name}" }
+}
+----
+
+== More examples
+
+Here are the description files for a few projects that use JCommander:
+
+- https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java[TestNG]
+- https://github.com/cbeust/kobalt/blob/master/modules/kobalt-plugin-api/src/main/kotlin/com/beust/kobalt/Args.kt[Kobalt]
+
+== Mailing list
+
+Join the http://groups.google.com/group/jcommander[JCommander Google group] if you are interested in discussions about JCommander.
+
+== Javadocs
+
+The Javadocs for JCommander can be found http://jcommander.org/apidocs/[here].
+
+== License
+
+JCommander is released under the https://github.com/cbeust/jcommander/blob/master/license.txt[Apache 2.0 license].
+
+== Download
+
+You can download JCommander from the following locations:
+
+- http://github.com/cbeust/jcommander[Source on github]
+- Gradle
+
+[source,groovy]
+----
+compile "com.beust:jcommander:1.48"
+----
+
+- Maven:
+
+[source,xml]
+----
+<dependency>
+  <groupId>com.beust</groupId>
+  <artifactId>jcommander</artifactId>
+  <version>1.60</version>
+</dependency>
+----
+
+
+

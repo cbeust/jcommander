@@ -1,17 +1,22 @@
+
+
 import com.beust.kobalt.plugin.packaging.assemble
 import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
-
-import org.apache.maven.model.*
+import org.apache.maven.model.Developer
+import org.apache.maven.model.License
+import org.apache.maven.model.Model
+import org.apache.maven.model.Scm
 
 val jcommander = project {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.58"
+    version = "1.65"
 
     dependenciesTest {
-        compile("org.testng:testng:6.9.13")
+        compile("org.testng:testng:6.10")
+        exclude("com.beust:jcommander:1.48")
     }
 
     assemble {

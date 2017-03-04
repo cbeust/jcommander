@@ -27,14 +27,14 @@ import com.beust.jcommander.IStringConverter;
  */
 abstract public class BaseConverter<T> implements IStringConverter<T> {
 
-  private String m_optionName;
+  private String optionName;
 
   public BaseConverter(String optionName) {
-    m_optionName = optionName;
+    this.optionName = optionName;
   }
 
   public String getOptionName() {
-    return m_optionName;
+    return optionName;
   }
 
   protected String getErrorString(String value, String to) {
