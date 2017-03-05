@@ -3,8 +3,10 @@ package com.beust.jcommander;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Test
 public class ParametersNotEmptyTest {
@@ -19,12 +21,17 @@ public class ParametersNotEmptyTest {
 
     @Test
     public void testParameters() throws Exception {
-        final JCommander jc = new JCommander(new Args1());
-        final String parameterNames = jc.getParameters().stream()
-                .map(ParameterDescription::getNames)
-                .sorted()
-                .collect(Collectors.joining(", "));
-        Assert.assertEquals(parameterNames,"-date, -debug",
-                "getParameters returns the @Parameters");
+        JCommander jc = new JCommander(new Args1());
+        List<String> parameters = new ArrayList<>();
+        for (ParameterDescription pd : jc.getParameters()) {
+            parameters.add(pd.getNames());
+        }
+        Collections.sort(parameters);
+
+        Assert.assertEquals(parameters, new ArrayList<String>() {{
+            add("-date");
+            add("-debug");
+        }}
+        );
     }
 }

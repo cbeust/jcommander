@@ -1,5 +1,5 @@
 
-
+import com.beust.kobalt.plugin.java.javaCompiler
 import com.beust.kobalt.plugin.packaging.assemble
 import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
@@ -27,6 +27,10 @@ val jcommander = project {
     bintray {
         publish = true
         sign = true
+    }
+
+    javaCompiler {
+        args("-target", "1.7", "-source", "1.7")
     }
 
     pom = Model().apply {

@@ -1297,7 +1297,7 @@ public class JCommander {
      * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
      * @param converterFactory the factory determining string converters
      */
-    public void addConverterFactory(IStringConverterFactory converterFactory) {
+    public void addConverterFactory(final IStringConverterFactory converterFactory) {
         addConverterInstanceFactory(new IStringConverterInstanceFactory() {
             @SuppressWarnings("unchecked")
             @Override
@@ -1337,7 +1337,7 @@ public class JCommander {
      * @param optionName
      * @param value The value to convert
      */
-    public Object convertValue(Parameterized parameterized, Class type, String optionName, String value) {
+    public Object convertValue(final Parameterized parameterized, Class type, String optionName, String value) {
         final Parameter annotation = parameterized.getParameter();
 
         // Do nothing if it's a @DynamicParameter
