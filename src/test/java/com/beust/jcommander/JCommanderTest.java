@@ -1208,19 +1208,49 @@ public class JCommanderTest {
         Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
     }
 
-    public void partialValidation() {
-        class Arg {
-            @Parameter(names = {"-h", "--host"})
-            String host;
-        }
-        Arg a = new Arg();
-        JCommander jc = new JCommander();
-        jc.setAcceptUnknownOptions(true);
-        jc.addObject(a);
-        jc.parse("-a", "foo", "-h", "host");
-        Assert.assertEquals(a.host, "host");
-        Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
+  public void usageWithSubCommands() {
+    class Arg {
     }
+    @Parameters(commandDescription = "command a")
+    class ArgCommandA {
+      @Parameter(description = "command a parameters")
+      List<String> parameters;
+    }
+    @Parameters(commandDescription = "command b")
+    class ArgCommandB {
+      @Parameter(description = "command b parameters")
+      List<String> parameters;
+    }
+
+    Arg a = new Arg();
+
+    JCommander c = new JCommander(a);
+    c.setColumnSize(100);
+    c.addCommand("a", new ArgCommandA());
+
+    // b is a sub-command of a
+    JCommander aCommand = c.getCommands().get("a");
+    aCommand.addCommand("b", new ArgCommandB());
+
+    StringBuilder sb = new StringBuilder();
+    c.usage(sb);
+    Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
+    Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
+  }
+
+  public void partialValidation() {
+    class Arg {
+      @Parameter(names = { "-h", "--host" })
+      String host;
+    }
+    Arg a = new Arg();
+    JCommander jc = new JCommander();
+    jc.setAcceptUnknownOptions(true);
+    jc.addObject(a);
+    jc.parse("-a", "foo", "-h", "host");
+    Assert.assertEquals(a.host, "host");
+    Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
+  }
 
     /**
      * GITHUB-137.
@@ -1384,6 +1414,17 @@ public class JCommanderTest {
         Assert.assertEquals(args.mvParameters.from, "from");
         Assert.assertEquals(args.mvParameters.to, "to");
     }
+
+  public void programName() {
+    JCommander jcommander = new JCommander();
+    String programName = "main";
+    jcommander.setProgramName(programName);
+    StringBuilder sb = new StringBuilder();
+    jcommander.usage(sb);
+
+    Assert.assertTrue(sb.toString().contains(programName));
+    Assert.assertEquals(jcommander.getProgramName(), programName);
+  }
 
     public void dontShowOptionUsageIfThereAreNoOptions() {
         class CommandTemplate {

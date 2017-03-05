@@ -1,8 +1,9 @@
 ## Changelog
 
 ### Current
-2017-01-14
+2017-03-04
 
+* Added: Add `getProgramName` to `JCommander`, #247
 * Added: Documentation for `listConverter` and `splitter`, #253, (@jeremysolarz)
 * Fixed: Return right parameter name in exception, #227, (@jeremysolarz)
 * Fixed: `JCommander#getParameters` returning nothing, #315, (@simon04)

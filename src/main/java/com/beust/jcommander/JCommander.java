@@ -888,6 +888,13 @@ public class JCommander {
     }
 
     /**
+     * Get the program name (used only in the usage).
+     */
+    public String getProgramName(){
+        return programName == null ? null : programName.getName();
+    }
+
+    /**
      * Set the program name
      *
      * @param name    program name
@@ -993,7 +1000,7 @@ public class JCommander {
          * Adds the provided arg object to the set of objects that this commander
          * will parse arguments into.
          *
-         * @param object The arg object expected to contain {@link Parameter}
+         * @param o The arg object expected to contain {@link Parameter}
          * annotations. If <code>object</code> is an array or is {@link Iterable},
          * the child objects will be added instead.
          */
@@ -1050,7 +1057,7 @@ public class JCommander {
 
         /**
          * Adds a factory to lookup string converters. The added factory is used prior to previously added factories.
-         * @param converterFactory the factory determining string converters
+         * @param factory the factory determining string converters
          */
         public Builder addConverterFactory(IStringConverterFactory factory) {
             jCommander.addConverterFactory(factory);
@@ -1194,7 +1201,7 @@ public class JCommander {
         // If commands were specified, show them as well
         //
         if (hasCommands) {
-            out.append("  Commands:\n");
+            out.append(indent + "  Commands:\n");
             // The magic value 3 is the number of spaces between the name of the option
             // and its description
             for (Map.Entry<ProgramName, JCommander> commands : this.commands.entrySet()) {
@@ -1210,7 +1217,7 @@ public class JCommander {
 
                     // Options for this command
                     JCommander jc = findCommandByAlias(progName.getName());
-                    jc.usage(out, "      ");
+                    jc.usage(out, indent + "      ");
                     out.append("\n");
                 }
             }

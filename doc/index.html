@@ -1194,13 +1194,13 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class FileListConverter implements IStringConverter&lt;List&lt;File&gt;&gt; {
   @Override
-  public File convert(String files) {
+  public List&lt;File&gt; convert(String files) {
     String [] paths = files.split(",");
-    List&lt;File&gt; files = new ArrayList&lt;&gt;();
+    List&lt;File&gt; fileList = new ArrayList&lt;&gt;();
     for(String path : paths){
-        files.add(new File(path));
+        fileList.add(new File(path));
     }
-    return files;
+    return fileList;
   }
 }</code></pre>
 </div>
