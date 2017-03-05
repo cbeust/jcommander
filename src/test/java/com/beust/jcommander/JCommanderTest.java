@@ -1265,13 +1265,38 @@ public class JCommanderTest {
         Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
     }
 
-    public void dashDashParameter() {
-        class Parameters {
-            @Parameter(names = {"-name"})
-            public String name;
-            @Parameter
-            public List<String> mainParameters;
-        }
+  @Test
+  public void dashDashEmpty() {
+    class Parameters {
+      @Parameter
+      public List<String> mainParameters = new ArrayList<>();
+    }
+
+    Parameters a = new Parameters();
+    new JCommander(a, "--");
+    Assert.assertTrue(a.mainParameters.isEmpty());
+  }
+
+  @Test
+  public void dashDashDashDash() {
+    class Parameters {
+      @Parameter
+      public List<String> mainParameters = new ArrayList<>();
+    }
+
+    Parameters a = new Parameters();
+    new JCommander(a, "--", "--");
+    Assert.assertEquals(a.mainParameters.size(), 1);
+    Assert.assertEquals(a.mainParameters.get(0), "--");
+  }
+
+  public void dashDashParameter() {
+    class Parameters {
+        @Parameter(names = { "-name" })
+        public String name;
+        @Parameter
+        public List<String> mainParameters;
+    }
 
         Parameters a = new Parameters();
         new JCommander(a, "-name", "theName", "--", "param1", "param2");

@@ -1,8 +1,9 @@
 ## Changelog
 
 ### Current
-2017-03-04
+2017-03-05
 
+* Fixed: '--' handling, #296
 * Added: Add `getProgramName` to `JCommander`, #247
 * Added: Documentation for `listConverter` and `splitter`, #253, (@jeremysolarz)
 * Fixed: Return right parameter name in exception, #227, (@jeremysolarz)
