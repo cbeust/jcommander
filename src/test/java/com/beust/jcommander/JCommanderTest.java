@@ -1415,6 +1415,17 @@ public class JCommanderTest {
         Assert.assertEquals(args.mvParameters.to, "to");
     }
 
+  public void programName() {
+    JCommander jcommander = new JCommander();
+    String programName = "main";
+    jcommander.setProgramName(programName);
+    StringBuilder sb = new StringBuilder();
+    jcommander.usage(sb);
+
+    Assert.assertTrue(sb.toString().contains(programName));
+    Assert.assertEquals(jcommander.getProgramName(), programName);
+  }
+
     public void dontShowOptionUsageIfThereAreNoOptions() {
         class CommandTemplate {
             @Parameter
