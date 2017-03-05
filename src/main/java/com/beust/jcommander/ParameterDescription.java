@@ -21,36 +21,28 @@ package com.beust.jcommander;
 import com.beust.jcommander.validators.NoValidator;
 import com.beust.jcommander.validators.NoValueValidator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class ParameterDescription {
-  private Object m_object;
+  private Object object;
 
-  private WrappedParameter m_wrappedParameter;
-  private Parameter m_parameterAnnotation;
-  private DynamicParameter m_dynamicParameterAnnotation;
+  private WrappedParameter wrappedParameter;
+  private Parameter parameterAnnotation;
+  private DynamicParameter dynamicParameterAnnotation;
 
   /** The field/method */
-  private Parameterized m_parameterized;
+  private Parameterized parameterized;
   /** Keep track of whether a value was added to flag an error */
-  private boolean m_assigned = false;
-  private ResourceBundle m_bundle;
-  private String m_description;
-  private JCommander m_jCommander;
-  private Object m_default;
+  private boolean assigned = false;
+  private ResourceBundle bundle;
+  private String description;
+  private JCommander jCommander;
+  private Object defaultObject;
   /** Longest of the names(), used to present usage() alphabetically */
-  private String m_longestName = "";
+  private String longestName = "";
 
   public ParameterDescription(Object object, DynamicParameter annotation,
       Parameterized parameterized,
@@ -61,15 +53,15 @@ public class ParameterDescription {
           + "Map but is " + parameterized.getType().getName());
     }
 
-    m_dynamicParameterAnnotation = annotation;
-    m_wrappedParameter = new WrappedParameter(m_dynamicParameterAnnotation);
+    dynamicParameterAnnotation = annotation;
+    wrappedParameter = new WrappedParameter(dynamicParameterAnnotation);
     init(object, parameterized, bundle, jc);
   }
 
   public ParameterDescription(Object object, Parameter annotation, Parameterized parameterized,
       ResourceBundle bundle, JCommander jc) {
-    m_parameterAnnotation = annotation;
-    m_wrappedParameter = new WrappedParameter(m_parameterAnnotation);
+    parameterAnnotation = annotation;
+    wrappedParameter = new WrappedParameter(parameterAnnotation);
     init(object, parameterized, bundle, jc);
   }
 
@@ -100,86 +92,86 @@ public class ParameterDescription {
   }
 
   private void initDescription(String description, String descriptionKey, String[] names) {
-    m_description = description;
+    this.description = description;
     if (! "".equals(descriptionKey)) {
-      if (m_bundle != null) {
-        m_description = m_bundle.getString(descriptionKey);
+      if (bundle != null) {
+        this.description = bundle.getString(descriptionKey);
       }
     }
 
     for (String name : names) {
-      if (name.length() > m_longestName.length()) m_longestName = name;
+      if (name.length() > longestName.length()) longestName = name;
     }
   }
 
   @SuppressWarnings("unchecked")
   private void init(Object object, Parameterized parameterized, ResourceBundle bundle,
       JCommander jCommander) {
-    m_object = object;
-    m_parameterized = parameterized;
-    m_bundle = bundle;
-    if (m_bundle == null) {
-      m_bundle = findResourceBundle(object);
+    this.object = object;
+    this.parameterized = parameterized;
+    this.bundle = bundle;
+    if (this.bundle == null) {
+      this.bundle = findResourceBundle(object);
     }
-    m_jCommander = jCommander;
+    this.jCommander = jCommander;
 
-    if (m_parameterAnnotation != null) {
+    if (parameterAnnotation != null) {
       String description;
       if (Enum.class.isAssignableFrom(parameterized.getType())
-          && m_parameterAnnotation.description().isEmpty()) {
+          && parameterAnnotation.description().isEmpty()) {
         description = "Options: " + EnumSet.allOf((Class<? extends Enum>) parameterized.getType());
       }else {
-        description = m_parameterAnnotation.description();
+        description = parameterAnnotation.description();
       }
-      initDescription(description, m_parameterAnnotation.descriptionKey(),
-          m_parameterAnnotation.names());
-    } else if (m_dynamicParameterAnnotation != null) {
-      initDescription(m_dynamicParameterAnnotation.description(),
-          m_dynamicParameterAnnotation.descriptionKey(),
-          m_dynamicParameterAnnotation.names());
+      initDescription(description, parameterAnnotation.descriptionKey(),
+          parameterAnnotation.names());
+    } else if (dynamicParameterAnnotation != null) {
+      initDescription(dynamicParameterAnnotation.description(),
+          dynamicParameterAnnotation.descriptionKey(),
+          dynamicParameterAnnotation.names());
     } else {
       throw new AssertionError("Shound never happen");
     }
 
     try {
-      m_default = parameterized.get(object);
+      defaultObject = parameterized.get(object);
     } catch (Exception e) {
     }
 
     //
     // Validate default values, if any and if applicable
     //
-    if (m_default != null) {
-      if (m_parameterAnnotation != null) {
-        validateDefaultValues(m_parameterAnnotation.names());
+    if (defaultObject != null) {
+      if (parameterAnnotation != null) {
+        validateDefaultValues(parameterAnnotation.names());
       }
     }
   }
 
   private void validateDefaultValues(String[] names) {
     String name = names.length > 0 ? names[0] : "";
-    validateValueParameter(name, m_default);
+    validateValueParameter(name, defaultObject);
   }
 
   public String getLongestName() {
-    return m_longestName;
+    return longestName;
   }
 
   public Object getDefault() {
-   return m_default;
+   return defaultObject;
   }
 
   public String getDescription() {
-    return m_description;
+    return description;
   }
 
   public Object getObject() {
-    return m_object;
+    return object;
   }
 
   public String getNames() {
     StringBuilder sb = new StringBuilder();
-    String[] names = m_wrappedParameter.names();
+    String[] names = wrappedParameter.names();
     for (int i = 0; i < names.length; i++) {
       if (i > 0) sb.append(", ");
       sb.append(names[i]);
@@ -188,17 +180,17 @@ public class ParameterDescription {
   }
 
   public WrappedParameter getParameter() {
-    return m_wrappedParameter;
+    return wrappedParameter;
   }
 
   public Parameterized getParameterized() {
-    return m_parameterized;
+    return parameterized;
   }
 
   private boolean isMultiOption() {
-    Class<?> fieldType = m_parameterized.getType();
+    Class<?> fieldType = parameterized.getType();
     return fieldType.equals(List.class) || fieldType.equals(Set.class)
-        || m_parameterized.isDynamicParameter();
+        || parameterized.isDynamicParameter();
   }
 
   public void addValue(String value) {
@@ -209,12 +201,12 @@ public class ParameterDescription {
    * @return true if this parameter received a value during the parsing phase.
    */
   public boolean isAssigned() {
-    return m_assigned;
+    return assigned;
   }
 
 
   public void setAssigned(boolean b) {
-    m_assigned = b;
+    assigned = b;
   }
 
   /**
@@ -223,16 +215,17 @@ public class ParameterDescription {
    * converter, and if we can't find any, throw an exception.
    */
   public void addValue(String value, boolean isDefault) {
-    addValue(null, value, isDefault, true);
+    addValue(null, value, isDefault, true, -1);
   }
 
-  void addValue(String name, String value, boolean isDefault, boolean validate) {
+  Object addValue(String name, String value, boolean isDefault, boolean validate, int currentIndex) {
     p("Adding " + (isDefault ? "default " : "") + "value:" + value
-        + " to parameter:" + m_parameterized.getName());
+        + " to parameter:" + parameterized.getName());
     if(name == null) {
-      name = m_wrappedParameter.names()[0];
+      name = wrappedParameter.names()[0];
     }
-    if (m_assigned && ! isMultiOption() && !m_jCommander.isParameterOverwritingAllowed() || isNonOverwritableForced()) {
+    if (currentIndex == 00 && assigned && ! isMultiOption() && !jCommander.isParameterOverwritingAllowed()
+            || isNonOverwritableForced()) {
       throw new ParameterException("Can only specify option " + name + " once.");
     }
 
@@ -240,41 +233,108 @@ public class ParameterDescription {
       validateParameter(name, value);
     }
 
-    Class<?> type = m_parameterized.getType();
+    Class<?> type = parameterized.getType();
 
-    Object convertedValue = m_jCommander.convertValue(getParameterized(), getParameterized().getType(), name, value);
+    Object convertedValue = jCommander.convertValue(getParameterized(), getParameterized().getType(), name, value);
     if (validate) {
       validateValueParameter(name, convertedValue);
     }
     boolean isCollection = Collection.class.isAssignableFrom(type);
 
+    Object finalValue;
     if (isCollection) {
       @SuppressWarnings("unchecked")
-      Collection<Object> l = (Collection<Object>) m_parameterized.get(m_object);
+      Collection<Object> l = (Collection<Object>) parameterized.get(object);
       if (l == null || fieldIsSetForTheFirstTime(isDefault)) {
-        l = newCollection(type);
-        m_parameterized.set(m_object, l);
+          l = newCollection(type);
+          parameterized.set(object, l);
       }
       if (convertedValue instanceof Collection) {
-        l.addAll((Collection) convertedValue);
+          l.addAll((Collection) convertedValue);
       } else {
-        l.add(convertedValue);
+          l.add(convertedValue);
+      }
+      finalValue = l;
+    } else {
+      // If the field type is not a collection, see if it's a type that contains @SubParameters annotations
+      List<SubParameterIndex> subParameters = findSubParameters(type);
+      if (! subParameters.isEmpty()) {
+        // @SubParameters found
+        finalValue = handleSubParameters(value, currentIndex, type, subParameters);
+      } else {
+        // No, regular parameter
+        wrappedParameter.addValue(parameterized, object, convertedValue);
+        finalValue = convertedValue;
+      }
+    }
+    if (! isDefault) assigned = true;
+
+    return finalValue;
+  }
+
+  private Object handleSubParameters(String value, int currentIndex, Class<?> type,
+      List<SubParameterIndex> subParameters) {
+    Object finalValue;// Yes, assign each following argument to the corresponding field of that object
+    SubParameterIndex sai = null;
+    for (SubParameterIndex si: subParameters) {
+      if (si.order == currentIndex) {
+        sai = si;
+        break;
+      }
+    }
+    if (sai != null) {
+      Object objectValue = parameterized.get(object);
+      try {
+        if (objectValue == null) {
+          objectValue = type.newInstance();
+          parameterized.set(object, objectValue);
+        }
+        wrappedParameter.addValue(parameterized, objectValue, value, sai.field);
+        finalValue = objectValue;
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new ParameterException("Couldn't instantiate " + type, e);
       }
     } else {
-      m_wrappedParameter.addValue(m_parameterized, m_object, convertedValue);
+      throw new ParameterException("Couldn't find where to assign parameter " + value + " in " + type);
     }
-    if (! isDefault) m_assigned = true;
+    return finalValue;
+  }
+
+  public Parameter getParameterAnnotation() {
+    return parameterAnnotation;
+  }
+
+  class SubParameterIndex {
+    int order = -1;
+    Field field;
+
+    public SubParameterIndex(int order, Field field) {
+      this.order = order;
+      this.field = field;
+    }
+  }
+
+  private List<SubParameterIndex> findSubParameters(Class<?> type) {
+    List<SubParameterIndex> result = new ArrayList<>();
+    for (Field field: type.getDeclaredFields()) {
+      Annotation subParameter = field.getAnnotation(SubParameter.class);
+      if (subParameter != null) {
+        SubParameter sa = (SubParameter) subParameter;
+        result.add(new SubParameterIndex(sa.order(), field));
+      }
+    }
+    return result;
   }
 
   private void validateParameter(String name, String value) {
-    Class<? extends IParameterValidator> validator = m_wrappedParameter.validateWith();
+    Class<? extends IParameterValidator> validator = wrappedParameter.validateWith();
     if (validator != null) {
       validateParameter(this, validator, name, value);
     }
   }
 
-  private void validateValueParameter(String name, Object value) {
-    Class<? extends IValueValidator> validator = m_wrappedParameter.validateValueWith();
+  void validateValueParameter(String name, Object value) {
+    Class<? extends IValueValidator> validator = wrappedParameter.validateValueWith();
     if (validator != null) {
       validateValueParameter(validator, name, value);
     }
@@ -336,7 +396,7 @@ public class ParameterDescription {
    * being added to the field.
    */
   private boolean fieldIsSetForTheFirstTime(boolean isDefault) {
-    return (!isDefault && !m_assigned);
+    return (!isDefault && !assigned);
   }
 
   private static void p(String string) {
@@ -347,18 +407,18 @@ public class ParameterDescription {
 
   @Override
   public String toString() {
-    return "[ParameterDescription " + m_parameterized.getName() + "]";
+    return "[ParameterDescription " + parameterized.getName() + "]";
   }
 
   public boolean isDynamicParameter() {
-    return m_dynamicParameterAnnotation != null;
+    return dynamicParameterAnnotation != null;
   }
 
   public boolean isHelp() {
-    return m_wrappedParameter.isHelp();
+    return wrappedParameter.isHelp();
   }
   
   public boolean isNonOverwritableForced() {
-    return m_wrappedParameter.isNonOverwritableForced();
+    return wrappedParameter.isNonOverwritableForced();
   }
 }

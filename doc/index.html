@@ -1194,13 +1194,13 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class FileListConverter implements IStringConverter&lt;List&lt;File&gt;&gt; {
   @Override
-  public File convert(String files) {
+  public List&lt;File&gt; convert(String files) {
     String [] paths = files.split(",");
-    List&lt;File&gt; files = new ArrayList&lt;&gt;();
+    List&lt;File&gt; fileList = new ArrayList&lt;&gt;();
     for(String path : paths){
-        files.add(new File(path));
+        fileList.add(new File(path));
     }
-    return files;
+    return fileList;
   }
 }</code></pre>
 </div>
@@ -1523,12 +1523,55 @@ program -foo a1 -bar</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Such a parameter must be of type <code>List&lt;String&gt;</code> and have the boolean <code>variableArity</code> set to <code>true</code>:</p>
+<p>Such a parameter can be parsed in two different ways.</p>
+</div>
+<div class="sect3">
+<h4 id="_with_a_list">10.2.1. With a list</h4>
+<div class="paragraph">
+<p>If the number of following parameters is unknown, your parameter must be of type <code>List&lt;String&gt;</code> and you
+need to set the boolean <code>variableArity</code> to <code>true</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-foo", variableArity = true)
 public List&lt;String&gt; foo = new ArrayList&lt;&gt;();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_with_a_class">10.2.2. With a class</h4>
+<div class="paragraph">
+<p>Alternatively, you can define a class in which the following parameters will be stored, based on their order
+of appearance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">static class MvParameters {
+  @SubParameter(order = 0)
+  String from;
+
+  @SubParameter(order = 1)
+  String to;
+}
+
+@Test
+public void arity() {
+  class Parameters {
+    @Parameter(names = {"--mv"}, arity = 2)
+    private MvParameters mvParameters;
+  }
+
+  Parameters args = new Parameters();
+  JCommander.newBuilder()
+          .addObject(args)
+          .args(new String[]{"--mv", "from", "to"})
+          .build();
+
+  Assert.assertNotNull(args.mvParameters);
+  Assert.assertEquals(args.mvParameters.from, "from");
+  Assert.assertEquals(args.mvParameters.to, "to");
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -1749,6 +1792,19 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
 </div>
 <div class="paragraph">
 <p>You can customize the name of your program by calling <code>setProgramName()</code> on your JCommander object. Options preceded by an asterisk are required.</p>
+</div>
+<div class="paragraph">
+<p>You can also specify the order in which each option should be displayed when calling <code>usage()</code> by setting the <code>order</code> attribute of the <code>@Parameter</code> annotation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class Parameters {
+    @Parameter(names = "--importantOption", order = 0)
+    private boolean a;
+
+    @Parameter(names = "--lessImportantOption", order = 3)
+    private boolean b;</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -1978,7 +2034,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-01-22 18:55:26 Pacific Standard Time
+Last updated 2017-02-12 13:03:46 Pacific Standard Time
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

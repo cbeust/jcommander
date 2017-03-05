@@ -34,8 +34,6 @@ import static java.lang.annotation.ElementType.TYPE;
 @Inherited
 public @interface Parameters {
 
-  String DEFAULT_OPTION_PREFIXES = "-";
-
   /**
    * The name of the resource bundle to use for this class.
    */
@@ -45,11 +43,6 @@ public @interface Parameters {
    * The character(s) that separate options.
    */
   String separators() default " ";
-
-  /**
-   * What characters an option starts with.
-   */
-  String optionPrefixes() default DEFAULT_OPTION_PREFIXES;
 
   /**
    * If the annotated class was added to {@link JCommander} as a command with

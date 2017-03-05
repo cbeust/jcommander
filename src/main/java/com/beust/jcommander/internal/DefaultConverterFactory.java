@@ -46,36 +46,36 @@ public class DefaultConverterFactory implements IStringConverterFactory {
   /**
    * A map of converters per class.
    */
-  private static Map<Class, Class<? extends IStringConverter<?>>> m_classConverters;
+  private static Map<Class, Class<? extends IStringConverter<?>>> classConverters;
 
   static {
-    m_classConverters = Maps.newHashMap();
-    m_classConverters.put(String.class, StringConverter.class);
-    m_classConverters.put(Integer.class, IntegerConverter.class);
-    m_classConverters.put(int.class, IntegerConverter.class);
-    m_classConverters.put(Long.class, LongConverter.class);
-    m_classConverters.put(long.class, LongConverter.class);
-    m_classConverters.put(Float.class, FloatConverter.class);
-    m_classConverters.put(float.class, FloatConverter.class);
-    m_classConverters.put(Double.class, DoubleConverter.class);
-    m_classConverters.put(double.class, DoubleConverter.class);
-    m_classConverters.put(Boolean.class, BooleanConverter.class);
-    m_classConverters.put(boolean.class, BooleanConverter.class);
-    m_classConverters.put(File.class, FileConverter.class);
-    m_classConverters.put(BigDecimal.class, BigDecimalConverter.class);
-    m_classConverters.put(Date.class, ISO8601DateConverter.class);
-    m_classConverters.put(URI.class, URIConverter.class);
-    m_classConverters.put(URL.class, URLConverter.class);
+    classConverters = Maps.newHashMap();
+    classConverters.put(String.class, StringConverter.class);
+    classConverters.put(Integer.class, IntegerConverter.class);
+    classConverters.put(int.class, IntegerConverter.class);
+    classConverters.put(Long.class, LongConverter.class);
+    classConverters.put(long.class, LongConverter.class);
+    classConverters.put(Float.class, FloatConverter.class);
+    classConverters.put(float.class, FloatConverter.class);
+    classConverters.put(Double.class, DoubleConverter.class);
+    classConverters.put(double.class, DoubleConverter.class);
+    classConverters.put(Boolean.class, BooleanConverter.class);
+    classConverters.put(boolean.class, BooleanConverter.class);
+    classConverters.put(File.class, FileConverter.class);
+    classConverters.put(BigDecimal.class, BigDecimalConverter.class);
+    classConverters.put(Date.class, ISO8601DateConverter.class);
+    classConverters.put(URI.class, URIConverter.class);
+    classConverters.put(URL.class, URLConverter.class);
 
     try {
-      m_classConverters.put(Path.class, PathConverter.class);
+      classConverters.put(Path.class, PathConverter.class);
     } catch (NoClassDefFoundError ex) {
       // skip if class is not present (e.g. on Android)
     }
   }
 
   public Class<? extends IStringConverter<?>> getConverter(Class forType) {
-    return m_classConverters.get(forType);
+    return classConverters.get(forType);
   }
 
 }

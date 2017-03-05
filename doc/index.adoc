@@ -365,13 +365,13 @@ For example, here is a list converter that turns a string into a `List<File>`:
 ----
 public class FileListConverter implements IStringConverter<List<File>> {
   @Override
-  public File convert(String files) {
+  public List<File> convert(String files) {
     String [] paths = files.split(",");
-    List<File> files = new ArrayList<>();
+    List<File> fileList = new ArrayList<>();
     for(String path : paths){
-        files.add(new File(path));
+        fileList.add(new File(path));
     }
-    return files;
+    return fileList;
   }
 }
 ----
@@ -485,7 +485,7 @@ Attempting to pass a negative integer to this option will cause a ParameterExcep
 
 === Global parameter validation
 
-After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simple perform this validation in Java on all the arguments that JCommander just parsed.
+After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simply perform this validation in Java on all the arguments that JCommander just parsed.
 
 
 == Main parameter
@@ -638,12 +638,51 @@ program -foo a1 a2 a3 -bar
 program -foo a1 -bar
 ----
 
-Such a parameter must be of type `List<String>` and have the boolean `variableArity` set to `true`:
+Such a parameter can be parsed in two different ways.
+
+==== With a list
+
+If the number of following parameters is unknown, your parameter must be of type `List<String>` and you
+need to set the boolean `variableArity` to `true`:
 
 [source,java]
 ----
 @Parameter(names = "-foo", variableArity = true)
 public List<String> foo = new ArrayList<>();
+----
+
+==== With a class
+
+Alternatively, you can define a class in which the following parameters will be stored, based on their order
+of appearance:
+
+[source,java]
+----
+static class MvParameters {
+  @SubParameter(order = 0)
+  String from;
+
+  @SubParameter(order = 1)
+  String to;
+}
+
+@Test
+public void arity() {
+  class Parameters {
+    @Parameter(names = {"--mv"}, arity = 2)
+    private MvParameters mvParameters;
+  }
+
+  Parameters args = new Parameters();
+  JCommander.newBuilder()
+          .addObject(args)
+          .args(new String[]{"--mv", "from", "to"})
+          .build();
+
+  Assert.assertNotNull(args.mvParameters);
+  Assert.assertEquals(args.mvParameters.from, "from");
+  Assert.assertEquals(args.mvParameters.to, "to");
+}
 ----
 
 == Multiple option names
@@ -816,6 +855,18 @@ Usage: <main class> [options]
 
 You can customize the name of your program by calling `setProgramName()` on your JCommander object. Options preceded by an asterisk are required.
 
+You can also specify the order in which each option should be displayed when calling `usage()` by setting the `order` attribute of the `@Parameter` annotation:
+
+[source,java]
+----
+class Parameters {
+    @Parameter(names = "--importantOption", order = 0)
+    private boolean a;
+
+    @Parameter(names = "--lessImportantOption", order = 3)
+    private boolean b;
+----
+
 == Hiding parameters
 
 If you don't want certain parameters to appear in the usage, you can mark them as "hidden":
@@ -872,10 +923,10 @@ class MainParams {
 ----
 
 The example above specifies a delegate parameter Delegate which is then referenced in MainParams. You only need to add a `MainParams` object to your 
+JCommander configuration in order to use the delegate:
 
 [source,java]
 ----
-JCommander configuration in order to use the delegate:
 MainParams p = new MainParams();
 new JCommander(p).parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);

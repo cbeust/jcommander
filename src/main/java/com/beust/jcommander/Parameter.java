@@ -122,9 +122,14 @@ public @interface Parameter {
   
   /**
    * If true, this parameter can be overwritten through a file or another appearance of the parameter
-   * @return 
+   * @return nc
    */
   boolean forceNonOverwritable() default false;
 
+  /**
+   * If specified, this number will be used to order the description of this parameter when usage() is invoked.
+   * @return
+   */
+  int order() default -1;
   
 }

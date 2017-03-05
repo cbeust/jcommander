@@ -1,5 +1,6 @@
 package com.beust.jcommander;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -7,68 +8,81 @@ import java.lang.reflect.Method;
  * Encapsulates the operations common to @Parameter and @DynamicParameter
  */
 public class WrappedParameter {
-  private Parameter m_parameter;
-  private DynamicParameter m_dynamicParameter;
+  private Parameter parameter;
+  private DynamicParameter dynamicParameter;
 
   public WrappedParameter(Parameter p) {
-    m_parameter = p;
+    parameter = p;
   }
 
   public WrappedParameter(DynamicParameter p) {
-    m_dynamicParameter = p;
+    dynamicParameter = p;
   }
 
   public Parameter getParameter() {
-    return m_parameter;
+    return parameter;
   }
 
   public DynamicParameter getDynamicParameter() {
-    return m_dynamicParameter;
+    return dynamicParameter;
   }
 
   public int arity() {
-    return m_parameter != null ? m_parameter.arity() : 1;
+    return parameter != null ? parameter.arity() : 1;
   }
 
   public boolean hidden() {
-    return m_parameter != null ? m_parameter.hidden() : m_dynamicParameter.hidden();
+    return parameter != null ? parameter.hidden() : dynamicParameter.hidden();
   }
 
   public boolean required() {
-    return m_parameter != null ? m_parameter.required() : m_dynamicParameter.required();
+    return parameter != null ? parameter.required() : dynamicParameter.required();
   }
 
   public boolean password() {
-    return m_parameter != null ? m_parameter.password() : false;
+    return parameter != null ? parameter.password() : false;
   }
 
   public String[] names() {
-    return m_parameter != null ? m_parameter.names() : m_dynamicParameter.names();
+    return parameter != null ? parameter.names() : dynamicParameter.names();
   }
 
   public boolean variableArity() {
-    return m_parameter != null ? m_parameter.variableArity() : false;
+    return parameter != null ? parameter.variableArity() : false;
   }
 
   public Class<? extends IParameterValidator> validateWith() {
-    return m_parameter != null ? m_parameter.validateWith() : m_dynamicParameter.validateWith();
+    return parameter != null ? parameter.validateWith() : dynamicParameter.validateWith();
   }
 
   public Class<? extends IValueValidator> validateValueWith() {
-    return m_parameter != null
-        ? m_parameter.validateValueWith()
-        : m_dynamicParameter.validateValueWith();
+    return parameter != null
+        ? parameter.validateValueWith()
+        : dynamicParameter.validateValueWith();
   }
 
   public boolean echoInput() {
-	  return m_parameter != null ? m_parameter.echoInput() : false;
+	  return parameter != null ? parameter.echoInput() : false;
   }
 
   public void addValue(Parameterized parameterized, Object object, Object value) {
-    if (m_parameter != null) {
-      parameterized.set(object, value);
+    try {
+      addValue(parameterized, object, value, null);
+    } catch (IllegalAccessException e) {
+      throw new ParameterException("Couldn't set " + object + " to " + value, e);
+    }
+  }
+
+  public void addValue(Parameterized parameterized, Object object, Object value, Field field)
+          throws IllegalAccessException {
+    if (parameter != null) {
+      if (field != null) {
+        field.set(object, value);
+      } else {
+        parameterized.set(object, value);
+      }
     } else {
-      String a = m_dynamicParameter.assignment();
+      String a = dynamicParameter.assignment();
       String sv = value.toString();
 
       int aInd = sv.indexOf(a);
@@ -96,14 +110,14 @@ public class WrappedParameter {
   }
 
   public String getAssignment() {
-    return m_dynamicParameter != null ? m_dynamicParameter.assignment() : "";
+    return dynamicParameter != null ? dynamicParameter.assignment() : "";
   }
 
   public boolean isHelp() {
-    return m_parameter != null && m_parameter.help();
+    return parameter != null && parameter.help();
   }
 
   public boolean isNonOverwritableForced() {
-      return m_parameter != null && m_parameter.forceNonOverwritable();
+      return parameter != null && parameter.forceNonOverwritable();
   }
 }
