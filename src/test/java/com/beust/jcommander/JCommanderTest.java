@@ -18,8 +18,64 @@
 
 package com.beust.jcommander;
 
-import com.beust.jcommander.args.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.TreeSet;
+
+import com.beust.jcommander.args.AlternateNamesForListArgs;
+import com.beust.jcommander.args.Args1;
+import com.beust.jcommander.args.Args1Setter;
+import com.beust.jcommander.args.Args2;
+import com.beust.jcommander.args.ArgsArityString;
+import com.beust.jcommander.args.ArgsBooleanArity;
+import com.beust.jcommander.args.ArgsBooleanArity0;
+import com.beust.jcommander.args.ArgsConverter;
+import com.beust.jcommander.args.ArgsEnum;
 import com.beust.jcommander.args.ArgsEnum.ChoiceType;
+import com.beust.jcommander.args.ArgsEquals;
+import com.beust.jcommander.args.ArgsHelp;
+import com.beust.jcommander.args.ArgsI18N1;
+import com.beust.jcommander.args.ArgsI18N2;
+import com.beust.jcommander.args.ArgsI18N2New;
+import com.beust.jcommander.args.ArgsInherited;
+import com.beust.jcommander.args.ArgsList;
+import com.beust.jcommander.args.ArgsLongCommandDescription;
+import com.beust.jcommander.args.ArgsLongDescription;
+import com.beust.jcommander.args.ArgsLongMainParameterDescription;
+import com.beust.jcommander.args.ArgsMainParameter1;
+import com.beust.jcommander.args.ArgsMaster;
+import com.beust.jcommander.args.ArgsMultipleUnparsed;
+import com.beust.jcommander.args.ArgsOutOfMemory;
+import com.beust.jcommander.args.ArgsPrivate;
+import com.beust.jcommander.args.ArgsRequired;
+import com.beust.jcommander.args.ArgsSlave;
+import com.beust.jcommander.args.ArgsSlaveBogus;
+import com.beust.jcommander.args.ArgsValidate1;
+import com.beust.jcommander.args.ArgsWithSet;
+import com.beust.jcommander.args.Arity1;
+import com.beust.jcommander.args.HiddenArgs;
+import com.beust.jcommander.args.SeparatorColon;
+import com.beust.jcommander.args.SeparatorEqual;
+import com.beust.jcommander.args.SeparatorMixed;
+import com.beust.jcommander.args.SlashSeparator;
+import com.beust.jcommander.args.VariableArity;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
@@ -28,14 +84,6 @@ import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import java.io.*;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.ResourceBundle;
 
 @Test
 public class JCommanderTest {
@@ -818,21 +866,35 @@ public class JCommanderTest {
         jc.parse("--configure");
     }
 
-    // Tests:
-    // required unparsed parameter
-    @Test(enabled = false,
-            description = "For some reason, this test still asks the password on stdin")
-    public void askedRequiredPassword() {
-        class A {
-            @Parameter(names = {"--password", "-p"}, description = "Private key password",
-                    password = true, required = true)
-            public String password;
+    public static class PasswordTestingArgs {
+        @Parameter(names = {"--password", "-p"}, description = "Private key password",
+                password = true, required = true)
+        public String password;
 
-            @Parameter(names = {"--port", "-o"}, description = "Port to bind server to",
-                    required = true)
-            public int port;
-        }
-        A a = new A();
+        @Parameter(names = {"--port", "-o"}, description = "Port to bind server to",
+                required = true)
+        public int port;
+    }
+
+    @Test
+    public void passwordNotRequiredToAsk() {
+        PasswordTestingArgs a = new PasswordTestingArgs();
+        final String expectedPassword = "somepassword";
+        final int expectedPort = 7;
+        new JCommander(a, "--password", expectedPassword, "--port", String.valueOf(7));
+        Assert.assertEquals(a.port, expectedPort);
+        Assert.assertEquals(a.password, expectedPassword);
+    }
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void passwordWithExcessiveArity() {
+        PasswordTestingArgs a = new PasswordTestingArgs();
+        new JCommander(a, "--password", "somepassword", "someotherarg", "--port", String.valueOf(7));
+    }
+
+    @Test
+    public void passwordRequiredAsked() {
+        PasswordTestingArgs a = new PasswordTestingArgs();
         InputStream stdin = System.in;
         try {
             System.setIn(new ByteArrayInputStream("password".getBytes()));
