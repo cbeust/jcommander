@@ -866,46 +866,6 @@ public class JCommanderTest {
         jc.parse("--configure");
     }
 
-    public static class PasswordTestingArgs {
-        @Parameter(names = {"--password", "-p"}, description = "Private key password",
-                password = true, required = true)
-        public String password;
-
-        @Parameter(names = {"--port", "-o"}, description = "Port to bind server to",
-                required = true)
-        public int port;
-    }
-
-    @Test
-    public void passwordNotRequiredToAsk() {
-        PasswordTestingArgs a = new PasswordTestingArgs();
-        final String expectedPassword = "somepassword";
-        final int expectedPort = 7;
-        new JCommander(a, "--password", expectedPassword, "--port", String.valueOf(7));
-        Assert.assertEquals(a.port, expectedPort);
-        Assert.assertEquals(a.password, expectedPassword);
-    }
-
-    @Test(expectedExceptions = ParameterException.class)
-    public void passwordWithExcessiveArity() {
-        PasswordTestingArgs a = new PasswordTestingArgs();
-        new JCommander(a, "--password", "somepassword", "someotherarg", "--port", String.valueOf(7));
-    }
-
-    @Test
-    public void passwordRequiredAsked() {
-        PasswordTestingArgs a = new PasswordTestingArgs();
-        InputStream stdin = System.in;
-        try {
-            System.setIn(new ByteArrayInputStream("password".getBytes()));
-            new JCommander(a, "--port", "7", "--password");
-            Assert.assertEquals(a.port, 7);
-            Assert.assertEquals(a.password, "password");
-        } finally {
-            System.setIn(stdin);
-        }
-    }
-
     public void dynamicParameters() {
         class Command {
             @DynamicParameter(names = {"-P"}, description = "Additional command parameters")
