@@ -18,19 +18,41 @@
 
 package com.beust.jcommander;
 
-import com.beust.jcommander.FuzzyMap.IKey;
-import com.beust.jcommander.converters.*;
-import com.beust.jcommander.internal.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.beust.jcommander.FuzzyMap.IKey;
+import com.beust.jcommander.converters.DefaultListConverter;
+import com.beust.jcommander.converters.EnumConverter;
+import com.beust.jcommander.converters.IParameterSplitter;
+import com.beust.jcommander.converters.NoConverter;
+import com.beust.jcommander.converters.StringConverter;
+import com.beust.jcommander.internal.Console;
+import com.beust.jcommander.internal.DefaultConsole;
+import com.beust.jcommander.internal.DefaultConverterFactory;
+import com.beust.jcommander.internal.JDK6Console;
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Nullable;
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -642,12 +664,7 @@ public class JCommander {
 
                 if (pd != null) {
                     if (pd.getParameter().password()) {
-                        //
-                        // Password option, use the Console to retrieve the password
-                        //
-                        char[] password = readPassword(pd.getDescription(), pd.getParameter().echoInput());
-                        pd.addValue(new String(password));
-                        requiredFields.remove(pd.getParameterized());
+                        increment = processPassword(args, i, pd, validate);
                     } else {
                         if (pd.getParameter().variableArity()) {
                             //
@@ -760,6 +777,34 @@ public class JCommander {
 
     private final IVariableArity DEFAULT_VARIABLE_ARITY = new DefaultVariableArity();
 
+    private final int determineArity(String[] args, int index, ParameterDescription pd, IVariableArity va) {
+        List<String> currentArgs = Lists.newArrayList();
+        for (int j = index + 1; j < args.length; j++) {
+            currentArgs.add(args[j]);
+        }
+        return va.processVariableArity(pd.getParameter().names()[0],
+                currentArgs.toArray(new String[0]));
+    }
+
+    /**
+     * @return the number of options that were processed.
+     */
+    private int processPassword(String[] args, int index, ParameterDescription pd, boolean validate) {
+        final int passwordArity = determineArity(args, index, pd, DEFAULT_VARIABLE_ARITY);
+        if (passwordArity == 0) {
+            // password option with password not specified, use the Console to retrieve the password
+            char[] password = readPassword(pd.getDescription(), pd.getParameter().echoInput());
+            pd.addValue(new String(password));
+            requiredFields.remove(pd.getParameterized());
+            return 1;
+        } else if (passwordArity == 1) {
+            // password option with password specified
+            return processFixedArity(args, index, pd, validate, List.class, 1);
+        } else {
+            throw new ParameterException("Password parameter must have at most 1 argument.");
+        }
+    }
+
     /**
      * @return the number of options that were processed.
      */
@@ -772,13 +817,7 @@ public class JCommander {
             va = (IVariableArity) arg;
         }
 
-        List<String> currentArgs = Lists.newArrayList();
-        for (int j = index + 1; j < args.length; j++) {
-            currentArgs.add(args[j]);
-        }
-        int arity = va.processVariableArity(pd.getParameter().names()[0],
-                currentArgs.toArray(new String[0]));
-
+        int arity = determineArity(args, index, pd, va);
         int result = processFixedArity(args, index, pd, validate, List.class, arity);
         return result;
     }
