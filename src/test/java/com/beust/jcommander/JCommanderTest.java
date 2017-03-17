@@ -18,72 +18,25 @@
 
 package com.beust.jcommander;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TreeSet;
-
-import com.beust.jcommander.args.AlternateNamesForListArgs;
-import com.beust.jcommander.args.Args1;
-import com.beust.jcommander.args.Args1Setter;
-import com.beust.jcommander.args.Args2;
-import com.beust.jcommander.args.ArgsArityString;
-import com.beust.jcommander.args.ArgsBooleanArity;
-import com.beust.jcommander.args.ArgsBooleanArity0;
-import com.beust.jcommander.args.ArgsConverter;
-import com.beust.jcommander.args.ArgsEnum;
+import com.beust.jcommander.args.*;
 import com.beust.jcommander.args.ArgsEnum.ChoiceType;
-import com.beust.jcommander.args.ArgsEquals;
-import com.beust.jcommander.args.ArgsHelp;
-import com.beust.jcommander.args.ArgsI18N1;
-import com.beust.jcommander.args.ArgsI18N2;
-import com.beust.jcommander.args.ArgsI18N2New;
-import com.beust.jcommander.args.ArgsInherited;
-import com.beust.jcommander.args.ArgsList;
-import com.beust.jcommander.args.ArgsLongCommandDescription;
-import com.beust.jcommander.args.ArgsLongDescription;
-import com.beust.jcommander.args.ArgsLongMainParameterDescription;
-import com.beust.jcommander.args.ArgsMainParameter1;
-import com.beust.jcommander.args.ArgsMaster;
-import com.beust.jcommander.args.ArgsMultipleUnparsed;
-import com.beust.jcommander.args.ArgsOutOfMemory;
-import com.beust.jcommander.args.ArgsPrivate;
-import com.beust.jcommander.args.ArgsRequired;
-import com.beust.jcommander.args.ArgsSlave;
-import com.beust.jcommander.args.ArgsSlaveBogus;
-import com.beust.jcommander.args.ArgsValidate1;
-import com.beust.jcommander.args.ArgsWithSet;
-import com.beust.jcommander.args.Arity1;
-import com.beust.jcommander.args.HiddenArgs;
-import com.beust.jcommander.args.SeparatorColon;
-import com.beust.jcommander.args.SeparatorEqual;
-import com.beust.jcommander.args.SeparatorMixed;
-import com.beust.jcommander.args.SlashSeparator;
-import com.beust.jcommander.args.VariableArity;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
+import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.io.*;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.ResourceBundle;
 
 @Test
 public class JCommanderTest {
@@ -1498,6 +1451,28 @@ public class JCommanderTest {
         }
 
         new JCommander(new DSimple()).usage(new StringBuilder());
+    }
+
+    @Test
+    public void twoCommandsSameOption() {
+        class GenerateOption {
+            @Parameter(names={"--config"}, required=true, converter=FileConverter.class  )
+            public File configFile;
+        }
+
+        class RegenerateOption {
+            @Parameter(names={"--config"}, required=true, converter=FileConverter.class  )
+            public File configFile;
+        }
+
+        GenerateOption generateOption = new GenerateOption();
+        RegenerateOption regenerateOption = new RegenerateOption();
+        JCommander.newBuilder()
+                .addCommand("--generate", generateOption)
+                .addCommand("--regenerate", regenerateOption)
+                .args(new String[]{"--generate", "--config", "foo.txt"})
+                .build();
+        Assert.assertEquals(generateOption.configFile.getName(), "foo.txt");
     }
 
     @Test(enabled = false)
