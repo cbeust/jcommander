@@ -10,6 +10,7 @@ build
 *.iml
 *.ipr
 *.iws
+lib/kotlin-r*jar
 .gradle
 local.properties
 kobaltBuild
