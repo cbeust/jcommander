@@ -358,13 +358,14 @@ public class JCommander {
         }
 
         if (!requiredFields.isEmpty()) {
-            StringBuilder missingFields = new StringBuilder();
+            List<String> missingFields = new ArrayList<>();
             for (ParameterDescription pd : requiredFields.values()) {
-                missingFields.append(pd.getNames()).append(" ");
+                missingFields.add("[" + String.join(" | ", pd.getParameter().names()) + "]");
             }
+            String message = String.join(", ", missingFields);
             throw new ParameterException("The following "
                     + pluralize(requiredFields.size(), "option is required: ", "options are required: ")
-                    + missingFields);
+                    + message);
         }
 
         if (mainParameterDescription != null) {
