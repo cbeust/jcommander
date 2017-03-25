@@ -327,16 +327,20 @@ public class ParameterDescription {
   }
 
   private void validateParameter(String name, String value) {
-    Class<? extends IParameterValidator> validator = wrappedParameter.validateWith();
-    if (validator != null) {
-      validateParameter(this, validator, name, value);
+    Class<? extends IParameterValidator> validators[] = wrappedParameter.validateWith();
+    if (validators != null && validators.length>0) {
+        for(final Class<? extends IParameterValidator> validator: validators) {
+           validateParameter(this, validator, name, value);
+        }
     }
   }
 
   void validateValueParameter(String name, Object value) {
-    Class<? extends IValueValidator> validator = wrappedParameter.validateValueWith();
-    if (validator != null) {
-      validateValueParameter(validator, name, value);
+    Class<? extends IValueValidator> validators[] = wrappedParameter.validateValueWith();
+    if (validators != null && validators.length>0) {
+      for(final Class<? extends IValueValidator> validator: validators) {
+        validateValueParameter(validator, name, value);
+      }
     }
   }
 
@@ -356,6 +360,7 @@ public class ParameterDescription {
       Class<? extends IParameterValidator> validator,
       String name, String value) {
     try {
+    	
       if (validator != NoValidator.class) {
         p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
       }

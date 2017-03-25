@@ -727,10 +727,12 @@ public class JCommander {
                             convertedValue = convertValue(mainParameter, (Class) cls, null, value);
                         }
                     }
-
-                    ParameterDescription.validateParameter(mainParameterDescription,
-                            mainParameterAnnotation.validateWith(),
+                    
+                    for(final Class<? extends IParameterValidator> validator : mainParameterAnnotation.validateWith() ) {
+                        ParameterDescription.validateParameter(mainParameterDescription,
+                        	validator,
                             "Default", value);
+                    }
 
                     mainParameterDescription.setAssigned(true);
                     mp.add(convertedValue);
