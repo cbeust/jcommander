@@ -593,31 +593,31 @@ public class JCommanderTest {
     
     @Test
     public void multipleValidators() {
-    	for(int i=1;i< 100;i+=2) {
-    	  ArgsMultiValidate a = new ArgsMultiValidate();
-          JCommander jc = new JCommander(a);
-          jc.parse("-age", String.valueOf(i));
-    	}
+    	  for(int i=1;i< 100;i+=2) {
+    	    ArgsMultiValidate a = new ArgsMultiValidate();
+            JCommander jc = new JCommander(a);
+            jc.parse("-age", String.valueOf(i));
+    	  }
     }
     @Test(expectedExceptions=ParameterException.class)
     public void multipleValidatorsFails1()
     {
-  	  ArgsMultiValidate a = new ArgsMultiValidate();
-      JCommander jc = new JCommander(a);
-      jc.parse("-age", "131");
+        ArgsMultiValidate a = new ArgsMultiValidate();
+        JCommander jc = new JCommander(a);
+        jc.parse("-age", "131");
     }
     
     @Test(expectedExceptions=ParameterException.class)
     public void multipleValidatorsFails2()
     {
-  	  ArgsMultiValidate a = new ArgsMultiValidate();
-      JCommander jc = new JCommander(a);
-      jc.parse("-age", "0");
+        ArgsMultiValidate a = new ArgsMultiValidate();
+        JCommander jc = new JCommander(a);
+        jc.parse("-age", "0");
     }
 
     @Test(expectedExceptions = ParameterException.class)
     public void validationShouldWork2() {
-        ArgsValidate1 a = new ArgsValidate1();
+    	  ArgsValidate1 a = new ArgsValidate1();
         JCommander jc = new JCommander(a);
         jc.parse("-age", "-2 ");
     }
