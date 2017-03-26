@@ -51,11 +51,11 @@ public class WrappedParameter {
     return parameter != null ? parameter.variableArity() : false;
   }
 
-  public Class<? extends IParameterValidator> validateWith() {
+  public Class<? extends IParameterValidator>[] validateWith() {
     return parameter != null ? parameter.validateWith() : dynamicParameter.validateWith();
   }
 
-  public Class<? extends IValueValidator> validateValueWith() {
+  public Class<? extends IValueValidator>[] validateValueWith() {
     return parameter != null
         ? parameter.validateValueWith()
         : dynamicParameter.validateValueWith();

@@ -483,6 +483,15 @@ private Integer age;
 
 Attempting to pass a negative integer to this option will cause a ParameterException to be thrown.
 
+Multiple validators may be specified:
+
+[source,java]
+----
+@Parameter(names = "-count", validateWith = { PositiveInteger.class, CustomOddNumberValidator.class })
+private Integer value;
+----
+
+
 === Global parameter validation
 
 After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simply perform this validation in Java on all the arguments that JCommander just parsed.

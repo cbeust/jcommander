@@ -37,14 +37,14 @@ public @interface DynamicParameter {
   boolean hidden() default false;
 
   /**
-   * The validation class to use.
+   * The validation classes to use.
    */
-  Class<? extends IParameterValidator> validateWith() default NoValidator.class;
+  Class<? extends IParameterValidator>[] validateWith() default NoValidator.class;
 
   /**
    * The character(s) used to assign the values.
    */
   String assignment() default "=";
 
-  Class<? extends IValueValidator> validateValueWith() default NoValueValidator.class;
+  Class<? extends IValueValidator>[] validateValueWith() default NoValueValidator.class;
 }

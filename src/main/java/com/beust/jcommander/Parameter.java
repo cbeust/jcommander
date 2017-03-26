@@ -90,12 +90,12 @@ public @interface Parameter {
   /**
    * Validate the parameter found on the command line.
    */
-  Class<? extends IParameterValidator> validateWith() default NoValidator.class;
+  Class<? extends IParameterValidator>[] validateWith() default NoValidator.class;
 
   /**
    * Validate the value for this parameter.
    */
-  Class<? extends IValueValidator> validateValueWith() default NoValueValidator.class;
+  Class<? extends IValueValidator>[] validateValueWith() default NoValueValidator.class;
 
   /**
    * @return true if this parameter has a variable arity. See @{IVariableArity}
