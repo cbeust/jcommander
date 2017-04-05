@@ -845,6 +845,9 @@ public class JCommander {
                         || boolean.class.isAssignableFrom(fieldType))) {
             pd.addValue("true");
             requiredFields.remove(pd.getParameterized());
+        } else if (arity == 0) {
+            throw new ParameterException("Expected a value after parameter " + arg);
+
         } else if (index < args.length - 1) {
             int offset = "--".equals(args[index + 1]) ? 1 : 0;
 

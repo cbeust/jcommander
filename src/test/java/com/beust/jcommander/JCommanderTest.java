@@ -688,7 +688,7 @@ public class JCommanderTest {
     @DataProvider
     public Object[][] variable() {
         return new Object[][]{
-                new Object[]{0, V.subList(0, 0), V},
+                //new Object[]{0, V.subList(0, 0), V},
                 new Object[]{1, V.subList(0, 1), V.subList(1, 4)},
                 new Object[]{2, V.subList(0, 2), V.subList(2, 4)},
                 new Object[]{3, V.subList(0, 3), V.subList(3, 4)},
@@ -702,6 +702,12 @@ public class JCommanderTest {
         new JCommander(va).parse("-variable", "a", "b", "c", "d");
         Assert.assertEquals(var, va.var);
         Assert.assertEquals(main, va.main);
+    }
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void variableArityZeroNonBoolean() {
+        VariableArity va = new VariableArity(0);
+        new JCommander(va).parse("-variable", "a", "b", "c", "d");
     }
 
     public void enumArgs() {
