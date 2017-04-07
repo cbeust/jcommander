@@ -26,7 +26,6 @@ package com.beust.jcommander;
  */
 @SuppressWarnings("serial")
 public class ParameterException extends RuntimeException {
-
   public ParameterException(Throwable t) {
     super(t);
   }
@@ -37,6 +36,21 @@ public class ParameterException extends RuntimeException {
   
   public ParameterException(String string, Throwable t) {
       super(string, t);
-  }   
+  }
 
+  private JCommander jc;
+
+  public void setJCommander(JCommander jc) {
+    this.jc = jc;
+  }
+
+  public JCommander getJCommander() {
+    return jc;
+  }
+
+  public void usage() {
+    if (jc != null) {
+      jc.usage();
+    }
+  }
 }

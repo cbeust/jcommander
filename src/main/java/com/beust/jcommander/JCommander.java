@@ -18,41 +18,19 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.FuzzyMap.IKey;
+import com.beust.jcommander.converters.*;
+import com.beust.jcommander.internal.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.beust.jcommander.FuzzyMap.IKey;
-import com.beust.jcommander.converters.DefaultListConverter;
-import com.beust.jcommander.converters.EnumConverter;
-import com.beust.jcommander.converters.IParameterSplitter;
-import com.beust.jcommander.converters.NoConverter;
-import com.beust.jcommander.converters.StringConverter;
-import com.beust.jcommander.internal.Console;
-import com.beust.jcommander.internal.DefaultConsole;
-import com.beust.jcommander.internal.DefaultConverterFactory;
-import com.beust.jcommander.internal.JDK6Console;
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
-import com.beust.jcommander.internal.Nullable;
 
 /**
  * The main class for JCommander. It's responsible for parsing the object that contains
@@ -306,7 +284,12 @@ public class JCommander {
      * Parse and validate the command line parameters.
      */
     public void parse(String... args) {
-        parse(true /* validate */, args);
+        try {
+            parse(true /* validate */, args);
+        } catch(ParameterException ex) {
+            ex.setJCommander(this);
+            throw ex;
+        }
     }
 
     /**
