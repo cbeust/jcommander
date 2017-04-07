@@ -216,7 +216,10 @@ public class JCommander {
     /**
      * @param object The arg object expected to contain {@link Parameter} annotations.
      * @param args The arguments to parse (optional).
+     *
+     * @deprecated Construct a JCommander instance first and then call parse() on it.
      */
+    @Deprecated()
     public JCommander(Object object, String... args) {
         this(object);
         parse(args);
