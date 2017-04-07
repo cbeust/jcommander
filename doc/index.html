@@ -816,7 +816,7 @@ You annotate fields with descriptions of your options:</p>
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">import com.beust.jcommander.Parameter;
 
-public class JCommanderExample {
+public class Args {
   @Parameter
   private List&lt;String&gt; parameters = new ArrayList&lt;&gt;();
 
@@ -836,9 +836,12 @@ public class JCommanderExample {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">JCommanderExample jct = new JCommanderExample();
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Args args = new Args();
 String[] argv = { "-log", "2", "-groups", "unit" };
-new JCommander(jct, argv);
+JCommander.newBuilder()
+  .addObject(args)
+  .build()
+  .parse(argv);
 
 Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
@@ -854,9 +857,12 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
     @Parameter(names={"--pattern", "-p"})
     int pattern;
 
-    public static void main(String ... args) {
+    public static void main(String ... argv) {
         Main main = new Main();
-        new JCommander(main, args);
+        JCommander.newBuilder()
+            .addObject(main)
+            .build()
+            .parse(argv);
         main.run();
     }
 
@@ -1154,9 +1160,11 @@ List&lt;File&gt; files;</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">ArgsConverterFactory a = new ArgsConverterFactory();
-JCommander jc = new JCommander(a);
-jc.addConverterFactory(new Factory());
-jc.parse("-hostport", "example.com:8080");
+JCommander jc = JCommander.newBuilder()
+    .addObject(a)
+    .addConverterFactory(new Factory())
+    .build()
+    .parse("-hostport", "example.com:8080");
 
 Assert.assertEquals(a.hostPort.host, "example.com");
 Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
@@ -1395,7 +1403,10 @@ private Integer debug = 1;</code></pre>
   }
 }
 ArgsPrivate args = new ArgsPrivate();
-new JCommander(args, "-verbose", "3");
+JCommander.newBuilder()
+    .addObject(args)
+    .build()
+    .parse("-verbose", "3");
 Assert.assertEquals(args.getVerbose().intValue(), 3);</code></pre>
 </div>
 </div>
@@ -1461,7 +1472,10 @@ public class ArgsSlave {
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">ArgsMaster m = new ArgsMaster();
 ArgsSlave s = new ArgsSlave();
 String[] argv = { "-master", "master", "-slave", "slave" };
-new JCommander(new Object[] { m , s }, argv);
+JCommander.newBuilder()
+    .addObject(new Object[] { m , s })
+    .build()
+    .parse(argv);
 
 Assert.assertEquals(m.master, "master");
 Assert.assertEquals(s.slave, "slave");</code></pre>
@@ -1688,8 +1702,10 @@ private String host;</code></pre>
 
 // ...
 
-JCommander jc = new JCommander(new Args());
-jc.setDefaultProvider(DEFAULT_PROVIDER);</code></pre>
+JCommander jc = JCommander.newBuilder()
+    .addObject(new Args())
+    .defaultProvider(DEFAULT_PROVIDER)
+    .build()</code></pre>
 </div>
 </div>
 </div>
@@ -1757,12 +1773,13 @@ public class CommandAdd {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">CommandMain cm = new CommandMain();
-JCommander jc = new JCommander(cm);
-
 CommandAdd add = new CommandAdd();
-jc.addCommand("add", add);
 CommandCommit commit = new CommandCommit();
-jc.addCommand("commit", commit);
+JCommander jc = JCommander.newBuilder()
+    .addObject(cm)
+    .addCommand("add", add);
+    .addCommand("commit", commit);
+    .build();
 
 jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
 
@@ -1779,7 +1796,8 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
 <h2 id="_exception">17. Exception</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Whenever JCommander detects an error, it will throw a <code>ParameterException</code>. Note that this is a Runtime Exception, since your application is probably not initialized correctly at this point.</p>
+<p>Whenever JCommander detects an error, it will throw a <code>ParameterException</code>. Note that this is a Runtime Exception, since your application is probably not initialized correctly at this point. Also, <code>ParameterException</code> contains the
+<code>JCommander</code> instance and you can also invoke <code>usage()</code> on it if you need to display some help.</p>
 </div>
 </div>
 </div>
@@ -1891,7 +1909,8 @@ JCommander configuration in order to use the delegate:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">MainParams p = new MainParams();
-new JCommander(p).parse("-v", "-port", "1234");
+JCommander.newBuilder().addObject(p).build()
+    .parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);
 Assert.assertEquals(p.delegate.port, 1234);</code></pre>
 </div>
@@ -1951,7 +1970,7 @@ class Args {
 }
 
 new Args().with {
-  new JCommander(it, args)
+  JCommander.newBuilder().addObject(it).build().parse(argv)
   file.each { println "file: ${new File(it).name}" }
 }</code></pre>
 </div>
@@ -2043,7 +2062,11 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
+<<<<<<< d9577be0eeb8a5b27cb91bbf212a88b9175d7992
 Last updated 2017-03-26 06:45:54 Pacific Daylight Time
+=======
+Last updated 2017-04-07 13:35:45 PDT
+>>>>>>> Use newBuilder() in the doc
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

@@ -36,7 +36,7 @@ You annotate fields with descriptions of your options:
 ----
 import com.beust.jcommander.Parameter;
  
-public class JCommanderExample {
+public class Args {
   @Parameter
   private List<String> parameters = new ArrayList<>();
  
@@ -55,9 +55,12 @@ and then you simply ask JCommander to parse:
 
 [source,java]
 ----
-JCommanderExample jct = new JCommanderExample();
+Args args = new Args();
 String[] argv = { "-log", "2", "-groups", "unit" };
-new JCommander(jct, argv);
+JCommander.newBuilder()
+  .addObject(args)
+  .build()
+  .parse(argv);
  
 Assert.assertEquals(jct.verbose.intValue(), 2);
 ----
@@ -72,9 +75,12 @@ class Main {
     @Parameter(names={"--pattern", "-p"})
     int pattern;
  
-    public static void main(String ... args) {
+    public static void main(String ... argv) {
         Main main = new Main();
-        new JCommander(main, args);
+        JCommander.newBuilder()
+            .addObject(main)
+            .build()
+            .parse(argv);
         main.run();
     }
  
@@ -331,9 +337,11 @@ All you need to do is add the factory to your JCommander object:
 [source,java]
 ----
 ArgsConverterFactory a = new ArgsConverterFactory();
-JCommander jc = new JCommander(a);
-jc.addConverterFactory(new Factory());
-jc.parse("-hostport", "example.com:8080");
+JCommander jc = JCommander.newBuilder()
+    .addObject(a)
+    .addConverterFactory(new Factory())
+    .build()
+    .parse("-hostport", "example.com:8080");
 
 Assert.assertEquals(a.hostPort.host, "example.com");
 Assert.assertEquals(a.hostPort.port.intValue(), 8080);
@@ -534,7 +542,10 @@ public class ArgsPrivate {
   }
 }
 ArgsPrivate args = new ArgsPrivate();
-new JCommander(args, "-verbose", "3");
+JCommander.newBuilder()
+    .addObject(args)
+    .build()
+    .parse("-verbose", "3");
 Assert.assertEquals(args.getVerbose().intValue(), 3);
 ----
 
@@ -589,7 +600,10 @@ and pass these two objects to JCommander:
 ArgsMaster m = new ArgsMaster();
 ArgsSlave s = new ArgsSlave();
 String[] argv = { "-master", "master", "-slave", "slave" };
-new JCommander(new Object[] { m , s }, argv);
+JCommander.newBuilder()
+    .addObject(new Object[] { m , s })
+    .build()
+    .parse(argv);
  
 Assert.assertEquals(m.master, "master");
 Assert.assertEquals(s.slave, "slave");
@@ -769,8 +783,11 @@ private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() 
 
 // ...
  
-JCommander jc = new JCommander(new Args());
-jc.setDefaultProvider(DEFAULT_PROVIDER);
+JCommander jc = JCommander.newBuilder()
+    .addObject(new Args())
+    .defaultProvider(DEFAULT_PROVIDER)
+    .build()
+
 ----
 
 
@@ -828,13 +845,14 @@ Then you register these commands with your JCommander object. After the parsing 
 [source,java]
 ----
 CommandMain cm = new CommandMain();
-JCommander jc = new JCommander(cm);
- 
 CommandAdd add = new CommandAdd();
-jc.addCommand("add", add);
 CommandCommit commit = new CommandCommit();
-jc.addCommand("commit", commit);
- 
+JCommander jc = JCommander.newBuilder()
+    .addObject(cm)
+    .addCommand("add", add);
+    .addCommand("commit", commit);
+    .build();
+
 jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
  
 Assert.assertTrue(cm.verbose);
@@ -846,7 +864,8 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
 
 == Exception
 
-Whenever JCommander detects an error, it will throw a `ParameterException`. Note that this is a Runtime Exception, since your application is probably not initialized correctly at this point.
+Whenever JCommander detects an error, it will throw a `ParameterException`. Note that this is a Runtime Exception, since your application is probably not initialized correctly at this point. Also, `ParameterException` contains the
+`JCommander` instance and you can also invoke `usage()` on it if you need to display some help.
 
 == Usage
 
@@ -937,7 +956,8 @@ JCommander configuration in order to use the delegate:
 [source,java]
 ----
 MainParams p = new MainParams();
-new JCommander(p).parse("-v", "-port", "1234");
+JCommander.newBuilder().addObject(p).build()
+    .parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);
 Assert.assertEquals(p.delegate.port, 1234);
 ----
@@ -987,7 +1007,7 @@ class Args {
 }
  
 new Args().with {
-  new JCommander(it, args)
+  JCommander.newBuilder().addObject(it).build().parse(argv)
   file.each { println "file: ${new File(it).name}" }
 }
 ----
