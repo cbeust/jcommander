@@ -12,7 +12,7 @@ val jcommander = project {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.66"
+    version = "1.67"
 
     dependenciesTest {
         compile("org.testng:testng:6.10")
