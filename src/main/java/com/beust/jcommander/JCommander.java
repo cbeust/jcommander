@@ -1019,7 +1019,7 @@ public class JCommander {
         return new Builder();
     }
 
-    static class Builder {
+    public static class Builder {
         private JCommander jCommander = new JCommander();
         private String[] args = null;
 
