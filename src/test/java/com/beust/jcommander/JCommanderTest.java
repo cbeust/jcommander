@@ -1505,6 +1505,20 @@ public class JCommanderTest {
         Assert.assertEquals(generateOption.configFile.getName(), "foo.txt");
     }
 
+    @Test
+    public void invertedBoolean() {
+        class Args {
+            @Parameter(names = {"--f"})
+            private boolean f = true;
+        }
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .args(new String[] { "--f"})
+                .build();
+        Assert.assertEquals(args.f, false);
+    }
+
     @Test(enabled = false)
     public static void main(String[] args) {
 

@@ -668,7 +668,9 @@ public class JCommander {
                             // an arity of 1, in which case we need to read the next value
                             if ((fieldType == boolean.class || fieldType == Boolean.class)
                                     && pd.getParameter().arity() == -1) {
-                                pd.addValue("true");
+                                // Flip the value this boolean was initialized with
+                                Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
+                                pd.addValue(value ? "false" : "true");
                                 requiredFields.remove(pd.getParameterized());
                             } else {
                                 increment = processFixedArity(args, i, pd, validate, fieldType);
@@ -829,7 +831,9 @@ public class JCommander {
         if (arity == 0 &&
                 (Boolean.class.isAssignableFrom(fieldType)
                         || boolean.class.isAssignableFrom(fieldType))) {
-            pd.addValue("true");
+            // Flip the value this boolean was initialized with
+            Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
+            pd.addValue(value ? "false" : "true");
             requiredFields.remove(pd.getParameterized());
         } else if (arity == 0) {
             throw new ParameterException("Expected a value after parameter " + arg);
