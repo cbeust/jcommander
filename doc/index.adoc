@@ -1036,6 +1036,13 @@ JCommander is released under the https://github.com/cbeust/jcommander/blob/maste
 You can download JCommander from the following locations:
 
 - http://github.com/cbeust/jcommander[Source on github]
+- Kobalt
+
+[source,groovy]
+----
+compile("com.beust:jcommander:1.71")
+----
+
 - Gradle
 
 [source,groovy]
