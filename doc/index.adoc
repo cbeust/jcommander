@@ -1040,7 +1040,7 @@ You can download JCommander from the following locations:
 
 [source,groovy]
 ----
-compile "com.beust:jcommander:1.48"
+compile "com.beust:jcommander:1.71"
 ----
 
 - Maven:
@@ -1050,7 +1050,7 @@ compile "com.beust:jcommander:1.48"
 <dependency>
   <groupId>com.beust</groupId>
   <artifactId>jcommander</artifactId>
-  <version>1.60</version>
+  <version>1.71</version>
 </dependency>
 ----
 
