@@ -115,7 +115,7 @@ public class JCommanderTest {
     }
 
     /**
-     *  Confirm that List<?> parameters with alternate names return the correct
+     * Confirm that List<?> parameters with alternate names return the correct
      * List regardless of how the arguments are specified
      */
 
@@ -590,26 +590,25 @@ public class JCommanderTest {
         ArgsValidate2 a = new ArgsValidate2();
         new JCommander(a).usage();
     }
-    
+
     @Test
     public void multipleValidators() {
-    	  for(int i=1;i< 100;i+=2) {
-    	    ArgsMultiValidate a = new ArgsMultiValidate();
+        for (int i = 1; i < 100; i += 2) {
+            ArgsMultiValidate a = new ArgsMultiValidate();
             JCommander jc = new JCommander(a);
             jc.parse("-age", String.valueOf(i));
-    	  }
+        }
     }
-    @Test(expectedExceptions=ParameterException.class)
-    public void multipleValidatorsFails1()
-    {
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void multipleValidatorsFails1() {
         ArgsMultiValidate a = new ArgsMultiValidate();
         JCommander jc = new JCommander(a);
         jc.parse("-age", "131");
     }
-    
-    @Test(expectedExceptions=ParameterException.class)
-    public void multipleValidatorsFails2()
-    {
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void multipleValidatorsFails2() {
         ArgsMultiValidate a = new ArgsMultiValidate();
         JCommander jc = new JCommander(a);
         jc.parse("-age", "0");
@@ -617,7 +616,7 @@ public class JCommanderTest {
 
     @Test(expectedExceptions = ParameterException.class)
     public void validationShouldWork2() {
-    	  ArgsValidate1 a = new ArgsValidate1();
+        ArgsValidate1 a = new ArgsValidate1();
         JCommander jc = new JCommander(a);
         jc.parse("-age", "-2 ");
     }
@@ -1213,49 +1212,49 @@ public class JCommanderTest {
         Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
     }
 
-  public void usageWithSubCommands() {
-    class Arg {
+    public void usageWithSubCommands() {
+        class Arg {
+        }
+        @Parameters(commandDescription = "command a")
+        class ArgCommandA {
+            @Parameter(description = "command a parameters")
+            List<String> parameters;
+        }
+        @Parameters(commandDescription = "command b")
+        class ArgCommandB {
+            @Parameter(description = "command b parameters")
+            List<String> parameters;
+        }
+
+        Arg a = new Arg();
+
+        JCommander c = new JCommander(a);
+        c.setColumnSize(100);
+        c.addCommand("a", new ArgCommandA());
+
+        // b is a sub-command of a
+        JCommander aCommand = c.getCommands().get("a");
+        aCommand.addCommand("b", new ArgCommandB());
+
+        StringBuilder sb = new StringBuilder();
+        c.usage(sb);
+        Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
+        Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
     }
-    @Parameters(commandDescription = "command a")
-    class ArgCommandA {
-      @Parameter(description = "command a parameters")
-      List<String> parameters;
+
+    public void partialValidation() {
+        class Arg {
+            @Parameter(names = {"-h", "--host"})
+            String host;
+        }
+        Arg a = new Arg();
+        JCommander jc = new JCommander();
+        jc.setAcceptUnknownOptions(true);
+        jc.addObject(a);
+        jc.parse("-a", "foo", "-h", "host");
+        Assert.assertEquals(a.host, "host");
+        Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
     }
-    @Parameters(commandDescription = "command b")
-    class ArgCommandB {
-      @Parameter(description = "command b parameters")
-      List<String> parameters;
-    }
-
-    Arg a = new Arg();
-
-    JCommander c = new JCommander(a);
-    c.setColumnSize(100);
-    c.addCommand("a", new ArgCommandA());
-
-    // b is a sub-command of a
-    JCommander aCommand = c.getCommands().get("a");
-    aCommand.addCommand("b", new ArgCommandB());
-
-    StringBuilder sb = new StringBuilder();
-    c.usage(sb);
-    Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
-    Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
-  }
-
-  public void partialValidation() {
-    class Arg {
-      @Parameter(names = { "-h", "--host" })
-      String host;
-    }
-    Arg a = new Arg();
-    JCommander jc = new JCommander();
-    jc.setAcceptUnknownOptions(true);
-    jc.addObject(a);
-    jc.parse("-a", "foo", "-h", "host");
-    Assert.assertEquals(a.host, "host");
-    Assert.assertEquals(jc.getUnknownOptions(), Lists.newArrayList("-a", "foo"));
-  }
 
     /**
      * GITHUB-137.
@@ -1270,38 +1269,38 @@ public class JCommanderTest {
         Assert.assertEquals(a.endpoint, Lists.newArrayList("dev"));
     }
 
-  @Test
-  public void dashDashEmpty() {
-    class Parameters {
-      @Parameter
-      public List<String> mainParameters = new ArrayList<>();
+    @Test
+    public void dashDashEmpty() {
+        class Parameters {
+            @Parameter
+            public List<String> mainParameters = new ArrayList<>();
+        }
+
+        Parameters a = new Parameters();
+        new JCommander(a, "--");
+        Assert.assertTrue(a.mainParameters.isEmpty());
     }
 
-    Parameters a = new Parameters();
-    new JCommander(a, "--");
-    Assert.assertTrue(a.mainParameters.isEmpty());
-  }
+    @Test
+    public void dashDashDashDash() {
+        class Parameters {
+            @Parameter
+            public List<String> mainParameters = new ArrayList<>();
+        }
 
-  @Test
-  public void dashDashDashDash() {
-    class Parameters {
-      @Parameter
-      public List<String> mainParameters = new ArrayList<>();
+        Parameters a = new Parameters();
+        new JCommander(a, "--", "--");
+        Assert.assertEquals(a.mainParameters.size(), 1);
+        Assert.assertEquals(a.mainParameters.get(0), "--");
     }
 
-    Parameters a = new Parameters();
-    new JCommander(a, "--", "--");
-    Assert.assertEquals(a.mainParameters.size(), 1);
-    Assert.assertEquals(a.mainParameters.get(0), "--");
-  }
-
-  public void dashDashParameter() {
-    class Parameters {
-        @Parameter(names = { "-name" })
-        public String name;
-        @Parameter
-        public List<String> mainParameters;
-    }
+    public void dashDashParameter() {
+        class Parameters {
+            @Parameter(names = {"-name"})
+            public String name;
+            @Parameter
+            public List<String> mainParameters;
+        }
 
         Parameters a = new Parameters();
         new JCommander(a, "-name", "theName", "--", "param1", "param2");
@@ -1445,16 +1444,16 @@ public class JCommanderTest {
         Assert.assertEquals(args.mvParameters.to, "to");
     }
 
-  public void programName() {
-    JCommander jcommander = new JCommander();
-    String programName = "main";
-    jcommander.setProgramName(programName);
-    StringBuilder sb = new StringBuilder();
-    jcommander.usage(sb);
+    public void programName() {
+        JCommander jcommander = new JCommander();
+        String programName = "main";
+        jcommander.setProgramName(programName);
+        StringBuilder sb = new StringBuilder();
+        jcommander.usage(sb);
 
-    Assert.assertTrue(sb.toString().contains(programName));
-    Assert.assertEquals(jcommander.getProgramName(), programName);
-  }
+        Assert.assertTrue(sb.toString().contains(programName));
+        Assert.assertEquals(jcommander.getProgramName(), programName);
+    }
 
     public void dontShowOptionUsageIfThereAreNoOptions() {
         class CommandTemplate {
@@ -1486,12 +1485,12 @@ public class JCommanderTest {
     @Test
     public void twoCommandsSameOption() {
         class GenerateOption {
-            @Parameter(names={"--config"}, required=true, converter=FileConverter.class  )
+            @Parameter(names = {"--config"}, required = true, converter = FileConverter.class)
             public File configFile;
         }
 
         class RegenerateOption {
-            @Parameter(names={"--config"}, required=true, converter=FileConverter.class  )
+            @Parameter(names = {"--config"}, required = true, converter = FileConverter.class)
             public File configFile;
         }
 
@@ -1514,7 +1513,7 @@ public class JCommanderTest {
         Args args = new Args();
         JCommander.newBuilder()
                 .addObject(args)
-                .args(new String[] { "--f"})
+                .args(new String[]{"--f"})
                 .build();
         Assert.assertEquals(args.f, false);
     }
