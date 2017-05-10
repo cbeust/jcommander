@@ -34,7 +34,11 @@ public class Parameterized {
     this.method = method;
     this.field = field;
     if (this.field != null) {
-      setFieldAccessible(this.field);
+      if(pd == null) {
+        setFieldAccessible(this.field);
+      } else {
+        setFieldAccessibleWithoutFinalCheck(this.field);
+      }
     }
     parametersDelegate = pd;
   }
@@ -237,6 +241,10 @@ public class Parameterized {
         "Cannot use final field " + f.getDeclaringClass().getName() + "#" + f.getName() + " as a parameter;"
         + " compile-time constant inlining may hide new values written to it.");
     }
+    f.setAccessible(true);
+  }
+
+  private static void setFieldAccessibleWithoutFinalCheck(Field f) {
     f.setAccessible(true);
   }
 
