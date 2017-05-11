@@ -64,7 +64,7 @@ public class ParameterDescription {
     wrappedParameter = new WrappedParameter(parameterAnnotation);
     init(object, parameterized, bundle, jc);
   }
-
+  
   /**
    * Find the resource bundle in the annotations.
    * @return

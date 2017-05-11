@@ -544,6 +544,26 @@ public class JCommander {
         }
     }
 
+    /** create a new ParameterDescription, subclasses of jcommander can override this to use custom instance of ParameterDescription */
+    protected ParameterDescription createParameterDescription(
+    		final Object object,
+    		final DynamicParameter annotation,
+        final Parameterized parameterized,
+        final ResourceBundle bundle
+        ) {
+    	return new ParameterDescription(object, annotation, parameterized, bundle, this);
+    	}
+    
+    /** create a new ParameterDescription, subclasses of jcommander can override this to use custom instance of ParameterDescription */
+    protected ParameterDescription createParameterDescription(
+    		final Object object,
+    		final Parameter annotation,
+    		final Parameterized parameterized,
+        final ResourceBundle bundle
+        ) {
+    	return new ParameterDescription(object, annotation, parameterized, bundle, this);
+    	}
+    
     private void addDescription(Object object) {
         Class<?> cls = object.getClass();
 
@@ -566,10 +586,10 @@ public class JCommander {
                     mainParameterObject = object;
                     mainParameterAnnotation = p;
                     mainParameterDescription =
-                            new ParameterDescription(object, p, parameterized, options.bundle, this);
+                            createParameterDescription(object, p, parameterized, options.bundle);
                 } else {
                     ParameterDescription pd =
-                            new ParameterDescription(object, p, parameterized, options.bundle, this);
+                    				createParameterDescription(object, p, parameterized, options.bundle );
                     for (String name : p.names()) {
                         if (descriptions.containsKey(new StringKey(name))) {
                             throw new ParameterException("Found the option " + name + " multiple times");
