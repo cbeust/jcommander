@@ -355,10 +355,25 @@ public class JCommander {
         }
 
         if (mainParameterDescription != null) {
+            // Make sure we have a main parameter if it was required
             if (mainParameterDescription.getParameter().required() &&
                     !mainParameterDescription.isAssigned()) {
                 throw new ParameterException("Main parameters are required (\""
                         + mainParameterDescription.getDescription() + "\")");
+            }
+
+            // If the main parameter has an arity, make sure the correct number of parameters was passed
+            int arity = mainParameterDescription.getParameter().arity();
+            if (arity != Parameter.DEFAULT_ARITY) {
+                Object value = mainParameterDescription.getParameterized().get(mainParameterObject);
+                if (List.class.isAssignableFrom(value.getClass())) {
+                    int size = ((List<?>) value).size();
+                    if (size != arity) {
+                        throw new ParameterException("There should be exactly " + arity + " main parameters but "
+                                + size + " were found");
+                    }
+                }
+
             }
         }
     }

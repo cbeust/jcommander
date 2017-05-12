@@ -33,6 +33,9 @@ import org.testng.annotations.Test;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1518,16 +1521,58 @@ public class JCommanderTest {
         Assert.assertEquals(args.f, false);
     }
 
+    @Test
+    public void mainParameterWithCorrectArity() {
+        class Args {
+            @Parameter(arity = 2)
+            private List<String> main;
+        }
+
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .args(new String[]{"a", "b"})
+                .build();
+        Assert.assertEquals(args.main.size(), 2);
+        Assert.assertEquals(args.main.get(0), "a");
+        Assert.assertEquals(args.main.get(1), "b");
+    }
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void mainParameterWithWrongArity() {
+        class Args {
+            @Parameter(arity = 2)
+            private List<String> main;
+        }
+
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .args(new String[]{"a"})
+                .build();
+    }
+
     @Test(enabled = false)
     public static void main(String[] args) {
 
-        CommandTemplate template = new CommandTemplate();
-        JCommander jcommander = new JCommander(template);
-        jcommander.setProgramName("prog");
-        jcommander.parse("help");
-
-        if (template.help) {
-            jcommander.usage();
+        class FileValidator implements IParameterValidator {
+            @Override
+            public void validate(String name, String value) throws ParameterException {
+                if (!Files.exists(Paths.get(value))) {
+                    throw new ParameterException("FILE_DOES_NOT_EXIST");
+                }
+            }
         }
+
+        class Args {
+            @Parameter(names = "--file", validateWith = FileValidator.class, required = true,
+                    description = "The properties file containing setup information.")
+            private Path propertiesFile = Paths.get("");
+        }
+
+        JCommander.newBuilder()
+                    .addObject(new Args())
+                    .build()
+                    .parse("--file", "README.markdown");
     }
 }

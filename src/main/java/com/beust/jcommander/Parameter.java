@@ -60,7 +60,8 @@ public @interface Parameter {
    * How many parameter values this parameter will consume. For example,
    * an arity of 2 will allow "-pair value1 value2".
    */
-  int arity() default -1;
+  public static int DEFAULT_ARITY = -1;
+  int arity() default DEFAULT_ARITY;
 
   /**
    * If true, this parameter is a password and it will be prompted on the console
