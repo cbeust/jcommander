@@ -59,23 +59,27 @@ public class JCommander {
 
     private boolean firstTimeMainParameter = true;
 
-    /**
-     * This field/method will contain whatever command line parameter is not an option.
-     * It is expected to be a List<String>.
-     */
-    private Parameterized mainParameter = null;
+    static class MainParameter {
+        /**
+         * This field/method will contain whatever command line parameter is not an option.
+         * It is expected to be a List<String>.
+         */
+        Parameterized parameterized;
 
-    /**
-     * The object on which we found the main parameter field.
-     */
-    private Object mainParameterObject;
+        /**
+         * The object on which we found the main parameter field.
+         */
+        Object object;
 
-    /**
-     * The annotation found on the main parameter field.
-     */
-    private Parameter mainParameterAnnotation;
+        /**
+         * The annotation found on the main parameter field.
+         */
+        private Parameter annotation;
 
-    private ParameterDescription mainParameterDescription;
+        private ParameterDescription description;
+    }
+
+    private MainParameter mainParameter = null;
 
     /**
      * A set of all the parameterizeds that are required. During the reflection phase,
@@ -354,7 +358,8 @@ public class JCommander {
                     + message);
         }
 
-        if (mainParameterDescription != null) {
+        if (mainParameter != null && mainParameter.description != null) {
+            ParameterDescription mainParameterDescription = mainParameter.description;
             // Make sure we have a main parameter if it was required
             if (mainParameterDescription.getParameter().required() &&
                     !mainParameterDescription.isAssigned()) {
@@ -365,7 +370,7 @@ public class JCommander {
             // If the main parameter has an arity, make sure the correct number of parameters was passed
             int arity = mainParameterDescription.getParameter().arity();
             if (arity != Parameter.DEFAULT_ARITY) {
-                Object value = mainParameterDescription.getParameterized().get(mainParameterObject);
+                Object value = mainParameterDescription.getParameterized().get(mainParameter.object);
                 if (List.class.isAssignableFrom(value.getClass())) {
                     int size = ((List<?>) value).size();
                     if (size != arity) {
@@ -577,10 +582,11 @@ public class JCommander {
                         throw new ParameterException("Only one @Parameter with no names attribute is"
                                 + " allowed, found:" + mainParameter + " and " + parameterized);
                     }
-                    mainParameter = parameterized;
-                    mainParameterObject = object;
-                    mainParameterAnnotation = p;
-                    mainParameterDescription =
+                    mainParameter = new MainParameter();
+                    mainParameter.parameterized = parameterized;
+                    mainParameter.object = object;
+                    mainParameter.annotation = p;
+                    mainParameter.description =
                             new ParameterDescription(object, p, parameterized, options.bundle, this);
                 } else {
                     ParameterDescription pd =
@@ -719,25 +725,27 @@ public class JCommander {
                     //
                     // Regular (non-command) parsing
                     //
-                    List mp = getMainParameter(arg);
+                    List mp = getMainParameterValue(arg);
                     String value = a; // If there's a non-quoted version, prefer that one
                     Object convertedValue = value;
 
-                    if (mainParameter.getGenericType() instanceof ParameterizedType) {
-                        ParameterizedType p = (ParameterizedType) mainParameter.getGenericType();
+                    Type genericType = mainParameter.parameterized.getGenericType();
+                    if (genericType instanceof ParameterizedType) {
+                        ParameterizedType p = (ParameterizedType) genericType;
                         Type cls = p.getActualTypeArguments()[0];
                         if (cls instanceof Class) {
-                            convertedValue = convertValue(mainParameter, (Class) cls, null, value);
+                            convertedValue = convertValue(mainParameter.parameterized, (Class) cls, null, value);
                         }
                     }
                     
-                    for(final Class<? extends IParameterValidator> validator : mainParameterAnnotation.validateWith() ) {
-                        ParameterDescription.validateParameter(mainParameterDescription,
+                    for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
+                            ) {
+                        ParameterDescription.validateParameter(mainParameter.description,
                         	validator,
                             "Default", value);
                     }
 
-                    mainParameterDescription.setAssigned(true);
+                    mainParameter.description.setAssigned(true);
                     mp.add(convertedValue);
                 } else {
                     //
@@ -901,20 +909,21 @@ public class JCommander {
      * @param arg the arg that we're about to add (only passed here to output a meaningful
      * error message).
      */
-    private List<?> getMainParameter(String arg) {
+    private List<?> getMainParameterValue(String arg) {
         if (mainParameter == null) {
             throw new ParameterException(
                     "Was passed main parameter '" + arg + "' but no main parameter was defined in your arg class");
         }
 
-        List<?> result = (List<?>) mainParameter.get(mainParameterObject);
+        List<?> result = (List<?>) mainParameter.parameterized.get(mainParameter.object);
         if (result == null) {
             result = Lists.newArrayList();
-            if (!List.class.isAssignableFrom(mainParameter.getType())) {
+            Class<?> type = mainParameter.parameterized.getType();
+            if (!List.class.isAssignableFrom(type)) {
                 throw new ParameterException("Main parameter field " + mainParameter
-                        + " needs to be of type List, not " + mainParameter.getType());
+                        + " needs to be of type List, not " + type);
             }
-            mainParameter.set(mainParameterObject, result);
+            mainParameter.parameterized.set(mainParameter.object, result);
         }
         if (firstTimeMainParameter) {
             result.clear();
@@ -925,7 +934,7 @@ public class JCommander {
 
     public String getMainParameterDescription() {
         if (descriptions == null) createDescriptions();
-        return mainParameterAnnotation != null ? mainParameterAnnotation.description()
+        return mainParameter.annotation != null ? mainParameter.annotation.description()
                 : null;
     }
 
@@ -1186,8 +1195,8 @@ public class JCommander {
         mainLine.append(indent).append("Usage: ").append(programName);
         if (hasOptions) mainLine.append(" [options]");
         if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
-        if (mainParameterDescription != null) {
-            mainLine.append(" ").append(mainParameterDescription.getDescription());
+        if (mainParameter != null && mainParameter.description != null) {
+            mainLine.append(" ").append(mainParameter.description.getDescription());
         }
         wrapDescription(out, indentCount, mainLine.toString());
         out.append("\n");
@@ -1332,8 +1341,8 @@ public class JCommander {
     /**
      * @return the main parameter description or null if none is defined.
      */
-    public ParameterDescription getMainParameter() {
-        return mainParameterDescription;
+    public ParameterDescription getMainParameterValue() {
+        return mainParameter.description;
     }
 
     private void p(String string) {
