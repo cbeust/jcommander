@@ -57,12 +57,13 @@ public class JCommander {
      */
     private List<Object> objects = Lists.newArrayList();
 
-    private boolean firstTimeMainParameter = true;
-
+    /**
+     * Description of a main parameter, which can be either a list of string or a single field. Both
+     * are subject to converters before being returned to the user.
+     */
     static class MainParameter {
         /**
          * This field/method will contain whatever command line parameter is not an option.
-         * It is expected to be a List<String>.
          */
         Parameterized parameterized;
 
@@ -77,6 +78,29 @@ public class JCommander {
         private Parameter annotation;
 
         private ParameterDescription description;
+        /**
+         * Non null if the main parameter is a List<String>.
+         */
+        private List<Object> multipleValue = null;
+
+        /**
+         * The value of the single field, if it's not a List<String>.
+         */
+        private Object singleValue = null;
+
+        private boolean firstTimeMainParameter = true;
+
+        public void addValue(Object convertedValue) {
+            if (multipleValue != null) {
+                multipleValue.add(convertedValue);
+            } else if (singleValue != null) {
+                throw new ParameterException("Only one main parameter allowed but found several: "
+                    + "\"" + singleValue + "\" and \"" + convertedValue + "\"");
+            } else {
+                singleValue = convertedValue;
+                parameterized.set(object, convertedValue);
+            }
+        }
     }
 
     private MainParameter mainParameter = null;
@@ -725,7 +749,7 @@ public class JCommander {
                     //
                     // Regular (non-command) parsing
                     //
-                    List mp = getMainParameterValue(arg);
+                    initMainParameterValue(arg);
                     String value = a; // If there's a non-quoted version, prefer that one
                     Object convertedValue = value;
 
@@ -746,7 +770,7 @@ public class JCommander {
                     }
 
                     mainParameter.description.setAssigned(true);
-                    mp.add(convertedValue);
+                    mainParameter.addValue(convertedValue);
                 } else {
                     //
                     // Command parsing
@@ -904,32 +928,36 @@ public class JCommander {
     }
 
     /**
-     * @return the field that's meant to receive all the parameters that are not options.
-     *
-     * @param arg the arg that we're about to add (only passed here to output a meaningful
-     * error message).
+     * Init the main parameter with the given arg. Note that the main parameter can be either a List<String>
+     * or a single value.
      */
-    private List<?> getMainParameterValue(String arg) {
+    private void initMainParameterValue(String arg) {
         if (mainParameter == null) {
             throw new ParameterException(
                     "Was passed main parameter '" + arg + "' but no main parameter was defined in your arg class");
         }
 
-        List<?> result = (List<?>) mainParameter.parameterized.get(mainParameter.object);
-        if (result == null) {
-            result = Lists.newArrayList();
-            Class<?> type = mainParameter.parameterized.getType();
-            if (!List.class.isAssignableFrom(type)) {
-                throw new ParameterException("Main parameter field " + mainParameter
-                        + " needs to be of type List, not " + type);
+        Object object = mainParameter.parameterized.get(mainParameter.object);
+        Class<?> type = mainParameter.parameterized.getType();
+
+        // If it's a List<String>, we might need to create that list and then add the value to it.
+        if (List.class.isAssignableFrom(type)) {
+            List result;
+            if (object == null) {
+                result = Lists.newArrayList();
+            } else {
+                result = (List) object;
             }
+
+            if (mainParameter.firstTimeMainParameter) {
+                result.clear();
+                mainParameter.firstTimeMainParameter = false;
+            }
+
+            mainParameter.multipleValue = result;
             mainParameter.parameterized.set(mainParameter.object, result);
         }
-        if (firstTimeMainParameter) {
-            result.clear();
-            firstTimeMainParameter = false;
-        }
-        return result;
+
     }
 
     public String getMainParameterDescription() {

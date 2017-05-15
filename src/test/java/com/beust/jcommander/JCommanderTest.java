@@ -1522,6 +1522,35 @@ public class JCommanderTest {
     }
 
     @Test
+    public void mainParameterWithNonListField() {
+        class Args {
+            @Parameter
+            private String main;
+        }
+
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .args(new String[]{"a"})
+                .build();
+        Assert.assertEquals(args.main, "a");
+    }
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void mainParameterWithNonListFieldWithException() {
+        class Args {
+            @Parameter
+            private String main;
+        }
+
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .args(new String[]{"a", "b"})
+                .build();
+    }
+
+    @Test
     public void mainParameterWithCorrectArity() {
         class Args {
             @Parameter(arity = 2)
