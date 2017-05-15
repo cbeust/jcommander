@@ -1,6 +1,6 @@
 
 import com.beust.kobalt.plugin.java.javaCompiler
-import com.beust.kobalt.plugin.osgi.*
+import com.beust.kobalt.plugin.osgi.osgi
 import com.beust.kobalt.plugin.packaging.assemble
 import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
@@ -13,7 +13,7 @@ val jcommander = project {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.71"
+    version = "1.72"
     description = "A Java library to parse command line options"
 
     dependenciesTest {
