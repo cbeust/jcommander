@@ -1362,7 +1362,8 @@ private Integer value;</code></pre>
 <h2 id="_main_parameter">5. Main parameter</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>So far, all the <code>@Parameter</code> annotations we have seen had defined an attribute called <code>names</code>. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a <code>List&lt;String&gt;</code> and it will contain all the parameters that are not options:</p>
+<p>So far, all the <code>@Parameter</code> annotations we have seen had defined an attribute called <code>names</code>. You can define one (and at most one) parameter without any such attribute. This parameter can be either a <code>List&lt;String&gt;</code> or a single field
+(for example a <code>String</code> or a type that has a converter, e.g. <code>File</code>), in which case there needs to be exactly one main parameter.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2074,7 +2075,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-05-02 10:07:41 PDT
+Last updated 2017-05-15 11:58:52 PDT
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

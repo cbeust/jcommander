@@ -507,7 +507,8 @@ After parsing your parameters with JCommander, you might want to perform additio
 
 == Main parameter
 
-So far, all the `@Parameter` annotations we have seen had defined an attribute called `names`. You can define one (and at most one) parameter without any such attribute. This parameter needs to be a `List<String>` and it will contain all the parameters that are not options:
+So far, all the `@Parameter` annotations we have seen had defined an attribute called `names`. You can define one (and at most one) parameter without any such attribute. This parameter can be either a `List<String>` or a single field
+(for example a `String` or a type that has a converter, e.g. `File`), in which case there needs to be exactly one main parameter.
 
 [source,java]
 ----
