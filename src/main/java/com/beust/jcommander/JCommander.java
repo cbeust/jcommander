@@ -199,7 +199,9 @@ public class JCommander {
             throw new NullPointerException("options");
         }
         this.options = options;
-        addConverterFactory(new DefaultConverterFactory());
+        if (options.converterInstanceFactories.isEmpty()) {
+            addConverterFactory(new DefaultConverterFactory());
+        }
     }
 
     /**
