@@ -18,6 +18,7 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.ArgsConverterFactory;
 import com.beust.jcommander.args.ArgsMainParameter1;
 import com.beust.jcommander.args.ArgsMainParameter2;
@@ -98,5 +99,15 @@ public class ConverterFactoryTest {
     }, new ArgsMainParameter1());
   }
 
+  @Test
+  public void mainWithSubcommand() throws Exception {
+    final Args1 a = new Args1();
+    final JCommander jc = new JCommander(a);
+    jc.addConverterInstanceFactory((parameter, forType, optionName) ->
+            Integer.class.equals(forType) ? value -> Integer.parseInt(value) + 100 : null);
+    jc.addCommand("foo", new ArgsConverterFactory());
+    jc.parse("-verbose", "42");
+    Assert.assertEquals(a.verbose.intValue(), 142);
+  }
 }
 
