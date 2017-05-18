@@ -103,8 +103,21 @@ public class ConverterFactoryTest {
   public void mainWithSubcommand() throws Exception {
     final Args1 a = new Args1();
     final JCommander jc = new JCommander(a);
-    jc.addConverterInstanceFactory((parameter, forType, optionName) ->
-            Integer.class.equals(forType) ? value -> Integer.parseInt(value) + 100 : null);
+
+    jc.addConverterInstanceFactory(new IStringConverterInstanceFactory() {
+      @Override
+      public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType, String optionName) {
+        return Integer.class.equals(forType)
+          ? new IStringConverter<Integer>() {
+              @Override
+              public Integer convert(String value) {
+                return Integer.parseInt(value) + 100;
+              }
+            }
+          : null;
+      }
+    });
+
     jc.addCommand("foo", new ArgsConverterFactory());
     jc.parse("-verbose", "42");
     Assert.assertEquals(a.verbose.intValue(), 142);
