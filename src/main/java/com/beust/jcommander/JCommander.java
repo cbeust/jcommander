@@ -265,7 +265,7 @@ public class JCommander {
         options.expandAtSign = expandAtSign;
     }
 
-    public static Console getConsole() {
+    public static synchronized Console getConsole() {
         if (console == null) {
             try {
                 Method consoleMethod = System.class.getDeclaredMethod("console");
@@ -763,7 +763,7 @@ public class JCommander {
                             convertedValue = convertValue(mainParameter.parameterized, (Class) cls, null, value);
                         }
                     }
-                    
+
                     for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
                             ) {
                         ParameterDescription.validateParameter(mainParameter.description,
