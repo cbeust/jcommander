@@ -1,11 +1,11 @@
 package com.beust.jcommander;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class PasswordTest {
 
@@ -46,29 +46,31 @@ public class PasswordTest {
     }
 
     @Test(dataProvider = "args")
-    public void passwordNotAsked(Args a) {
+    public void passwordNotAsked(Args args) {
         String expectedPassword = "somepassword";
         int expectedPort = 7;
-        new JCommander(a, "--password", expectedPassword, "--port", String.valueOf(7));
-        Assert.assertEquals(a.getPort(), expectedPort);
-        Assert.assertEquals(a.getPassword(), expectedPassword);
+        JCommander.newBuilder().addObject(args).build()
+                .parse("--password", expectedPassword, "--port", String.valueOf(7));
+        Assert.assertEquals(args.getPort(), expectedPort);
+        Assert.assertEquals(args.getPassword(), expectedPassword);
     }
 
     @Test(dataProvider = "args", expectedExceptions = ParameterException.class)
-    public void passwordWithExcessiveArity(Args a) {
-        new JCommander(a, "--password", "somepassword", "someotherarg", "--port", String.valueOf(7));
+    public void passwordWithExcessiveArity(Args args) {
+        JCommander.newBuilder().addObject(args).build()
+                .parse("--password", "somepassword", "someotherarg", "--port", String.valueOf(7));
     }
 
     @Test(dataProvider = "args")
-    public void passwordAsked(Args a) {
+    public void passwordAsked(Args args) {
         InputStream stdin = System.in;
         String password = "password";
         int port = 7;
         try {
             System.setIn(new ByteArrayInputStream(password.getBytes()));
-            new JCommander(a, "--port", String.valueOf(port), "--password");
-            Assert.assertEquals(a.getPort(), port);
-            Assert.assertEquals(a.getPassword(), password);
+            JCommander.newBuilder().addObject(args).build().parse("--port", String.valueOf(port), "--password");
+            Assert.assertEquals(args.getPort(), port);
+            Assert.assertEquals(args.getPassword(), password);
         } finally {
             System.setIn(stdin);
         }
@@ -96,16 +98,16 @@ public class PasswordTest {
 
     @Test
     public void passwordOptionalNotProvided() {
-        Args a = new OptionalPasswordTestingArgs();
-        new JCommander(a, "--port", "7");
-        Assert.assertEquals(a.getPort(), 7);
-        Assert.assertEquals(a.getPassword(), null);
+        Args args = new OptionalPasswordTestingArgs();
+        JCommander.newBuilder().addObject(args).build().parse("--port", "7");
+        Assert.assertEquals(args.getPort(), 7);
+        Assert.assertEquals(args.getPassword(), null);
     }
 
     @Test(expectedExceptions = ParameterException.class)
     public void passwordRequredNotProvided() {
-        Args a = new PasswordTestingArgs();
-        new JCommander(a, "--port", "7");
+        Args args = new PasswordTestingArgs();
+        JCommander.newBuilder().addObject(args).build().parse("--port", "7");
     }
 
 }
