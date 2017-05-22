@@ -18,14 +18,13 @@
 
 package com.beust.jcommander.args;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import org.testng.Assert;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-
-import org.testng.Assert;
-
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
 
 /**
  * Test enums.
@@ -44,7 +43,8 @@ public class ArgsEnum {
   public static void main(String[] args1) {
     ArgsEnum args = new ArgsEnum();
     String[] argv = { "-choice", "ONE"};
-    JCommander jc = new JCommander(args, argv);
+    JCommander jc = JCommander.newBuilder().addObject(args).build();
+    jc.parse(argv);
     jc.usage();
     Assert.assertEquals(jc.getParameters().get(0).getDescription(),
         "Options: " + EnumSet.allOf((Class<? extends Enum>) ArgsEnum.ChoiceType.class));

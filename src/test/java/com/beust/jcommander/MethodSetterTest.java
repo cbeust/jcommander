@@ -30,7 +30,7 @@ public class MethodSetterTest {
     }
     ArgsArityStringSetter args = new ArgsArityStringSetter();
     String[] argv = { "-pairs", "pair0", "pair1", "rest" };
-    new JCommander(args, argv);
+    JCommander.newBuilder().addObject(args).build().parse(argv);
 
     Assert.assertEquals(args.pairs.size(), 2);
     Assert.assertEquals(args.pairs.get(0), "pair0");
@@ -48,7 +48,7 @@ public class MethodSetterTest {
     }
     boolean passed = false;
     try {
-      new JCommander(new Arg(), "--host", "host");
+      JCommander.newBuilder().addObject(new Arg()).build().parse("--host", "host");
     } catch(ParameterException ex) {
       Assert.assertEquals(ex.getCause(), null);
       passed = true;
@@ -69,10 +69,10 @@ public class MethodSetterTest {
         return port;
       }
     }
-    Arg arg = new Arg();
-    new JCommander(arg, "--port", "42");
+    Arg args = new Arg();
+    JCommander.newBuilder().addObject(args).build().parse("--port", "42");
 
-    Assert.assertEquals(arg.port, new Integer(42));
+    Assert.assertEquals(args.port, new Integer(42));
   }
 
   public void noGetterButWithField() {
@@ -84,8 +84,9 @@ public class MethodSetterTest {
         this.port = Integer.parseInt(port);
       }
     }
-    Arg arg = new Arg();
-    JCommander jc = new JCommander(arg, "--port", "42");
+    Arg args = new Arg();
+    JCommander jc = JCommander.newBuilder().addObject(args).build();
+    jc.parse("--port", "42");
     ParameterDescription pd = jc.getParameters().get(0);
     Assert.assertEquals(pd.getDefault(), 43);
   }

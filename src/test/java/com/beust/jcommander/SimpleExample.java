@@ -15,10 +15,10 @@ class Main {
     @Parameter(names={"--pattern", "-p"})
     int pattern;
 
-    public static void main(String ... args) {
-        Main main = new Main();
-        new JCommander(main, args);
-        main.run();
+    public static void main(String ... argv) {
+        Main args = new Main();
+        JCommander.newBuilder().addObject(args).build().parse(argv);
+        args.run();
     }
 
     public void run() {
