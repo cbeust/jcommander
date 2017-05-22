@@ -12,6 +12,7 @@
 * Fixed: Default value for `@Parameter(help=true)` parameter is not displayed in output of `JCommander.usage()`, #305 (@jeremysolarz) 
 * Fixed: When providing two names in `@Parameter` always first name is given to `IValueValidator`, #309 (@jeremysolarz) 
 * Fixed: Do not add a DefaultConverterFactory for every subcommand, #359 (@simon04)
+* Added: Add testcase for `EnumConverter`, #360 (@jeremysolarz)
 
 ### 1.58
 2016-09-29
