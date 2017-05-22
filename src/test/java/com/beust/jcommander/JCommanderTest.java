@@ -1135,9 +1135,9 @@ public class JCommanderTest {
         Assert.assertEquals(a.rules, Arrays.asList("some test"));
     }
 
-  static class V2 implements IParameterValidator2 {
-     static finalList<String> names =  Lists.newArrayList();
-    static boolean validateCalled = false;
+    static class V2 implements IParameterValidator2 {
+        static final List<String> names = Lists.newArrayList();
+        static boolean validateCalled = false;
 
         @Override
         public void validate(String name, String value) throws ParameterException {
@@ -1600,8 +1600,8 @@ public class JCommanderTest {
         }
 
         JCommander.newBuilder()
-                    .addObject(new Args())
-                    .build()
-                    .parse("--file", "README.markdown");
+                .addObject(new Args())
+                .build()
+                .parse("--file", "README.markdown");
     }
 }
