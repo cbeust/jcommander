@@ -23,6 +23,7 @@ import com.beust.jcommander.args.ArgsEnum.ChoiceType;
 import com.beust.jcommander.command.CommandAdd;
 import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
+import com.beust.jcommander.converters.EnumConverter;
 import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
@@ -716,6 +717,42 @@ public class JCommanderTest {
     public void variableArityZeroNonBoolean() {
         VariableArity va = new VariableArity(0);
         new JCommander(va).parse("-variable", "a", "b", "c", "d");
+    }
+
+    enum Color {
+        RED, BLUE
+    }
+
+    @Test
+    public void enumConverter(){
+
+
+        class ColorEnumConverter extends EnumConverter<Color> {
+            /**
+             * Constructs a new converter.
+             *
+             * @param optionName the option name for error reporting
+             * @param clazz      the enum class
+             */
+            public ColorEnumConverter(String optionName, Class<Color> clazz) {
+                super(optionName, clazz);
+            }
+
+            @Override
+            public Color convert(String value) {
+                return Color.valueOf(value);
+            }
+        }
+
+        class Arg {
+            @Parameter(names = "-colors", converter = ColorEnumConverter.class)
+            List<Color> colors;
+        }
+
+        Arg command = new Arg();
+        JCommander jc = JCommander.newBuilder().addObject(command).build();
+        jc.parse("-colors", "RED");
+        Assert.assertEquals(command.colors.size(), 1);
     }
 
     public void enumArgs() {
