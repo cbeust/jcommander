@@ -1,0 +1,26 @@
+<project name="jcommander" default="dist" basedir=".">
+
+  <property file="build.properties" />
+
+  <target name="clean">
+    <delete dir="${dir.build}" />
+    <delete dir="${dir.dist}" />
+    <delete dir="${dir.test.build}" />
+  </target>
+  
+  <target name="compile">
+    <mkdir dir="${dir.build}" />
+    <javac includeantruntime="false"
+           srcdir="${dir.src}" 
+           destdir="${dir.build}">
+    </javac>
+  </target>
+  
+  <target name="dist" depends="compile">
+    <mkdir dir="${dir.dist}" />
+    <jar destfile="${jcommander.jar}">
+      <zipfileset dir="${dir.build}" includes="**/*.class" />
+    </jar>
+  </target>
+
+</project>
