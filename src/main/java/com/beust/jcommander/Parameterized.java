@@ -169,8 +169,15 @@ public class Parameterized {
     try {
       if (method != null) {
         if (getter == null) {
-            getter = method.getDeclaringClass()
-                .getMethod("g" + method.getName().substring(1));
+          String methodName;
+          if(Boolean.class.getSimpleName().toLowerCase().equals(getType().getName())){
+            methodName = "is" + method.getName().substring(3);
+          } else {
+            methodName = "g" + method.getName().substring(1);
+          }
+
+          getter = object.getClass()
+                  .getMethod(methodName);
         }
         return getter.invoke(object);
       } else {
