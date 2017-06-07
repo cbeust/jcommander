@@ -169,8 +169,7 @@ public class Parameterized {
     try {
       if (method != null) {
         if (getter == null) {
-            getter = method.getDeclaringClass()
-                .getMethod("g" + method.getName().substring(1));
+          setGetter(object);
         }
         return getter.invoke(object);
       } else {
@@ -194,6 +193,22 @@ public class Parameterized {
       }
       return result;
     }
+  }
+
+  private void setGetter(Object object) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    if(Boolean.class.getSimpleName().toLowerCase().equals(getType().getName())){
+      // try is<fieldname> notation
+      try {
+        getter = object.getClass()
+                .getMethod("is" + method.getName().substring(3));
+        // we have found a is<fieldname> getter we can return
+        return;
+      } catch (NoSuchMethodException n){
+        // if not found ignore exception and try with default get<fieldname> below
+      }
+    }
+    getter = object.getClass()
+            .getMethod("g" + method.getName().substring(1));
   }
 
   @Override

@@ -375,6 +375,34 @@ public class JCommanderTest {
         Assert.assertEquals(Arrays.asList(".txt", ".md"), args.extensions);
     }
 
+    @Test
+    public void booleanNoDefault() {
+        class Args {
+            @Parameter(names = {"--f"}, description = "Just a simple flag")
+            private Boolean f;
+        }
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .build().parse("--f");
+        Assert.assertEquals(args.f, null);
+    }
+
+
+    @Test
+    public void invertedBoolean() {
+        class Args {
+            @Parameter(names = {"--f"})
+            private boolean f = true;
+        }
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .args(new String[]{"--f"})
+                .build();
+        Assert.assertEquals(args.f, false);
+    }
+
     private void argsBoolean1(String[] argv, Boolean expected) {
         ArgsBooleanArity args = new ArgsBooleanArity();
         JCommander.newBuilder().addObject(args).build().parse(argv);
@@ -1556,20 +1584,6 @@ public class JCommanderTest {
                 .args(new String[]{"--generate", "--config", "foo.txt"})
                 .build();
         Assert.assertEquals(generateOption.configFile.getName(), "foo.txt");
-    }
-
-    @Test
-    public void invertedBoolean() {
-        class Args {
-            @Parameter(names = {"--f"})
-            private boolean f = true;
-        }
-        Args args = new Args();
-        JCommander.newBuilder()
-                .addObject(args)
-                .args(new String[]{"--f"})
-                .build();
-        Assert.assertEquals(args.f, false);
     }
 
     @Test
