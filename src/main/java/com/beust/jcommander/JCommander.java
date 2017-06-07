@@ -717,7 +717,9 @@ public class JCommander {
                                     && pd.getParameter().arity() == -1) {
                                 // Flip the value this boolean was initialized with
                                 Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
-                                pd.addValue(value ? "false" : "true");
+                                if(value != null) {
+                                    pd.addValue(value ? "false" : "true");
+                                }
                                 requiredFields.remove(pd.getParameterized());
                             } else {
                                 increment = processFixedArity(args, i, pd, validate, fieldType);
