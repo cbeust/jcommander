@@ -65,4 +65,18 @@ public @interface Parameters {
    * If true, this command won't appear in the usage().
    */
   boolean hidden() default false;
+
+  /**
+   * If the annotated class was added to {@link JCommander} as a command with
+   * {@link JCommander#addCommand}, then this string will be displayed in the
+   * description when @{link JCommander#usage} is invoked.
+   * @return
+   */
+  String example() default "";
+
+  /**
+   * @return the key used to find the command example in the resource bundle.
+   */
+  String exampleKey() default "";
+
 }

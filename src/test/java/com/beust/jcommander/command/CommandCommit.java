@@ -23,7 +23,7 @@ import com.beust.jcommander.Parameters;
 
 import java.util.List;
 
-@Parameters(separators = "=", commandDescription = "Record changes to the repository")
+@Parameters(separators = "=", commandDescription = "Record changes to the repository", example= "This is a simple example that shows how commit commands could be executed.")
 public class CommandCommit {
 
   @Parameter(description = "List of files")

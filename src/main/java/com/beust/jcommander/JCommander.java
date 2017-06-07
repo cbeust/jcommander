@@ -1020,6 +1020,12 @@ public class JCommander {
             out.append("\n");
         }
         jc.usage(out, indent);
+
+        String example = getCommandExample(commandName);
+        if (example != null && example.length() > 0) {
+            out.append(indent).append("Examples:\n");
+            out.append(indent).append("    ").append(example);
+        }
     }
 
     /**
@@ -1048,6 +1054,39 @@ public class JCommander {
                 String descriptionKey = p.commandDescriptionKey();
                 if (!"".equals(descriptionKey)) {
                     result = getI18nString(bundle, descriptionKey, p.commandDescription());
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @return the example of the command.
+     */
+    public String getCommandExample(String commandName) {
+        JCommander jc = findCommandByAlias(commandName);
+        if (jc == null) {
+            throw new ParameterException("Asking description for unknown command: " + commandName);
+        }
+
+        Object arg = jc.getObjects().get(0);
+        Parameters p = arg.getClass().getAnnotation(Parameters.class);
+        ResourceBundle bundle = null;
+        String result = null;
+        if (p != null) {
+            result = p.example();
+            String bundleName = p.resourceBundle();
+            if (!"".equals(bundleName)) {
+                bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+            } else {
+                bundle = options.bundle;
+            }
+
+            if (bundle != null) {
+                String exampleKey = p.exampleKey();
+                if (!"".equals(exampleKey)) {
+                    result = getI18nString(bundle, exampleKey, p.example());
                 }
             }
         }
