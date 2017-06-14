@@ -335,7 +335,9 @@ public class JCommanderTest {
         JCommander.newBuilder().addObject(args).build().parse("-file", "/tmp/" + fileName,
                 "-listStrings", "Tuesday,Thursday",
                 "-listInts", "-1,8",
-                "-listBigDecimals", "-11.52,100.12");
+                "-listBigDecimals", "-11.52,100.12",
+                "-listBigDecimalsWildcardUpper", "-11.52,100.12",
+                "-listBigDecimalsWildcardLower", "-11.52,100.12");
         Assert.assertEquals(args.file.getName(), fileName);
         Assert.assertEquals(args.listStrings.size(), 2);
         Assert.assertEquals(args.listStrings.get(0), "Tuesday");
@@ -346,6 +348,12 @@ public class JCommanderTest {
         Assert.assertEquals(args.listBigDecimals.size(), 2);
         Assert.assertEquals(args.listBigDecimals.get(0), new BigDecimal("-11.52"));
         Assert.assertEquals(args.listBigDecimals.get(1), new BigDecimal("100.12"));
+        Assert.assertEquals(args.listBigDecimalsWildcardUpper.size(), 2);
+        Assert.assertEquals(args.listBigDecimalsWildcardUpper.get(0), new BigDecimal("-11.52"));
+        Assert.assertEquals(args.listBigDecimalsWildcardUpper.get(1), new BigDecimal("100.12"));
+        Assert.assertEquals(args.listBigDecimalsWildcardLower.size(), 2);
+        Assert.assertEquals(args.listBigDecimalsWildcardLower.get(0), new BigDecimal("-11.52"));
+        Assert.assertEquals(args.listBigDecimalsWildcardLower.get(1), new BigDecimal("100.12"));
     }
 
     public void hiddenConverter() {

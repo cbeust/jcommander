@@ -4,12 +4,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +72,7 @@ public class Parameterized {
    * Given an object return the set of classes that it extends
    * or implements.
    *
-   * @param arg object to describe
+   * @param inputClass object to describe
    * @return set of classes that are implemented or extended by that object
    */
   private static Set<Class<?>> describeClassTree(Class<?> inputClass) {
@@ -314,6 +309,14 @@ public class Parameterized {
         Type cls = p.getActualTypeArguments()[0];
         if (cls instanceof Class) {
           return cls;
+        } else if ( cls instanceof WildcardType) {
+          WildcardType wildcardType = (WildcardType)cls;
+          if (wildcardType.getLowerBounds().length > 0) {
+            return wildcardType.getLowerBounds()[0];
+          }
+          if (wildcardType.getUpperBounds().length > 0) {
+            return wildcardType.getUpperBounds()[0];
+          }
         }
       }
     }

@@ -53,5 +53,11 @@ public class ArgsConverter {
 
   @Parameter(names = "-listBigDecimals")
   public List<BigDecimal> listBigDecimals;
+
+  @Parameter(names = "-listBigDecimalsWildcardUpper")
+  public List<? extends BigDecimal> listBigDecimalsWildcardUpper;
+
+  @Parameter(names = "-listBigDecimalsWildcardLower")
+  public List<? super BigDecimal> listBigDecimalsWildcardLower;
   
 }
