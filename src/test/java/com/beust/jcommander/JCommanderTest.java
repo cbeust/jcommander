@@ -700,10 +700,12 @@ public class JCommanderTest {
         final Args1 args1 = new Args1();
         final JCommander jc = new JCommander(args1);
         try {
-            jc.parse("@" + f.getAbsolutePath());
+            jc.parse("@__this_file_does_not_exists_then_we_should_get_some_exception_telling_us_so");
             throw new IllegalStateException("Expected exception to be thrown");
         } catch (ParameterException expected) {
-            Assert.assertTrue(expected.getMessage().startsWith("Could not read file"));
+          if (!expected.getMessage().startsWith("Could not read file")) {
+            Assert.fail("Invalid exception message", expected);
+          }
         }
         jc.setAtFileCharset(utf32);
         jc.parse("@" + f.getAbsolutePath());
