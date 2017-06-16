@@ -22,10 +22,10 @@ package com.beust.jcommander;
  * A factory for IStringConverter. This interface lets you specify your
  * converters in one place instead of having them repeated all over
  * your argument classes.
- * 
+ *
  * @author cbeust
  * @see IStringConverterInstanceFactory
  */
 public interface IStringConverterFactory {
-  <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType);
+  Class<? extends IStringConverter<?>> getConverter(Class<?> forType);
 }
