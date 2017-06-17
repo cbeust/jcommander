@@ -393,7 +393,7 @@ public class JCommanderTest {
         JCommander.newBuilder()
                 .addObject(args)
                 .build().parse("--f");
-        Assert.assertEquals(args.f, null);
+        Assert.assertEquals(args.f, Boolean.TRUE);
     }
 
 

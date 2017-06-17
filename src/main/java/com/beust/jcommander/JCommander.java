@@ -671,7 +671,7 @@ public class JCommander {
             }
         }
     }
-
+    
     /**
      * Main method that parses the values and initializes the fields accordingly.
      */
@@ -713,14 +713,8 @@ public class JCommander {
 
                             // Boolean, set to true as soon as we see it, unless it specified
                             // an arity of 1, in which case we need to read the next value
-                            if ((fieldType == boolean.class || fieldType == Boolean.class)
-                                    && pd.getParameter().arity() == -1) {
-                                // Flip the value this boolean was initialized with
-                                Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
-                                if(value != null) {
-                                    pd.addValue(value ? "false" : "true");
-                                }
-                                requiredFields.remove(pd.getParameterized());
+                            if (pd.getParameter().arity() == -1 && isBooleanType(fieldType)) {
+                                handleBooleanOption(pd, fieldType);
                             } else {
                                 increment = processFixedArity(args, i, pd, validate, fieldType);
                             }
@@ -805,6 +799,21 @@ public class JCommander {
 
     }
 
+    private boolean isBooleanType(Class<?> fieldType) {
+      return Boolean.class.isAssignableFrom(fieldType) || boolean.class.isAssignableFrom(fieldType);
+    }
+    
+    private void handleBooleanOption(ParameterDescription pd, Class<?> fieldType) {
+      // Flip the value this boolean was initialized with
+      Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
+      if(value != null) {
+          pd.addValue(value ? "false" : "true");
+      } else if (!fieldType.isPrimitive()) {
+          pd.addValue("true");
+      }
+      requiredFields.remove(pd.getParameterized());
+    }
+
     private class DefaultVariableArity implements IVariableArity {
 
         @Override
@@ -879,16 +888,10 @@ public class JCommander {
         int index = originalIndex;
         String arg = args[index];
         // Special case for boolean parameters of arity 0
-        if (arity == 0 &&
-                (Boolean.class.isAssignableFrom(fieldType)
-                        || boolean.class.isAssignableFrom(fieldType))) {
-            // Flip the value this boolean was initialized with
-            Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
-            pd.addValue(value ? "false" : "true");
-            requiredFields.remove(pd.getParameterized());
+        if (arity == 0 && isBooleanType(fieldType)) {
+            handleBooleanOption(pd, fieldType);
         } else if (arity == 0) {
             throw new ParameterException("Expected a value after parameter " + arg);
-
         } else if (index < args.length - 1) {
             int offset = "--".equals(args[index + 1]) ? 1 : 0;
 
