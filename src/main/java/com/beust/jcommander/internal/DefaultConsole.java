@@ -5,15 +5,25 @@ import com.beust.jcommander.ParameterException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 public class DefaultConsole implements Console {
+  private final PrintStream target;
+
+  public DefaultConsole(PrintStream target) {
+    this.target = target;
+  }
+
+  public DefaultConsole() {
+    this.target = System.out;
+  }
 
   public void print(String msg) {
-    System.out.print(msg);
+    target.print(msg);
   }
 
   public void println(String msg) {
-    System.out.println(msg);
+    target.println(msg);
   }
 
   public char[] readPassword(boolean echoInput) {
