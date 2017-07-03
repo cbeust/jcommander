@@ -31,7 +31,10 @@ and how you use it:
 JCommanderTest jct = new JCommanderTest();
 String[] argv = { "-log", "2", "-groups", "unit1,unit2,unit3",
                     "-debug", "-Doption=value", "a", "b", "c" };
-new JCommander(jct, argv);
+JCommander.newBuilder()
+  .addObject(args)
+  .build()
+  .parse(argv);
 
 Assert.assertEquals(2, jct.verbose.intValue());
 Assert.assertEquals("unit1,unit2,unit3", jct.groups);
