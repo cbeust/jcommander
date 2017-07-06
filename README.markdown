@@ -32,7 +32,7 @@ JCommanderTest jct = new JCommanderTest();
 String[] argv = { "-log", "2", "-groups", "unit1,unit2,unit3",
                     "-debug", "-Doption=value", "a", "b", "c" };
 JCommander.newBuilder()
-  .addObject(args)
+  .addObject(jct)
   .build()
   .parse(argv);
 
