@@ -47,7 +47,7 @@ public @interface Parameters {
   /**
    * If the annotated class was added to {@link JCommander} as a command with
    * {@link JCommander#addCommand}, then this string will be displayed in the
-   * description when @{link JCommander#usage} is invoked.
+   * description when {@link JCommander#usage} is invoked.
    */
   String commandDescription() default "";
 
