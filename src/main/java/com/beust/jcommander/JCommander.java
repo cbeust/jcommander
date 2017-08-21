@@ -147,7 +147,7 @@ public class JCommander {
 
     private List<String> unknownArgs = Lists.newArrayList();
 
-    private static Console console;
+    private Console console;
 
     private final Options options;
 
@@ -265,12 +265,14 @@ public class JCommander {
         options.expandAtSign = expandAtSign;
     }
 
-    public static synchronized Console getConsole() {
+    public void setConsole(Console console) { this.console = console; }
+
+    public synchronized Console getConsole() {
         if (console == null) {
             try {
                 Method consoleMethod = System.class.getDeclaredMethod("console");
                 Object console = consoleMethod.invoke(null);
-                JCommander.console = new JDK6Console(console);
+                this.console = new JDK6Console(console);
             } catch (Throwable t) {
                 console = new DefaultConsole();
             }
@@ -762,8 +764,7 @@ public class JCommander {
 
                     for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
                             ) {
-                        ParameterDescription.validateParameter(mainParameter.description,
-                        	validator,
+                        mainParameter.description.validateParameter(validator,
                             "Default", value);
                     }
 
@@ -1113,6 +1114,11 @@ public class JCommander {
 
         public Builder args(String[] args) {
             this.args = args;
+            return this;
+        }
+
+        public Builder console(Console console) {
+            jCommander.setConsole(console);
             return this;
         }
 
