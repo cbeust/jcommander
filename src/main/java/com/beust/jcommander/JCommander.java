@@ -753,6 +753,13 @@ public class JCommander {
                     String value = a; // If there's a non-quoted version, prefer that one
                     Object convertedValue = value;
 
+                    // Fix
+                    // Main parameter doesn't support Converter
+                    // https://github.com/cbeust/jcommander/issues/380
+                    if (mainParameter.annotation.converter() != null && mainParameter.annotation.converter() != NoConverter.class){
+                        convertedValue = convertValue(mainParameter.parameterized, mainParameter.parameterized.getType(), null, value);
+                    }
+
                     Type genericType = mainParameter.parameterized.getGenericType();
                     if (genericType instanceof ParameterizedType) {
                         ParameterizedType p = (ParameterizedType) genericType;
