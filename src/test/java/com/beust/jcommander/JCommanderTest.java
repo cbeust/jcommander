@@ -1656,6 +1656,18 @@ public class JCommanderTest {
                 .build();
     }
 
+    @Test
+    public void mainWithConverter() {
+
+        String path = "..";
+        File file = new File(path);
+        ArgsMainParameter3 args = new ArgsMainParameter3();
+        JCommander jc = new JCommander(args);
+
+        jc.parse(path);
+        Assert.assertEquals(file.getAbsolutePath(), args.getPath().getAbsolutePath());
+    }
+
     @Test(enabled = false)
     public static void main(String[] args) {
 
