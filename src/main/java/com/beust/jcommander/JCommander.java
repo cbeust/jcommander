@@ -460,7 +460,28 @@ public class JCommander {
             }
         }
 
+        //
+        // Expand combined options
+        //
+        if (options.allowCombinedShortOptions) {
+            vResult2 = expandCombinedShortOptions(vResult2);
+        }
+
         return vResult2.toArray(new String[vResult2.size()]);
+    }
+
+    private List<String> expandCombinedShortOptions(List<String> args) {
+        List<String> vResult = Lists.newArrayList();
+        for (String arg : args) {
+            if (arg.length() > 1 && arg.charAt(0) == '-' && arg.charAt(1) != '-') {
+                for (int i = 1; i < arg.length(); i++) {
+                    vResult.add("-" + arg.charAt(i));
+                }
+            } else {
+                vResult.add(arg);
+            }
+        }
+        return vResult;
     }
 
     private List<String> expandDynamicArg(String arg) {
