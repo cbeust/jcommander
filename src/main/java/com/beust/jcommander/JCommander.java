@@ -187,6 +187,7 @@ public class JCommander {
         private int verbose = 0;
         private boolean caseSensitiveOptions = true;
         private boolean allowAbbreviatedOptions = false;
+        private boolean allowCombinedShortOptions = false;
         /**
          * The factories used to look up string converters.
          */
@@ -1180,6 +1181,11 @@ public class JCommander {
             return this;
         }
 
+        public Builder allowCombinedShortOptions(boolean b) {
+            jCommander.setAllowCombinedShortOptions(b);
+            return this;
+        }
+
         public Builder acceptUnknownOptions(boolean b) {
             jCommander.setAcceptUnknownOptions(b);
             return this;
@@ -1734,6 +1740,10 @@ public class JCommander {
 
     public void setAllowAbbreviatedOptions(boolean b) {
         options.allowAbbreviatedOptions = b;
+    }
+
+    public void setAllowCombinedShortOptions(boolean b) {
+        options.allowCombinedShortOptions = b;
     }
 
     public void setAcceptUnknownOptions(boolean b) {
