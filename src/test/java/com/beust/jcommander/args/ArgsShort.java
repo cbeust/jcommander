@@ -1,8 +1,10 @@
 package com.beust.jcommander.args;
 
+import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test combined short arguments.
@@ -21,5 +23,8 @@ public class ArgsShort {
 
     @Parameter(names = "-s", description = "String")
     public String s;
+
+    @DynamicParameter(names = "-D", description = "Dynamic parameters")
+    public Map<String, String> params = new HashMap<>();
 
 }

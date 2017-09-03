@@ -1,6 +1,5 @@
 package com.beust.jcommander;
 
-import com.beust.jcommander.args.Args1;
 import com.beust.jcommander.args.ArgsShort;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -58,5 +57,17 @@ public class CombinedShortOptionsTest {
         Assert.assertTrue(args.a);
         Assert.assertFalse(args.b);
         Assert.assertFalse(args.c);
+    }
+
+    @Test
+    public void testShortOptionsWithDynamicParameters() {
+        ArgsShort args = new ArgsShort();
+        String[] argv = {"-ab", "-Dparam=str"};
+        JCommander.newBuilder().addObject(args).allowCombinedShortOptions(true).build().parse(argv);
+
+        Assert.assertTrue(args.a);
+        Assert.assertTrue(args.b);
+        Assert.assertFalse(args.c);
+        Assert.assertEquals(args.params.get("param"), "str");
     }
 }

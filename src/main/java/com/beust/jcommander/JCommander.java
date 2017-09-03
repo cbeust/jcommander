@@ -474,8 +474,8 @@ public class JCommander {
         List<String> vResult = Lists.newArrayList();
         for (String arg : args) {
             if (arg.length() > 1 && arg.charAt(0) == '-' && arg.charAt(1) != '-') {
-                for (int i = 1; i < arg.length(); i++) {
-                    vResult.add("-" + arg.charAt(i));
+                for (char ch : arg.substring(1).toCharArray()) {
+                    vResult.add("-" + ch);
                 }
             } else {
                 vResult.add(arg);
