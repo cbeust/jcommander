@@ -732,6 +732,7 @@ You can configure how options are looked up in a few different ways:
 
 - `JCommander#setCaseSensitiveOptions(boolean)`: specify whether options are case sensitive. If you call this method with `false`, then `"-param"` and `"-PARAM"` are considered equal.
 - `JCommander#setAllowAbbreviatedOptions(boolean)`: specify whether users can pass abbreviated options. If you call this method with `true` then users can pass `"-par"` to specify an option called `-param`. JCommander will throw a `ParameterException` if the abbreviated name is ambiguous.
+- `JCommander#setAllowCombinedShortOptions(boolean)`: specify whether users can combine single-character options (i.e. options with names of the form `-x`). If you call this method with `true`, users can pass `"-abc"` to specify boolean options called `-a`, `-b`, and `-c`. The final option may have a non-zero arity. In this configuration, parameters with longer names should use the double-dash prefix (e.g. `--name`).
 
 == Required and optional parameters
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.5">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <meta name="author" content="Cédric Beust">
 <title>JCommander</title>
 <style>
@@ -1638,6 +1638,9 @@ $ java Main --outputDirectory /tmp</code></pre>
 <li>
 <p><code>JCommander#setAllowAbbreviatedOptions(boolean)</code>: specify whether users can pass abbreviated options. If you call this method with <code>true</code> then users can pass <code>"-par"</code> to specify an option called <code>-param</code>. JCommander will throw a <code>ParameterException</code> if the abbreviated name is ambiguous.</p>
 </li>
+<li>
+<p><code>JCommander#setAllowCombinedShortOptions(boolean)</code>: specify whether users can combine single-character options (i.e. options with names of the form <code>-x</code>). If you call this method with <code>true</code>, users can pass <code>"-abc"</code> to specify boolean options called <code>-a</code>, <code>-b</code>, and <code>-c</code>. The final option may have a non-zero arity. In this configuration, parameters with longer names should use the double-dash prefix (e.g. <code>--name</code>).</p>
+</li>
 </ul>
 </div>
 </div>
@@ -2075,7 +2078,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-05-15 11:58:52 PDT
+Last updated 2017-09-04 11:29:07 BST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
