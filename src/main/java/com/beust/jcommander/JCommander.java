@@ -1486,6 +1486,10 @@ public class JCommander {
         if (converter == null && type.isEnum()) {
             converter = new EnumConverter(optionName, type);
         }
+        if(converter==null) {
+            converter = ConstructorOrValueOfConverter.tryCreateConverter(optionName, type);
+        }
+
         if (converter == null) {
             converter = new StringConverter();
         }
