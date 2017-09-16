@@ -518,7 +518,7 @@ public class JCommander {
 
     private ParameterDescription getPrefixDescriptionFor(String arg) {
         for (Map.Entry<IKey, ParameterDescription> es : descriptions.entrySet()) {
-            if (arg.startsWith(es.getKey().getName())) return es.getValue();
+            if (Strings.startsWith(arg, es.getKey().getName(), options.caseSensitiveOptions)) return es.getValue();
         }
 
         return null;

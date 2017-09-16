@@ -32,6 +32,23 @@ public class FinderTest {
     Assert.assertEquals(command, "--configure");
   }
 
+
+  public void caseInsensitiveArguments() throws Exception {
+    @Parameters(separators = "=")
+    class TestJobRunnerArgs {
+      @Parameter(names = "someParameter2")
+      private String someParameter2;
+    }
+
+    String[] testValues = {"someparameter2=2"};
+    TestJobRunnerArgs testJobRunnerArgs = new TestJobRunnerArgs();
+
+    JCommander jCommander = JCommander.newBuilder().addObject(testJobRunnerArgs).build();
+    jCommander.setCaseSensitiveOptions(false);
+    jCommander.parse(testValues);
+    Assert.assertEquals("2", testJobRunnerArgs.someParameter2);
+  }
+
   public void abbreviatedOptions() {
     class Arg {
       @Parameter(names = { "-p", "--param" })
