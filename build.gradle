@@ -27,6 +27,13 @@ dependencies {
     testCompile 'org.testng:testng:6.9.13'
 }
 
+jar {
+  manifest {
+    attributes(
+      "Automatic-Module-Name": "com.beust.jcommander")
+  }
+}
+
 task sourceJar(type: Jar) {
     group 'Build'
     description 'An archive of the source code'
