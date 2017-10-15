@@ -163,7 +163,7 @@ public class JCommander {
     /**
      * Options shared with sub commands
      */
-    public static class Options {
+    private static class Options {
 
         private ResourceBundle bundle;
 
@@ -201,10 +201,6 @@ public class JCommander {
          */
         private final List<IStringConverterInstanceFactory> converterInstanceFactories = new CopyOnWriteArrayList<>();
         private Charset atFileCharset = Charset.defaultCharset();
-
-        public ResourceBundle getBundle() {
-            return bundle;
-        }
     }
 
     private JCommander(Options options) {
@@ -1206,6 +1202,10 @@ public class JCommander {
 
     public int getColumnSize() {
         return options.columnSize;
+    }
+
+    public ResourceBundle getBundle() {
+        return options.bundle;
     }
 
     /**

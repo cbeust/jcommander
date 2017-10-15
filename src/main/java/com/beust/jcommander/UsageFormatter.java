@@ -77,7 +77,7 @@ public abstract class UsageFormatter {
             if (!bundleName.isEmpty()) {
                 bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
             } else {
-                bundle = commander.getOptions().getBundle();
+                bundle = commander.getBundle();
             }
 
             if (bundle != null) {
