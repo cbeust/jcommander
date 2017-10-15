@@ -107,7 +107,10 @@ public class JCommander {
         }
     }
 
-    private UsageFormatter usageFormatter = new UsageFormatter(this);
+    /**
+     * The usage formatter to use in {@link #usage()}.
+     */
+    private UsageFormatter usageFormatter = new DefaultUsageFormatter(this);
 
     private MainParameter mainParameter = null;
 

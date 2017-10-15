@@ -1,11 +1,12 @@
 package com.beust.jcommander;
 
-import com.beust.jcommander.internal.Lists;
-
-import java.util.*;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class UsageFormatter {
+/**
+ * An abstract formatter for help messages.
+ */
+public abstract class UsageFormatter {
 
     private final JCommander commander;
 
@@ -53,115 +54,7 @@ public class UsageFormatter {
     /**
      * Stores the help in the passed string builder, with the argument indentation.
      */
-    public void usage(StringBuilder out, String indent) {
-        if (commander.getDescriptions() == null) commander.createDescriptions();
-        boolean hasCommands = !commander.getCommands().isEmpty();
-        boolean hasOptions = !commander.getDescriptions().isEmpty();
-
-        // Indentation constants
-        final int descriptionIndent = 6;
-        final int indentCount = indent.length() + descriptionIndent;
-
-        //
-        // First line of the usage
-        //
-        String programName = commander.getProgramDisplayName() != null
-                ? commander.getProgramDisplayName() : "<main class>";
-        StringBuilder mainLine = new StringBuilder();
-        mainLine.append(indent).append("Usage: ").append(programName);
-        if (hasOptions) mainLine.append(" [options]");
-        if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
-        if (commander.getMainParameter() != null && commander.getMainParameter().getDescription() != null) {
-            mainLine.append(" ").append(commander.getMainParameter().getDescription().getDescription());
-        }
-        wrapDescription(out, indentCount, mainLine.toString());
-        out.append("\n");
-
-        //
-        // Align the descriptions at the "longestName" column
-        //
-        int longestName = 0;
-        List<ParameterDescription> sorted = Lists.newArrayList();
-
-        for (ParameterDescription pd : commander.getFields().values()) {
-            if (!pd.getParameter().hidden()) {
-                sorted.add(pd);
-                // + to have an extra space between the name and the description
-                int length = pd.getNames().length() + 2;
-
-                if (length > longestName) {
-                    longestName = length;
-                }
-            }
-        }
-
-        //
-        // Sort the options
-        //
-        Collections.sort(sorted, commander.getParameterDescriptionComparator());
-
-        //
-        // Display all the names and descriptions
-        //
-        if (sorted.size() > 0) out.append(indent).append("  Options:\n");
-
-        for (ParameterDescription pd : sorted) {
-            WrappedParameter parameter = pd.getParameter();
-            out.append(indent).append("  "
-                    + (parameter.required() ? "* " : "  ")
-                    + pd.getNames()
-                    + "\n");
-            wrapDescription(out, indentCount, s(indentCount) + pd.getDescription());
-            Object def = pd.getDefault();
-            if (pd.isDynamicParameter()) {
-                out.append("\n" + s(indentCount))
-                        .append("Syntax: " + parameter.names()[0]
-                                + "key" + parameter.getAssignment()
-                                + "value");
-            }
-            if (def != null && !pd.isHelp()) {
-                String displayedDef = Strings.isStringEmpty(def.toString())
-                        ? "<empty string>"
-                        : def.toString();
-                out.append("\n" + s(indentCount))
-                        .append("Default: " + (parameter.password() ? "********" : displayedDef));
-            }
-            Class<?> type = pd.getParameterized().getType();
-            if (type.isEnum()) {
-                out.append("\n" + s(indentCount))
-                        .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
-            }
-            out.append("\n");
-        }
-
-        //
-        // If commands were specified, show them as well
-        //
-        if (hasCommands) {
-            out.append(indent + "  Commands:\n");
-
-            // The magic value 3 is the number of spaces between the name of the option
-            // and its description
-            for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getCommands2().entrySet()) {
-                Object arg = commands.getValue().getObjects().get(0);
-                Parameters p = arg.getClass().getAnnotation(Parameters.class);
-
-                if (p == null || !p.hidden()) {
-                    JCommander.ProgramName progName = commands.getKey();
-                    String dispName = progName.getDisplayName();
-                    String description = getCommandDescription(progName.getName());
-                    wrapDescription(out, indentCount + descriptionIndent,
-                            indent + "    " + dispName + "      " + description);
-                    out.append("\n");
-
-                    // Options for this command
-                    JCommander jc = commander.findCommandByAlias(progName.getName());
-                    jc.getUsageFormatter().usage(out, indent + "      ");
-                    out.append("\n");
-                }
-            }
-        }
-    }
+    public abstract void usage(StringBuilder out, String indent);
 
     /**
      * @return the description of the command.
@@ -207,7 +100,7 @@ public class UsageFormatter {
      *                    description}. If the first line needs to be indented prepend the
      *                    correct number of spaces to {@code description}.
      */
-    private void wrapDescription(StringBuilder out, int indent, String description) {
+    protected void wrapDescription(StringBuilder out, int indent, String description) {
         int max = commander.getColumnSize();
         String[] words = description.split(" ");
         int current = 0;
@@ -232,11 +125,15 @@ public class UsageFormatter {
         }
     }
 
+    public JCommander getCommander() {
+        return commander;
+    }
+
     /**
      * @return The internationalized version of the string if available, otherwise
      * return def.
      */
-    private static String getI18nString(ResourceBundle bundle, String key, String def) {
+    public static String getI18nString(ResourceBundle bundle, String key, String def) {
         String s = bundle != null ? bundle.getString(key) : null;
         return s != null ? s : def;
     }
@@ -244,7 +141,7 @@ public class UsageFormatter {
     /**
      * @return <tt>count</tt>-many spaces
      */
-    private static String s(int count) {
+    public static String s(int count) {
         StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < count; i++) {
