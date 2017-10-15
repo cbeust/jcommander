@@ -1176,6 +1176,11 @@ public class JCommander {
             return this;
         }
 
+        public Builder usageFormatter(UsageFormatter usageFormatter) {
+            jCommander.setUsageFormatter(usageFormatter);
+            return this;
+        }
+
         public JCommander build() {
             if (args != null) {
                 jCommander.parse(args);
