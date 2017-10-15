@@ -1412,14 +1412,20 @@ public class JCommander {
 
     public Map<String, JCommander> getCommands() {
         Map<String, JCommander> res = Maps.newLinkedHashMap();
+
         for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
             res.put(entry.getKey().name, entry.getValue());
         }
         return res;
     }
 
-    public Map<ProgramName, JCommander> getCommands2() {
-        return commands;
+    public Map<ProgramName, JCommander> getRawCommands() {
+        Map<ProgramName, JCommander> res = Maps.newLinkedHashMap();
+
+        for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
+            res.put(entry.getKey(), entry.getValue());
+        }
+        return res;
     }
 
     public String getParsedCommand() {

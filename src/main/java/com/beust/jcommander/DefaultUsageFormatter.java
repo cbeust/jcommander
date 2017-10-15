@@ -2,7 +2,6 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.internal.Lists;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -17,40 +16,25 @@ public class DefaultUsageFormatter extends UsageFormatter {
      * Stores the help in the passed string builder, with the argument indentation.
      */
     public void usage(StringBuilder out, String indent) {
-        JCommander commander = getCommander();
-
-        if (commander.getDescriptions() == null) commander.createDescriptions();
-        boolean hasCommands = !commander.getCommands().isEmpty();
-        boolean hasOptions = !commander.getDescriptions().isEmpty();
+        if (getCommander().getDescriptions() == null)
+            getCommander().createDescriptions();
+        boolean hasCommands = !getCommander().getCommands().isEmpty();
+        boolean hasOptions = !getCommander().getDescriptions().isEmpty();
 
         // Indentation constants
         final int descriptionIndent = 6;
         final int indentCount = indent.length() + descriptionIndent;
 
-        //
-        // First line of the usage
-        //
-        String programName = commander.getProgramDisplayName() != null
-                ? commander.getProgramDisplayName() : "<main class>";
-        StringBuilder mainLine = new StringBuilder();
-        mainLine.append(indent).append("Usage: ").append(programName);
-        if (hasOptions) mainLine.append(" [options]");
-        if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
-        if (commander.getMainParameter() != null && commander.getMainParameter().getDescription() != null) {
-            mainLine.append(" ").append(commander.getMainParameter().getDescription().getDescription());
-        }
-        wrapDescription(out, indentCount, mainLine.toString());
-        out.append("\n");
+        // Append first line (aka main line) of the usage
+        appendMainLine(out, hasOptions, hasCommands, indentCount, indent);
 
-        //
         // Align the descriptions at the "longestName" column
-        //
         int longestName = 0;
-        List<ParameterDescription> sorted = Lists.newArrayList();
+        List<ParameterDescription> sortedParameters = Lists.newArrayList();
 
-        for (ParameterDescription pd : commander.getFields().values()) {
+        for (ParameterDescription pd : getCommander().getFields().values()) {
             if (!pd.getParameter().hidden()) {
-                sorted.add(pd);
+                sortedParameters.add(pd);
                 // + to have an extra space between the name and the description
                 int length = pd.getNames().length() + 2;
 
@@ -60,71 +44,97 @@ public class DefaultUsageFormatter extends UsageFormatter {
             }
         }
 
-        //
         // Sort the options
-        //
-        Collections.sort(sorted, commander.getParameterDescriptionComparator());
+        sortedParameters.sort(getCommander().getParameterDescriptionComparator());
 
-        //
-        // Display all the names and descriptions
-        //
-        if (sorted.size() > 0) out.append(indent).append("  Options:\n");
+        // Append all the parameter names and descriptions
+        appendAllParametersDetails(out, indentCount, indent, sortedParameters);
 
-        for (ParameterDescription pd : sorted) {
+        // Append commands if they were specified
+        if (hasCommands) {
+            appendCommands(out, indentCount, descriptionIndent, indent);
+        }
+    }
+
+    private void appendMainLine(StringBuilder out, boolean hasOptions, boolean hasCommands, int indentCount,
+            String indent) {
+        String programName = getCommander().getProgramDisplayName() != null
+                ? getCommander().getProgramDisplayName() : "<main class>";
+        StringBuilder mainLine = new StringBuilder();
+        mainLine.append(indent).append("Usage: ").append(programName);
+
+        if (hasOptions)
+            mainLine.append(" [options]");
+        if (hasCommands)
+            mainLine.append(indent).append(" [command] [command options]");
+        if (getCommander().getMainParameter() != null && getCommander().getMainParameter().getDescription() != null)
+            mainLine.append(" ").append(getCommander().getMainParameter().getDescription().getDescription());
+        wrapDescription(out, indentCount, mainLine.toString());
+        out.append("\n");
+    }
+
+    private void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
+            List<ParameterDescription> sortedParameters) {
+        if (sortedParameters.size() > 0)
+            out.append(indent).append("  Options:\n");
+
+        for (ParameterDescription pd : sortedParameters) {
             WrappedParameter parameter = pd.getParameter();
-            out.append(indent).append("  "
-                    + (parameter.required() ? "* " : "  ")
-                    + pd.getNames()
-                    + "\n");
+
+            // First line, command name
+            out.append(indent)
+                    .append("  ")
+                    .append(parameter.required() ? "* " : "  ")
+                    .append(pd.getNames())
+                    .append("\n");
             wrapDescription(out, indentCount, s(indentCount) + pd.getDescription());
             Object def = pd.getDefault();
+
             if (pd.isDynamicParameter()) {
-                out.append("\n" + s(indentCount))
-                        .append("Syntax: " + parameter.names()[0]
-                                + "key" + parameter.getAssignment()
-                                + "value");
+                String syntax = "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
+                out.append(newLineAndIndent(indentCount)).append(syntax);
             }
+
             if (def != null && !pd.isHelp()) {
-                String displayedDef = Strings.isStringEmpty(def.toString())
-                        ? "<empty string>"
-                        : def.toString();
-                out.append("\n" + s(indentCount))
-                        .append("Default: " + (parameter.password() ? "********" : displayedDef));
+                String displayedDef = Strings.isStringEmpty(def.toString()) ? "<empty string>" : def.toString();
+                String defaultText = "Default: " + (parameter.password() ? "********" : displayedDef);
+                out.append(newLineAndIndent(indentCount)).append(defaultText);
             }
             Class<?> type = pd.getParameterized().getType();
+
             if (type.isEnum()) {
-                out.append("\n" + s(indentCount))
-                        .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
+                String possibleValues = "Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type);
+                out.append(newLineAndIndent(indentCount)).append(possibleValues);
             }
             out.append("\n");
         }
+    }
 
-        //
-        // If commands were specified, show them as well
-        //
-        if (hasCommands) {
-            out.append(indent + "  Commands:\n");
+    private void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
+        out.append(indent + "  Commands:\n");
 
-            // The magic value 3 is the number of spaces between the name of the option
-            // and its description
-            for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getCommands2().entrySet()) {
-                Object arg = commands.getValue().getObjects().get(0);
-                Parameters p = arg.getClass().getAnnotation(Parameters.class);
+        // The magic value 3 is the number of spaces between the name of the option
+        // and its description
+        for (Map.Entry<JCommander.ProgramName, JCommander> commands : getCommander().getRawCommands().entrySet()) {
+            Object arg = commands.getValue().getObjects().get(0);
+            Parameters p = arg.getClass().getAnnotation(Parameters.class);
 
-                if (p == null || !p.hidden()) {
-                    JCommander.ProgramName progName = commands.getKey();
-                    String dispName = progName.getDisplayName();
-                    String description = getCommandDescription(progName.getName());
-                    wrapDescription(out, indentCount + descriptionIndent,
-                            indent + "    " + dispName + "      " + description);
-                    out.append("\n");
+            if (p == null || !p.hidden()) {
+                JCommander.ProgramName progName = commands.getKey();
+                String dispName = progName.getDisplayName();
+                String description = indent + s(4) + dispName + s(6) + getCommandDescription(progName.getName());
+                wrapDescription(out, indentCount + descriptionIndent, description);
+                out.append("\n");
 
-                    // Options for this command
-                    JCommander jc = commander.findCommandByAlias(progName.getName());
-                    jc.getUsageFormatter().usage(out, indent + "      ");
-                    out.append("\n");
-                }
+                // Options for this command
+                JCommander jc = getCommander().findCommandByAlias(progName.getName());
+                jc.getUsageFormatter().usage(out, indent + s(6));
+                out.append("\n");
             }
         }
+    }
+
+    private static String newLineAndIndent(int indent) {
+        return "\n" + s(indent);
     }
 }
