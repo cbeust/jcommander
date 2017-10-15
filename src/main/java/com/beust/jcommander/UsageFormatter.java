@@ -112,19 +112,19 @@ public abstract class UsageFormatter {
     /**
      * Wrap a potentially long line to {@link #commander#getColumnSize()}.
      *
-     * @param out         the output
-     * @param indent      the indentation in spaces for lines after the first line.
-     * @param description the text to wrap. No extra spaces are inserted before {@code
-     *                    description}. If the first line needs to be indented prepend the
-     *                    correct number of spaces to {@code description}.
+     * @param out               the output
+     * @param indent            the indentation in spaces for lines after the first line.
+     * @param currentLineIndent the length of the indentation of the initial line
+     * @param description       the text to wrap. No extra spaces are inserted before {@code
+     *                          description}. If the first line needs to be indented prepend the
+     *                          correct number of spaces to {@code description}.
      */
-    protected void wrapDescription(StringBuilder out, int indent, String description) {
-        int max = commander.getColumnSize();
+    protected void wrapDescription(StringBuilder out, int indent, int currentLineIndent, String description) {
+        int max = getCommander().getColumnSize();
         String[] words = description.split(" ");
-        int current = 0;
-        int i = 0;
+        int current = currentLineIndent;
 
-        while (i < words.length) {
+        for (int i = 0; i < words.length; i++) {
             String word = words[i];
 
             if (word.length() > max || current + 1 + word.length() <= max) {
@@ -137,10 +137,23 @@ public abstract class UsageFormatter {
                 }
             } else {
                 out.append("\n").append(s(indent)).append(word).append(" ");
-                current = indent + 1 + word.length();
+                current = indent + word.length() + 1;
             }
-            i++;
         }
+    }
+
+    /**
+     * Wrap a potentially long line to {@link #commander#getColumnSize()}.
+     *
+     * @param out         the output
+     * @param indent      the indentation in spaces for lines after the first line.
+     * @param description the text to wrap. No extra spaces are inserted before {@code
+     *                    description}. If the first line needs to be indented prepend the
+     *                    correct number of spaces to {@code description}.
+     * @see #wrapDescription(StringBuilder, int, int, String)
+     */
+    protected void wrapDescription(StringBuilder out, int indent, String description) {
+        wrapDescription(out, indent, 0, description);
     }
 
     public JCommander getCommander() {

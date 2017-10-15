@@ -24,6 +24,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The default usage formatter.
+ */
 public class DefaultUsageFormatter extends UsageFormatter {
 
     public DefaultUsageFormatter(JCommander commander) {
@@ -74,7 +77,7 @@ public class DefaultUsageFormatter extends UsageFormatter {
         }
     }
 
-    private void appendMainLine(StringBuilder out, boolean hasOptions, boolean hasCommands, int indentCount,
+    protected void appendMainLine(StringBuilder out, boolean hasOptions, boolean hasCommands, int indentCount,
             String indent) {
         String programName = getCommander().getProgramDisplayName() != null
                 ? getCommander().getProgramDisplayName() : "<main class>";
@@ -91,7 +94,7 @@ public class DefaultUsageFormatter extends UsageFormatter {
         out.append("\n");
     }
 
-    private void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
+    protected void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0)
             out.append(indent).append("  Options:\n");
@@ -128,11 +131,10 @@ public class DefaultUsageFormatter extends UsageFormatter {
         }
     }
 
-    private void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
+    protected void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
         out.append(indent + "  Commands:\n");
 
-        // The magic value 3 is the number of spaces between the name of the option
-        // and its description
+        // The magic value 3 is the number of spaces between the name of the option and its description
         for (Map.Entry<JCommander.ProgramName, JCommander> commands : getCommander().getRawCommands().entrySet()) {
             Object arg = commands.getValue().getObjects().get(0);
             Parameters p = arg.getClass().getAnnotation(Parameters.class);
