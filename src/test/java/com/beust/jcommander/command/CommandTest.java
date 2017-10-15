@@ -99,7 +99,7 @@ public class CommandTest {
 
         jc.setProgramName("TestCommander");
         StringBuilder out = new StringBuilder();
-        jc.usage(out);
+        jc.getUsageFormatter().usage(out);
 
         Assert.assertTrue(out.toString().contains("add      Add file contents to the index"));
         Assert.assertFalse(out.toString().contains("hidden      Hidden command to add file contents to the index"));
@@ -114,7 +114,7 @@ public class CommandTest {
 
     jc.setProgramName("TestCommander");
     StringBuilder out = new StringBuilder();
-    jc.usage(out);
+    jc.getUsageFormatter().usage(out);
 
     Assert.assertTrue(out.toString().contains("no-annotation"));
   }
@@ -129,7 +129,7 @@ public class CommandTest {
     jc.addCommand("commit", commit);
     jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
     StringBuilder out = new StringBuilder();
-    jc.usage(out);
+    jc.getUsageFormatter().usage(out);
     String firstLine = out.toString().split("\n")[0];
     Assert.assertFalse(firstLine.endsWith(" "), "Usage should not have trailing spaces");
   }

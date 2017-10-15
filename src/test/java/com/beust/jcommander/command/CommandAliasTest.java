@@ -119,15 +119,15 @@ public class CommandAliasTest {
     CommandCommit commit = new CommandCommit();
     jc.addCommand("commit", commit, "ci", "cmt");
     StringBuilder out = new StringBuilder();
-    jc.usage("commit", out);
+    jc.getUsageFormatter().usage("commit", out);
     patternMatchesTimes("commit\\(ci,cmt\\)", out.toString(), 1);
 
     out = new StringBuilder();
-    jc.usage("ci", out);
+    jc.getUsageFormatter().usage("ci", out);
     patternMatchesTimes("commit\\(ci,cmt\\)", out.toString(), 1);
 
     out = new StringBuilder();
-    jc.usage("cmt", out);
+    jc.getUsageFormatter().usage("cmt", out);
     patternMatchesTimes("commit\\(ci,cmt\\)", out.toString(), 1);
   }
 
@@ -138,7 +138,7 @@ public class CommandAliasTest {
     CommandCommit commit = new CommandCommit();
     jc.addCommand("commit", commit, "ci", "cmt");
     StringBuilder out = new StringBuilder();
-    jc.usage(out);
+    jc.getUsageFormatter().usage(out);
     // The usage should display this string twice: one as the command name
     // and one after Usage:
     patternMatchesTimes("commit\\(ci,cmt\\)", out.toString(), 2);
@@ -156,12 +156,12 @@ public class CommandAliasTest {
     CommandCommit commit = new CommandCommit();
     jc.addCommand("commit", commit, "ci", "cmt");
     StringBuilder sb = new StringBuilder();
-    jc.usage(sb);
+    jc.getUsageFormatter().usage(sb);
     System.out.println("--- usage() formatting ---");
     System.out.println(sb.toString());
 
     sb = new StringBuilder();
-    jc.usage("commit", sb);
+    jc.getUsageFormatter().usage("commit", sb);
     System.out.println("--- usage('commit') formatting ---");
     System.out.println(sb.toString());
   }

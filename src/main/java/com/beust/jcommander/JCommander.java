@@ -90,6 +90,10 @@ public class JCommander {
 
         private boolean firstTimeMainParameter = true;
 
+        public ParameterDescription getDescription() {
+            return description;
+        }
+
         public void addValue(Object convertedValue) {
             if (multipleValue != null) {
                 multipleValue.add(convertedValue);
@@ -102,6 +106,8 @@ public class JCommander {
             }
         }
     }
+
+    private UsageFormatter usageFormatter = new UsageFormatter(this);
 
     private MainParameter mainParameter = null;
 
@@ -154,7 +160,7 @@ public class JCommander {
     /**
      * Options shared with sub commands
      */
-    private static class Options {
+    public static class Options {
 
         private ResourceBundle bundle;
 
@@ -192,6 +198,10 @@ public class JCommander {
          */
         private final List<IStringConverterInstanceFactory> converterInstanceFactories = new CopyOnWriteArrayList<>();
         private Charset atFileCharset = Charset.defaultCharset();
+
+        public ResourceBundle getBundle() {
+            return bundle;
+        }
     }
 
     private JCommander(Options options) {
@@ -584,7 +594,7 @@ public class JCommander {
     /**
      * Create the ParameterDescriptions for all the \@Parameter found.
      */
-    private void createDescriptions() {
+    public void createDescriptions() {
         descriptions = Maps.newHashMap();
 
         for (Object object : objects) {
@@ -996,6 +1006,13 @@ public class JCommander {
     }
 
     /**
+     * Get the program display name (used only in the usage).
+     */
+    public String getProgramDisplayName() {
+        return programName == null ? null : programName.getDisplayName();
+    }
+
+    /**
      * Set the program name
      *
      * @param name    program name
@@ -1006,84 +1023,34 @@ public class JCommander {
     }
 
     /**
-     * Display the usage for this command.
-     */
-    public void usage(String commandName) {
-        StringBuilder sb = new StringBuilder();
-        usage(commandName, sb);
-        getConsole().println(sb.toString());
-    }
-
-    /**
-     * Store the help for the command in the passed string builder.
-     */
-    public void usage(String commandName, StringBuilder out) {
-        usage(commandName, out, "");
-    }
-
-    /**
-     * Store the help for the command in the passed string builder, indenting
-     * every line with "indent".
-     */
-    public void usage(String commandName, StringBuilder out, String indent) {
-        String description = getCommandDescription(commandName);
-        JCommander jc = findCommandByAlias(commandName);
-        if (description != null) {
-            out.append(indent).append(description);
-            out.append("\n");
-        }
-        jc.usage(out, indent);
-    }
-
-    /**
-     * @return the description of the command.
-     */
-    public String getCommandDescription(String commandName) {
-        JCommander jc = findCommandByAlias(commandName);
-        if (jc == null) {
-            throw new ParameterException("Asking description for unknown command: " + commandName);
-        }
-
-        Object arg = jc.getObjects().get(0);
-        Parameters p = arg.getClass().getAnnotation(Parameters.class);
-        ResourceBundle bundle = null;
-        String result = null;
-        if (p != null) {
-            result = p.commandDescription();
-            String bundleName = p.resourceBundle();
-            if (!"".equals(bundleName)) {
-                bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
-            } else {
-                bundle = options.bundle;
-            }
-
-            if (bundle != null) {
-                String descriptionKey = p.commandDescriptionKey();
-                if (!"".equals(descriptionKey)) {
-                    result = getI18nString(bundle, descriptionKey, p.commandDescription());
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * @return The internationalized version of the string if available, otherwise
-     * return def.
-     */
-    private String getI18nString(ResourceBundle bundle, String key, String def) {
-        String s = bundle != null ? bundle.getString(key) : null;
-        return s != null ? s : def;
-    }
-
-    /**
      * Display the help on System.out.
      */
     public void usage() {
         StringBuilder sb = new StringBuilder();
-        usage(sb);
+        usageFormatter.usage(sb);
         getConsole().println(sb.toString());
+    }
+
+    public void setUsageFormatter(UsageFormatter usageFormatter) {
+        if (usageFormatter == null)
+            throw new IllegalArgumentException("Argument UsageFormatter must not be null");
+        this.usageFormatter = usageFormatter;
+    }
+
+    public UsageFormatter getUsageFormatter() {
+        return usageFormatter;
+    }
+
+    public Options getOptions() {
+        return options;
+    }
+
+    public Map<IKey, ParameterDescription> getDescriptions() {
+        return descriptions;
+    }
+
+    public MainParameter getMainParameter() {
+        return mainParameter;
     }
 
     public static Builder newBuilder() {
@@ -1218,119 +1185,11 @@ public class JCommander {
         }
     }
 
-
-    /**
-     * Store the help in the passed string builder.
-     */
-    public void usage(StringBuilder out) {
-        usage(out, "");
+    public Map<Parameterized, ParameterDescription> getFields() {
+        return fields;
     }
 
-    public void usage(StringBuilder out, String indent) {
-        if (descriptions == null) createDescriptions();
-        boolean hasCommands = !commands.isEmpty();
-        boolean hasOptions = !descriptions.isEmpty();
-
-        //indenting
-        int descriptionIndent = 6;
-        int indentCount = indent.length() + descriptionIndent;
-
-        //
-        // First line of the usage
-        //
-        String programName = this.programName != null ? this.programName.getDisplayName() : "<main class>";
-        StringBuilder mainLine = new StringBuilder();
-        mainLine.append(indent).append("Usage: ").append(programName);
-        if (hasOptions) mainLine.append(" [options]");
-        if (hasCommands) mainLine.append(indent).append(" [command] [command options]");
-        if (mainParameter != null && mainParameter.description != null) {
-            mainLine.append(" ").append(mainParameter.description.getDescription());
-        }
-        wrapDescription(out, indentCount, mainLine.toString());
-        out.append("\n");
-
-        //
-        // Align the descriptions at the "longestName" column
-        //
-        int longestName = 0;
-        List<ParameterDescription> sorted = Lists.newArrayList();
-        for (ParameterDescription pd : fields.values()) {
-            if (!pd.getParameter().hidden()) {
-                sorted.add(pd);
-                // + to have an extra space between the name and the description
-                int length = pd.getNames().length() + 2;
-                if (length > longestName) {
-                    longestName = length;
-                }
-            }
-        }
-
-        //
-        // Sort the options
-        //
-        Collections.sort(sorted, getParameterDescriptionComparator());
-
-        //
-        // Display all the names and descriptions
-        //
-        if (sorted.size() > 0) out.append(indent).append("  Options:\n");
-        for (ParameterDescription pd : sorted) {
-            WrappedParameter parameter = pd.getParameter();
-            out.append(indent).append("  "
-                    + (parameter.required() ? "* " : "  ")
-                    + pd.getNames()
-                    + "\n");
-            wrapDescription(out, indentCount, s(indentCount) + pd.getDescription());
-            Object def = pd.getDefault();
-            if (pd.isDynamicParameter()) {
-                out.append("\n" + s(indentCount))
-                        .append("Syntax: " + parameter.names()[0]
-                                + "key" + parameter.getAssignment()
-                                + "value");
-            }
-            if (def != null && !pd.isHelp()) {
-                String displayedDef = Strings.isStringEmpty(def.toString())
-                        ? "<empty string>"
-                        : def.toString();
-                out.append("\n" + s(indentCount))
-                        .append("Default: " + (parameter.password() ? "********" : displayedDef));
-            }
-            Class<?> type = pd.getParameterized().getType();
-            if (type.isEnum()) {
-                out.append("\n" + s(indentCount))
-                        .append("Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type));
-            }
-            out.append("\n");
-        }
-
-        //
-        // If commands were specified, show them as well
-        //
-        if (hasCommands) {
-            out.append(indent + "  Commands:\n");
-            // The magic value 3 is the number of spaces between the name of the option
-            // and its description
-            for (Map.Entry<ProgramName, JCommander> commands : this.commands.entrySet()) {
-                Object arg = commands.getValue().getObjects().get(0);
-                Parameters p = arg.getClass().getAnnotation(Parameters.class);
-                if (p == null || !p.hidden()) {
-                    ProgramName progName = commands.getKey();
-                    String dispName = progName.getDisplayName();
-                    String description = getCommandDescription(progName.getName());
-                    wrapDescription(out, indentCount + descriptionIndent,
-                            indent + "    " + dispName + "      " + description);
-                    out.append("\n");
-
-                    // Options for this command
-                    JCommander jc = findCommandByAlias(progName.getName());
-                    jc.usage(out, indent + "      ");
-                    out.append("\n");
-                }
-            }
-        }
-    }
-
-    private Comparator<? super ParameterDescription> getParameterDescriptionComparator() {
+    public Comparator<? super ParameterDescription> getParameterDescriptionComparator() {
         return options.parameterDescriptionComparator;
     }
 
@@ -1344,37 +1203,6 @@ public class JCommander {
 
     public int getColumnSize() {
         return options.columnSize;
-    }
-
-    /**
-     * Wrap a potentially long line to {@link #getColumnSize()}.
-     *
-     * @param out         the output
-     * @param indent      the indentation in spaces for lines after the first line.
-     * @param description the text to wrap. No extra spaces are inserted before {@code
-     *                    description}. If the first line needs to be indented prepend the
-     *                    correct number of spaces to {@code description}.
-     */
-    private void wrapDescription(StringBuilder out, int indent, String description) {
-        int max = getColumnSize();
-        String[] words = description.split(" ");
-        int current = 0;
-        int i = 0;
-        while (i < words.length) {
-            String word = words[i];
-            if (word.length() > max || current + 1 + word.length() <= max) {
-                out.append(word);
-                current += word.length();
-                if (i != words.length - 1) {
-                    out.append(" ");
-                    current++;
-                }
-            } else {
-                out.append("\n").append(s(indent)).append(word).append(" ");
-                current = indent + 1 + word.length();
-            }
-            i++;
-        }
     }
 
     /**
@@ -1587,6 +1415,10 @@ public class JCommander {
         return res;
     }
 
+    public Map<ProgramName, JCommander> getCommands2() {
+        return commands;
+    }
+
     public String getParsedCommand() {
         return parsedCommand;
     }
@@ -1640,7 +1472,7 @@ public class JCommander {
     /*
     * Reverse lookup JCommand object by command's name or its alias
     */
-    private JCommander findCommandByAlias(String commandOrAlias) {
+    public JCommander findCommandByAlias(String commandOrAlias) {
         ProgramName progName = findProgramName(commandOrAlias);
         if (progName == null) {
             return null;
@@ -1657,7 +1489,7 @@ public class JCommander {
     /**
      * Encapsulation of either a main application or an individual command.
      */
-    private static final class ProgramName implements IKey {
+    public static final class ProgramName implements IKey {
         private final String name;
         private final List<String> aliases;
 
@@ -1671,7 +1503,7 @@ public class JCommander {
             return name;
         }
 
-        private String getDisplayName() {
+        public String getDisplayName() {
             StringBuilder sb = new StringBuilder();
             sb.append(name);
             if (!aliases.isEmpty()) {

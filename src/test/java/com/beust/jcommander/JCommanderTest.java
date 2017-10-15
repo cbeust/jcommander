@@ -52,7 +52,7 @@ public class JCommanderTest {
         StringBuilder sb = new StringBuilder();
 
         //action
-        jc.usage(sb);
+        jc.getUsageFormatter().usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -68,7 +68,7 @@ public class JCommanderTest {
         StringBuilder sb = new StringBuilder();
 
         //action
-        jc.usage(sb);
+        jc.getUsageFormatter().usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -83,7 +83,7 @@ public class JCommanderTest {
         final JCommander jc = new JCommander(new ArgsLongDescription());
 
         //action
-        jc.usage(sb);
+        jc.getUsageFormatter().usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -166,7 +166,7 @@ public class JCommanderTest {
         String[] argv = {};
         JCommander jc = JCommander.newBuilder().addObject(new Object()).build();
         jc.parse(argv);
-        jc.getCommandDescription("foo");
+        jc.getUsageFormatter().getCommandDescription("foo");
     }
 
     /**
@@ -233,14 +233,14 @@ public class JCommanderTest {
         JCommander jc = new JCommander(new ArgsHelp(), bundle);
         jc.addCommand(new ArgsLongCommandDescription());
         StringBuilder sb = new StringBuilder();
-        jc.usage(sb);
+        jc.getUsageFormatter().usage(sb);
         String usage = sb.toString();
         Assert.assertTrue(usage.contains("text"));
     }
 
     public void noParseConstructor() {
         JCommander jCommander = new JCommander(new ArgsMainParameter1());
-        jCommander.usage(new StringBuilder());
+        jCommander.getUsageFormatter().usage(new StringBuilder());
         // Before fix, this parse would throw an exception, because it calls createDescription, which
         // was already called by usage(), and can only be called once.
         jCommander.parse();
@@ -255,7 +255,7 @@ public class JCommanderTest {
         JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()},
                 java.util.ResourceBundle.getBundle("MessageBundle"));
         // Should be able to display usage without triggering validation
-        jc.usage(new StringBuilder());
+        jc.getUsageFormatter().usage(new StringBuilder());
         try {
             jc.parse("-h");
             Assert.fail("Should have thrown a required parameter exception");
@@ -523,11 +523,11 @@ public class JCommanderTest {
         JCommander jc = JCommander.newBuilder().addObject(new Args1()).build();
         jc.parse("-log", "1");
         StringBuilder sb = new StringBuilder();
-        jc.usage(sb);
+        jc.getUsageFormatter().usage(sb);
         String expected = sb.toString();
 
         sb = new StringBuilder();
-        jc.usage(sb);
+        jc.getUsageFormatter().usage(sb);
         String actual = sb.toString();
         Assert.assertEquals(actual, expected);
     }
@@ -615,7 +615,7 @@ public class JCommanderTest {
     @Test(description = "This used to run out of memory")
     public void oom() {
         JCommander jc = new JCommander(new ArgsOutOfMemory());
-        jc.usage(new StringBuilder());
+        jc.getUsageFormatter().usage(new StringBuilder());
     }
 
     @Test
@@ -1103,7 +1103,7 @@ public class JCommanderTest {
 
         StringBuilder sb = new StringBuilder();
 
-        jc.usage(sb);
+        jc.getUsageFormatter().usage(sb);
 
         Assert.assertFalse(sb.toString().contains("Default"));
     }
@@ -1176,7 +1176,7 @@ public class JCommanderTest {
         }
         Arg a = new Arg();
         StringBuilder sb = new StringBuilder();
-        new JCommander(a).usage(sb);
+        new JCommander(a).getUsageFormatter().usage(sb);
         Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
     }
 
@@ -1273,7 +1273,7 @@ public class JCommanderTest {
         c.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        c.usage(sb);
+        c.getUsageFormatter().usage(sb);
         Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
     }
 
@@ -1298,7 +1298,7 @@ public class JCommanderTest {
         c.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        c.usage(sb);
+        c.getUsageFormatter().usage(sb);
         Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
     }
 
@@ -1327,7 +1327,7 @@ public class JCommanderTest {
         aCommand.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        c.usage(sb);
+        c.getUsageFormatter().usage(sb);
         Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
         Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
     }
@@ -1541,7 +1541,7 @@ public class JCommanderTest {
         String programName = "main";
         jcommander.setProgramName(programName);
         StringBuilder sb = new StringBuilder();
-        jcommander.usage(sb);
+        jcommander.getUsageFormatter().usage(sb);
 
         Assert.assertTrue(sb.toString().contains(programName));
         Assert.assertEquals(jcommander.getProgramName(), programName);
@@ -1557,7 +1557,7 @@ public class JCommanderTest {
         JCommander jcommander = new JCommander(template);
         jcommander.setProgramName("main");
         StringBuilder sb = new StringBuilder();
-        jcommander.usage(sb);
+        jcommander.getUsageFormatter().usage(sb);
         Assert.assertEquals(sb.toString().indexOf("options"), -1);
     }
 
@@ -1571,7 +1571,7 @@ public class JCommanderTest {
             public Map<String, String> params2 = Maps.newHashMap();
         }
 
-        new JCommander(new DSimple()).usage(new StringBuilder());
+        new JCommander(new DSimple()).getUsageFormatter().usage(new StringBuilder());
     }
 
     @Test
