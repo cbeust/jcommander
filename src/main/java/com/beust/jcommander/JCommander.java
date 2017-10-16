@@ -110,7 +110,7 @@ public class JCommander {
     /**
      * The usage formatter to use in {@link #usage()}.
      */
-    private UsageFormatter usageFormatter = new DefaultUsageFormatter(this);
+    private IUsageFormatter usageFormatter = new DefaultUsageFormatter(this);
 
     private MainParameter mainParameter = null;
 
@@ -1030,13 +1030,13 @@ public class JCommander {
         getConsole().println(sb.toString());
     }
 
-    public void setUsageFormatter(UsageFormatter usageFormatter) {
+    public void setUsageFormatter(IUsageFormatter usageFormatter) {
         if (usageFormatter == null)
             throw new IllegalArgumentException("Argument UsageFormatter must not be null");
         this.usageFormatter = usageFormatter;
     }
 
-    public UsageFormatter getUsageFormatter() {
+    public IUsageFormatter getUsageFormatter() {
         return usageFormatter;
     }
 
@@ -1176,7 +1176,7 @@ public class JCommander {
             return this;
         }
 
-        public Builder usageFormatter(UsageFormatter usageFormatter) {
+        public Builder usageFormatter(IUsageFormatter usageFormatter) {
             jCommander.setUsageFormatter(usageFormatter);
             return this;
         }
