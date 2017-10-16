@@ -1,0 +1,302 @@
+package com.beust.jcommander;
+
+import com.beust.jcommander.args.*;
+import com.beust.jcommander.internal.Maps;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import java.util.*;
+import java.util.ResourceBundle;
+
+@Test
+public class UnixStyleUsageFormatterTest {
+
+    @Test
+    public void testLongMainParameterDescription() {
+        //setup
+        JCommander jc = new JCommander(new ArgsLongMainParameterDescription());
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        StringBuilder sb = new StringBuilder();
+
+        //action
+        jc.getUsageFormatter().usage(sb);
+
+        //verify
+        for (String line : sb.toString().split("\n")) {
+            Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
+        }
+    }
+
+    @Test
+    public void testLongCommandDescription() throws Exception {
+        //setup
+        JCommander jc = new JCommander();
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.addCommand(new ArgsLongCommandDescription());
+        StringBuilder sb = new StringBuilder();
+
+        //action
+        jc.getUsageFormatter().usage(sb);
+
+        //verify
+        for (String line : sb.toString().split("\n")) {
+            Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
+        }
+    }
+
+    @Test
+    public void testDescriptionWrappingLongWord() {
+        //setup
+        StringBuilder sb = new StringBuilder();
+        final JCommander jc = new JCommander(new ArgsLongDescription());
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+
+        //action
+        jc.getUsageFormatter().usage(sb);
+
+        //verify
+        for (String line : sb.toString().split("\n")) {
+            Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
+        }
+    }
+
+    @Test
+    public void programName() {
+        JCommander jcommander = new JCommander();
+        jcommander.setUsageFormatter(new UnixStyleUsageFormatter(jcommander));
+        String programName = "main";
+        jcommander.setProgramName(programName);
+        StringBuilder sb = new StringBuilder();
+        jcommander.getUsageFormatter().usage(sb);
+
+        Assert.assertTrue(sb.toString().contains(programName));
+        Assert.assertEquals(jcommander.getProgramName(), programName);
+    }
+
+    @Test
+    public void dontShowOptionUsageIfThereAreNoOptions() {
+        class CommandTemplate {
+            @Parameter
+            List<String> parameters = new ArrayList<>();
+        }
+
+        CommandTemplate template = new CommandTemplate();
+        JCommander jcommander = new JCommander(template);
+        jcommander.setUsageFormatter(new UnixStyleUsageFormatter(jcommander));
+        jcommander.setProgramName("main");
+        StringBuilder sb = new StringBuilder();
+        jcommander.getUsageFormatter().usage(sb);
+        Assert.assertEquals(sb.toString().indexOf("options"), -1);
+    }
+
+    @Test
+    public void annotationsAndDynamicParameters() {
+        class DSimple {
+            @DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+            public Map<String, String> params = Maps.newHashMap();
+
+            @DynamicParameter(names = "-A", assignment = "@")
+            public Map<String, String> params2 = Maps.newHashMap();
+        }
+
+        JCommander jc = new JCommander(new DSimple());
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.getUsageFormatter().usage(new StringBuilder());
+    }
+
+    /**
+     * Getting the description of a nonexistent command should throw an exception.
+     */
+    @Test(expectedExceptions = ParameterException.class)
+    public void nonexistentCommandShouldThrow() {
+        String[] argv = {};
+        JCommander jc = JCommander.newBuilder().addObject(new Object()).build();
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.parse(argv);
+        jc.getUsageFormatter().getCommandDescription("foo");
+    }
+
+    @Test
+    public void i18MissingKeyForCommand() {
+        java.util.ResourceBundle bundle = ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
+        JCommander jc = new JCommander(new ArgsHelp(), bundle);
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.addCommand(new ArgsLongCommandDescription());
+        StringBuilder sb = new StringBuilder();
+        jc.getUsageFormatter().usage(sb);
+        String usage = sb.toString();
+        Assert.assertTrue(usage.contains("text"));
+    }
+
+    @Test
+    public void noParseConstructor() {
+        JCommander jCommander = new JCommander(new ArgsMainParameter1());
+        jCommander.setUsageFormatter(new UnixStyleUsageFormatter(jCommander));
+        jCommander.getUsageFormatter().usage(new StringBuilder());
+        // Before fix, this parse would throw an exception, because it calls createDescription, which
+        // was already called by usage(), and can only be called once.
+        jCommander.parse();
+    }
+
+    /**
+     * Test a use case where there are required parameters, but you still want
+     * to interrogate the options which are specified.
+     */
+    @Test
+    public void usageWithRequiredArgsAndResourceBundle() {
+        ArgsHelp argsHelp = new ArgsHelp();
+        JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()},
+                java.util.ResourceBundle.getBundle("MessageBundle"));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        // Should be able to display usage without triggering validation
+        jc.getUsageFormatter().usage(new StringBuilder());
+        try {
+            jc.parse("-h");
+            Assert.fail("Should have thrown a required parameter exception");
+        } catch (ParameterException e) {
+            Assert.assertTrue(e.getMessage().contains("are required"));
+        }
+        Assert.assertTrue(argsHelp.help);
+    }
+
+    @Test
+    public void usageShouldNotChange() {
+        JCommander jc = JCommander.newBuilder().addObject(new Args1()).build();
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.parse("-log", "1");
+        StringBuilder sb = new StringBuilder();
+        jc.getUsageFormatter().usage(sb);
+        String expected = sb.toString();
+
+        sb = new StringBuilder();
+        jc.getUsageFormatter().usage(sb);
+        String actual = sb.toString();
+        Assert.assertEquals(actual, expected);
+    }
+
+    @Test(description = "This used to run out of memory")
+    public void oom() {
+        JCommander jc = new JCommander(new ArgsOutOfMemory());
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.getUsageFormatter().usage(new StringBuilder());
+    }
+
+    @Test
+    public void doNotDisplayHelpDefaultValue() {
+        class Arg {
+            @Parameter(names = "--help", help = true)
+            public boolean help = false;
+        }
+        Arg args = new Arg();
+        String[] argv = {"--help"};
+        JCommander jc = JCommander.newBuilder().addObject(args).build();
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.parse(argv);
+
+        StringBuilder sb = new StringBuilder();
+
+        jc.getUsageFormatter().usage(sb);
+
+        Assert.assertFalse(sb.toString().contains("Default"));
+    }
+
+    @Test
+    public void usageCommandsUnderUsage() {
+        class Arg {
+        }
+        @Parameters(commandDescription = "command a")
+        class ArgCommandA {
+            @Parameter(description = "command a parameters")
+            List<String> parameters;
+        }
+        @Parameters(commandDescription = "command b")
+        class ArgCommandB {
+            @Parameter(description = "command b parameters")
+            List<String> parameters;
+        }
+
+        Arg a = new Arg();
+
+        JCommander jc = new JCommander(a);
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.addCommand("a", new ArgCommandA());
+        jc.addCommand("b", new ArgCommandB());
+
+        StringBuilder sb = new StringBuilder();
+        jc.getUsageFormatter().usage(sb);
+        Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
+    }
+
+    @Test
+    public void usageWithEmpytLine() {
+        class Arg {
+        }
+        @Parameters(commandDescription = "command a")
+        class ArgCommandA {
+            @Parameter(description = "command a parameters")
+            List<String> parameters;
+        }
+        @Parameters(commandDescription = "command b")
+        class ArgCommandB {
+            @Parameter(description = "command b parameters")
+            List<String> parameters;
+        }
+
+        Arg a = new Arg();
+
+        JCommander jc = new JCommander(a);
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.addCommand("a", new ArgCommandA());
+        jc.addCommand("b", new ArgCommandB());
+
+        StringBuilder sb = new StringBuilder();
+        jc.getUsageFormatter().usage(sb);
+        Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
+    }
+
+    @Test
+    public void usageWithSubCommands() {
+        class Arg {
+        }
+        @Parameters(commandDescription = "command a")
+        class ArgCommandA {
+            @Parameter(description = "command a parameters")
+            List<String> parameters;
+        }
+        @Parameters(commandDescription = "command b")
+        class ArgCommandB {
+            @Parameter(description = "command b parameters")
+            List<String> parameters;
+        }
+
+        Arg a = new Arg();
+
+        JCommander jc = new JCommander(a);
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setColumnSize(100);
+        jc.addCommand("a", new ArgCommandA());
+
+        // b is a sub-command of a
+        JCommander aCommand = jc.getCommands().get("a");
+        aCommand.addCommand("b", new ArgCommandB());
+
+        StringBuilder sb = new StringBuilder();
+        jc.getUsageFormatter().usage(sb);
+        Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
+        Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
+    }
+
+    @Test
+    public void emptyStringAsDefault() {
+        class Arg {
+            @Parameter(names = "-x")
+            String s = "";
+        }
+        Arg a = new Arg();
+        StringBuilder sb = new StringBuilder();
+        JCommander jc = new JCommander(a);
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.getUsageFormatter().usage(sb);
+        Assert.assertTrue(sb.toString().contains("default: <empty string>"));
+    }
+}
