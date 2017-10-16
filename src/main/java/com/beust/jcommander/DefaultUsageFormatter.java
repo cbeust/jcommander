@@ -115,7 +115,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         }
     }
 
-    protected void appendMainLine(StringBuilder out, boolean hasOptions, boolean hasCommands, int indentCount,
+    public void appendMainLine(StringBuilder out, boolean hasOptions, boolean hasCommands, int indentCount,
             String indent) {
         String programName = commander.getProgramDisplayName() != null
                 ? commander.getProgramDisplayName() : "<main class>";
@@ -132,7 +132,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         out.append("\n");
     }
 
-    protected void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
+    public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0)
             out.append(indent).append("  Options:\n");
@@ -169,7 +169,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         }
     }
 
-    protected void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
+    public void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
         out.append(indent + "  Commands:\n");
 
         // The magic value 3 is the number of spaces between the name of the option and its description
@@ -195,7 +195,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     /**
      * @return the description of the command.
      */
-    public final String getCommandDescription(String commandName) {
+    public String getCommandDescription(String commandName) {
         JCommander jc = commander.findCommandByAlias(commandName);
 
         if (jc == null) {
@@ -237,7 +237,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      *                          description}. If the first line needs to be indented prepend the
      *                          correct number of spaces to {@code description}.
      */
-    protected void wrapDescription(StringBuilder out, int indent, int currentLineIndent, String description) {
+    public void wrapDescription(StringBuilder out, int indent, int currentLineIndent, String description) {
         int max = commander.getColumnSize();
         String[] words = description.split(" ");
         int current = currentLineIndent;
@@ -270,7 +270,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      *                    correct number of spaces to {@code description}.
      * @see #wrapDescription(StringBuilder, int, int, String)
      */
-    protected void wrapDescription(StringBuilder out, int indent, String description) {
+    public void wrapDescription(StringBuilder out, int indent, String description) {
         wrapDescription(out, indent, 0, description);
     }
 
