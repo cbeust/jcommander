@@ -11,6 +11,62 @@ import java.util.ResourceBundle;
 @Test
 public class UnixStyleUsageFormatterTest {
 
+    private enum TestEnum1 {
+        A, B, C, D
+    }
+
+    private enum TestEnum2 {
+    }
+
+    @Test
+    public void testOutputFormat() {
+        class ArgsTemplate {
+            @Parameter(names = {"--a", "-a"})
+            public int a;
+            @Parameter(names = {"--b", "-b"})
+            public int b = 2;
+            @Parameter(names = {"--c", "-c"}, description = "sets c")
+            public int c;
+            @Parameter(names = {"--d", "-d"}, description = "sets d")
+            public int d = 2;
+            @Parameter(names = {"--e"})
+            public TestEnum1 e;
+            @Parameter(names = {"--f"})
+            public TestEnum1 f = TestEnum1.A;
+            @Parameter(names = {"--g"}, description = "sets g")
+            public TestEnum1 g;
+            @Parameter(names = {"--h"}, description = "sets h")
+            public TestEnum1 h = TestEnum1.A;
+            @Parameter(names = {"-i"})
+            public TestEnum2 i;
+            @Parameter(names = {"-k"}, description = "sets k")
+            public TestEnum2 k;
+        }
+
+        // setup
+        StringBuilder sb = new StringBuilder();
+        JCommander jc = new JCommander(new ArgsTemplate());
+        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+
+        // action
+        jc.getUsageFormatter().usage(sb);
+
+        // verify
+        String expected = "Usage: <main class> [options]\n"
+                + "  Options:\n"
+                + "    --a, -a (default: 0)\n"
+                + "    --b, -b (default: 2)\n"
+                + "    --c, -c sets c (default: 0)\n"
+                + "    --d, -d sets d (default: 2)\n"
+                + "    --e     Options: [A, B, C, D] (values: [A, B, C, D])\n"
+                + "    --f     Options: [A, B, C, D] (default: A) (values: [A, B, C, D])\n"
+                + "    --g     sets g (values: [A, B, C, D])\n"
+                + "    --h     sets h (default: A) (values: [A, B, C, D])\n"
+                + "    -i      Options: [] (values: [])\n"
+                + "    -k      sets k (values: [])\n";
+        Assert.assertEquals(sb.toString(), expected);
+    }
+
     @Test
     public void testLongMainParameterDescription() {
         //setup
@@ -228,7 +284,7 @@ public class UnixStyleUsageFormatterTest {
     }
 
     @Test
-    public void usageWithEmpytLine() {
+    public void usageWithEmptyLine() {
         class Arg {
         }
         @Parameters(commandDescription = "command a")

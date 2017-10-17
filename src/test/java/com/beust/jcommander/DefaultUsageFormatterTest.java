@@ -11,6 +11,83 @@ import java.util.ResourceBundle;
 @Test
 public class DefaultUsageFormatterTest {
 
+    private enum TestEnum1 {
+        A, B, C, D
+    }
+
+    private enum TestEnum2 {
+    }
+
+    @Test
+    public void testOutputFormat() {
+        class ArgsTemplate {
+            @Parameter(names = {"--a", "-a"})
+            public int a;
+            @Parameter(names = {"--b", "-b"})
+            public int b = 2;
+            @Parameter(names = {"--c", "-c"}, description = "sets c")
+            public int c;
+            @Parameter(names = {"--d", "-d"}, description = "sets d")
+            public int d = 2;
+            @Parameter(names = {"--e"})
+            public TestEnum1 e;
+            @Parameter(names = {"--f"})
+            public TestEnum1 f = TestEnum1.A;
+            @Parameter(names = {"--g"}, description = "sets g")
+            public TestEnum1 g;
+            @Parameter(names = {"--h"}, description = "sets h")
+            public TestEnum1 h = TestEnum1.A;
+            @Parameter(names = {"-i"})
+            public TestEnum2 i;
+            @Parameter(names = {"-k"}, description = "sets k")
+            public TestEnum2 k;
+        }
+
+        // setup
+        StringBuilder sb = new StringBuilder();
+        JCommander jc = new JCommander(new ArgsTemplate());
+
+        // action
+        jc.getUsageFormatter().usage(sb);
+
+        // verify
+        String expected = "Usage: <main class> [options]\n"
+                + "  Options:\n"
+                + "    --a, -a\n"
+                + "\n"
+                + "      Default: 0\n"
+                + "    --b, -b\n"
+                + "\n"
+                + "      Default: 2\n"
+                + "    --c, -c\n"
+                + "      sets c\n"
+                + "      Default: 0\n"
+                + "    --d, -d\n"
+                + "      sets d\n"
+                + "      Default: 2\n"
+                + "    --e\n"
+                + "      Options: [A, B, C, D]\n"
+                + "      Possible Values: [A, B, C, D]\n"
+                + "    --f\n"
+                + "      Options: [A, B, C, D]\n"
+                + "      Default: A\n"
+                + "      Possible Values: [A, B, C, D]\n"
+                + "    --g\n"
+                + "      sets g\n"
+                + "      Possible Values: [A, B, C, D]\n"
+                + "    --h\n"
+                + "      sets h\n"
+                + "      Default: A\n"
+                + "      Possible Values: [A, B, C, D]\n"
+                + "    -i\n"
+                + "      Options: []\n"
+                + "      Possible Values: []\n"
+                + "    -k\n"
+                + "      sets k\n"
+                + "      Possible Values: []\n";
+        Assert.assertEquals(sb.toString(), expected);
+    }
+
     @Test
     public void testLongMainParameterDescription() {
         //setup
@@ -213,7 +290,7 @@ public class DefaultUsageFormatterTest {
     }
 
     @Test
-    public void usageWithEmpytLine() {
+    public void usageWithEmptyLine() {
         class Arg {
         }
         @Parameters(commandDescription = "command a")
