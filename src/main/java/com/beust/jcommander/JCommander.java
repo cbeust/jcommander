@@ -336,22 +336,13 @@ public class JCommander {
 
     private void parse(boolean validate, String... args) {
         StringBuilder sb = new StringBuilder("Parsing \"");
-        sb.append(join(args).append("\"\n  with:").append(join(objects.toArray())));
+        sb.append(Strings.join(" ", args)).append("\"\n  with:").append(Strings.join(" ", objects.toArray()));
         p(sb.toString());
 
         if (descriptions == null) createDescriptions();
         initializeDefaultValues();
         parseValues(expandArgs(args), validate);
         if (validate) validateOptions();
-    }
-
-    private StringBuilder join(Object[] args) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            if (i > 0) result.append(" ");
-            result.append(args[i]);
-        }
-        return result;
     }
 
     private void initializeDefaultValues() {
@@ -378,9 +369,9 @@ public class JCommander {
         if (!requiredFields.isEmpty()) {
             List<String> missingFields = new ArrayList<>();
             for (ParameterDescription pd : requiredFields.values()) {
-                missingFields.add("[" + String.join(" | ", pd.getParameter().names()) + "]");
+                missingFields.add("[" + Strings.join(" | ", pd.getParameter().names()) + "]");
             }
-            String message = String.join(", ", missingFields);
+            String message = Strings.join(", ", missingFields);
             throw new ParameterException("The following "
                     + pluralize(requiredFields.size(), "option is required: ", "options are required: ")
                     + message);
