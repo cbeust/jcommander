@@ -139,6 +139,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
         for (ParameterDescription pd : sortedParameters) {
             WrappedParameter parameter = pd.getParameter();
+            boolean hasDescription = !pd.getDescription().isEmpty();
 
             // First line, command name
             out.append(indent)
@@ -146,24 +147,41 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .append(parameter.required() ? "* " : "  ")
                     .append(pd.getNames())
                     .append("\n");
-            wrapDescription(out, indentCount, s(indentCount) + pd.getDescription());
+
+            if (hasDescription)
+                wrapDescription(out, indentCount, s(indentCount) + pd.getDescription());
             Object def = pd.getDefault();
 
             if (pd.isDynamicParameter()) {
                 String syntax = "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
-                out.append(newLineAndIndent(indentCount)).append(syntax);
+
+                if (hasDescription)
+                    out.append(newLineAndIndent(indentCount));
+                else
+                    out.append(s(indentCount));
+                out.append(syntax);
             }
 
             if (def != null && !pd.isHelp()) {
                 String displayedDef = Strings.isStringEmpty(def.toString()) ? "<empty string>" : def.toString();
                 String defaultText = "Default: " + (parameter.password() ? "********" : displayedDef);
-                out.append(newLineAndIndent(indentCount)).append(defaultText);
+
+                if (hasDescription)
+                    out.append(newLineAndIndent(indentCount));
+                else
+                    out.append(s(indentCount));
+                out.append(defaultText);
             }
             Class<?> type = pd.getParameterized().getType();
 
             if (type.isEnum()) {
                 String possibleValues = "Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type);
-                out.append(newLineAndIndent(indentCount)).append(possibleValues);
+
+                if (hasDescription)
+                    out.append(newLineAndIndent(indentCount));
+                else
+                    out.append(s(indentCount));
+                out.append(possibleValues);
             }
             out.append("\n");
         }
