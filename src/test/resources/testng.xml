@@ -17,6 +17,8 @@
       <class name="com.beust.jcommander.PositiveIntegerTest" />
       <class name="com.beust.jcommander.FinderTest" />
       <class name="com.beust.jcommander.CmdTest" />
+      <class name="com.beust.jcommander.DefaultUsageFormatterTest" />
+      <class name="com.beust.jcommander.UnixStyleUsageFormatterTest" />
       <class name="com.beust.jcommander.StringsTest" />
     </classes>
   </test>
