@@ -45,7 +45,9 @@ public class DefaultUsageFormatterTest {
 
         // setup
         StringBuilder sb = new StringBuilder();
-        JCommander jc = new JCommander(new ArgsTemplate());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsTemplate())
+                .build();
 
         // action
         jc.getUsageFormatter().usage(sb);
@@ -86,7 +88,9 @@ public class DefaultUsageFormatterTest {
     @Test
     public void testLongMainParameterDescription() {
         //setup
-        JCommander jc = new JCommander(new ArgsLongMainParameterDescription());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsLongMainParameterDescription())
+                .build();
         StringBuilder sb = new StringBuilder();
 
         //action
@@ -101,8 +105,9 @@ public class DefaultUsageFormatterTest {
     @Test
     public void testLongCommandDescription() throws Exception {
         //setup
-        JCommander jc = new JCommander();
-        jc.addCommand(new ArgsLongCommandDescription());
+        JCommander jc = JCommander.newBuilder()
+                .addCommand(new ArgsLongCommandDescription())
+                .build();
         StringBuilder sb = new StringBuilder();
 
         //action
@@ -118,7 +123,9 @@ public class DefaultUsageFormatterTest {
     public void testDescriptionWrappingLongWord() {
         //setup
         StringBuilder sb = new StringBuilder();
-        final JCommander jc = new JCommander(new ArgsLongDescription());
+        final JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsLongDescription())
+                .build();
 
         //action
         jc.getUsageFormatter().usage(sb);
@@ -149,7 +156,9 @@ public class DefaultUsageFormatterTest {
         }
 
         CommandTemplate template = new CommandTemplate();
-        JCommander jcommander = new JCommander(template);
+        JCommander jcommander = JCommander.newBuilder()
+                .addObject(template)
+                .build();
         jcommander.setProgramName("main");
         StringBuilder sb = new StringBuilder();
         jcommander.getUsageFormatter().usage(sb);
@@ -166,7 +175,10 @@ public class DefaultUsageFormatterTest {
             public Map<String, String> params2 = Maps.newHashMap();
         }
 
-        new JCommander(new DSimple()).getUsageFormatter().usage(new StringBuilder());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new DSimple())
+                .build();
+        jc.getUsageFormatter().usage(new StringBuilder());
     }
 
     /**
@@ -183,7 +195,10 @@ public class DefaultUsageFormatterTest {
     @Test
     public void i18MissingKeyForCommand() {
         java.util.ResourceBundle bundle = ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
-        JCommander jc = new JCommander(new ArgsHelp(), bundle);
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsHelp())
+                .resourceBundle(bundle)
+                .build();
         jc.addCommand(new ArgsLongCommandDescription());
         StringBuilder sb = new StringBuilder();
         jc.getUsageFormatter().usage(sb);
@@ -193,7 +208,9 @@ public class DefaultUsageFormatterTest {
 
     @Test
     public void noParseConstructor() {
-        JCommander jCommander = new JCommander(new ArgsMainParameter1());
+        JCommander jCommander = JCommander.newBuilder()
+                .addObject(new ArgsMainParameter1())
+                .build();
         jCommander.getUsageFormatter().usage(new StringBuilder());
         // Before fix, this parse would throw an exception, because it calls createDescription, which
         // was already called by usage(), and can only be called once.
@@ -207,8 +224,10 @@ public class DefaultUsageFormatterTest {
     @Test
     public void usageWithRequiredArgsAndResourceBundle() {
         ArgsHelp argsHelp = new ArgsHelp();
-        JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()},
-                java.util.ResourceBundle.getBundle("MessageBundle"));
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new Object[] {argsHelp, new ArgsRequired()})
+                .resourceBundle(java.util.ResourceBundle.getBundle("MessageBundle"))
+                .build();
         // Should be able to display usage without triggering validation
         jc.getUsageFormatter().usage(new StringBuilder());
         try {
@@ -236,7 +255,9 @@ public class DefaultUsageFormatterTest {
 
     @Test(description = "This used to run out of memory")
     public void oom() {
-        JCommander jc = new JCommander(new ArgsOutOfMemory());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsOutOfMemory())
+                .build();
         jc.getUsageFormatter().usage(new StringBuilder());
     }
 
@@ -275,7 +296,9 @@ public class DefaultUsageFormatterTest {
 
         Arg a = new Arg();
 
-        JCommander c = new JCommander(a);
+        JCommander c = JCommander.newBuilder()
+                .addObject(a)
+                .build();
         c.addCommand("a", new ArgCommandA());
         c.addCommand("b", new ArgCommandB());
 
@@ -301,7 +324,9 @@ public class DefaultUsageFormatterTest {
 
         Arg a = new Arg();
 
-        JCommander c = new JCommander(a);
+        JCommander c = JCommander.newBuilder()
+                .addObject(a)
+                .build();
         c.addCommand("a", new ArgCommandA());
         c.addCommand("b", new ArgCommandB());
 
@@ -327,7 +352,9 @@ public class DefaultUsageFormatterTest {
 
         Arg a = new Arg();
 
-        JCommander c = new JCommander(a);
+        JCommander c = JCommander.newBuilder()
+                .addObject(a)
+                .build();
         c.setColumnSize(100);
         c.addCommand("a", new ArgCommandA());
 
@@ -349,7 +376,10 @@ public class DefaultUsageFormatterTest {
         }
         Arg a = new Arg();
         StringBuilder sb = new StringBuilder();
-        new JCommander(a).getUsageFormatter().usage(sb);
+        JCommander c = JCommander.newBuilder()
+                .addObject(a)
+                .build();
+        c.getUsageFormatter().usage(sb);
         Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
     }
 }

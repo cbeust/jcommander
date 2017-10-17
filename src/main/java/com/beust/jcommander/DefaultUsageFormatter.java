@@ -75,8 +75,9 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      * Stores the help in the passed string builder, with the argument indentation.
      */
     public void usage(StringBuilder out, String indent) {
-        if (commander.getDescriptions() == null)
+        if (commander.getDescriptions() == null) {
             commander.createDescriptions();
+        }
         boolean hasCommands = !commander.getCommands().isEmpty();
         boolean hasOptions = !commander.getDescriptions().isEmpty();
 
@@ -122,20 +123,26 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         StringBuilder mainLine = new StringBuilder();
         mainLine.append(indent).append("Usage: ").append(programName);
 
-        if (hasOptions)
+        if (hasOptions) {
             mainLine.append(" [options]");
-        if (hasCommands)
+        }
+
+        if (hasCommands) {
             mainLine.append(indent).append(" [command] [command options]");
-        if (commander.getMainParameter() != null && commander.getMainParameter().getDescription() != null)
+        }
+
+        if (commander.getMainParameter() != null && commander.getMainParameter().getDescription() != null) {
             mainLine.append(" ").append(commander.getMainParameter().getDescription().getDescription());
+        }
         wrapDescription(out, indentCount, mainLine.toString());
         out.append("\n");
     }
 
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
-        if (sortedParameters.size() > 0)
+        if (sortedParameters.size() > 0) {
             out.append(indent).append("  Options:\n");
+        }
 
         for (ParameterDescription pd : sortedParameters) {
             WrappedParameter parameter = pd.getParameter();
@@ -149,17 +156,19 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .append(pd.getNames())
                     .append("\n");
 
-            if (hasDescription)
+            if (hasDescription) {
                 wrapDescription(out, indentCount, s(indentCount) + description);
+            }
             Object def = pd.getDefault();
 
             if (pd.isDynamicParameter()) {
                 String syntax = "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
 
-                if (hasDescription)
+                if (hasDescription) {
                     out.append(newLineAndIndent(indentCount));
-                else
+                } else {
                     out.append(s(indentCount));
+                }
                 out.append(syntax);
             }
 
@@ -167,10 +176,11 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                 String displayedDef = Strings.isStringEmpty(def.toString()) ? "<empty string>" : def.toString();
                 String defaultText = "Default: " + (parameter.password() ? "********" : displayedDef);
 
-                if (hasDescription)
+                if (hasDescription) {
                     out.append(newLineAndIndent(indentCount));
-                else
+                } else {
                     out.append(s(indentCount));
+                }
                 out.append(defaultText);
             }
             Class<?> type = pd.getParameterized().getType();
@@ -182,10 +192,11 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                 // Prevent duplicate values list, since it is set as 'Options: [values]' if the description
                 // of an enum field is empty in ParameterDescription#init(..)
                 if (!description.contains("Options: " + valueList)) {
-                    if (hasDescription)
+                    if (hasDescription) {
                         out.append(newLineAndIndent(indentCount));
-                    else
+                    } else {
                         out.append(s(indentCount));
+                    }
                     out.append(possibleValues);
                 }
             }

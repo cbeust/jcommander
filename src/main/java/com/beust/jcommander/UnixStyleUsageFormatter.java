@@ -32,8 +32,9 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
 
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
-        if (sortedParameters.size() > 0)
+        if (sortedParameters.size() > 0) {
             out.append(indent).append("  Options:\n");
+        }
 
         // Calculate prefix indent
         int prefixIndent = 0;

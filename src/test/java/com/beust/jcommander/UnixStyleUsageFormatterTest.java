@@ -45,7 +45,9 @@ public class UnixStyleUsageFormatterTest {
 
         // setup
         StringBuilder sb = new StringBuilder();
-        JCommander jc = new JCommander(new ArgsTemplate());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsTemplate())
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
 
         // action
@@ -70,7 +72,9 @@ public class UnixStyleUsageFormatterTest {
     @Test
     public void testLongMainParameterDescription() {
         //setup
-        JCommander jc = new JCommander(new ArgsLongMainParameterDescription());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsLongMainParameterDescription())
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         StringBuilder sb = new StringBuilder();
 
@@ -86,9 +90,10 @@ public class UnixStyleUsageFormatterTest {
     @Test
     public void testLongCommandDescription() throws Exception {
         //setup
-        JCommander jc = new JCommander();
+        JCommander jc = JCommander.newBuilder()
+                .addCommand(new ArgsLongCommandDescription())
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
-        jc.addCommand(new ArgsLongCommandDescription());
         StringBuilder sb = new StringBuilder();
 
         //action
@@ -104,7 +109,9 @@ public class UnixStyleUsageFormatterTest {
     public void testDescriptionWrappingLongWord() {
         //setup
         StringBuilder sb = new StringBuilder();
-        final JCommander jc = new JCommander(new ArgsLongDescription());
+        final JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsLongDescription())
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
 
         //action
@@ -137,7 +144,9 @@ public class UnixStyleUsageFormatterTest {
         }
 
         CommandTemplate template = new CommandTemplate();
-        JCommander jcommander = new JCommander(template);
+        JCommander jcommander = JCommander.newBuilder()
+                .addObject(template)
+                .build();
         jcommander.setUsageFormatter(new UnixStyleUsageFormatter(jcommander));
         jcommander.setProgramName("main");
         StringBuilder sb = new StringBuilder();
@@ -155,7 +164,9 @@ public class UnixStyleUsageFormatterTest {
             public Map<String, String> params2 = Maps.newHashMap();
         }
 
-        JCommander jc = new JCommander(new DSimple());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new DSimple())
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.getUsageFormatter().usage(new StringBuilder());
     }
@@ -175,7 +186,10 @@ public class UnixStyleUsageFormatterTest {
     @Test
     public void i18MissingKeyForCommand() {
         java.util.ResourceBundle bundle = ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
-        JCommander jc = new JCommander(new ArgsHelp(), bundle);
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsHelp())
+                .resourceBundle(bundle)
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.addCommand(new ArgsLongCommandDescription());
         StringBuilder sb = new StringBuilder();
@@ -186,7 +200,9 @@ public class UnixStyleUsageFormatterTest {
 
     @Test
     public void noParseConstructor() {
-        JCommander jCommander = new JCommander(new ArgsMainParameter1());
+        JCommander jCommander = JCommander.newBuilder()
+                .addObject(new ArgsMainParameter1())
+                .build();
         jCommander.setUsageFormatter(new UnixStyleUsageFormatter(jCommander));
         jCommander.getUsageFormatter().usage(new StringBuilder());
         // Before fix, this parse would throw an exception, because it calls createDescription, which
@@ -201,8 +217,10 @@ public class UnixStyleUsageFormatterTest {
     @Test
     public void usageWithRequiredArgsAndResourceBundle() {
         ArgsHelp argsHelp = new ArgsHelp();
-        JCommander jc = new JCommander(new Object[]{argsHelp, new ArgsRequired()},
-                java.util.ResourceBundle.getBundle("MessageBundle"));
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new Object[] {argsHelp, new ArgsRequired()})
+                .resourceBundle(java.util.ResourceBundle.getBundle("MessageBundle"))
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         // Should be able to display usage without triggering validation
         jc.getUsageFormatter().usage(new StringBuilder());
@@ -232,7 +250,9 @@ public class UnixStyleUsageFormatterTest {
 
     @Test(description = "This used to run out of memory")
     public void oom() {
-        JCommander jc = new JCommander(new ArgsOutOfMemory());
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsOutOfMemory())
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.getUsageFormatter().usage(new StringBuilder());
     }
@@ -273,7 +293,9 @@ public class UnixStyleUsageFormatterTest {
 
         Arg a = new Arg();
 
-        JCommander jc = new JCommander(a);
+        JCommander jc = JCommander.newBuilder()
+                .addObject(a)
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.addCommand("a", new ArgCommandA());
         jc.addCommand("b", new ArgCommandB());
@@ -300,7 +322,9 @@ public class UnixStyleUsageFormatterTest {
 
         Arg a = new Arg();
 
-        JCommander jc = new JCommander(a);
+        JCommander jc = JCommander.newBuilder()
+                .addObject(a)
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.addCommand("a", new ArgCommandA());
         jc.addCommand("b", new ArgCommandB());
@@ -327,7 +351,9 @@ public class UnixStyleUsageFormatterTest {
 
         Arg a = new Arg();
 
-        JCommander jc = new JCommander(a);
+        JCommander jc = JCommander.newBuilder()
+                .addObject(a)
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.setColumnSize(100);
         jc.addCommand("a", new ArgCommandA());
@@ -350,7 +376,9 @@ public class UnixStyleUsageFormatterTest {
         }
         Arg a = new Arg();
         StringBuilder sb = new StringBuilder();
-        JCommander jc = new JCommander(a);
+        JCommander jc = JCommander.newBuilder()
+                .addObject(a)
+                .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.getUsageFormatter().usage(sb);
         Assert.assertTrue(sb.toString().contains("default: <empty string>"));
