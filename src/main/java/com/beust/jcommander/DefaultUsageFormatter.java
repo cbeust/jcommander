@@ -139,7 +139,8 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
         for (ParameterDescription pd : sortedParameters) {
             WrappedParameter parameter = pd.getParameter();
-            boolean hasDescription = !pd.getDescription().isEmpty();
+            String description = pd.getDescription();
+            boolean hasDescription = !description.isEmpty();
 
             // First line, command name
             out.append(indent)
@@ -149,7 +150,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .append("\n");
 
             if (hasDescription)
-                wrapDescription(out, indentCount, s(indentCount) + pd.getDescription());
+                wrapDescription(out, indentCount, s(indentCount) + description);
             Object def = pd.getDefault();
 
             if (pd.isDynamicParameter()) {
@@ -175,13 +176,18 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             Class<?> type = pd.getParameterized().getType();
 
             if (type.isEnum()) {
-                String possibleValues = "Possible Values: " + EnumSet.allOf((Class<? extends Enum>) type);
+                String valueList = EnumSet.allOf((Class<? extends Enum>) type).toString();
+                String possibleValues = "Possible Values: " + valueList;
 
-                if (hasDescription)
-                    out.append(newLineAndIndent(indentCount));
-                else
-                    out.append(s(indentCount));
-                out.append(possibleValues);
+                // Prevent duplicate values list, since it is set as 'Options: [values]' if the description
+                // of an enum field is empty in ParameterDescription#init(..)
+                if (!description.contains("Options: " + valueList)) {
+                    if (hasDescription)
+                        out.append(newLineAndIndent(indentCount));
+                    else
+                        out.append(s(indentCount));
+                    out.append(possibleValues);
+                }
             }
             out.append("\n");
         }

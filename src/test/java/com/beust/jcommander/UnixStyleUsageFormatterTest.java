@@ -58,11 +58,11 @@ public class UnixStyleUsageFormatterTest {
                 + "    --b, -b (default: 2)\n"
                 + "    --c, -c sets c (default: 0)\n"
                 + "    --d, -d sets d (default: 2)\n"
-                + "    --e     Options: [A, B, C, D] (values: [A, B, C, D])\n"
-                + "    --f     Options: [A, B, C, D] (default: A) (values: [A, B, C, D])\n"
+                + "    --e     Options: [A, B, C, D]\n"
+                + "    --f     Options: [A, B, C, D] (default: A)\n"
                 + "    --g     sets g (values: [A, B, C, D])\n"
                 + "    --h     sets h (default: A) (values: [A, B, C, D])\n"
-                + "    -i      Options: [] (values: [])\n"
+                + "    -i      Options: []\n"
                 + "    -k      sets k (values: [])\n";
         Assert.assertEquals(sb.toString(), expected);
     }

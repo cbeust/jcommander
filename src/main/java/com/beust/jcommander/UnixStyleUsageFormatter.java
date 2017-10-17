@@ -76,8 +76,14 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
             Class<?> type = pd.getParameterized().getType();
 
             if (type.isEnum()) {
-                String possibleValues = "(values: " + EnumSet.allOf((Class<? extends Enum>) type) + ")";
-                description += (description.length() == 0 ? "" : " ") + possibleValues;
+                String valueList = EnumSet.allOf((Class<? extends Enum>) type).toString();
+
+                // Prevent duplicate values list, since it is set as 'Options: [values]' if the description
+                // of an enum field is empty in ParameterDescription#init(..)
+                if (!description.contains("Options: " + valueList)) {
+                    String possibleValues = "(values: " + valueList + ")";
+                    description += (description.length() == 0 ? "" : " ") + possibleValues;
+                }
             }
 
             // Append description
