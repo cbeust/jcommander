@@ -35,7 +35,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Display the usage for this command.
+     * Prints the usage to {@link JCommander#getConsole()} on the underlying commander instance.
      */
     public final void usage(String commandName) {
         StringBuilder sb = new StringBuilder();
@@ -44,21 +44,22 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Store the help for the command in the passed string builder.
+     * Store the usage for the argument command in the argument string builder.
      */
     public final void usage(String commandName, StringBuilder out) {
         usage(commandName, out, "");
     }
 
     /**
-     * Store the help in the passed string builder.
+     * Store the usage in the argument string builder.
      */
     public final void usage(StringBuilder out) {
         usage(out, "");
     }
 
     /**
-     * Store the help for the command in the passed string builder, indenting every line with "indent".
+     * Store the usage for the command in the argument string builder, indenting every line with the
+     * value of <tt>indent</tt>.
      */
     public final void usage(String commandName, StringBuilder out, String indent) {
         String description = getCommandDescription(commandName);
@@ -72,7 +73,15 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Stores the help in the passed string builder, with the argument indentation.
+     * Stores the usage in the argument string builder, with the argument indentation. This works by appending
+     * each portion of the help in the following order. Their outputs can be modified by overriding them in a
+     * subclass of this class.
+     *
+     * <ul>
+     *     <li>Main line - {@link #appendMainLine(StringBuilder, boolean, boolean, int, String)}</li>
+     *     <li>Parameters - {@link #appendAllParametersDetails(StringBuilder, int, String, List)}</li>
+     *     <li>Commands - {@link #appendCommands(StringBuilder, int, int, String)}</li>
+     * </ul>
      */
     public void usage(StringBuilder out, String indent) {
         if (commander.getDescriptions() == null) {
@@ -116,6 +125,16 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         }
     }
 
+    /**
+     * Appends the main line segment of the usage to the argument string builder, indenting every
+     * line with <tt>indentCount</tt>-many <tt>indent</tt>.
+     *
+     * @param out the builder to append to
+     * @param hasOptions if the options section should be appended
+     * @param hasCommands if the comments section should be appended
+     * @param indentCount the amount of indentation to apply
+     * @param indent the indentation
+     */
     public void appendMainLine(StringBuilder out, boolean hasOptions, boolean hasCommands, int indentCount,
             String indent) {
         String programName = commander.getProgramDisplayName() != null
@@ -138,6 +157,15 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         out.append("\n");
     }
 
+    /**
+     * Appends the details of all parameters in the given order to the argument string builder, indenting every
+     * line with <tt>indentCount</tt>-many <tt>indent</tt>.
+     *
+     * @param out the builder to append to
+     * @param indentCount the amount of indentation to apply
+     * @param indent the indentation
+     * @param sortedParameters the parameters to append to the builder
+     */
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0) {
@@ -204,6 +232,17 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         }
     }
 
+    /**
+     * Appends the details of all commands to the argument string builder, indenting every line with
+     * <tt>indentCount</tt>-many <tt>indent</tt>. The commands are obtained from calling
+     * {@link JCommander#getRawCommands()} and the commands are resolved using
+     * {@link JCommander#findCommandByAlias(String)} on the underlying commander instance.
+     *
+     * @param out the builder to append to
+     * @param indentCount the amount of indentation to apply
+     * @param descriptionIndent the indentation for the description
+     * @param indent the indentation
+     */
     public void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
         out.append(indent + "  Commands:\n");
 
@@ -228,6 +267,11 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
+     * Returns the description of the command corresponding to the argument command name. The commands are resolved
+     * by calling {@link JCommander#findCommandByAlias(String)}, and the default resource bundle used from
+     * {@link JCommander#getBundle()} on the underlying commander instance.
+     *
+     * @param commandName the name of the command to get the description for
      * @return the description of the command.
      */
     public String getCommandDescription(String commandName) {
@@ -263,7 +307,8 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Wrap a potentially long line to {@link #commander#getColumnSize()}.
+     * Wrap a potentially long line to the value obtained by calling {@link JCommander#getColumnSize()} on the
+     * underlying commander instance.
      *
      * @param out               the output
      * @param indent            the indentation in spaces for lines after the first line.
@@ -310,8 +355,9 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * @return The internationalized version of the string if available, otherwise
-     * return def.
+     * Returns the internationalized version of the string if available, otherwise it returns <tt>def</tt>.
+     *
+     * @return the internationalized version of the string if available, otherwise it returns <tt>def</tt>
      */
     public static String getI18nString(ResourceBundle bundle, String key, String def) {
         String s = bundle != null ? bundle.getString(key) : null;
@@ -319,6 +365,8 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
+     * Returns <tt>count</tt>-many spaces.
+     *
      * @return <tt>count</tt>-many spaces
      */
     public static String s(int count) {
@@ -330,6 +378,11 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         return result.toString();
     }
 
+    /**
+     * Returns new line followed by <tt>indent</tt>-many spaces.
+     *
+     * @return new line followed by <tt>indent</tt>-many spaces
+     */
     private static String newLineAndIndent(int indent) {
         return "\n" + s(indent);
     }

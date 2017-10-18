@@ -276,6 +276,9 @@ public class JCommander {
 
     public void setConsole(Console console) { this.console = console; }
 
+    /**
+     * @return a wrapper for a {@link java.io.PrintStream}, typically {@link System#out}.
+     */
     public synchronized Console getConsole() {
         if (console == null) {
             try {
@@ -1013,7 +1016,7 @@ public class JCommander {
     }
 
     /**
-     * Display the help on System.out.
+     * Prints the usage on {@link #getConsole()} using the underlying {@link #usageFormatter}.
      */
     public void usage() {
         StringBuilder sb = new StringBuilder();
@@ -1021,12 +1024,23 @@ public class JCommander {
         getConsole().println(sb.toString());
     }
 
+    /**
+     * Sets the usage formatter.
+     *
+     * @param usageFormatter the usage formatter
+     * @throws IllegalArgumentException if the argument is <tt>null</tt>
+     **/
     public void setUsageFormatter(IUsageFormatter usageFormatter) {
         if (usageFormatter == null)
             throw new IllegalArgumentException("Argument UsageFormatter must not be null");
         this.usageFormatter = usageFormatter;
     }
 
+    /**
+     * Returns the usage formatter.
+     *
+     * @return the usage formatter
+     */
     public IUsageFormatter getUsageFormatter() {
         return usageFormatter;
     }

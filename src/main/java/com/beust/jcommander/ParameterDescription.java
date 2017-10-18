@@ -104,6 +104,17 @@ public class ParameterDescription {
     }
   }
 
+  /**
+   * Initializes the state of this parameter description. This will set an appropriate bundle if it is <tt>null</tt>.
+   * If its the description in is empty and it refers to an enum type, then the description will be set to its possible
+   * values. It will also attempt to validate the default value of the parameter.
+   *
+   * @param object the object defining the command-line arguments
+   * @param parameterized the wrapper for the field or method annotated with \@Parameter this represents
+   * @param bundle the locale
+   * @param jCommander the parent JCommander instance
+   * @see #initDescription(String, String, String[])
+   */
   @SuppressWarnings("unchecked")
   private void init(Object object, Parameterized parameterized, ResourceBundle bundle,
       JCommander jCommander) {

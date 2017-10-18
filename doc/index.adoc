@@ -975,6 +975,41 @@ private Map<String, String> params = new HashMap<>();
 
 You can specify a different assignment string than = by using the attribute assignment.
 
+== Custom usage formats
+
+JCommander allows you to customize the output of the `JCommander#usage()` method.
+You can do this by subclassing `IUsageFormatter` and then calling `JCommander#setUsageFormatter(IUsageFormatter)`.
+
+An example of a usage formatter which only prints the parameter names, separated by new lines is shown below:
+
+[source,java]
+----
+class ParameterNamesUsageFormatter implements IUsageFormatter {
+
+    // Extend other required methods as seen in DefaultUsageFormatter
+
+    // This is the method which does the actual output formatting
+    public void usage(StringBuilder out, String indent) {
+        if (commander.getDescriptions() == null) {
+            commander.createDescriptions();
+        }
+
+        // Create a list of the parameters
+        List<ParameterDescription> params = Lists.newArrayList();
+        params.addAll(commander.getFields().values());
+
+        // Append all the parameter names
+        if (params.size() > 0) {
+            out.append("Options:\n");
+
+            for (ParameterDescription pd : params) {
+                out.append(pd.getNames()).append("\n");
+            }
+        }
+    }
+}
+----
+
 == JCommander in other languages
 
 === Kotlin
