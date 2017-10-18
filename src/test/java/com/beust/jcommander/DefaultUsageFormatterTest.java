@@ -11,6 +11,16 @@ import java.util.ResourceBundle;
 @Test
 public class DefaultUsageFormatterTest {
 
+    /**
+     * Returns a resource bundle for the en_US locale, this is to prevent needing an exhaustive list of locales
+     * to allow the related tests to run on foreign machines.
+     *
+     * @return a hard-coded resource bundle for the en_US locale
+     */
+    public static ResourceBundle getResourceBundle() {
+        return ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
+    }
+
     private enum TestEnum1 {
         A, B, C, D
     }
@@ -194,10 +204,9 @@ public class DefaultUsageFormatterTest {
 
     @Test
     public void i18MissingKeyForCommand() {
-        java.util.ResourceBundle bundle = ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
         JCommander jc = JCommander.newBuilder()
                 .addObject(new ArgsHelp())
-                .resourceBundle(bundle)
+                .resourceBundle(getResourceBundle())
                 .build();
         jc.addCommand(new ArgsLongCommandDescription());
         StringBuilder sb = new StringBuilder();
@@ -226,7 +235,7 @@ public class DefaultUsageFormatterTest {
         ArgsHelp argsHelp = new ArgsHelp();
         JCommander jc = JCommander.newBuilder()
                 .addObject(new Object[] {argsHelp, new ArgsRequired()})
-                .resourceBundle(java.util.ResourceBundle.getBundle("MessageBundle"))
+                .resourceBundle(getResourceBundle())
                 .build();
         // Should be able to display usage without triggering validation
         jc.getUsageFormatter().usage(new StringBuilder());

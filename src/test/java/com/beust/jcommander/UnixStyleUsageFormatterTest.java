@@ -5,8 +5,9 @@ import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.*;
-import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Test
 public class UnixStyleUsageFormatterTest {
@@ -185,10 +186,9 @@ public class UnixStyleUsageFormatterTest {
 
     @Test
     public void i18MissingKeyForCommand() {
-        java.util.ResourceBundle bundle = ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
         JCommander jc = JCommander.newBuilder()
                 .addObject(new ArgsHelp())
-                .resourceBundle(bundle)
+                .resourceBundle(DefaultUsageFormatterTest.getResourceBundle())
                 .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         jc.addCommand(new ArgsLongCommandDescription());
@@ -219,7 +219,7 @@ public class UnixStyleUsageFormatterTest {
         ArgsHelp argsHelp = new ArgsHelp();
         JCommander jc = JCommander.newBuilder()
                 .addObject(new Object[] {argsHelp, new ArgsRequired()})
-                .resourceBundle(java.util.ResourceBundle.getBundle("MessageBundle"))
+                .resourceBundle(DefaultUsageFormatterTest.getResourceBundle())
                 .build();
         jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
         // Should be able to display usage without triggering validation
