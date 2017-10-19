@@ -22,7 +22,9 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * A unix-style usage formatter.
+ * A unix-style usage formatter. This works by overriding and modifying the output of
+ * {@link #appendAllParametersDetails(StringBuilder, int, String, List)} which is inherited from
+ * {@link DefaultUsageFormatter}.
  */
 public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
 
@@ -30,6 +32,15 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
         super(commander);
     }
 
+    /**
+     * Appends the details of all parameters in the given order to the argument string builder, indenting every
+     * line with <tt>indentCount</tt>-many <tt>indent</tt>.
+     *
+     * @param out the builder to append to
+     * @param indentCount the amount of indentation to apply
+     * @param indent the indentation
+     * @param sortedParameters the parameters to append to the builder
+     */
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0) {
