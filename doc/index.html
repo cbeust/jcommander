@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.5">
+<meta name="generator" content="Asciidoctor 1.5.6.1">
 <meta name="author" content="Cédric Beust">
 <title>JCommander</title>
 <style>
@@ -749,7 +749,7 @@ pre.pygments.highlight { background-color: rgba(16, 195, 196, 0.05); }
 <li><a href="#_private_parameters">6. Private parameters</a></li>
 <li><a href="#_parameter_separators">7. Parameter separators</a></li>
 <li><a href="#_multiple_descriptions">8. Multiple descriptions</a></li>
-<li><a href="#__syntax">9. @ syntax</a></li>
+<li><a href="#_syntax">9. @ syntax</a></li>
 <li><a href="#_arities_multiple_values_for_parameters">10. Arities (multiple values for parameters)</a>
 <ul class="sectlevel2">
 <li><a href="#_fixed_arities">10.1. Fixed arities</a></li>
@@ -768,17 +768,18 @@ pre.pygments.highlight { background-color: rgba(16, 195, 196, 0.05); }
 <li><a href="#_internationalization">20. Internationalization</a></li>
 <li><a href="#_parameter_delegates">21. Parameter delegates</a></li>
 <li><a href="#_dynamic_parameters">22. Dynamic parameters</a></li>
-<li><a href="#_jcommander_in_other_languages">23. JCommander in other languages</a>
+<li><a href="#_custom_usage_formats">23. Custom usage formats</a></li>
+<li><a href="#_jcommander_in_other_languages">24. JCommander in other languages</a>
 <ul class="sectlevel2">
-<li><a href="#_kotlin">23.1. Kotlin</a></li>
-<li><a href="#_groovy">23.2. Groovy</a></li>
+<li><a href="#_kotlin">24.1. Kotlin</a></li>
+<li><a href="#_groovy">24.2. Groovy</a></li>
 </ul>
 </li>
-<li><a href="#_more_examples">24. More examples</a></li>
-<li><a href="#_mailing_list">25. Mailing list</a></li>
-<li><a href="#_javadocs">26. Javadocs</a></li>
-<li><a href="#_license">27. License</a></li>
-<li><a href="#_download">28. Download</a></li>
+<li><a href="#_more_examples">25. More examples</a></li>
+<li><a href="#_mailing_list">26. Mailing list</a></li>
+<li><a href="#_javadocs">27. Javadocs</a></li>
+<li><a href="#_license">28. License</a></li>
+<li><a href="#_download">29. Download</a></li>
 </ul>
 </div>
 </div>
@@ -1485,7 +1486,7 @@ Assert.assertEquals(s.slave, "slave");</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="__syntax">9. @ syntax</h2>
+<h2 id="_syntax">9. @ syntax</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>JCommander supports the @ syntax, which allows you to put all your options into a file and pass this file as parameter:</p>
@@ -1936,10 +1937,50 @@ private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_jcommander_in_other_languages">23. JCommander in other languages</h2>
+<h2 id="_custom_usage_formats">23. Custom usage formats</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JCommander allows you to customize the output of the <code>JCommander#usage()</code> method.
+You can do this by subclassing <code>IUsageFormatter</code> and then calling <code>JCommander#setUsageFormatter(IUsageFormatter)</code>.</p>
+</div>
+<div class="paragraph">
+<p>An example of a usage formatter which only prints the parameter names, separated by new lines is shown below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class ParameterNamesUsageFormatter implements IUsageFormatter {
+
+    // Extend other required methods as seen in DefaultUsageFormatter
+
+    // This is the method which does the actual output formatting
+    public void usage(StringBuilder out, String indent) {
+        if (commander.getDescriptions() == null) {
+            commander.createDescriptions();
+        }
+
+        // Create a list of the parameters
+        List&lt;ParameterDescription&gt; params = Lists.newArrayList();
+        params.addAll(commander.getFields().values());
+
+        // Append all the parameter names
+        if (params.size() &gt; 0) {
+            out.append("Options:\n");
+
+            for (ParameterDescription pd : params) {
+                out.append(pd.getNames()).append("\n");
+            }
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_jcommander_in_other_languages">24. JCommander in other languages</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_kotlin">23.1. Kotlin</h3>
+<h3 id="_kotlin">24.1. Kotlin</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-kotlin" data-lang="kotlin">class Args {
@@ -1957,7 +1998,7 @@ private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_groovy">23.2. Groovy</h3>
+<h3 id="_groovy">24.2. Groovy</h3>
 <div class="paragraph">
 <p>Courtesy of Paul King:</p>
 </div>
@@ -1980,7 +2021,7 @@ new Args().with {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_more_examples">24. More examples</h2>
+<h2 id="_more_examples">25. More examples</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Here are the description files for a few projects that use JCommander:</p>
@@ -1998,7 +2039,7 @@ new Args().with {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_mailing_list">25. Mailing list</h2>
+<h2 id="_mailing_list">26. Mailing list</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Join the <a href="http://groups.google.com/group/jcommander">JCommander Google group</a> if you are interested in discussions about JCommander.</p>
@@ -2006,7 +2047,7 @@ new Args().with {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_javadocs">26. Javadocs</h2>
+<h2 id="_javadocs">27. Javadocs</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The Javadocs for JCommander can be found <a href="http://jcommander.org/apidocs/">here</a>.</p>
@@ -2014,7 +2055,7 @@ new Args().with {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_license">27. License</h2>
+<h2 id="_license">28. License</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>JCommander is released under the <a href="https://github.com/cbeust/jcommander/blob/master/license.txt">Apache 2.0 license</a>.</p>
@@ -2022,7 +2063,7 @@ new Args().with {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_download">28. Download</h2>
+<h2 id="_download">29. Download</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>You can download JCommander from the following locations:</p>
@@ -2075,7 +2116,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-05-15 11:58:52 PDT
+Last updated 2017-10-19 11:25:51 PDT
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
