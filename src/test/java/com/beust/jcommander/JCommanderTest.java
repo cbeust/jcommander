@@ -238,13 +238,16 @@ public class JCommanderTest {
     public void converterArgs() {
         ArgsConverter args = new ArgsConverter();
         String fileName = "a";
-        JCommander.newBuilder().addObject(args).build().parse("-file", "/tmp/" + fileName,
+        JCommander.newBuilder().addObject(args).build().parse(
+                "-file", "/tmp/" + fileName,
+                "-path", "/tmp/" + fileName,
                 "-listStrings", "Tuesday,Thursday",
                 "-listInts", "-1,8",
                 "-listBigDecimals", "-11.52,100.12",
                 "-listBigDecimalsWildcardUpper", "-11.52,100.12",
                 "-listBigDecimalsWildcardLower", "-11.52,100.12");
         Assert.assertEquals(args.file.getName(), fileName);
+        Assert.assertEquals(args.path.getFileName().toString(), fileName);
         Assert.assertEquals(args.listStrings.size(), 2);
         Assert.assertEquals(args.listStrings.get(0), "Tuesday");
         Assert.assertEquals(args.listStrings.get(1), "Thursday");
@@ -260,6 +263,13 @@ public class JCommanderTest {
         Assert.assertEquals(args.listBigDecimalsWildcardLower.size(), 2);
         Assert.assertEquals(args.listBigDecimalsWildcardLower.get(0), new BigDecimal("-11.52"));
         Assert.assertEquals(args.listBigDecimalsWildcardLower.get(1), new BigDecimal("100.12"));
+    }
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void pathConverterErr() {
+        ArgsConverter args = new ArgsConverter();
+        // even the most permissive filesystems do not allow file names containing null character
+        JCommander.newBuilder().addObject(args).build().parse("-path", "an\u0000invalid_path ");
     }
 
     public void hiddenConverter() {
