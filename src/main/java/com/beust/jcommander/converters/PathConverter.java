@@ -39,7 +39,20 @@ public class PathConverter extends BaseConverter<Path> {
     try {
       return Paths.get(value);
     } catch (InvalidPathException e) {
-      throw new ParameterException(getErrorString(value, "a path"));
+      String encoded = escapeUnprintable(value);
+      throw new ParameterException(getErrorString(encoded, "a path"));
     }
+  }
+
+  private static String escapeUnprintable(String value) {
+    StringBuilder bldr = new StringBuilder();
+    for (char c: value.toCharArray()) {
+        if (c < ' ') {
+            bldr.append("\\u").append(String.format("%04X", (int) c));
+        } else {
+            bldr.append(c);
+        }
+    }
+    return bldr.toString();
   }
 }
