@@ -21,7 +21,7 @@ package com.beust.jcommander.converters;
 import com.beust.jcommander.IStringConverter;
 
 /**
- * Base class for converters that stores the name of the option.
+ * Base class for converters that store the name of the option.
  * 
  * @author cbeust
  */
