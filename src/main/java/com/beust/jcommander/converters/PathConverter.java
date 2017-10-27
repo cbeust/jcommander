@@ -18,20 +18,41 @@
 
 package com.beust.jcommander.converters;
 
-import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
  * Convert a string into a path.
- * 
+ *
  * @author samvv
  */
-public class PathConverter implements IStringConverter<Path> {
-  
-  public Path convert(String value) {
-    return Paths.get(value);
+public class PathConverter extends BaseConverter<Path> {
+
+  public PathConverter(String optionName) {
+    super(optionName);
   }
-  
+
+  public Path convert(String value) {
+    try {
+      return Paths.get(value);
+    } catch (InvalidPathException e) {
+      String encoded = escapeUnprintable(value);
+      throw new ParameterException(getErrorString(encoded, "a path"));
+    }
+  }
+
+  private static String escapeUnprintable(String value) {
+    StringBuilder bldr = new StringBuilder();
+    for (char c: value.toCharArray()) {
+        if (c < ' ') {
+            bldr.append("\\u").append(String.format("%04X", (int) c));
+        } else {
+            bldr.append(c);
+        }
+    }
+    return bldr.toString();
+  }
 }

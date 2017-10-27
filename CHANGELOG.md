@@ -15,6 +15,7 @@
 * Fixed: Do not add a DefaultConverterFactory for every subcommand, #359 (@simon04)
 * Fixed: Fix Sonar rules squid:ModifiersOrderCheck and squid:S2444, #254 (@kirill-vlasov)
 * Added: Add testcase for `EnumConverter`, #360 (@jeremysolarz)
+* Fixed: Proper `ParameterException` when `Path` converter fails, #414 (@selliera)
 
 ### 1.58
 2016-09-29
