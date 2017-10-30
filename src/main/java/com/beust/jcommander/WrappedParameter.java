@@ -51,6 +51,10 @@ public class WrappedParameter {
     return parameter != null ? parameter.variableArity() : false;
   }
 
+  public int order() {
+    return parameter != null ? parameter.order() : dynamicParameter.order();
+  }
+
   public Class<? extends IParameterValidator>[] validateWith() {
     return parameter != null ? parameter.validateWith() : dynamicParameter.validateWith();
   }
@@ -62,7 +66,7 @@ public class WrappedParameter {
   }
 
   public boolean echoInput() {
-	  return parameter != null ? parameter.echoInput() : false;
+    return parameter != null ? parameter.echoInput() : false;
   }
 
   public void addValue(Parameterized parameterized, Object object, Object value) {
