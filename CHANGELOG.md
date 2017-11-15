@@ -16,6 +16,11 @@
 * Fixed: Fix Sonar rules squid:ModifiersOrderCheck and squid:S2444, #254 (@kirill-vlasov)
 * Added: Add testcase for `EnumConverter`, #360 (@jeremysolarz)
 * Fixed: Proper `ParameterException` when `Path` converter fails, #414 (@selliera)
+* Fixed: `misc.xml` syntax, #407 (@PureCS)
+* Added: Flexible usage formatting, #408 (@PureCS)
+* Fixed: Java 7 compatibility, #409 (@PureCS)
+* Fixed: Locale-related issues in usage formatter tests, #410 (@PureCS)
+* Added: Documentation for `IUsageFormatter` and related classes, #411 (@PureCS)
 
 ### 1.58
 2016-09-29
