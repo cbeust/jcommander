@@ -21,6 +21,7 @@
 * Fixed: Java 7 compatibility, #409 (@PureCS)
 * Fixed: Locale-related issues in usage formatter tests, #410 (@PureCS)
 * Added: Documentation for `IUsageFormatter` and related classes, #411 (@PureCS)
+* Added: `order` support for `@DynamicParameter`, #418 (@selliera)
 
 ### 1.58
 2016-09-29
