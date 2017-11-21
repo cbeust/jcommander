@@ -176,8 +176,8 @@ public class JCommander {
                 = new Comparator<ParameterDescription>() {
             @Override
             public int compare(ParameterDescription p0, ParameterDescription p1) {
-                Parameter a0 = p0.getParameterAnnotation();
-                Parameter a1 = p1.getParameterAnnotation();
+                WrappedParameter a0 = p0.getParameter();
+                WrappedParameter a1 = p1.getParameter();
                 if (a0 != null && a0.order() != -1 && a1 != null && a1.order() != -1) {
                     return Integer.compare(a0.order(), a1.order());
                 } else if (a0 != null && a0.order() != -1) {
@@ -676,7 +676,7 @@ public class JCommander {
             }
         }
     }
-    
+
     /**
      * Main method that parses the values and initializes the fields accordingly.
      */
@@ -813,7 +813,7 @@ public class JCommander {
     private boolean isBooleanType(Class<?> fieldType) {
       return Boolean.class.isAssignableFrom(fieldType) || boolean.class.isAssignableFrom(fieldType);
     }
-    
+
     private void handleBooleanOption(ParameterDescription pd, Class<?> fieldType) {
       // Flip the value this boolean was initialized with
       Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
