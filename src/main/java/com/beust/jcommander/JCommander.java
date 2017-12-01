@@ -909,7 +909,7 @@ public class JCommander {
             Object finalValue = null;
             if (index + arity < args.length) {
                 for (int j = 1; j <= arity; j++) {
-                    String value = trim(args[index + j + offset]);
+                    String value = args[index + j + offset];
                     finalValue = pd.addValue(arg, value, false, validate, j - 1);
                     requiredFields.remove(pd.getParameterized());
                 }
