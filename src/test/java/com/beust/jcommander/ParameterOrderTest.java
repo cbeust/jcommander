@@ -61,7 +61,7 @@ public class ParameterOrderTest {
     JCommander commander = new JCommander(cmd);
 
     StringBuilder out = new StringBuilder();
-    commander.getUsageFormatter().usage(out);
+    commander.usage(out);
     String output = out.toString();
     List<String> order = new ArrayList<>();
     for (String line : output.split("[\\n\\r]+")) {

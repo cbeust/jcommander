@@ -26,30 +26,30 @@ public interface IUsageFormatter {
     /**
      * Display the usage for this command.
      */
-    void usage(String commandName);
+    void usage(JCommander commander, String commandName);
 
     /**
      * Store the help for the command in the passed string builder.
      */
-    void usage(String commandName, StringBuilder out);
+    void usage(JCommander commander, String commandName, StringBuilder out);
 
     /**
      * Store the help in the passed string builder.
      */
-    void usage(StringBuilder out);
+    void usage(JCommander commander, StringBuilder out);
 
     /**
      * Store the help for the command in the passed string builder, indenting every line with "indent".
      */
-    void usage(String commandName, StringBuilder out, String indent);
+    void usage(JCommander commander, String commandName, StringBuilder out, String indent);
 
     /**
      * Stores the help in the passed string builder, with the argument indentation.
      */
-    void usage(StringBuilder out, String indent);
+    void usage(JCommander commander, StringBuilder out, String indent);
 
     /**
      * @return the description of the argument command
      */
-    String getCommandDescription(String commandName);
+    String getCommandDescription(JCommander commander, String commandName);
 }

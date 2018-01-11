@@ -49,10 +49,10 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(new ArgsTemplate())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
 
         // action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         // verify
         String expected = "Usage: <main class> [options]\n"
@@ -76,11 +76,11 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(new ArgsLongMainParameterDescription())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         StringBuilder sb = new StringBuilder();
 
         //action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -94,11 +94,11 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addCommand(new ArgsLongCommandDescription())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         StringBuilder sb = new StringBuilder();
 
         //action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -113,10 +113,10 @@ public class UnixStyleUsageFormatterTest {
         final JCommander jc = JCommander.newBuilder()
                 .addObject(new ArgsLongDescription())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
 
         //action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -127,11 +127,11 @@ public class UnixStyleUsageFormatterTest {
     @Test
     public void programName() {
         JCommander jcommander = new JCommander();
-        jcommander.setUsageFormatter(new UnixStyleUsageFormatter(jcommander));
+        jcommander.setUsageFormatter(new UnixStyleUsageFormatter());
         String programName = "main";
         jcommander.setProgramName(programName);
         StringBuilder sb = new StringBuilder();
-        jcommander.getUsageFormatter().usage(sb);
+        jcommander.usage(sb);
 
         Assert.assertTrue(sb.toString().contains(programName));
         Assert.assertEquals(jcommander.getProgramName(), programName);
@@ -148,10 +148,10 @@ public class UnixStyleUsageFormatterTest {
         JCommander jcommander = JCommander.newBuilder()
                 .addObject(template)
                 .build();
-        jcommander.setUsageFormatter(new UnixStyleUsageFormatter(jcommander));
+        jcommander.setUsageFormatter(new UnixStyleUsageFormatter());
         jcommander.setProgramName("main");
         StringBuilder sb = new StringBuilder();
-        jcommander.getUsageFormatter().usage(sb);
+        jcommander.usage(sb);
         Assert.assertEquals(sb.toString().indexOf("options"), -1);
     }
 
@@ -168,8 +168,8 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(new DSimple())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
-        jc.getUsageFormatter().usage(new StringBuilder());
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
+        jc.usage(new StringBuilder());
     }
 
     /**
@@ -179,9 +179,9 @@ public class UnixStyleUsageFormatterTest {
     public void nonexistentCommandShouldThrow() {
         String[] argv = {};
         JCommander jc = JCommander.newBuilder().addObject(new Object()).build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         jc.parse(argv);
-        jc.getUsageFormatter().getCommandDescription("foo");
+        jc.getCommandDescription("foo");
     }
 
     @Test
@@ -190,10 +190,10 @@ public class UnixStyleUsageFormatterTest {
                 .addObject(new ArgsHelp())
                 .resourceBundle(DefaultUsageFormatterTest.getResourceBundle())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         jc.addCommand(new ArgsLongCommandDescription());
         StringBuilder sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         String usage = sb.toString();
         Assert.assertTrue(usage.contains("text"));
     }
@@ -203,8 +203,8 @@ public class UnixStyleUsageFormatterTest {
         JCommander jCommander = JCommander.newBuilder()
                 .addObject(new ArgsMainParameter1())
                 .build();
-        jCommander.setUsageFormatter(new UnixStyleUsageFormatter(jCommander));
-        jCommander.getUsageFormatter().usage(new StringBuilder());
+        jCommander.setUsageFormatter(new UnixStyleUsageFormatter());
+        jCommander.usage(new StringBuilder());
         // Before fix, this parse would throw an exception, because it calls createDescription, which
         // was already called by usage(), and can only be called once.
         jCommander.parse();
@@ -221,9 +221,9 @@ public class UnixStyleUsageFormatterTest {
                 .addObject(new Object[] {argsHelp, new ArgsRequired()})
                 .resourceBundle(DefaultUsageFormatterTest.getResourceBundle())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         // Should be able to display usage without triggering validation
-        jc.getUsageFormatter().usage(new StringBuilder());
+        jc.usage(new StringBuilder());
         try {
             jc.parse("-h");
             Assert.fail("Should have thrown a required parameter exception");
@@ -236,14 +236,14 @@ public class UnixStyleUsageFormatterTest {
     @Test
     public void usageShouldNotChange() {
         JCommander jc = JCommander.newBuilder().addObject(new Args1()).build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         jc.parse("-log", "1");
         StringBuilder sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         String expected = sb.toString();
 
         sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         String actual = sb.toString();
         Assert.assertEquals(actual, expected);
     }
@@ -253,8 +253,8 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(new ArgsOutOfMemory())
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
-        jc.getUsageFormatter().usage(new StringBuilder());
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
+        jc.usage(new StringBuilder());
     }
 
     @Test
@@ -266,12 +266,12 @@ public class UnixStyleUsageFormatterTest {
         Arg args = new Arg();
         String[] argv = {"--help"};
         JCommander jc = JCommander.newBuilder().addObject(args).build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         jc.parse(argv);
 
         StringBuilder sb = new StringBuilder();
 
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         Assert.assertFalse(sb.toString().contains("Default"));
     }
@@ -296,12 +296,12 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(a)
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         jc.addCommand("a", new ArgCommandA());
         jc.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
     }
 
@@ -325,12 +325,12 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(a)
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         jc.addCommand("a", new ArgCommandA());
         jc.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
     }
 
@@ -354,7 +354,7 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(a)
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
         jc.setColumnSize(100);
         jc.addCommand("a", new ArgCommandA());
 
@@ -363,7 +363,7 @@ public class UnixStyleUsageFormatterTest {
         aCommand.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
         Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
     }
@@ -379,8 +379,8 @@ public class UnixStyleUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(a)
                 .build();
-        jc.setUsageFormatter(new UnixStyleUsageFormatter(jc));
-        jc.getUsageFormatter().usage(sb);
+        jc.setUsageFormatter(new UnixStyleUsageFormatter());
+        jc.usage(sb);
         Assert.assertTrue(sb.toString().contains("default: <empty string>"));
     }
 }

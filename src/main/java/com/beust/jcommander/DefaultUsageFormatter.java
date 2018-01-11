@@ -27,49 +27,80 @@ import java.util.ResourceBundle;
  * The default usage formatter.
  */
 public class DefaultUsageFormatter implements IUsageFormatter {
+    public DefaultUsageFormatter() {
+    }
 
-    private final JCommander commander;
+    /**
+     * Returns the internationalized version of the string if available, otherwise it returns <tt>def</tt>.
+     * @return the internationalized version of the string if available, otherwise it returns <tt>def</tt>
+     */
+    protected static String getI18nString(ResourceBundle bundle, String key, String def) {
+        String s = bundle != null ? bundle.getString(key) : null;
+        return s != null ? s : def;
+    }
 
-    public DefaultUsageFormatter(JCommander commander) {
-        this.commander = commander;
+    /**
+     * Returns <tt>count</tt>-many spaces.
+     * @return <tt>count</tt>-many spaces
+     */
+    protected static String s(int count) {
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < count; i++) {
+            result.append(" ");
+        }
+        return result.toString();
+    }
+
+    /**
+     * Returns new line followed by <tt>indent</tt>-many spaces.
+     * @return new line followed by <tt>indent</tt>-many spaces
+     */
+    private static String newLineAndIndent(int indent) {
+        return "\n" + s(indent);
     }
 
     /**
      * Prints the usage to {@link JCommander#getConsole()} on the underlying commander instance.
      */
-    public final void usage(String commandName) {
+    @Override
+    public final void usage(JCommander commander, String commandName) {
         StringBuilder sb = new StringBuilder();
-        usage(commandName, sb);
+        usage(commander, commandName, sb);
         commander.getConsole().println(sb.toString());
     }
 
     /**
      * Store the usage for the argument command in the argument string builder.
      */
-    public final void usage(String commandName, StringBuilder out) {
-        usage(commandName, out, "");
+    @Override
+    public final void usage(JCommander commander, String commandName, StringBuilder out) {
+        usage(commander, commandName, out, "");
     }
 
     /**
      * Store the usage in the argument string builder.
      */
-    public final void usage(StringBuilder out) {
-        usage(out, "");
+    @Override
+    public final void usage(JCommander commander, StringBuilder out) {
+        usage(commander, out, "");
     }
 
     /**
      * Store the usage for the command in the argument string builder, indenting every line with the
      * value of <tt>indent</tt>.
      */
-    public final void usage(String commandName, StringBuilder out, String indent) {
-        String description = getCommandDescription(commandName);
+    @Override
+    public final void usage(
+        JCommander commander, String commandName, StringBuilder out, String indent) {
+        String description = getCommandDescription(commander, commandName);
         JCommander jc = commander.findCommandByAlias(commandName);
 
         if (description != null) {
             out.append(indent).append(description);
             out.append("\n");
         }
-        jc.getUsageFormatter().usage(out, indent);
+        usage(jc, out, indent);
     }
 
     /**
@@ -78,12 +109,13 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      * subclass of this class.
      *
      * <ul>
-     *     <li>Main line - {@link #appendMainLine(StringBuilder, boolean, boolean, int, String)}</li>
-     *     <li>Parameters - {@link #appendAllParametersDetails(StringBuilder, int, String, List)}</li>
-     *     <li>Commands - {@link #appendCommands(StringBuilder, int, int, String)}</li>
+     * <li>Main line - {@link #appendMainLine(JCommander, StringBuilder, boolean, boolean, int, String)}</li>
+     * <li>Parameters - {@link #appendAllParametersDetails(JCommander, StringBuilder, int, String, List)}</li>
+     * <li>Commands - {@link #appendCommands(JCommander, StringBuilder, int, int, String)}</li>
      * </ul>
      */
-    public void usage(StringBuilder out, String indent) {
+    @Override
+    public void usage(JCommander commander, StringBuilder out, String indent) {
         if (commander.getDescriptions() == null) {
             commander.createDescriptions();
         }
@@ -95,7 +127,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         final int indentCount = indent.length() + descriptionIndent;
 
         // Append first line (aka main line) of the usage
-        appendMainLine(out, hasOptions, hasCommands, indentCount, indent);
+        appendMainLine(commander, out, hasOptions, hasCommands, indentCount, indent);
 
         // Align the descriptions at the "longestName" column
         int longestName = 0;
@@ -117,28 +149,30 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         sortedParameters.sort(commander.getParameterDescriptionComparator());
 
         // Append all the parameter names and descriptions
-        appendAllParametersDetails(out, indentCount, indent, sortedParameters);
+        appendAllParametersDetails(commander, out, indentCount, indent, sortedParameters);
 
         // Append commands if they were specified
         if (hasCommands) {
-            appendCommands(out, indentCount, descriptionIndent, indent);
+            appendCommands(commander, out, indentCount, descriptionIndent, indent);
         }
     }
 
     /**
      * Appends the main line segment of the usage to the argument string builder, indenting every
      * line with <tt>indentCount</tt>-many <tt>indent</tt>.
-     *
+     * @param commander the commander
      * @param out the builder to append to
      * @param hasOptions if the options section should be appended
      * @param hasCommands if the comments section should be appended
      * @param indentCount the amount of indentation to apply
      * @param indent the indentation
      */
-    public void appendMainLine(StringBuilder out, boolean hasOptions, boolean hasCommands, int indentCount,
-            String indent) {
+    protected void appendMainLine(
+        JCommander commander, StringBuilder out, boolean hasOptions, boolean hasCommands,
+        int indentCount,
+        String indent) {
         String programName = commander.getProgramDisplayName() != null
-                ? commander.getProgramDisplayName() : "<main class>";
+            ? commander.getProgramDisplayName() : "<main class>";
         StringBuilder mainLine = new StringBuilder();
         mainLine.append(indent).append("Usage: ").append(programName);
 
@@ -150,24 +184,27 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             mainLine.append(indent).append(" [command] [command options]");
         }
 
-        if (commander.getMainParameter() != null && commander.getMainParameter().getDescription() != null) {
-            mainLine.append(" ").append(commander.getMainParameter().getDescription().getDescription());
+        if (commander.getMainParameter() != null
+            && commander.getMainParameter().getDescription() != null) {
+            mainLine.append(" ")
+                .append(commander.getMainParameter().getDescription().getDescription());
         }
-        wrapDescription(out, indentCount, mainLine.toString());
+        wrapDescription(commander, out, indentCount, mainLine.toString());
         out.append("\n");
     }
 
     /**
      * Appends the details of all parameters in the given order to the argument string builder, indenting every
      * line with <tt>indentCount</tt>-many <tt>indent</tt>.
-     *
+     * @param commander the commander
      * @param out the builder to append to
      * @param indentCount the amount of indentation to apply
      * @param indent the indentation
      * @param sortedParameters the parameters to append to the builder
      */
-    public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
-            List<ParameterDescription> sortedParameters) {
+    protected void appendAllParametersDetails(
+        JCommander commander, StringBuilder out, int indentCount, String indent,
+        List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0) {
             out.append(indent).append("  Options:\n");
         }
@@ -179,18 +216,19 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
             // First line, command name
             out.append(indent)
-                    .append("  ")
-                    .append(parameter.required() ? "* " : "  ")
-                    .append(pd.getNames())
-                    .append("\n");
+                .append("  ")
+                .append(parameter.required() ? "* " : "  ")
+                .append(pd.getNames())
+                .append("\n");
 
             if (hasDescription) {
-                wrapDescription(out, indentCount, s(indentCount) + description);
+                wrapDescription(commander, out, indentCount, s(indentCount) + description);
             }
             Object def = pd.getDefault();
 
             if (pd.isDynamicParameter()) {
-                String syntax = "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
+                String syntax =
+                    "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
 
                 if (hasDescription) {
                     out.append(newLineAndIndent(indentCount));
@@ -201,7 +239,8 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             }
 
             if (def != null && !pd.isHelp()) {
-                String displayedDef = Strings.isStringEmpty(def.toString()) ? "<empty string>" : def.toString();
+                String displayedDef =
+                    Strings.isStringEmpty(def.toString()) ? "<empty string>" : def.toString();
                 String defaultText = "Default: " + (parameter.password() ? "********" : displayedDef);
 
                 if (hasDescription) {
@@ -237,30 +276,34 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      * <tt>indentCount</tt>-many <tt>indent</tt>. The commands are obtained from calling
      * {@link JCommander#getRawCommands()} and the commands are resolved using
      * {@link JCommander#findCommandByAlias(String)} on the underlying commander instance.
-     *
+     * @param commander the commander
      * @param out the builder to append to
      * @param indentCount the amount of indentation to apply
      * @param descriptionIndent the indentation for the description
      * @param indent the indentation
      */
-    public void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
+    protected void appendCommands(
+        JCommander commander, StringBuilder out, int indentCount, int descriptionIndent,
+        String indent) {
         out.append(indent + "  Commands:\n");
 
         // The magic value 3 is the number of spaces between the name of the option and its description
-        for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
+        for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands()
+            .entrySet()) {
             Object arg = commands.getValue().getObjects().get(0);
             Parameters p = arg.getClass().getAnnotation(Parameters.class);
 
             if (p == null || !p.hidden()) {
                 JCommander.ProgramName progName = commands.getKey();
                 String dispName = progName.getDisplayName();
-                String description = indent + s(4) + dispName + s(6) + getCommandDescription(progName.getName());
-                wrapDescription(out, indentCount + descriptionIndent, description);
+                String description = indent + s(4) + dispName + s(6) + getCommandDescription(commander,
+                    progName.getName());
+                wrapDescription(commander, out, indentCount + descriptionIndent, description);
                 out.append("\n");
 
                 // Options for this command
                 JCommander jc = commander.findCommandByAlias(progName.getName());
-                jc.getUsageFormatter().usage(out, indent + s(6));
+                usage(jc, out, indent + s(6));
                 out.append("\n");
             }
         }
@@ -270,11 +313,12 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      * Returns the description of the command corresponding to the argument command name. The commands are resolved
      * by calling {@link JCommander#findCommandByAlias(String)}, and the default resource bundle used from
      * {@link JCommander#getBundle()} on the underlying commander instance.
-     *
+     * @param commander the commander
      * @param commandName the name of the command to get the description for
      * @return the description of the command.
      */
-    public String getCommandDescription(String commandName) {
+    @Override
+    public String getCommandDescription(JCommander commander, String commandName) {
         JCommander jc = commander.findCommandByAlias(commandName);
 
         if (jc == null) {
@@ -309,15 +353,17 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     /**
      * Wrap a potentially long line to the value obtained by calling {@link JCommander#getColumnSize()} on the
      * underlying commander instance.
-     *
-     * @param out               the output
-     * @param indent            the indentation in spaces for lines after the first line.
+     * @param commander the commander
+     * @param out the output
+     * @param indent the indentation in spaces for lines after the first line.
      * @param currentLineIndent the length of the indentation of the initial line
-     * @param description       the text to wrap. No extra spaces are inserted before {@code
-     *                          description}. If the first line needs to be indented prepend the
-     *                          correct number of spaces to {@code description}.
+     * @param description the text to wrap. No extra spaces are inserted before {@code
+     * description}. If the first line needs to be indented prepend the
+     * correct number of spaces to {@code description}.
      */
-    public void wrapDescription(StringBuilder out, int indent, int currentLineIndent, String description) {
+    protected void wrapDescription(
+        JCommander commander, StringBuilder out, int indent, int currentLineIndent,
+        String description) {
         int max = commander.getColumnSize();
         String[] words = description.split(" ");
         int current = currentLineIndent;
@@ -341,49 +387,17 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Wrap a potentially long line to {@link #commander#getColumnSize()}.
-     *
-     * @param out         the output
-     * @param indent      the indentation in spaces for lines after the first line.
+     * Wrap a potentially long line to {@link JCommander#getColumnSize()}.
+     * @param commander the commander
+     * @param out the output
+     * @param indent the indentation in spaces for lines after the first line.
      * @param description the text to wrap. No extra spaces are inserted before {@code
-     *                    description}. If the first line needs to be indented prepend the
-     *                    correct number of spaces to {@code description}.
-     * @see #wrapDescription(StringBuilder, int, int, String)
+     * description}. If the first line needs to be indented prepend the
+     * correct number of spaces to {@code description}.
+     * @see #wrapDescription(JCommander, StringBuilder, int, int, String)
      */
-    public void wrapDescription(StringBuilder out, int indent, String description) {
-        wrapDescription(out, indent, 0, description);
-    }
-
-    /**
-     * Returns the internationalized version of the string if available, otherwise it returns <tt>def</tt>.
-     *
-     * @return the internationalized version of the string if available, otherwise it returns <tt>def</tt>
-     */
-    public static String getI18nString(ResourceBundle bundle, String key, String def) {
-        String s = bundle != null ? bundle.getString(key) : null;
-        return s != null ? s : def;
-    }
-
-    /**
-     * Returns <tt>count</tt>-many spaces.
-     *
-     * @return <tt>count</tt>-many spaces
-     */
-    public static String s(int count) {
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < count; i++) {
-            result.append(" ");
-        }
-        return result.toString();
-    }
-
-    /**
-     * Returns new line followed by <tt>indent</tt>-many spaces.
-     *
-     * @return new line followed by <tt>indent</tt>-many spaces
-     */
-    private static String newLineAndIndent(int indent) {
-        return "\n" + s(indent);
+    protected void wrapDescription(
+        JCommander commander, StringBuilder out, int indent, String description) {
+        wrapDescription(commander, out, indent, 0, description);
     }
 }
