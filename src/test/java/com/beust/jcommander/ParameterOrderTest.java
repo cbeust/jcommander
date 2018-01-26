@@ -104,4 +104,32 @@ public class ParameterOrderTest {
     }
     Assert.assertEquals(order, Arrays.asList(expected));
   }
+
+  private static class WithoutOrder {
+    @Parameter(names = "--arg_b")
+    public boolean isB;
+    @Parameter(names = "--arg_c")
+    public boolean isC;
+    @Parameter(names = "--arg_a")
+    public boolean isA;
+  }
+
+  @Test
+  public void parametersWithoutOrder() {
+    testOrder(new WithoutOrder(), "--arg_a", "--arg_b", "--arg_c");
+  }
+
+  private static class WithSameOrder {
+    @Parameter(order=0, names = "--arg_b")
+    public boolean isB;
+    @Parameter(order=0, names = "--arg_c")
+    public boolean isC;
+    @Parameter(order=0, names = "--arg_a")
+    public boolean isA;
+  }
+
+  @Test
+  public void parametersWithSameOrder() {
+    testOrder(new WithSameOrder(), "--arg_a", "--arg_b", "--arg_c");
+  }
 }
