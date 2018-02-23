@@ -34,9 +34,6 @@ import org.testng.annotations.Test;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -524,7 +521,7 @@ public class JCommanderTest {
     public void validationShouldWork1() {
         ArgsValidate1 a = new ArgsValidate1();
         JCommander jc = new JCommander(a);
-        jc.parse("-age", "2 ");
+        jc.parse("-age", "2");
         Assert.assertEquals(a.age, new Integer(2));
     }
 
@@ -1418,27 +1415,22 @@ public class JCommanderTest {
         Assert.assertEquals(file.getAbsolutePath(), args.getPath().getAbsolutePath());
     }
 
+    @Test
+    public void trimTest() {
+        class Args {
+            @Parameter(names = {"-L", "--replace-new-line"}, description = "Char used for replacing new line in value")
+            protected String escapeNl;
+        }
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .build()
+                .parse("-L", " ");
+        Assert.assertEquals(args.escapeNl, " ");
+    }
+
     @Test(enabled = false)
     public static void main(String[] args) {
-
-        class FileValidator implements IParameterValidator {
-            @Override
-            public void validate(String name, String value) throws ParameterException {
-                if (!Files.exists(Paths.get(value))) {
-                    throw new ParameterException("FILE_DOES_NOT_EXIST");
-                }
-            }
-        }
-
-        class Args {
-            @Parameter(names = "--file", validateWith = FileValidator.class, required = true,
-                    description = "The properties file containing setup information.")
-            private Path propertiesFile = Paths.get("");
-        }
-
-        JCommander.newBuilder()
-                .addObject(new Args())
-                .build()
-                .parse("--file", "README.markdown");
+        new JCommanderTest().trimTest();
     }
 }
