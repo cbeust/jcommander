@@ -495,7 +495,7 @@ public class JCommander {
         for (ParameterDescription pd : descriptions.values()) {
             if (pd.isDynamicParameter()) {
                 for (String name : pd.getParameter().names()) {
-                    if (arg.startsWith(name) && !arg.equals(name)) {
+                    if (arg.startsWith(name) && !arg.equals(name) && arg.contains(pd.getParameter().getAssignment())) {
                         return Arrays.asList(name, arg.substring(name.length()));
                     }
                 }
