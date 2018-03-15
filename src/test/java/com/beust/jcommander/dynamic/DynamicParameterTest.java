@@ -3,7 +3,6 @@ package com.beust.jcommander.dynamic;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.internal.Maps;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -54,5 +53,13 @@ public class DynamicParameterTest {
   public static void main(String[] args) {
     DynamicParameterTest dpt = new DynamicParameterTest();
     dpt.simpleWithSpaces();
+  }
+
+  @Test
+  public void shouldNotBreakSimilarParameter() {
+    ShadowingParameter shadowingParameter = new ShadowingParameter();
+    new JCommander(shadowingParameter).parse("-abc", "abc", "-ab", "a=b");
+    Assert.assertEquals(shadowingParameter.abc, "abc");
+    Assert.assertEquals(shadowingParameter.ab.get("a"), "b");
   }
 }
