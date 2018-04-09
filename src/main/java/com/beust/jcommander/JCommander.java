@@ -1064,7 +1064,9 @@ public class JCommander {
         if (usageFormatter == null)
             throw new IllegalArgumentException("Argument UsageFormatter must not be null");
         this.usageFormatter = usageFormatter;
-        commands.forEach((programName, commander) -> commander.setUsageFormatter(usageFormatter));
+        for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
+            entry.getValue().setUsageFormatter(usageFormatter);
+        }
     }
 
     /**
