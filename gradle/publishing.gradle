@@ -42,12 +42,18 @@ publishing {
 
 task install(dependsOn: publishToMavenLocal)
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.file) {
+    def localProperties = new Properties()
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+    localProperties.forEach { key, value ->
+        ext[key] = value
+    }
+}
 
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = findProperty('bintray.user')
+    key = findProperty('bintray.apikey')
     publications = ['mavenCustom']
     pkg {
         repo = 'maven'
