@@ -110,7 +110,7 @@ public class JCommander {
     /**
      * The usage formatter to use in {@link #usage()}.
      */
-    private IUsageFormatter usageFormatter = new DefaultUsageFormatter(this);
+    private IUsageFormatter usageFormatter = new DefaultUsageFormatter();
 
     private MainParameter mainParameter = null;
 
@@ -1020,12 +1020,42 @@ public class JCommander {
      */
     public void usage() {
         StringBuilder sb = new StringBuilder();
-        usageFormatter.usage(sb);
+        usageFormatter.usage(this, sb);
         getConsole().println(sb.toString());
     }
 
     /**
-     * Sets the usage formatter.
+     * Prints the usage to given {@link StringBuilder} using the underlying {@link #usageFormatter}
+     * @param sb {@link StringBuilder} to append
+     */
+    void usage(StringBuilder sb) {
+        // package access, for tests
+        usageFormatter.usage(this, sb);
+    }
+
+    /**
+     * Prints the usage of subcommand on {@link #getConsole()} using the underlying {@link #usageFormatter}.
+     */
+    public void usage(String commandName) {
+        StringBuilder sb = new StringBuilder();
+        usageFormatter.usage(this, commandName, sb);
+        getConsole().println(sb.toString());
+    }
+
+    void usage(String commandName, StringBuilder sb) {
+        // package access, for tests
+        usageFormatter.usage(this, commandName, sb);
+    }
+
+    /**
+     * @return Get the description of the argument command using the underlying {@link #usageFormatter}
+     */
+    public String getCommandDescription(String commandName) {
+        return usageFormatter.getCommandDescription(this, commandName);
+    }
+
+    /**
+     * Sets the usage formatter. This will set usage formatter for all subcommands recursively.
      *
      * @param usageFormatter the usage formatter
      * @throws IllegalArgumentException if the argument is <tt>null</tt>
@@ -1034,6 +1064,9 @@ public class JCommander {
         if (usageFormatter == null)
             throw new IllegalArgumentException("Argument UsageFormatter must not be null");
         this.usageFormatter = usageFormatter;
+        for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
+            entry.getValue().setUsageFormatter(usageFormatter);
+        }
     }
 
     /**
@@ -1393,6 +1426,7 @@ public class JCommander {
         jc.addObject(object);
         jc.createDescriptions();
         jc.setProgramName(name, aliases);
+        jc.setUsageFormatter(usageFormatter);
         ProgramName progName = jc.programName;
         commands.put(progName, jc);
 

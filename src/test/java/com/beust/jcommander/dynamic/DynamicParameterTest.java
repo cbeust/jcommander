@@ -40,7 +40,7 @@ public class DynamicParameterTest {
     JCommander jc = JCommander.newBuilder()
             .addObject(ds)
             .build();
-    jc.getUsageFormatter().usage(new StringBuilder());
+    jc.getUsageFormatter().usage(jc, new StringBuilder());
   }
 
   public void differentAssignment() {

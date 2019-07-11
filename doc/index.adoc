@@ -989,7 +989,7 @@ class ParameterNamesUsageFormatter implements IUsageFormatter {
     // Extend other required methods as seen in DefaultUsageFormatter
 
     // This is the method which does the actual output formatting
-    public void usage(StringBuilder out, String indent) {
+    public void usage(JCommander commander, StringBuilder out, String indent) {
         if (commander.getDescriptions() == null) {
             commander.createDescriptions();
         }

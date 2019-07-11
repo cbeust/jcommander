@@ -60,7 +60,7 @@ public class DefaultUsageFormatterTest {
                 .build();
 
         // action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         // verify
         String expected = "Usage: <main class> [options]\n"
@@ -104,7 +104,7 @@ public class DefaultUsageFormatterTest {
         StringBuilder sb = new StringBuilder();
 
         //action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -121,7 +121,7 @@ public class DefaultUsageFormatterTest {
         StringBuilder sb = new StringBuilder();
 
         //action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -138,7 +138,7 @@ public class DefaultUsageFormatterTest {
                 .build();
 
         //action
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         //verify
         for (String line : sb.toString().split("\n")) {
@@ -152,7 +152,7 @@ public class DefaultUsageFormatterTest {
         String programName = "main";
         jcommander.setProgramName(programName);
         StringBuilder sb = new StringBuilder();
-        jcommander.getUsageFormatter().usage(sb);
+        jcommander.usage(sb);
 
         Assert.assertTrue(sb.toString().contains(programName));
         Assert.assertEquals(jcommander.getProgramName(), programName);
@@ -171,7 +171,7 @@ public class DefaultUsageFormatterTest {
                 .build();
         jcommander.setProgramName("main");
         StringBuilder sb = new StringBuilder();
-        jcommander.getUsageFormatter().usage(sb);
+        jcommander.usage(sb);
         Assert.assertEquals(sb.toString().indexOf("options"), -1);
     }
 
@@ -188,7 +188,7 @@ public class DefaultUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(new DSimple())
                 .build();
-        jc.getUsageFormatter().usage(new StringBuilder());
+        jc.usage(new StringBuilder());
     }
 
     /**
@@ -199,7 +199,7 @@ public class DefaultUsageFormatterTest {
         String[] argv = {};
         JCommander jc = JCommander.newBuilder().addObject(new Object()).build();
         jc.parse(argv);
-        jc.getUsageFormatter().getCommandDescription("foo");
+        jc.getCommandDescription("foo");
     }
 
     @Test
@@ -210,7 +210,7 @@ public class DefaultUsageFormatterTest {
                 .build();
         jc.addCommand(new ArgsLongCommandDescription());
         StringBuilder sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         String usage = sb.toString();
         Assert.assertTrue(usage.contains("text"));
     }
@@ -220,7 +220,7 @@ public class DefaultUsageFormatterTest {
         JCommander jCommander = JCommander.newBuilder()
                 .addObject(new ArgsMainParameter1())
                 .build();
-        jCommander.getUsageFormatter().usage(new StringBuilder());
+        jCommander.usage(new StringBuilder());
         // Before fix, this parse would throw an exception, because it calls createDescription, which
         // was already called by usage(), and can only be called once.
         jCommander.parse();
@@ -238,7 +238,7 @@ public class DefaultUsageFormatterTest {
                 .resourceBundle(getResourceBundle())
                 .build();
         // Should be able to display usage without triggering validation
-        jc.getUsageFormatter().usage(new StringBuilder());
+        jc.usage(new StringBuilder());
         try {
             jc.parse("-h");
             Assert.fail("Should have thrown a required parameter exception");
@@ -253,11 +253,11 @@ public class DefaultUsageFormatterTest {
         JCommander jc = JCommander.newBuilder().addObject(new Args1()).build();
         jc.parse("-log", "1");
         StringBuilder sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         String expected = sb.toString();
 
         sb = new StringBuilder();
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
         String actual = sb.toString();
         Assert.assertEquals(actual, expected);
     }
@@ -267,7 +267,7 @@ public class DefaultUsageFormatterTest {
         JCommander jc = JCommander.newBuilder()
                 .addObject(new ArgsOutOfMemory())
                 .build();
-        jc.getUsageFormatter().usage(new StringBuilder());
+        jc.usage(new StringBuilder());
     }
 
     @Test
@@ -283,7 +283,7 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
 
-        jc.getUsageFormatter().usage(sb);
+        jc.usage(sb);
 
         Assert.assertFalse(sb.toString().contains("Default"));
     }
@@ -312,7 +312,7 @@ public class DefaultUsageFormatterTest {
         c.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        c.getUsageFormatter().usage(sb);
+        c.usage(sb);
         Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
     }
 
@@ -340,7 +340,7 @@ public class DefaultUsageFormatterTest {
         c.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        c.getUsageFormatter().usage(sb);
+        c.usage(sb);
         Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
     }
 
@@ -372,7 +372,7 @@ public class DefaultUsageFormatterTest {
         aCommand.addCommand("b", new ArgCommandB());
 
         StringBuilder sb = new StringBuilder();
-        c.getUsageFormatter().usage(sb);
+        c.usage(sb);
         Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
         Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
     }
@@ -388,7 +388,7 @@ public class DefaultUsageFormatterTest {
         JCommander c = JCommander.newBuilder()
                 .addObject(a)
                 .build();
-        c.getUsageFormatter().usage(sb);
+        c.usage(sb);
         Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
     }
 }
