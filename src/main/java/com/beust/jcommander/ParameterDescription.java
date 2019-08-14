@@ -105,7 +105,7 @@ public class ParameterDescription {
   }
 
   /**
-   * Initializes the state of this parameter description. This will set an appropriate bundle if it is <tt>null</tt>.
+   * Initializes the state of this parameter description. This will set an appropriate bundle if it is null<.
    * If its the description in is empty and it refers to an enum type, then the description will be set to its possible
    * values. It will also attempt to validate the default value of the parameter.
    *

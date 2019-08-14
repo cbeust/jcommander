@@ -59,7 +59,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
     /**
      * Store the usage for the command in the argument string builder, indenting every line with the
-     * value of <tt>indent</tt>.
+     * value of indent.
      */
     public final void usage(String commandName, StringBuilder out, String indent) {
         String description = getCommandDescription(commandName);
@@ -127,7 +127,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
     /**
      * Appends the main line segment of the usage to the argument string builder, indenting every
-     * line with <tt>indentCount</tt>-many <tt>indent</tt>.
+     * line with indentCount-many indent.
      *
      * @param out the builder to append to
      * @param hasOptions if the options section should be appended
@@ -159,7 +159,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
     /**
      * Appends the details of all parameters in the given order to the argument string builder, indenting every
-     * line with <tt>indentCount</tt>-many <tt>indent</tt>.
+     * line with indentCount-many indent<.
      *
      * @param out the builder to append to
      * @param indentCount the amount of indentation to apply
@@ -234,7 +234,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
     /**
      * Appends the details of all commands to the argument string builder, indenting every line with
-     * <tt>indentCount</tt>-many <tt>indent</tt>. The commands are obtained from calling
+     * indentCount-many indent. The commands are obtained from calling
      * {@link JCommander#getRawCommands()} and the commands are resolved using
      * {@link JCommander#findCommandByAlias(String)} on the underlying commander instance.
      *
@@ -355,9 +355,9 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Returns the internationalized version of the string if available, otherwise it returns <tt>def</tt>.
+     * Returns the internationalized version of the string if available, otherwise it returns def.
      *
-     * @return the internationalized version of the string if available, otherwise it returns <tt>def</tt>
+     * @return the internationalized version of the string if available, otherwise it returns def
      */
     public static String getI18nString(ResourceBundle bundle, String key, String def) {
         String s = bundle != null ? bundle.getString(key) : null;
@@ -365,9 +365,9 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Returns <tt>count</tt>-many spaces.
+     * Returns count-many spaces.
      *
-     * @return <tt>count</tt>-many spaces
+     * @return count<-many spaces
      */
     public static String s(int count) {
         StringBuilder result = new StringBuilder();
@@ -379,9 +379,9 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Returns new line followed by <tt>indent</tt>-many spaces.
+     * Returns new line followed by indent-many spaces.
      *
-     * @return new line followed by <tt>indent</tt>-many spaces
+     * @return new line followed by indent-many spaces
      */
     private static String newLineAndIndent(int indent) {
         return "\n" + s(indent);

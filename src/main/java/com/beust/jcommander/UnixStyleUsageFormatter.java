@@ -34,7 +34,7 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
 
     /**
      * Appends the details of all parameters in the given order to the argument string builder, indenting every
-     * line with <tt>indentCount</tt>-many <tt>indent</tt>.
+     * line with indentCount-many indent.
      *
      * @param out the builder to append to
      * @param indentCount the amount of indentation to apply

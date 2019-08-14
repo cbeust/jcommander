@@ -1028,7 +1028,7 @@ public class JCommander {
      * Sets the usage formatter.
      *
      * @param usageFormatter the usage formatter
-     * @throws IllegalArgumentException if the argument is <tt>null</tt>
+     * @throws IllegalArgumentException if the argument is null
      **/
     public void setUsageFormatter(IUsageFormatter usageFormatter) {
         if (usageFormatter == null)

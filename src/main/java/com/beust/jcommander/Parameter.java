@@ -70,15 +70,15 @@ public @interface Parameter {
   boolean password() default false;
 
   /**
-   * The string converter to use for this field. If the field is of type <tt>List</tt>
-   * and not <tt>listConverter</tt> attribute was specified, JCommander will split
+   * The string converter to use for this field. If the field is of type List
+   * and not listConverter attribute was specified, JCommander will split
    * the input in individual values and convert each of them separately.
    */
   Class<? extends IStringConverter<?>> converter() default NoConverter.class;
 
   /**
    * The list string converter to use for this field. If it's specified, the
-   * field has to be of type <tt>List</tt> and the converter needs to return
+   * field has to be of type List and the converter needs to return
    * a List that's compatible with that type.
    */
   Class<? extends IStringConverter<?>> listConverter() default NoConverter.class;
@@ -104,7 +104,7 @@ public @interface Parameter {
   boolean variableArity() default false;
 
   /**
-   * What splitter to use (applicable only on fields of type <tt>List</tt>). By default,
+   * What splitter to use (applicable only on fields of type List). By default,
    * a comma separated splitter will be used.
    */
   Class<? extends IParameterSplitter> splitter() default CommaParameterSplitter.class;
