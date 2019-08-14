@@ -12,7 +12,13 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version = '1.72'
+allprojects {
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+version = '1.75'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
