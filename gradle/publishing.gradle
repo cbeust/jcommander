@@ -8,6 +8,7 @@ ext {
 }
 
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 apply plugin: 'com.jfrog.bintray'
 
 jar {
@@ -23,21 +24,139 @@ jar {
     }
 }
 
+task source2Jar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier "sources"
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier "javadoc"
+}
+
+
 publishing {
     publications {
         mavenCustom(MavenPublication) {
+            customizePom(pom)
             from components.java
-            artifact sourceJar
-
             groupId 'com.beust'
             artifactId 'jcommander'
             version project.version
+            artifact javadocJar
+            artifact source2Jar
+
+            // create the sign pom artifact
+//            pom.withXml {
+//                def pomFile = file("${project.buildDir}/generated-pom.xml")
+//                writeTo(pomFile)
+//                def pomAscFile = signing.sign(pomFile).signatureFiles[0]
+//                artifact(pomAscFile) {
+//                    classifier = null
+//                    extension = 'pom.asc'
+//                }
+//            }
+
+            // create the signed artifacts
+//            project.tasks.signArchives.signatureFiles.each {
+//                artifact(it) {
+//                    def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
+//                    if (matcher.find()) {
+//                        classifier = matcher.group(1)
+//                    } else {
+//                        classifier = null
+//                    }
+//                    extension = 'jar.asc'
+//                }
+//            }
+        }
+
 
 //            pom.withXml {
 //                asNode().children().last() + pomConfig
 //            }
+    }
+
+    repositories {
+        maven {
+            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username sonatypeUser
+                password sonatypePassword
+            }
         }
     }
+}
+
+//signing.keyId='MY_KEY'
+//signing.password='MY_SECRET'
+//signing.secretKeyRingFile="~/.gnupg/secring.gpg"
+
+
+signing {
+    sign publishing.publications.mavenCustom
+    required = true
+}
+
+model {
+    tasks.generatePomFileForMavenCustomPublication {
+        destination = file("$buildDir/generated-pom.xml")
+    }
+    tasks.publishMavenCustomPublicationToMavenLocal {
+        dependsOn project.tasks.signArchives
+    }
+    tasks.publishMavenCustomPublicationToMavenRepository {
+        dependsOn project.tasks.signArchives
+    }
+}
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        // eliminate test-scoped dependencies (no need in maven central POMs)
+        root.dependencies.removeAll { dep ->
+            dep.scope == "test"
+        }
+
+        // add all items necessary for maven central publication
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            description 'Command line arguments parser for Java'
+            name 'JCommander'
+            url 'https://jcommander.org'
+            organization {
+                name 'Cedric Beust'
+                url 'https://github.com/cbeust/jcommander'
+            }
+            issueManagement {
+                system 'GitHub'
+                url 'https://github.com/cbeust/jcommander/issues'
+            }
+            licenses {
+                license {
+                    name 'Apache License 2.0'
+                    url 'https://github.com/cbeust/jcommander/blob/master/license.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                url 'https://github.com/cbeust/jcommander'
+                connection 'scm:git:git://github.com/cbeust/jcommander.git'
+                developerConnection 'scm:git:ssh://git@github.com:cbeust/jcommander.git'
+            }
+            developers {
+                developer {
+                    name 'Cedric Beust'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign configurations.archives
 }
 
 task install(dependsOn: publishToMavenLocal)
@@ -61,3 +180,4 @@ bintray {
         }
     }
 }
+
