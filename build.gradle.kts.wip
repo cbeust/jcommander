@@ -1,0 +1,114 @@
+
+
+val jcommanderVersion = "1.76"
+
+allprojects {
+    group = "com.beust"
+    version = jcommanderVersion
+    apply<MavenPublishPlugin>()
+    tasks.withType<Javadoc> {
+        options {
+            quiet()
+//            outputLevel = JavadocOutputLevel.QUIET
+//            jFlags = listOf("-Xdoclint:none", "foo")
+//            "-quiet"
+        }
+    }
+}
+
+buildscript {
+    val kotlinVer by extra { "1.3.41" }
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { setUrl("https://plugins.gradle.org/m2") }
+    }
+
+    dependencies {
+        classpath(kotlin("gradle-plugin", kotlinVer))
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { setUrl("https://plugins.gradle.org/m2") }
+}
+
+plugins {
+    java
+    "java-library"
+    "maven-publish"
+    id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
+}
+
+val kotlinVer by extra { "1.3.41" }
+
+dependencies {
+    listOf("org.testng:testng:7.0.0")
+        .forEach { testCompile(it) }
+}
+
+//
+// Bintray release.
+//
+bintray {
+    user = project.findProperty("bintray.user")?.toString()
+    key = project.findProperty("bintray.apikey")?.toString()
+    dryRun = false
+    publish = true
+
+    setPublications("custom")
+
+    with(pkg) {
+        repo = "maven"
+        name = "jcommander"
+        with(version) {
+            name = jcommanderVersion
+            desc = "Command line parsing library for Java"
+            with(gpg) {
+                sign = true
+            }
+        }
+    }
+}
+
+val sourcesJar by tasks.creating(Jar::class) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = "Assembles sources JAR"
+    archiveClassifier.set("sources")
+    from(sourceSets.getByName("main").allSource)
+}
+
+//(tasks["javadoc"] as org.gradle.api.tasks.javadoc.Javadoc)
+//        .options.addStringOption("Xdoclint:none", "-quiet")
+
+val javadocJar by tasks.creating(Jar::class) {
+    from(tasks.javadoc)
+    archiveClassifier.set("javadoc")
+}
+
+configure<PublishingExtension> {
+    publications {
+        create<MavenPublication>("custom") {
+            groupId = "com.beust"
+            artifactId = "jcommander"
+            version = project.version.toString()
+            afterEvaluate {
+                from(components["java"])
+            }
+            artifact(sourcesJar)
+            artifact(javadocJar)
+        }
+    }
+
+    repositories {
+        mavenLocal()
+        maven {
+            name = "myRepo"
+            url = uri("file://${buildDir}/repo")
+        }
+    }
+}
+
