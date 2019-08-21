@@ -21,7 +21,7 @@ package com.beust.jcommander;
 /**
  * The class used to validate parameters.
  *
- * @author Cedric Beust <cedric@beust.com>
+ * @author Cedric Beust &lt;cedric@beust.com&gt;
  */
 public interface IParameterValidator {
 

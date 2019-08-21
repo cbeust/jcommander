@@ -159,7 +159,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
     /**
      * Appends the details of all parameters in the given order to the argument string builder, indenting every
-     * line with indentCount-many indent<.
+     * line with indentCount-many indent.
      *
      * @param out the builder to append to
      * @param indentCount the amount of indentation to apply
@@ -341,7 +341,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Wrap a potentially long line to {@link #commander#getColumnSize()}.
+     * Wrap a potentially long line to { @link #commander#getColumnSize()}.
      *
      * @param out         the output
      * @param indent      the indentation in spaces for lines after the first line.
@@ -367,7 +367,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     /**
      * Returns count-many spaces.
      *
-     * @return count<-many spaces
+     * @return count-many spaces
      */
     public static String s(int count) {
         StringBuilder result = new StringBuilder();

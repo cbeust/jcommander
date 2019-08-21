@@ -33,7 +33,7 @@ package com.beust.jcommander;
  */
 public interface IStringConverter<T> {
   /**
-   * @return an object of type <T> created from the parameter value.
+   * @return an object of type T created from the parameter value.
    */
   T convert(String value);
 }
