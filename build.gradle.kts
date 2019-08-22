@@ -1,6 +1,6 @@
 
 
-val jcommanderVersion = "1.77"
+val jcommanderVersion = "1.78"
 
 allprojects {
     group = "com.beust"

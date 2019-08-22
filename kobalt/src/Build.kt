@@ -13,7 +13,7 @@ val jcommander = project {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.77"
+    version = "1.78"
     description = "A Java library to parse command line options"
 
     dependenciesTest {
