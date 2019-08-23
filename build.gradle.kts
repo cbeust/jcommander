@@ -17,17 +17,11 @@ allprojects {
 }
 
 buildscript {
-    val kotlinVer by extra { "1.3.41" }
-
     repositories {
         jcenter()
         mavenCentral()
         maven { setUrl("https://plugins.gradle.org/m2") }
     }
-
-//    dependencies {
-//        classpath(kotlin("gradle-plugin", kotlinVer))
-//    }
 }
 
 java {
@@ -48,8 +42,6 @@ plugins {
     signing
     id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
 }
-
-val kotlinVer by extra { "1.3.41" }
 
 dependencies {
     listOf("org.testng:testng:7.0.0")
