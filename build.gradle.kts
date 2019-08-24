@@ -1,10 +1,23 @@
 
 
-val jcommanderVersion = "1.78"
+object This {
+    val version = "1.79"
+    val artifactId = "jcommander"
+    val groupId = "com.beust"
+    val description = "Command line parsing library for Java"
+    val url = "https://jcommander.org"
+    val scm = "github.com/cbeust/jcommander"
+
+    // Should not need to change anything below
+    val issueManagementUrl = "https://$scm/issues"
+}
+
+
+val kotlinVersion = "1.3.50"
 
 allprojects {
-    group = "com.beust"
-    version = jcommanderVersion
+    group = This.groupId
+    version = This.version
     apply<MavenPublishPlugin>()
     tasks.withType<Javadoc> {
         options {
@@ -15,6 +28,8 @@ allprojects {
         }
     }
 }
+
+val kotlinVer by extra { kotlinVersion }
 
 buildscript {
     repositories {
@@ -57,17 +72,18 @@ dependencies {
 bintray {
     user = project.findProperty("bintrayUser")?.toString()
     key = project.findProperty("bintrayApiKey")?.toString()
+    println("User: $user $key")
     dryRun = false
-    publish = true
+    publish = false
 
     setPublications("custom")
 
     with(pkg) {
         repo = "maven"
-        name = "jcommander"
+        name = This.artifactId
         with(version) {
-            name = jcommanderVersion
-            desc = "Command line parsing library for Java"
+            name = This.version
+            desc = This.description
             with(gpg) {
                 sign = true
             }
@@ -90,8 +106,8 @@ val javadocJar by tasks.creating(Jar::class) {
 with(publishing) {
     publications {
         create<MavenPublication>("custom") {
-            groupId = "com.beust"
-            artifactId = "jcommander"
+            groupId = This.groupId
+            artifactId = This.artifactId
             version = project.version.toString()
             afterEvaluate {
                 from(components["java"])
@@ -99,9 +115,9 @@ with(publishing) {
             artifact(sourcesJar)
             artifact(javadocJar)
             pom {
-                name.set("jcommander")
-                description.set("Command line parser library for Java")
-                url.set("https://jcommander.org")
+                name.set(This.artifactId)
+                description.set(This.description)
+                url.set(This.url)
                 licenses {
                     license {
                         name.set("Apache License, Version 2.0")
@@ -110,7 +126,7 @@ with(publishing) {
                 }
                 issueManagement {
                     system.set("Github")
-                    url.set("https://github.com/cbeust/jcommander/issues")
+                    url.set(This.issueManagementUrl)
                 }
                 developers {
                     developer {
@@ -120,8 +136,8 @@ with(publishing) {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/jcommander.git")
-                    url.set("https://github.com/jcommander/")
+                    connection.set("scm:git:git://${This.scm}.git")
+                    url.set("https://${This.scm}")
                 }
             }
         }
@@ -131,7 +147,7 @@ with(publishing) {
         mavenLocal()
         maven {
             name = "sonatype"
-            url = if (false) // isSnapshot
+            url = if (This.version.contains("SNAPSHOT"))
                 uri("https://oss.sonatype.org/content/repositories/snapshots/") else
                 uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
