@@ -72,7 +72,6 @@ dependencies {
 bintray {
     user = project.findProperty("bintrayUser")?.toString()
     key = project.findProperty("bintrayApiKey")?.toString()
-    println("User: $user $key")
     dryRun = false
     publish = false
 
