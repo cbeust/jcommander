@@ -20,6 +20,7 @@
       <class name="com.beust.jcommander.DefaultUsageFormatterTest" />
       <class name="com.beust.jcommander.UnixStyleUsageFormatterTest" />
       <class name="com.beust.jcommander.StringsTest" />
+      <class name="com.beust.jcommander.defaultprovider.EnvironmentVariableDefaultProviderTest" />
     </classes>
   </test>
 
