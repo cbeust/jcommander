@@ -349,6 +349,25 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);
 
 Another advantage of using string converter factories is that your factories can come from a dependency injection framework.
 
+==== By convention
+
+If your custom type has either a public static method called *valueOf* which takes exactly one string parameter and
+return an object of the self type, or if your custom type has a public constructor which again take exactly one string parameter,
+these methods will be used to convert a string representation to your type. if both are available the valueOf method will be used.
+
+[source,java]
+----
+public class MyType {
+    public MyType(String aValue) {
+        //
+    }
+
+    public static MyType valueOf(String aValue) {
+        //
+    }
+}
+----
+
 [[list-value]]
 === Custom types - List value
 
