@@ -1020,10 +1020,10 @@ class Args {
     @Parameter
     var targets: List<String> = arrayListOf()
 
-    @Parameter(names = arrayOf("-bf", "--buildFile"), description = "The build file")
+    @Parameter(names = ["-bf", "--buildFile"], description = "The build file")
     var buildFile: String? = null
 
-    @Parameter(names = arrayOf("--checkVersions"),
+    @Parameter(names = ["--checkVersions"],
                description = "Check if there are any newer versions of the dependencies")
     var checkVersions = false
 }
