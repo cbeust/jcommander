@@ -7,5 +7,6 @@ before_install:
 
 install: true
 
-script: ./kobaltw assemble test
+script: ./gradlew assemble test
+
 
