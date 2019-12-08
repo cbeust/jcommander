@@ -48,6 +48,6 @@ The full doc is available at [https://jcommander.org](https://jcommander.org).
 ## Building JCommander
 
 ```
-./kobaltw assemble
+./gradlew assemble
 ```
 
