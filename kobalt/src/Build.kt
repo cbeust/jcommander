@@ -32,7 +32,7 @@ val jcommander = project {
     }
 
     javaCompiler {
-        args("-target", "1.7", "-source", "1.7", "-g", "-encoding", "utf-8")
+        args("-target", "1.8", "-source", "1.8", "-g", "-encoding", "utf-8")
     }
 
     osgi {}
