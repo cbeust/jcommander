@@ -359,7 +359,7 @@ public class JCommander {
 
     private void initializeDefaultValues() {
         if (options.defaultProvider != null) {
-            for (ParameterDescription pd : descriptions.values()) {
+            for (ParameterDescription pd : new HashSet<>(descriptions.values())) {
                 initializeDefaultValue(pd);
             }
 
