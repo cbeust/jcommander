@@ -20,6 +20,8 @@ package com.beust.jcommander.defaultprovider;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,21 +85,27 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
     }
 
     @Override
-    public final String getDefaultValueFor(final String optionName) {
+    public final List<String> getDefaultValueFor(final String optionName) {
+        final List<String> result = new ArrayList<>();
+
         if (this.environmentVariableValue == null)
-            return null;
+            return result;
         final Matcher matcher = Pattern
                 .compile("(?:(?:.*\\s+)|(?:^))(" + Pattern.quote(optionName) + ")\\s*((?:'[^']*(?='))|(?:\"[^\"]*(?=\"))|(?:[^" + this.optionPrefixesPattern + "\\s]+))?.*")
                 .matcher(this.environmentVariableValue);
         if (!matcher.matches())
-            return null;
+            return result;
         String value = matcher.group(2);
-        if (value == null)
-            return "true";
+        if (value == null) {
+            result.add("true");
+            return result;
+        }
         final char firstCharacter = value.charAt(0);
         if (firstCharacter == '\'' || firstCharacter == '"')
-            value = value.substring(1);
-        return value;
+            result.add(value.substring(1));
+
+
+        return result;
     }
 
 }

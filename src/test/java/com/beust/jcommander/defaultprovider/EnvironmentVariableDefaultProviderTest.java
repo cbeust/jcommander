@@ -36,11 +36,11 @@ public final class EnvironmentVariableDefaultProviderTest {
 		final IDefaultProvider defaultProvider = new EnvironmentVariableDefaultProvider(null, "-", variableResolver);
 
 		// when
-		final String nonExistentValue = defaultProvider.getDefaultValueFor("--non-existent-option");
-		final String someOption = defaultProvider.getDefaultValueFor("--some-option");
-		final String simpleValue = defaultProvider.getDefaultValueFor("--simple-value");
-		final String quotedValue = defaultProvider.getDefaultValueFor("--quoted-value");
-		final String doubleQuotedValue = defaultProvider.getDefaultValueFor("--double-quoted-value");
+		final String nonExistentValue = defaultProvider.getDefaultValueFor("--non-existent-option").get(0);
+		final String someOption = defaultProvider.getDefaultValueFor("--some-option").get(0);
+		final String simpleValue = defaultProvider.getDefaultValueFor("--simple-value").get(0);
+		final String quotedValue = defaultProvider.getDefaultValueFor("--quoted-value").get(0);
+		final String doubleQuotedValue = defaultProvider.getDefaultValueFor("--double-quoted-value").get(0);
 
 		// then
 		assertNull(nonExistentValue);

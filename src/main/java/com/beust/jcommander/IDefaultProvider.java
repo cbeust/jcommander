@@ -18,6 +18,8 @@
 
 package com.beust.jcommander;
 
+import java.util.List;
+
 /**
  * Allows the specification of default values.
  * 
@@ -31,5 +33,5 @@ public interface IDefaultProvider {
    * 
    * @return the default value for this option.
    */
-  String getDefaultValueFor(String optionName);
+  List<String> getDefaultValueFor(String optionName);
 }

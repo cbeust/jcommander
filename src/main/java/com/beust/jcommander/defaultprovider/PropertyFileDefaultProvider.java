@@ -23,6 +23,8 @@ import com.beust.jcommander.ParameterException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -57,14 +59,20 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
       throw new ParameterException("Could not open property file: " + fileName);
     }
   }
-  
-  public String getDefaultValueFor(String optionName) {
+
+  @Override
+  public final List<String> getDefaultValueFor(final String optionName) {
+    final List<String> result = new ArrayList<>();
+
     int index = 0;
     while (index < optionName.length() && ! Character.isLetterOrDigit(optionName.charAt(index))) {
       index++;
     }
     String key = optionName.substring(index);
-    return properties.getProperty(key);
+
+    result.add(properties.getProperty(key));
+
+    return result;
   }
 
 }
