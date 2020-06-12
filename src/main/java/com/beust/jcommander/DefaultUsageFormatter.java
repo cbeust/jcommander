@@ -20,8 +20,8 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.internal.Lists;
 
-import java.util.*;
 import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * The default usage formatter.
@@ -246,8 +246,12 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     public void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
         out.append(indent + "  Commands:\n");
 
+        // sort the commands by command name
+        final Map<JCommander.ProgramName, JCommander> sortedRawCommands = new TreeMap<>(Comparator.comparing(JCommander.ProgramName::getName));
+        sortedRawCommands.putAll(commander.getRawCommands());
+
         // The magic value 3 is the number of spaces between the name of the option and its description
-        for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
+        for (Map.Entry<JCommander.ProgramName, JCommander> commands : sortedRawCommands.entrySet()) {
             Object arg = commands.getValue().getObjects().get(0);
             Parameters p = arg.getClass().getAnnotation(Parameters.class);
 
