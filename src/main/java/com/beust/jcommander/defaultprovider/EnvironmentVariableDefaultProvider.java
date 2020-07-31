@@ -60,7 +60,7 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
      *  
      * @param environmentVariableName
      *            The name of the environment variable to read (e. g. {@code "JCOMMANDER_OPTS"}). Must not be {@code null}.
-     * @param optionPrefix
+     * @param optionPrefixes
      *            A set of characters used to indicate the start of an option (e. g. {@code "-/"} if option names may start with either dash or slash). Must not be {@code null}.
      */
     public EnvironmentVariableDefaultProvider(final String environmentVariableName, final String optionPrefixes) {
@@ -72,7 +72,7 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
      *
      * @param environmentVariableName
      *            The name of the environment variable to read. May be {@code null} if the passed resolver doesn't use it (e. g. Unit Test).
-     * @param optionPrefix
+     * @param optionPrefixes
      *            A set of characters used to indicate the start of an option (e. g. {@code "-/"} if option names may start with either dash or slash). Must not be {@code null}.
      * @param resolver
      *            Reads the value from the environment variable (e. g. {@code System::getenv}). Must not be {@code null}.
