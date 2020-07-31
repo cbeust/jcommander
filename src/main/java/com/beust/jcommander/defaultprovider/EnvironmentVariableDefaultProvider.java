@@ -18,13 +18,13 @@
 
 package com.beust.jcommander.defaultprovider;
 
-import static java.util.Objects.requireNonNull;
+import com.beust.jcommander.IDefaultProvider;
 
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.beust.jcommander.IDefaultProvider;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A default provider that reads its default values from an environment
