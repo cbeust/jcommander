@@ -62,7 +62,7 @@ JCommander.newBuilder()
   .build()
   .parse(argv);
  
-Assert.assertEquals(jct.verbose.intValue(), 2);
+Assert.assertEquals(args.verbose.intValue(), 2);
 ----
 
 Here is another example:
