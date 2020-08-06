@@ -60,7 +60,7 @@ plugins {
 
 dependencies {
     listOf("org.testng:testng:7.0.0")
-        .forEach { testCompile(it) }
+        .forEach { testImplementation(it) }
 }
 
 //
