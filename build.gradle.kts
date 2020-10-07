@@ -56,6 +56,22 @@ plugins {
     `maven-publish`
     signing
     id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
+    id("biz.aQute.bnd.builder") version "5.1.2"
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes(
+                mapOf(
+                    "Bundle-Description" to "A Java library to parse command line options",
+                    "Bundle-License" to "http://www.apache.org/licenses/LICENSE-2.0.txt",
+                    "Bundle-Name" to "com.beust.jcommander",
+                    "Export-Package" to "*;-split-package:=merge-first;-noimport:=true"
+                )
+            )
+        }
+    }
 }
 
 dependencies {
