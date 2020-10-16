@@ -39,11 +39,6 @@ buildscript {
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 repositories {
     jcenter()
     mavenCentral()
@@ -87,6 +82,37 @@ bintray {
                 sign = true
             }
         }
+    }
+}
+
+
+val compileJavaSource = tasks.create("compileJavaSource", JavaCompile::class) {
+    excludes.add("module-info.java")
+    val sourcedirectorySet = sourceSets.named("main").get().java
+    sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+    targetCompatibility = JavaVersion.VERSION_1_8.toString()
+    source = sourcedirectorySet
+    destinationDirectory.set(sourcedirectorySet.destinationDirectory)
+    classpath = sourceSets.named("main").get().compileClasspath
+}
+
+val compileModuleInfo = tasks.create("compileModuleInfo", JavaCompile::class) {
+    val sourcedirectorySet = sourceSets.named("main").get().java
+    dependsOn(compileJavaSource)
+    includes.add("module-info.java")
+    sourceCompatibility = JavaVersion.VERSION_11.toString()
+    targetCompatibility = JavaVersion.VERSION_11.toString()
+    source = sourcedirectorySet
+    destinationDirectory.set(sourcedirectorySet.destinationDirectory)
+    classpath = sourceSets.named("main").get().compileClasspath
+}
+
+tasks.named("compileJava", JavaCompile::class.java) {
+    excludes.add("**/*.java")
+    if(JavaVersion.current().isJava9Compatible) {
+        dependsOn(compileModuleInfo)
+    } else {
+        dependsOn(compileJavaSource)
     }
 }
 
