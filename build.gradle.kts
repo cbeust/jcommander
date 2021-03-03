@@ -111,6 +111,7 @@ with(publishing) {
             afterEvaluate {
                 from(components["java"])
             }
+            suppressAllPomMetadataWarnings()
             artifact(sourcesJar)
             artifact(javadocJar)
             pom {
@@ -120,7 +121,7 @@ with(publishing) {
                 licenses {
                     license {
                         name.set("Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
                 issueManagement {
@@ -143,7 +144,6 @@ with(publishing) {
     }
 
     repositories {
-        mavenLocal()
         maven {
             name = "sonatype"
             url = if (This.version.contains("SNAPSHOT"))
