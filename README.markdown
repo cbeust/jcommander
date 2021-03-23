@@ -1,6 +1,9 @@
 JCommander
 ==========
 
+![Bintray](https://img.shields.io/bintray/dt/cbeust/maven/jcommander)
+![Bintray](https://img.shields.io/bintray/v/cbeust/maven/jcommander)
+
 This is an annotation based parameter parsing framework for Java 8.
 
 Here is a quick example:
