@@ -574,17 +574,6 @@ public class JCommander {
     }
 
     /**
-     * Remove spaces at both ends and handle double quotes.
-     */
-    private static String trim(String string) {
-        String result = string.trim();
-        if (result.startsWith("\"") && result.endsWith("\"") && result.length() > 1) {
-            result = result.substring(1, result.length() - 1);
-        }
-        return result;
-    }
-
-    /**
      * Create the ParameterDescriptions for all the \@Parameter found.
      */
     public void createDescriptions() {
@@ -688,18 +677,16 @@ public class JCommander {
         int i = 0;
         boolean isDashDash = false; // once we encounter --, everything goes into the main parameter
         while (i < args.length && !commandParsed) {
-            String arg = args[i];
-            String a = trim(arg);
-            args[i] = a;
-            p("Parsing arg: " + a);
+            String arg = (args[i]).trim();
+            p("Parsing arg: " + arg);
 
             JCommander jc = findCommandByAlias(arg);
             int increment = 1;
-            if (!isDashDash && !"--".equals(a) && isOption(a) && jc == null) {
+            if (!isDashDash && !"--".equals(arg) && isOption(arg) && jc == null) {
                 //
                 // Option
                 //
-                ParameterDescription pd = findParameterDescription(a);
+                ParameterDescription pd = findParameterDescription(arg);
 
                 if (pd != null) {
                     if (pd.getParameter().password()) {
@@ -753,7 +740,7 @@ public class JCommander {
                     // Regular (non-command) parsing
                     //
                     initMainParameterValue(arg);
-                    String value = a; // If there's a non-quoted version, prefer that one
+                    String value = arg; // If there's a non-quoted version, prefer that one
                     Object convertedValue = value;
 
                     // Fix
