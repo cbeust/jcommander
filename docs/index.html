@@ -1697,8 +1697,10 @@ private String host;</code></pre>
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
   @Override
-  public String getDefaultValueFor(String optionName) {
-    return "-debug".equals(optionName) ? "false" : "42";
+  public List<String> getDefaultValueFor(String optionName) {
+    final List<String> result = new ArrayList<>();
+    result.add("-debug".equals(optionName) ? "false" : "42");
+    return result;
   }
 };
 

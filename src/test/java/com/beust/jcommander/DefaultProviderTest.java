@@ -24,11 +24,16 @@ import com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DefaultProviderTest {
   private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
 
-    public String getDefaultValueFor(String optionName) {
-      return "-debug".equals(optionName) ? "false" : "42";
+    public List<String> getDefaultValueFor(String optionName) {
+      final List<String> result = new ArrayList<>();
+      result.add("-debug".equals(optionName) ? "false" : "42");
+      return result;
     }
     
   };
@@ -125,8 +130,10 @@ public class DefaultProviderTest {
     }
 
     IDefaultProvider defaultProvider = new IDefaultProvider() {
-      public String getDefaultValueFor(String optionName) {
-        return "-log".equals(optionName) ? "1" : "";
+      public List<String> getDefaultValueFor(String optionName) {
+        final List<String> result = new ArrayList<>();
+        result.add("-log".equals(optionName) ? "1" : "");
+        return result;
       }
     };
 

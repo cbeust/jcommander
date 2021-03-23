@@ -654,8 +654,10 @@ For example, here is a default provider that will assign a default value of 42 f
 <pre class="brush: java">
 private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
   @Override
-  public String getDefaultValueFor(String optionName) {
-    return "-debug".equals(optionName) ? "false" : "42";
+  public List<String> getDefaultValueFor(String optionName) {
+    final List<String> result = new ArrayList<>();
+    result.add("-debug".equals(optionName) ? "false" : "42");
+    return result;
   }
 };
 

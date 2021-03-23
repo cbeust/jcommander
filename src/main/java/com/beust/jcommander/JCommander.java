@@ -666,13 +666,17 @@ public class JCommander {
 
     private void initializeDefaultValue(ParameterDescription pd) {
         for (String optionName : pd.getParameter().names()) {
-            String def = options.defaultProvider.getDefaultValueFor(optionName);
-            if (def != null) {
-                p("Initializing " + optionName + " with default value:" + def);
-                pd.addValue(def, true /* default */);
-                // remove the parameter from the list of fields to be required
-                requiredFields.remove(pd.getParameterized());
-                return;
+            List<String> defs = options.defaultProvider.getDefaultValueFor(optionName);
+            if (defs != null) {
+                for (String def : defs) {
+                    if (def != null) {
+                        p("Initializing " + optionName + " with default value:" + def);
+                        pd.addValue(def, true /* default */);
+                        // remove the parameter from the list of fields to be required
+                        requiredFields.remove(pd.getParameterized());
+                        return;
+                    }
+                }
             }
         }
     }
