@@ -19,10 +19,9 @@
 package com.beust.jcommander.args;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ResourceBundle;
+import com.beust.jcommander.Parameters;
 
-@SuppressWarnings("deprecation")
-@ResourceBundle("MessageBundle")
+@Parameters(resourceBundle = "MessageBundle")
 public class ArgsI18N2 {
 
   @Parameter(names = "-host", description = "Host", descriptionKey = "host")
