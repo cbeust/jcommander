@@ -18,6 +18,7 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.parser.DefaultParameterizedParser;
 import com.beust.jcommander.FuzzyMap.IKey;
 import com.beust.jcommander.converters.*;
 import com.beust.jcommander.internal.*;
@@ -46,6 +47,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class JCommander {
     public static final String DEBUG_PROPERTY = "jcommander.debug";
+    
+    protected IParameterizedParser parameterizedParser = new DefaultParameterizedParser();
 
     /**
      * A map to look up parameter description per option name.
@@ -264,6 +267,10 @@ public class JCommander {
         parse(args);
     }
 
+  public void setParameterizedParser(IParameterizedParser parameterizedParser) {
+    this.parameterizedParser = parameterizedParser;
+  }    
+    
     /**
      * Disables expanding {@code @file}.
      *
@@ -598,7 +605,7 @@ public class JCommander {
     private void addDescription(Object object) {
         Class<?> cls = object.getClass();
 
-        List<Parameterized> parameterizeds = Parameterized.parseArg(object);
+        List<Parameterized> parameterizeds = this.parameterizedParser.parseArg(object);
         for (Parameterized parameterized : parameterizeds) {
             WrappedParameter wp = parameterized.getWrappedParameter();
             if (wp != null && wp.getParameter() != null) {
