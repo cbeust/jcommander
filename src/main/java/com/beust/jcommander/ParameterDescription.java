@@ -300,7 +300,10 @@ public class ParameterDescription {
           objectValue = type.newInstance();
           parameterized.set(object, objectValue);
         }
+        boolean access = sai.field.isAccessible();
+        sai.field.setAccessible(true); // before using the field, set accessible to true
         wrappedParameter.addValue(parameterized, objectValue, value, sai.field);
+        sai.field.setAccessible(access); // after using the field, set accessible to origin
         finalValue = objectValue;
       } catch (InstantiationException | IllegalAccessException e) {
         throw new ParameterException("Couldn't instantiate " + type, e);
