@@ -169,7 +169,10 @@ public class ParameterDescription {
   }
 
   public Object getDefault() {
-   return defaultObject;
+   String defaultDescription = parameterAnnotation.defaultValueDescription();
+   if (defaultDescription.isEmpty())
+     return defaultObject;
+   return defaultDescription;
   }
 
   public String getDescription() {
