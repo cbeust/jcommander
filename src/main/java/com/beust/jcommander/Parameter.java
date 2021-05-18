@@ -45,11 +45,6 @@ public @interface Parameter {
    * A description of this option.
    */
   String description() default "";
-
-  /**
-   * Description of default value.
-   */
-  String defaultValueDescription() default "";
   
   /**
    * Whether this option is required.
