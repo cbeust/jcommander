@@ -45,7 +45,7 @@ public @interface Parameter {
    * A description of this option.
    */
   String description() default "";
-  
+
   /**
    * Whether this option is required.
    */
