@@ -47,6 +47,11 @@ public @interface Parameter {
   String description() default "";
 
   /**
+   * Description of default value.
+   */
+  String defaultValueDescription() default "";
+  
+  /**
    * Whether this option is required.
    */
   boolean required() default false;
