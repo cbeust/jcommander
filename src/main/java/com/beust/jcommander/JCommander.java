@@ -1302,11 +1302,11 @@ public class JCommander {
         }
 
         IStringConverter<?> converter = null;
-        if (type.isAssignableFrom(List.class)) {
+        if (type.isAssignableFrom(List.class) || type.isAssignableFrom(Set.class)) {
             // If a list converter was specified, pass the value to it for direct conversion
             converter = tryInstantiateConverter(optionName, annotation.listConverter());
         }
-        if (type.isAssignableFrom(List.class) && converter == null) {
+        if ((type.isAssignableFrom(List.class) || type.isAssignableFrom(Set.class)) && converter == null) {
             // No list converter: use the single value converter and pass each parsed value to it individually
             final IParameterSplitter splitter = tryInstantiateConverter(null, annotation.splitter());
             converter = new DefaultListConverter(splitter, new IStringConverter() {
