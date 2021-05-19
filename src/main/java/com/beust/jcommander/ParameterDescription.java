@@ -168,11 +168,15 @@ public class ParameterDescription {
     return longestName;
   }
 
+  /**
+   * @return defaultValueDescription, if description is empty string, return default Object.
+   */
   public Object getDefault() {
    String defaultDescription = parameterAnnotation.defaultValueDescription();
    if (defaultDescription.isEmpty())
      return defaultObject;
-   return defaultDescription;
+   else
+     return defaultDescription;
   }
 
   public String getDescription() {
