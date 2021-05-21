@@ -53,4 +53,11 @@ public @interface DynamicParameter {
    * @return
    */
   int order() default -1;
+
+  /**
+   * If specified, the category name will be used to order the description of this parameter when usage() is invoked before the number order() is used.
+   * @return (default or specified) category name
+   */
+  String category() default "";
+
 }

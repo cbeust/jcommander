@@ -190,6 +190,10 @@ public class ParameterDescription {
     return sb.toString();
   }
 
+  public String getCategory() {
+    return wrappedParameter.category();
+  }
+
   public WrappedParameter getParameter() {
     return wrappedParameter;
   }
