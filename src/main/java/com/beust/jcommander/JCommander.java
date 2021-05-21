@@ -178,6 +178,9 @@ public class JCommander {
             public int compare(ParameterDescription p0, ParameterDescription p1) {
                 WrappedParameter a0 = p0.getParameter();
                 WrappedParameter a1 = p1.getParameter();
+                if (a0 != null && a1 != null && !a0.category().equals(a1.category())) {
+                    return a0.category().compareTo(a1.category());
+                }
                 if (a0 != null && a0.order() != -1 && a1 != null && a1.order() != -1) {
                     return Integer.compare(a0.order(), a1.order());
                 } else if (a0 != null && a0.order() != -1) {

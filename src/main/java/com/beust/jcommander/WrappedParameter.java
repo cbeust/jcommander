@@ -55,6 +55,10 @@ public class WrappedParameter {
     return parameter != null ? parameter.order() : dynamicParameter.order();
   }
 
+  public String category() {
+    return parameter != null ? parameter.category() : dynamicParameter.category();
+  }
+
   public Class<? extends IParameterValidator>[] validateWith() {
     return parameter != null ? parameter.validateWith() : dynamicParameter.validateWith();
   }

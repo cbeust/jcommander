@@ -57,6 +57,38 @@ public class ParameterOrderTest {
     testOrder(new ManualOrder3(), "--arg_a","--arg_b","--arg_c", "--arg_d");
   }
 
+  private static class ManualCategoryOrder1 {
+    @Parameter(names = "--arg_a", category = "Category 1")
+    public boolean isA;
+    @Parameter(names = "--arg_b", category = "Category 2")
+    public boolean isB;
+    @Parameter(names = "--arg_c", category = "Category 1")
+    public boolean isC;
+    @Parameter(names = "--arg_d", category = "Category 2")
+    public boolean isD;
+  }
+
+  @Test
+  public void testCategoryOrder1() {
+    testOrder(new ManualCategoryOrder1(), "--arg_a","--arg_c","--arg_b", "--arg_d");
+  }
+
+  private static class ManualCategoryOrder2 {
+    @Parameter(names = "--arg_a", category = "Category 1", order = 2)
+    public boolean isA;
+    @Parameter(names = "--arg_b", category = "Category 2", order = 2)
+    public boolean isB;
+    @Parameter(names = "--arg_c", category = "Category 1", order = 1)
+    public boolean isC;
+    @Parameter(names = "--arg_d", category = "Category 2", order = 1)
+    public boolean isD;
+  }
+
+  @Test
+  public void testCategoryOrder2() {
+    testOrder(new ManualCategoryOrder2(), "--arg_c","--arg_a","--arg_d", "--arg_b");
+  }
+
   public void testOrder(Object cmd, String ... expected) {
     JCommander commander = new JCommander(cmd);
 

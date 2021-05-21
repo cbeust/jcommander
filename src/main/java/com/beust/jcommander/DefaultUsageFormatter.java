@@ -187,6 +187,19 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             if (hasDescription) {
                 wrapDescription(out, indentCount, s(indentCount) + description);
             }
+
+            String category = pd.getCategory();
+            if (!category.equals("")) {
+                String categoryType = "Category: " + category;
+
+                if (hasDescription) {
+                    out.append(newLineAndIndent(indentCount));
+                } else {
+                    out.append(s(indentCount));
+                }
+                out.append(categoryType);
+            }
+
             Object def = pd.getDefault();
 
             if (pd.isDynamicParameter()) {
