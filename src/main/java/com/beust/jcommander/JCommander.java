@@ -1287,7 +1287,7 @@ public class JCommander {
     }
 
     /**
-     * @param type The type of the actual parameter
+     * @param type The type of the actual parameter.
      * @param optionName
      * @param value The value to convert
      */
@@ -1418,6 +1418,102 @@ public class JCommander {
                 aliasMap.put(alias, progName);
             }
         }
+    }
+
+    /**
+     * This method can create a subcommand for one command.
+     * The used command like this: programName command subcommand --flag
+     * Actually this method is wrap "addCommand", add a command for one command but the main command
+     * @param name the name for subcommand
+     * @param object the class you want to create for subcommand
+     * @param parentCommand the instance of command that you want to add subcommand
+     * @param aliases the aliases for the subcommand
+     **/
+    public void addSubcommand(String name, Object object, JCommander parentCommand, String... aliases){
+        if (parentCommand == null) {
+          throw new MissingCommandException("Expected a command, command not exist");
+        }
+        parentCommand.addCommand(name, object, aliases);
+    }
+
+  /**
+   * his method can create a subcommand for one command.
+   * The used command like this: programName command subcommand --flag
+   * Actually this method is wrap "addCommand", add a command for one command but the main command
+   * @param name the name for subcommand
+   * @param object the class you want to create for subcommand
+   * @param parentCommand the instance of command that you want to add subcommand
+   */
+    public void addSubcommand(String name, Object object, JCommander parentCommand) {
+      addSubcommand(name, object, parentCommand, new String[0]);
+    }
+
+  /**
+   * his method can create a subcommand for one command.
+   * The used command like this: programName command subcommand --flag
+   * Actually this method is wrap "addCommand", add a command for one command but the main command
+   * @param object the class you want to create for subcommand
+   * @param parentCommand the instance of command that you want to add subcommand
+   */
+    public void addSubcommand(Object object, JCommander parentCommand) {
+      Parameters p = object.getClass().getAnnotation(Parameters.class);
+      if (p != null && p.commandNames().length > 0) {
+        for (String commandName : p.commandNames()) {
+          addSubcommand(commandName, object, parentCommand);
+        }
+      } else {
+        throw new ParameterException("Trying to add command " + object.getClass().getName()
+            + " without specifying its names in @Parameters");
+      }
+    }
+
+  /**
+   * This method can create a subcommand for one command.
+   * The used command like this: programName command subcommand --flag
+   * Actually this method is wrap "addCommand", add a command for one command but the main command
+   * @param name the name for subcommand
+   * @param object the class you want to create for subcommand
+   * @param parentCommandName the String name  of command that you want to add subcommand
+   * @param aliases the aliases for the subcommand
+   **/
+    public void addSubcommand(String name, Object object,String parentCommandName, String... aliases){
+      JCommander parentJC = findCommandByAlias(parentCommandName);
+      if (parentJC != null)
+        parentJC.addCommand(name, object, aliases);
+      else {
+        throw new MissingCommandException("Expected a command, " + parentCommandName + " not found");
+      }
+    }
+
+  /**
+   * This method can create a subcommand for one command.
+   * The used command like this: programName command subcommand --flag
+   * Actually this method is wrap "addCommand", add a command for one command but the main command
+   * @param name the name for subcommand
+   * @param object the class you want to create for subcommand
+   * @param parentCommandName the String name  of command that you want to add subcommand
+   **/
+    public void addSubcommand(String name, Object object, String parentCommandName) {
+      addSubcommand(name, object, parentCommandName, new String[0]);
+    }
+
+  /**
+   * This method can create a subcommand for one command.
+   * The used command like this: programName command subcommand --flag
+   * Actually this method is wrap "addCommand", add a command for one command but the main command
+   * @param object the class you want to create for subcommand
+   * @param parentCommandName the String name  of command that you want to add subcommand
+   **/
+    public void addSubcommand(Object object, String parentCommandName) {
+      Parameters p = object.getClass().getAnnotation(Parameters.class);
+      if (p != null && p.commandNames().length > 0) {
+        for (String commandName : p.commandNames()) {
+          addSubcommand(commandName, object, parentCommandName);
+        }
+      } else {
+        throw new ParameterException("Trying to add command " + object.getClass().getName()
+            + " without specifying its names in @Parameters");
+      }
     }
 
     public Map<String, JCommander> getCommands() {
