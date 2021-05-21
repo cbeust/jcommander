@@ -435,8 +435,13 @@ public class JCommander {
         for (String arg : originalArgv) {
 
             if (arg.startsWith("@") && options.expandAtSign) {
-                String fileName = arg.substring(1);
-                vResult1.addAll(readFile(fileName));
+                if(arg.startsWith("@/")){
+                    List<String> expanded = expandDynamicArg(arg.substring(2,arg.length()));
+                    vResult1.addAll(expanded);
+                }else {
+                    String fileName = arg.substring(1);
+                    vResult1.addAll(readFile(fileName));
+                }
             } else {
                 List<String> expanded = expandDynamicArg(arg);
                 vResult1.addAll(expanded);
