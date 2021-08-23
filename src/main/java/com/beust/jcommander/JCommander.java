@@ -1023,6 +1023,41 @@ public class JCommander {
         usageFormatter.usage(sb);
         getConsole().println(sb.toString());
     }
+    
+    /**
+     * Display the usage for this command.
+     */
+    public void usage(String commandName) {
+        StringBuilder sb = new StringBuilder();
+        usageFormatter.usage(commandName, sb);
+        getConsole().println(sb.toString());
+    }
+
+    /**
+     * Store the help for the command in the passed string builder.
+     */
+    public void usage(String commandName, StringBuilder out) {
+        usageFormatter.usage(commandName, out, "");
+    }
+
+    /**
+     * Store the help for the command in the passed string builder, indenting
+     * every line with "indent".
+     */
+    public void usage(String commandName, StringBuilder out, String indent) {
+        usageFormatter.usage(commandName, out, indent);
+    }
+    
+    /**
+     * Store the help in the passed string builder.
+     */
+    public void usage(StringBuilder out) {
+        usageFormatter.usage(out, "");
+    }
+
+    public void usage(StringBuilder out, String indent) {
+        usageFormatter.usage(out, indent);
+    }
 
     /**
      * Sets the usage formatter.
