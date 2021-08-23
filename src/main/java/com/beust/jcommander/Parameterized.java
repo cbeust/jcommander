@@ -146,7 +146,7 @@ public class Parameterized {
 
   public Class<?> getType() {
     if (method != null) {
-      return method.getParameterTypes()[0];
+      return method.getReturnType();
     } else {
       return field.getType();
     }
@@ -287,7 +287,7 @@ public class Parameterized {
 
   public Type getGenericType() {
     if (method != null) {
-      return method.getGenericParameterTypes()[0];
+      return method.getGenericReturnType();
     } else {
       return field.getGenericType();
     }
