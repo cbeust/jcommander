@@ -1052,7 +1052,7 @@ new Args().with {
 
 Here are the description files for a few projects that use JCommander:
 
-- https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java[TestNG]
+- https://github.com/cbeust/testng/blob/b703fdc81a3a6f1ed3d0dee92c035ad3903178b6/testng-core/src/main/java/org/testng/CommandLineArgs.java[TestNG]
 - https://github.com/cbeust/kobalt/blob/master/modules/kobalt-plugin-api/src/main/kotlin/com/beust/kobalt/Args.kt[Kobalt]
 
 == Mailing list
