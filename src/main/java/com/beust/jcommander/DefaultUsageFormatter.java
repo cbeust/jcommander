@@ -244,6 +244,18 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      * @param indent the indentation
      */
     public void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
+        boolean hasOnlyHiddenCommands = true;
+        for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
+            Object arg = commands.getValue().getObjects().get(0);
+            Parameters p = arg.getClass().getAnnotation(Parameters.class);
+
+            if (p == null || !p.hidden())
+                hasOnlyHiddenCommands = false;
+        }
+
+        if (hasOnlyHiddenCommands)
+            return;
+
         out.append(indent + "  Commands:\n");
 
         // The magic value 3 is the number of spaces between the name of the option and its description
