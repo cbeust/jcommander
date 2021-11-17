@@ -605,7 +605,7 @@ public class JCommander {
     private void addDescription(Object object) {
         Class<?> cls = object.getClass();
 
-        List<Parameterized> parameterizeds = this.parameterizedParser.parseArg(object);
+        List<Parameterized> parameterizeds = parameterizedParser.parseArg(object);
         for (Parameterized parameterized : parameterizeds) {
             WrappedParameter wp = parameterized.getWrappedParameter();
             if (wp != null && wp.getParameter() != null) {
