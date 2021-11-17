@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Thin interface allows the Parameterized parsing mechanism, which reflects an object to find the 
- * JCommander annotations, to be replaced at runtime for cases where the source code can not
+ * JCommander annotations, to be replaced at runtime for cases where the source code cannot
  * be directly annotated with JCommander annotations, but may have other annotations such as 
  * Json annotations that can be used to reflect as JCommander parameters.
  *
