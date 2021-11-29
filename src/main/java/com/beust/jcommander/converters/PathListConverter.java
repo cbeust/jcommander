@@ -34,24 +34,21 @@ import com.beust.jcommander.converters.PathConverter;
  */
 public class PathListConverter extends BaseConverter<List<Path>>
 {
-	private final PathConverter pathConverter;
+  private final PathConverter pathConverter;
 
-	public PathListConverter(final String optionName)
-	{
-		super(optionName);
-		pathConverter = new PathConverter(optionName);
-	}
+  public PathListConverter(final String optionName) {
+    super(optionName);
+    pathConverter = new PathConverter(optionName);
+  }
 
-	/* @see com.beust.jcommander.IStringConverter#convert(java.lang.String) */
-	@Override
-	public List<Path> convert(final String value)
-	{
-		String [] paths = value.split(",");
-		List<Path> pathList = new ArrayList<>(paths.length);
-		for (String path : paths)
-		{
-			pathList.add(pathConverter.convert(path.trim()));
-		}
-		return pathList;
-	}
+  /* @see com.beust.jcommander.IStringConverter#convert(java.lang.String) */
+  @Override
+  public List<Path> convert(final String value) {
+    String [] paths = value.split(",");
+    List<Path> pathList = new ArrayList<>(paths.length);
+    for (String path : paths) {
+      pathList.add(pathConverter.convert(path.trim()));
+    }
+    return pathList;
+  }
 }
