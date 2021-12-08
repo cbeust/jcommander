@@ -243,12 +243,12 @@ public class JsonAnnotationParameterizedParser implements IParameterizedParser {
   /**
    * Basic check for primitive or Java class that should be used directly.
    * 
-   * @param field
+   * @param field non-null java Field
    * @return true if Java primitive or part of the Java or Sun package.
    */
   public boolean isPrimitiveOrString(Field field) {
-    final Class type = field.getType();
-    final String name = type.getName();
+    Class type = field.getType();
+    String name = type.getName();
 
     return type.isPrimitive() || name.startsWith("java") || name.startsWith("sun");
   }
