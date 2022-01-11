@@ -1,7 +1,7 @@
 
 
 object This {
-    val version = "1.81"
+    val version = "1.82"
     val artifactId = "jcommander"
     val groupId = "com.beust"
     val description = "Command line parsing library for Java"
@@ -68,6 +68,12 @@ dependencies {
 // Releases:
 // ./gradlew bintrayUpload (to JCenter)
 // ./gradlew publish (to Sonatype, then go to https://oss.sonatype.org/index.html#stagingRepositories to publish)
+// Make sure that ~/.gradle/gradle.properties:
+//     signing.keyId=XXXXXXXX
+//     signing.password=
+//     signing.secretKeyRingFile=../../.gnupg/secring.gpg
+// lists a key that's listed in the keyring
+// (gpg --list-keys, last eight digits of the key)
 //
 
 bintray {
