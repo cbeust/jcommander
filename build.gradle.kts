@@ -59,8 +59,9 @@ plugins {
 }
 
 dependencies {
-    listOf("org.testng:testng:7.0.0")
-        .forEach { testCompile(it) }
+    listOf("org.testng:testng:7.0.0", "com.fasterxml.jackson.core:jackson-core:2.13.1",
+        "com.fasterxml.jackson.core:jackson-annotations:2.13.1")
+            .forEach { testImplementation(it) }
 }
 
 //
