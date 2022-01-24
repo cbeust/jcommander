@@ -570,7 +570,7 @@ public class JCommander {
             while ((line = bufRead.readLine()) != null) {
                 // Allow empty lines and # comments in these at files
                 if (line.length() > 0 && !line.trim().startsWith("#")) {
-                    result.add(line);
+                    result.addAll(Arrays.asList(line.split("\\s")));
                 }
             }
         } catch (IOException e) {
