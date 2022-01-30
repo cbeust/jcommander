@@ -570,6 +570,20 @@ public class JCommanderTest {
         Assert.assertEquals(ArgMultiNameValidator.MultiNameValidator.parsedName, paramName);
     }
 
+    @Test
+    public void atFileCanContainNameAndValueInSameLine() throws IOException {
+        File f = File.createTempFile("JCommander", null);
+        f.deleteOnExit();
+        FileWriter fw = new FileWriter(f);
+        fw.write("-verbose 2\n");
+        fw.write("-groups g\n");
+        fw.close();
+        Args1 args1 = new Args1();
+        JCommander.newBuilder().addObject(args1).build().parse("@" + f.getAbsolutePath());
+        Assert.assertEquals(args1.verbose.intValue(), 2);
+        Assert.assertEquals(args1.groups, "g");
+    }
+
     public void atFileCanContainEmptyLines() throws IOException {
         File f = File.createTempFile("JCommander", null);
         f.deleteOnExit();
