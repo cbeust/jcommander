@@ -280,7 +280,15 @@ public class ParameterDescription {
     }
     if (! isDefault) assigned = true;
 
+    this.value = finalValue;
+
     return finalValue;
+  }
+
+  private Object value;
+
+  Object getValue() {
+	  return value;
   }
 
   private Object handleSubParameters(String value, int currentIndex, Class<?> type,

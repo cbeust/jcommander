@@ -128,6 +128,11 @@ public class JCommander {
     private Map<Parameterized, ParameterDescription> requiredFields = Maps.newHashMap();
 
     /**
+     * A set of all the rules to be checked.
+     */
+    private Set<IRule> rules = Sets.newHashSet();
+
+    /**
      * A map of all the parameterized fields/methods.
      */
     private Map<Parameterized, ParameterDescription> fields = Maps.newHashMap();
@@ -377,7 +382,8 @@ public class JCommander {
     }
 
     /**
-     * Make sure that all the required parameters have received a value.
+     * Make sure that all the required parameters have received a value and that
+     * all provided parameters have a value compliant to all given rules.
      */
     private void validateOptions() {
         // No validation if we found a help parameter
@@ -418,6 +424,15 @@ public class JCommander {
                 }
 
             }
+        }
+
+        Map<String, Object> nameValuePairs = Maps.newHashMap();
+        for (ParameterDescription pd : fields.values()) {
+            nameValuePairs.put(pd.getLongestName(), pd.getValue());
+        }
+
+        for (IRule rule : rules) {
+            rule.validate(nameValuePairs);
         }
     }
 
@@ -604,6 +619,17 @@ public class JCommander {
 
     private void addDescription(Object object) {
         Class<?> cls = object.getClass();
+
+        Parameters parameters = cls.getAnnotation(Parameters.class);
+        Class<? extends IRule>[] ruleClasses = parameters.rules();
+        for (Class<? extends IRule> ruleClass : ruleClasses) {
+            try {
+                IRule rule = ruleClass.getDeclaredConstructor().newInstance();
+                rules.add(rule);
+            } catch (ReflectiveOperationException e) {
+                throw new ParameterException("Cannot instantiate rule: " + ruleClass, e);
+            }
+        }
 
         List<Parameterized> parameterizeds = parameterizedParser.parseArg(object);
         for (Parameterized parameterized : parameterizeds) {

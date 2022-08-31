@@ -65,4 +65,10 @@ public @interface Parameters {
    * If true, this command won't appear in the usage().
    */
   boolean hidden() default false;
+
+  /**
+   * Validate the value for all parameters.
+   */
+  Class<? extends IRule>[] rules() default {};
+
 }
