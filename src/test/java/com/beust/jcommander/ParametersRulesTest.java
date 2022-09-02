@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 
 public class ParametersRulesTest {
 
-    @Parameters(rules = QuietAndVerboseAreMutualExclusive.class)
+    @Parameters(parametersValidators = QuietAndVerboseAreMutualExclusive.class)
     class Flags {
         @Parameter(names = "--quiet", description = "Do not output anything")
         boolean quiet;
@@ -17,7 +17,7 @@ public class ParametersRulesTest {
         boolean verbose;
     }
 
-    public static class QuietAndVerboseAreMutualExclusive implements IRule {
+    public static class QuietAndVerboseAreMutualExclusive implements IParametersValidator {
         @Override
         public void validate(Map<String, Object> parameters) throws ParameterException {
             if (parameters.get("--quiet") == TRUE && parameters.get("--verbose") == TRUE)

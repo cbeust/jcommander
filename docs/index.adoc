@@ -522,7 +522,7 @@ Here is an example implementation that will make sure that the boolean options `
 
 [source,java]
 ----
-public static class QuietAndVerboseAreMutualExclusive implements IRule {
+public static class QuietAndVerboseAreMutualExclusive implements IParametersValidator {
     @Override
     public void validate(Map<String, Object> parameters) throws ParameterException {
         if (parameters.get("--quiet") == TRUE && parameters.get("--verbose") == TRUE)

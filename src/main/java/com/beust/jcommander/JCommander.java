@@ -128,9 +128,9 @@ public class JCommander {
     private Map<Parameterized, ParameterDescription> requiredFields = Maps.newHashMap();
 
     /**
-     * A set of all the rules to be checked.
+     * A set of all the parameters validators to be applied.
      */
-    private Set<IRule> rules = Sets.newHashSet();
+    private Set<IParametersValidator> parametersValidators = Sets.newHashSet();
 
     /**
      * A map of all the parameterized fields/methods.
@@ -431,8 +431,8 @@ public class JCommander {
             nameValuePairs.put(pd.getLongestName(), pd.getValue());
         }
 
-        for (IRule rule : rules) {
-            rule.validate(nameValuePairs);
+        for (IParametersValidator parametersValidator : parametersValidators) {
+            parametersValidator.validate(nameValuePairs);
         }
     }
 
@@ -621,13 +621,13 @@ public class JCommander {
         Class<?> cls = object.getClass();
 
         Parameters parameters = cls.getAnnotation(Parameters.class);
-        Class<? extends IRule>[] ruleClasses = parameters.rules();
-        for (Class<? extends IRule> ruleClass : ruleClasses) {
+        Class<? extends IParametersValidator>[] parametersValidatorClasses = parameters.parametersValidators();
+        for (Class<? extends IParametersValidator> parametersValidatorClass : parametersValidatorClasses) {
             try {
-                IRule rule = ruleClass.getDeclaredConstructor().newInstance();
-                rules.add(rule);
+                IParametersValidator parametersValidator = parametersValidatorClass.getDeclaredConstructor().newInstance();
+                parametersValidators.add(parametersValidator);
             } catch (ReflectiveOperationException e) {
-                throw new ParameterException("Cannot instantiate rule: " + ruleClass, e);
+                throw new ParameterException("Cannot instantiate rule: " + parametersValidatorClass, e);
             }
         }
 

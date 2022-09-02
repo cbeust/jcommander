@@ -2,7 +2,7 @@ package com.beust.jcommander;
 
 import java.util.Map;
 
-public interface IRule {
+public interface IParametersValidator {
 
     /**
      * Validate all parameters.

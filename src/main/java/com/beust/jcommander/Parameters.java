@@ -69,6 +69,6 @@ public @interface Parameters {
   /**
    * Validate the value for all parameters.
    */
-  Class<? extends IRule>[] rules() default {};
+  Class<? extends IParametersValidator>[] parametersValidators() default {};
 
 }
