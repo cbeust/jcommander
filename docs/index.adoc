@@ -531,11 +531,11 @@ public static class QuietAndVerboseAreMutualExclusive implements IParametersVali
 }
 ----
 
-Specify the name of a class implementing this interface in the `rules` attribute of your `@Parameters` annotations:
+Specify the name of a class implementing this interface in the `parametersValidators` attribute of your `@Parameters` annotations:
 
 [source,java]
 ----
-@Parameters(rules = QuietAndVerboseAreMutualExclusive.class)
+@Parameters(parametersValidators = QuietAndVerboseAreMutualExclusive.class)
 class Flags {
     @Parameter(names = "--quiet", description = "Do not output anything")
     boolean quiet;
@@ -547,11 +547,11 @@ class Flags {
 
 Attempting to enable `--quiet` and `--verbose` at the same time will cause a `ParameterException` to be thrown.
 
-Multiple rules may be specified:
+Multiple validators may be specified:
 
 [source,java]
 ----
-@Parameters(rules = { QuietAndVerboseAreMutualExclusive.class, VerboseNeedsLevel.class })
+@Parameters(paremetersValidators = { QuietAndVerboseAreMutualExclusive.class, VerboseNeedsLevel.class })
 class Flags {
     @Parameter(names = "--quiet", description = "Do not output anything")
     boolean quiet;
