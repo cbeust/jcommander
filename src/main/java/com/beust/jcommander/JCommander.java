@@ -128,6 +128,11 @@ public class JCommander {
     private Map<Parameterized, ParameterDescription> requiredFields = Maps.newHashMap();
 
     /**
+     * A set of all the parameters validators to be applied.
+     */
+    private Set<IParametersValidator> parametersValidators = Sets.newHashSet();
+
+    /**
      * A map of all the parameterized fields/methods.
      */
     private Map<Parameterized, ParameterDescription> fields = Maps.newHashMap();
@@ -377,7 +382,8 @@ public class JCommander {
     }
 
     /**
-     * Make sure that all the required parameters have received a value.
+     * Make sure that all the required parameters have received a value and that
+     * all provided parameters have a value compliant to all given rules.
      */
     private void validateOptions() {
         // No validation if we found a help parameter
@@ -418,6 +424,15 @@ public class JCommander {
                 }
 
             }
+        }
+
+        Map<String, Object> nameValuePairs = Maps.newHashMap();
+        for (ParameterDescription pd : fields.values()) {
+            nameValuePairs.put(pd.getLongestName(), pd.getValue());
+        }
+
+        for (IParametersValidator parametersValidator : parametersValidators) {
+            parametersValidator.validate(nameValuePairs);
         }
     }
 
@@ -604,6 +619,17 @@ public class JCommander {
 
     private void addDescription(Object object) {
         Class<?> cls = object.getClass();
+
+        Parameters parameters = cls.getAnnotation(Parameters.class);
+        Class<? extends IParametersValidator>[] parametersValidatorClasses = parameters.parametersValidators();
+        for (Class<? extends IParametersValidator> parametersValidatorClass : parametersValidatorClasses) {
+            try {
+                IParametersValidator parametersValidator = parametersValidatorClass.getDeclaredConstructor().newInstance();
+                parametersValidators.add(parametersValidator);
+            } catch (ReflectiveOperationException e) {
+                throw new ParameterException("Cannot instantiate rule: " + parametersValidatorClass, e);
+            }
+        }
 
         List<Parameterized> parameterizeds = parameterizedParser.parseArg(object);
         for (Parameterized parameterized : parameterizeds) {

@@ -502,7 +502,67 @@ private Integer value;
 
 === Global parameter validation
 
-After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simply perform this validation in Java on all the arguments that JCommander just parsed.
+After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified.
+
+[source,java]
+----
+/**
+ * Validate all parameters.
+ *
+ * @param parameters
+ *            Name-value-pairs of all parameters (e.g. "-host":"localhost").
+ *
+ * @throws ParameterException
+ *             Thrown if validation of the parameters fails.
+ */
+void validate(Map<String, Object> parameters) throws ParameterException;
+----
+
+Here is an example implementation that will make sure that the boolean options `--quiet` and `--verbose` are not enabled at the same time:
+
+[source,java]
+----
+public static class QuietAndVerboseAreMutualExclusive implements IParametersValidator {
+    @Override
+    public void validate(Map<String, Object> parameters) throws ParameterException {
+        if (parameters.get("--quiet") == TRUE && parameters.get("--verbose") == TRUE)
+            throw new ParameterException("--quiet and --verbose are mutually exclusive");
+    }
+}
+----
+
+Specify the name of a class implementing this interface in the `parametersValidators` attribute of your `@Parameters` annotations:
+
+[source,java]
+----
+@Parameters(parametersValidators = QuietAndVerboseAreMutualExclusive.class)
+class Flags {
+    @Parameter(names = "--quiet", description = "Do not output anything")
+    boolean quiet;
+
+    @Parameter(names = "--verbose", description = "Output detailed information")
+    boolean verbose;
+}
+----
+
+Attempting to enable `--quiet` and `--verbose` at the same time will cause a `ParameterException` to be thrown.
+
+Multiple validators may be specified:
+
+[source,java]
+----
+@Parameters(paremetersValidators = { QuietAndVerboseAreMutualExclusive.class, VerboseNeedsLevel.class })
+class Flags {
+    @Parameter(names = "--quiet", description = "Do not output anything")
+    boolean quiet;
+
+    @Parameter(names = "--verbose", description = "Output detailed information")
+    boolean verbose;
+
+    @Parameter(names = "--level", description = "Detail level of verbose information")
+    Integer level;
+}
+----
 
 
 == Main parameter
