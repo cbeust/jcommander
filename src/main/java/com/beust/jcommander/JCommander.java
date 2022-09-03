@@ -621,13 +621,15 @@ public class JCommander {
         Class<?> cls = object.getClass();
 
         Parameters parameters = cls.getAnnotation(Parameters.class);
-        Class<? extends IParametersValidator>[] parametersValidatorClasses = parameters.parametersValidators();
-        for (Class<? extends IParametersValidator> parametersValidatorClass : parametersValidatorClasses) {
-            try {
-                IParametersValidator parametersValidator = parametersValidatorClass.getDeclaredConstructor().newInstance();
-                parametersValidators.add(parametersValidator);
-            } catch (ReflectiveOperationException e) {
-                throw new ParameterException("Cannot instantiate rule: " + parametersValidatorClass, e);
+        if (parameters != null) {
+            Class<? extends IParametersValidator>[] parametersValidatorClasses = parameters.parametersValidators();
+                for (Class<? extends IParametersValidator> parametersValidatorClass : parametersValidatorClasses) {
+                try {
+                    IParametersValidator parametersValidator = parametersValidatorClass.getDeclaredConstructor().newInstance();
+                    parametersValidators.add(parametersValidator);
+                } catch (ReflectiveOperationException e) {
+                    throw new ParameterException("Cannot instantiate rule: " + parametersValidatorClass, e);
+                }
             }
         }
 
