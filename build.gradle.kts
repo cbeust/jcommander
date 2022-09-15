@@ -80,6 +80,10 @@ dependencies {
             .forEach { testImplementation(it) }
 }
 
+tasks.withType<Test> {
+     useTestNG()
+}
+
 //
 // Releases:
 // ./gradlew bintrayUpload (to JCenter)
