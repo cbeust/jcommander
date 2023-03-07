@@ -1447,4 +1447,34 @@ public class JCommanderTest {
     public static void main(String[] args) {
         new JCommanderTest().trimTest();
     }
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void syntaxTest_1()
+    {
+        class Args{
+            @Parameter(names = "-password",description = "parameter starts with @")
+            public String x = "password";
+        }
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .build()
+                .parse("-password","@X");
+        Assert.assertEquals("@X", args.x);
+    }
+
+    @Test
+    public void syntaxTest_2()
+    {
+        class Args{
+            @Parameter(names = "-password",description = "parameter starts with @")
+            public String x = "password";
+        }
+        Args args = new Args();
+        JCommander.newBuilder()
+                .addObject(args)
+                .build()
+                .parse("-password","@/@X");
+        Assert.assertEquals("@X", args.x);
+    }
 }
