@@ -89,54 +89,49 @@ public class Parameterized {
     return classes;
   }
 
+  private static void checkFields(Class<?> cls,List<Parameterized> result){
+    for (Field f : cls.getDeclaredFields()) {
+      Annotation annotation = f.getAnnotation(Parameter.class);
+      Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
+      Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
+      addToResult(annotation,delegateAnnotation,dynamicParameter,result,f,null);
+    }
+  }
+  private static void checkMethods(Class<?> cls,List<Parameterized> result){
+
+    for (Method m : cls.getDeclaredMethods()) {
+      m.setAccessible(true);
+      Annotation annotation = m.getAnnotation(Parameter.class);
+      Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
+      Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
+      addToResult(annotation,delegateAnnotation,dynamicParameter,result,null,m);
+    }
+  }
+  private static void addToResult(Annotation annotation,Annotation delegateAnnotation,Annotation dynamicParameter,List<Parameterized> result,Field f,Method m){
+    if (annotation != null) {
+      result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
+              f, m));
+    } else if (dynamicParameter != null) {
+      result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
+              f, m));
+    } else if (delegateAnnotation != null) {
+      result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
+              f, m));
+    }
+  }
   public static List<Parameterized> parseArg(Object arg) {
     List<Parameterized> result = Lists.newArrayList();
-
     Class<?> rootClass = arg.getClass();
-
     // get the list of types that are extended or implemented by the root class
     // and all of its parent types
     Set<Class<?>> types = describeClassTree(rootClass);
-
     // analyze each type
     for(Class<?> cls : types) {
-
       // check fields
-      for (Field f : cls.getDeclaredFields()) {
-        Annotation annotation = f.getAnnotation(Parameter.class);
-        Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
-        Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
-        if (annotation != null) {
-          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-                  f, null));
-        } else if (dynamicParameter != null) {
-          result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
-                  f, null));
-        } else if (delegateAnnotation != null) {
-          result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-                  f, null));
-        }
-      }
-
+      checkFields(cls,result);
       // check methods
-      for (Method m : cls.getDeclaredMethods()) {
-        m.setAccessible(true);
-        Annotation annotation = m.getAnnotation(Parameter.class);
-        Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
-        Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
-        if (annotation != null) {
-          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-                  null, m));
-        } else if (dynamicParameter != null) {
-          result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
-                  null, m));
-        } else if (delegateAnnotation != null) {
-          result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-                  null, m));
-        }
-      }
+      checkMethods(cls,result);
     }
-
     return result;
   }
 
