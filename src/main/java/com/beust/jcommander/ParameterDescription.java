@@ -235,8 +235,7 @@ public class ParameterDescription {
     if(name == null) {
       name = wrappedParameter.names()[0];
     }
-    if (currentIndex == 00 && assigned && ! isMultiOption() && !jCommander.isParameterOverwritingAllowed()
-            || isNonOverwritableForced()) {
+    if (multipleOptionsAtOnce(currentIndex)) {
       throw new ParameterException("Can only specify option " + name + " once.");
     }
 
@@ -284,6 +283,9 @@ public class ParameterDescription {
 
     return finalValue;
   }
+
+  private boolean multipleOptionsAtOnce(int currentIndex){return  (currentIndex == 00 && assigned && ! isMultiOption() && !jCommander.isParameterOverwritingAllowed()
+          || isNonOverwritableForced());}
 
   private Object value;
 
