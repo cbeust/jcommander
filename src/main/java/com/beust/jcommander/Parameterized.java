@@ -90,33 +90,33 @@ public class Parameterized {
   }
 
   private static void checkFields(Class<?> cls,List<Parameterized> result){
-    for (Field f : cls.getDeclaredFields()) {
-      Annotation annotation = f.getAnnotation(Parameter.class);
-      Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
-      Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
-      addToResult(annotation,delegateAnnotation,dynamicParameter,result,f,null);
+    for (Field field : cls.getDeclaredFields()) {
+      Annotation annotation = field.getAnnotation(Parameter.class);
+      Annotation delegateAnnotation = field.getAnnotation(ParametersDelegate.class);
+      Annotation dynamicParameter = field.getAnnotation(DynamicParameter.class);
+      addToResult(annotation,delegateAnnotation,dynamicParameter,result,field,null);
     }
   }
   private static void checkMethods(Class<?> cls,List<Parameterized> result){
 
-    for (Method m : cls.getDeclaredMethods()) {
-      m.setAccessible(true);
-      Annotation annotation = m.getAnnotation(Parameter.class);
-      Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
-      Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
-      addToResult(annotation,delegateAnnotation,dynamicParameter,result,null,m);
+    for (Method method : cls.getDeclaredMethods()) {
+      method.setAccessible(true);
+      Annotation annotation = method.getAnnotation(Parameter.class);
+      Annotation delegateAnnotation = method.getAnnotation(ParametersDelegate.class);
+      Annotation dynamicParameter = method.getAnnotation(DynamicParameter.class);
+      addToResult(annotation,delegateAnnotation,dynamicParameter,result,null,method);
     }
   }
-  private static void addToResult(Annotation annotation,Annotation delegateAnnotation,Annotation dynamicParameter,List<Parameterized> result,Field f,Method m){
+  private static void addToResult(Annotation annotation,Annotation delegateAnnotation,Annotation dynamicParameter,List<Parameterized> result,Field field,Method method){
     if (annotation != null) {
       result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-              f, m));
+              field, method));
     } else if (dynamicParameter != null) {
       result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
-              f, m));
+              field, method));
     } else if (delegateAnnotation != null) {
       result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-              f, m));
+              field, method));
     }
   }
   public static List<Parameterized> parseArg(Object arg) {
