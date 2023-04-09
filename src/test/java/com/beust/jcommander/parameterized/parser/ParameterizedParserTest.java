@@ -61,7 +61,7 @@ public class ParameterizedParserTest {
     JCommander jcommander = new JCommander();
     jcommander.setParameterizedParser(new JsonAnnotationParameterizedParser());
     jcommander.addObject(commandOptions);
-    
+
     testFields(jcommander, EXPECTED_MAP);
 
     jcommander.parse(ARGS);
