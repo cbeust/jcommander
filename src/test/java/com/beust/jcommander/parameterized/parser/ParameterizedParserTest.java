@@ -54,21 +54,21 @@ public class ParameterizedParserTest {
     Assert.assertTrue(EXPECTED_LOG_LEVEL.equals(commandOptions.subCommands.loggingLevel), "Log level is not " + EXPECTED_LOG_LEVEL);
   }
   
-//  @Test
-//  public void jsonParameterizedParsingTest() {
-//    JsonCommandClassExample_01 commandOptions = new JsonCommandClassExample_01();
-//
-//    JCommander jcommander = new JCommander();
-//    jcommander.setParameterizedParser(new JsonAnnotationParameterizedParser());
-//    jcommander.addObject(commandOptions);
-//
-//    testFields(jcommander, EXPECTED_MAP);
-//
-//    jcommander.parse(ARGS);
-//    Assert.assertTrue(EXPECTED_VERSION.equals(commandOptions.version), "Version is not " + EXPECTED_VERSION);
-//    Assert.assertTrue(EXPECTED_STACK_LEVEL == commandOptions.subCommands.stackLevel, "Stack level field is not" + EXPECTED_STACK_LEVEL);
-//    Assert.assertTrue(EXPECTED_LOG_LEVEL.equals(commandOptions.subCommands.loggingLevel), "Log level is not " + EXPECTED_LOG_LEVEL);
-//  }
+  @Test
+  public void jsonParameterizedParsingTest() {
+    JsonCommandClassExample_01 commandOptions = new JsonCommandClassExample_01();
+    
+    JCommander jcommander = new JCommander();
+    jcommander.setParameterizedParser(new JsonAnnotationParameterizedParser());
+    jcommander.addObject(commandOptions);
+
+    testFields(jcommander, EXPECTED_MAP);
+
+    jcommander.parse(ARGS);
+    Assert.assertTrue(EXPECTED_VERSION.equals(commandOptions.version), "Version is not " + EXPECTED_VERSION);
+    Assert.assertTrue(EXPECTED_STACK_LEVEL == commandOptions.subCommands.stackLevel, "Stack level field is not" + EXPECTED_STACK_LEVEL);
+    Assert.assertTrue(EXPECTED_LOG_LEVEL.equals(commandOptions.subCommands.loggingLevel), "Log level is not " + EXPECTED_LOG_LEVEL);
+  }
   
   
   public void testFields(JCommander jcommander, Map<String, Boolean> expectedMap) {
