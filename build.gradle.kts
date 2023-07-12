@@ -1,9 +1,9 @@
 
 
 object This {
-    val version = "1.82"
+    val version = "1.83"
     val artifactId = "jcommander"
-    val groupId = "com.beust"
+    val groupId = "org.jcommander"
     val description = "Command line parsing library for Java"
     val url = "https://jcommander.org"
     val scm = "github.com/cbeust/jcommander"
