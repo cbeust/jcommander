@@ -42,10 +42,10 @@ uploadArchives {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2") {
                 authentication(userName: System.getenv('SONATYPE_USER'), password: System.getenv('SONATYPE_PASSWORD'))
             }
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots") {
                 authentication(userName: System.getenv('SONATYPE_USER'), password: System.getenv('SONATYPE_PASSWORD'))
             }
             pom {
@@ -82,7 +82,7 @@ uploadArchives {
 
 uploadArchives.doLast {
     if (! version.contains("SNAPSHOT")) {
-        println("Now go to https://oss.sonatype.org/index.html#stagingRepositories to close" +
+        println("Now go to https://s01.oss.sonatype.org/index.html#stagingRepositories to close" +
                 " and publish the distribution")
     }
 }

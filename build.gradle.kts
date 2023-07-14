@@ -87,7 +87,7 @@ tasks.withType<Test> {
 //
 // Releases:
 // ./gradlew bintrayUpload (to JCenter)
-// ./gradlew publish (to Sonatype, then go to https://oss.sonatype.org/index.html#stagingRepositories to publish)
+// ./gradlew publish (to Sonatype, then go to https://s01.oss.sonatype.org/index.html#stagingRepositories to publish)
 // Make sure that ~/.gradle/gradle.properties:
 //     signing.keyId=XXXXXXXX
 //     signing.password=
@@ -174,8 +174,8 @@ with(publishing) {
         maven {
             name = "sonatype"
             url = if (This.version.contains("SNAPSHOT"))
-                uri("https://oss.sonatype.org/content/repositories/snapshots/") else
-                uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") else
+                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
                 username = project.findProperty("sonatypeUser")?.toString() ?: System.getenv("SONATYPE_USER")
                 password = project.findProperty("sonatypePassword")?.toString() ?: System.getenv("SONATYPE_PASSWORD")
