@@ -537,6 +537,9 @@ public class JCommander {
         for (IKey key : commands.keySet()) {
             if (matchArg(arg, key)) return true;
         }
+        for (IKey key : aliasMap.keySet()) {
+            if (matchArg(arg, key)) return true;
+        }
 
         return false;
     }
