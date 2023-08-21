@@ -20,20 +20,22 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Install gpg secret key
+      env:
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
         cat <(echo -e "${{ secrets.GPG_SECRET_KEY }}") | gpg --batch --import
-        gpg --export-secret-keys >$HOME/.gnupg/secring.gpg
+        gpg --pinentry-mode=loopback --passphrase "$GPG_PASSPHRASE" --export-secret-keys >$HOME/.gnupg/secring.gpg
         gpg --list-secret-keys --keyid-format LONG
         ls -l $HOME/.gnupg
 
     - name: Publish release
       env:
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       run: |
-        ./gradlew --info --stacktrace -Psigning.secretKeyRingFile=$HOME/.gnupg/secring.gpg -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} publish
+        ./gradlew --info --stacktrace -Psigning.secretKeyRingFile=$HOME/.gnupg/secring.gpg -Psigning.password="$GPG_PASSPHRASE" -P signing.keyId=${{ secrets.GPG_KEY_ID }} publish
 
     - name: Display next step
       run: |
         echo "Now go to https://s01.oss.sonatype.org/index.html#stagingRepositories, select the repo, Close it and then Release it"
-
