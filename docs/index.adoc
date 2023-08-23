@@ -1136,14 +1136,14 @@ You can download JCommander from the following locations:
 
 [source,groovy]
 ----
-compile("com.beust:jcommander:1.71")
+compile("org.jcommander:jcommander:1.83")
 ----
 
 - Gradle
 
 [source,groovy]
 ----
-compile "com.beust:jcommander:1.71"
+compile "org.jcommander:jcommander:1.83"
 ----
 
 - Maven:
@@ -1151,9 +1151,9 @@ compile "com.beust:jcommander:1.71"
 [source,xml]
 ----
 <dependency>
-  <groupId>com.beust</groupId>
+  <groupId>org.jcommander</groupId>
   <artifactId>jcommander</artifactId>
-  <version>1.71</version>
+  <version>1.83</version>
 </dependency>
 ----
 
