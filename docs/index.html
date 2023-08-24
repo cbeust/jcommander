@@ -1775,6 +1775,9 @@ JCommander jc = JCommander.newBuilder()
     .build()</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>For the most common cases, there is no need to actually implement <code>IDefaultProvider</code>, as JCommander contains the classes <code>PropertyFileDefaultProvider</code> and <code>EnvironmentVariableDefaultProvider</code> for reading defaults from a property file (<code>jcommander.properties</code> by default) or from an environment variable (<code>JCOMMANDER_OPTS</code> by default).</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2181,7 +2184,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-08-24 12:18:14 UTC
+Last updated 2023-08-24 12:53:02 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>

@@ -851,6 +851,8 @@ JCommander jc = JCommander.newBuilder()
 
 ----
 
+For the most common cases, there is no need to actually implement `IDefaultProvider`, as JCommander contains the classes `PropertyFileDefaultProvider` and `EnvironmentVariableDefaultProvider` for reading defaults from a property file (`jcommander.properties` by default) or from an environment variable (`JCOMMANDER_OPTS` by default).
+
 
 == Help parameter
 
