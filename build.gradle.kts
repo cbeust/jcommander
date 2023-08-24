@@ -1,7 +1,7 @@
 
 
 object This {
-    val version = "1.83"
+    val version = "1.84"
     val artifactId = "jcommander"
     val groupId = "org.jcommander"
     val description = "Command line parsing library for Java"
