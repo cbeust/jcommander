@@ -1447,4 +1447,29 @@ public class JCommanderTest {
     public static void main(String[] args) {
         new JCommanderTest().trimTest();
     }
+
+    @Test
+    public void ignoreDefaultValueForRequiredParameter() {
+        class Parameters {
+            @Parameter(names = "-v",
+                    required = true,
+                    validateValueWith = StrictlyPositiveInteger.class)
+            private int value;
+        }
+
+        String[] argv = { "-v", "1" };
+        Parameters args = new Parameters();
+        JCommander.newBuilder().addObject(args).build().parse(argv);
+        JCommander jc = JCommander.newBuilder().addObject(args).build();
+        jc.parse(argv);
+    }
+    static class StrictlyPositiveInteger implements IValueValidator<Integer> {
+        @Override
+        public void validate(String name, Integer i) throws ParameterException {
+            if (i <= 0) {
+                throw new ParameterException("Parameter " + name
+                        + " should be strictly positive (found " + i + ")");
+            }
+        }
+    }
 }
