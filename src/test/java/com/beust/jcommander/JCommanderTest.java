@@ -1460,8 +1460,6 @@ public class JCommanderTest {
         String[] argv = { "-v", "1" };
         Parameters args = new Parameters();
         JCommander.newBuilder().addObject(args).build().parse(argv);
-        JCommander jc = JCommander.newBuilder().addObject(args).build();
-        jc.parse(argv);
     }
     static class StrictlyPositiveInteger implements IValueValidator<Integer> {
         @Override
