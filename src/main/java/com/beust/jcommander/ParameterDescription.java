@@ -153,7 +153,7 @@ public class ParameterDescription {
     // Validate default values, if any and if applicable
     //
     if (defaultObject != null) {
-      if (parameterAnnotation != null) {
+      if (parameterAnnotation != null && !parameterAnnotation.required()) {
         validateDefaultValues(parameterAnnotation.names());
       }
     }
