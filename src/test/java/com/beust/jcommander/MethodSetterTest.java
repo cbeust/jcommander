@@ -72,7 +72,7 @@ public class MethodSetterTest {
     Arg args = new Arg();
     JCommander.newBuilder().addObject(args).build().parse("--port", "42");
 
-    Assert.assertEquals(args.port, new Integer(42));
+    Assert.assertEquals(args.port, Integer.valueOf(42));
   }
 
   public void noGetterButWithField() {

@@ -522,7 +522,7 @@ public class JCommanderTest {
         ArgsValidate1 a = new ArgsValidate1();
         JCommander jc = new JCommander(a);
         jc.parse("-age", "2");
-        Assert.assertEquals(a.age, new Integer(2));
+        Assert.assertEquals(a.age, Integer.valueOf(2));
     }
 
     @Test(expectedExceptions = ParameterException.class)
