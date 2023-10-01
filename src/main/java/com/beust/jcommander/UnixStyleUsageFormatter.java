@@ -77,13 +77,13 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
 
             if (pd.isDynamicParameter()) {
                 String syntax = "(syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value)";
-                description += (description.length() == 0 ? "" : " ") + syntax;
+                description += (description.isEmpty() ? "" : " ") + syntax;
             }
 
             if (def != null && !pd.isHelp()) {
                 String displayedDef = Strings.isStringEmpty(def.toString()) ? "<empty string>" : def.toString();
                 String defaultText = "(default: " + (parameter.password() ? "********" : displayedDef) + ")";
-                description += (description.length() == 0 ? "" : " ") + defaultText;
+                description += (description.isEmpty() ? "" : " ") + defaultText;
             }
             Class<?> type = pd.getParameterized().getType();
 
@@ -94,7 +94,7 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
                 // of an enum field is empty in ParameterDescription#init(..)
                 if (!description.contains("Options: " + valueList)) {
                     String possibleValues = "(values: " + valueList + ")";
-                    description += (description.length() == 0 ? "" : " ") + possibleValues;
+                    description += (description.isEmpty() ? "" : " ") + possibleValues;
                 }
             }
 

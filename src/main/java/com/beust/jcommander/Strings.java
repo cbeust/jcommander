@@ -5,7 +5,7 @@ import java.util.List;
 public class Strings {
 
     public static boolean isStringEmpty(String s) {
-        return s == null || "".equals(s);
+        return s == null || s.isEmpty();
     }
 
     public static boolean startsWith(String s, String with, boolean isCaseSensitive) {
