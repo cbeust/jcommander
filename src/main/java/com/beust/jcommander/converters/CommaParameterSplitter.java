@@ -7,9 +7,6 @@ import java.util.List;
 public class CommaParameterSplitter implements IParameterSplitter {
 
   public List<String> split(String value) {
-    if ("".equals(value)) {
-      return Collections.emptyList();
-    }
-    return Arrays.asList(value.split(","));
+    return value.isEmpty() ? Collections.emptyList() : Arrays.asList(value.split(","));
   }
 }
