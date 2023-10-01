@@ -587,7 +587,7 @@ public class JCommander {
             // Read through file one line at time. Print line # and line
             while ((line = bufRead.readLine()) != null) {
                 // Allow empty lines and # comments in these at files
-                if (line.length() > 0 && !line.trim().startsWith("#")) {
+                if (!line.isEmpty() && !line.trim().startsWith("#")) {
                     result.addAll(Arrays.asList(line.split("\\s")));
                 }
             }
