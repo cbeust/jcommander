@@ -158,7 +158,7 @@ When a Parameter annotation is found on a field of type `List` or `Set`, JComman
 
 [source,java]
 ----
-@Parameter(names = "-host", description = "The host")
+@Parameter(names = {"-host", "-hosts"}, description = "Host option can be used multiple times, and may be comma-separated")
 private List<String> hosts = new ArrayList<>();
 ----
 
@@ -167,6 +167,13 @@ will allow you to parse the following command line:
 [source,bash]
 ----
 $ java Main -host host1 -verbose -host host2
+----
+
+Alternatively the parameters can be provided as a comma-separated list:
+
+[source,bash]
+----
+$ java Main -hosts host1,host2
 ----
 
 When JCommander is done parsing the line above, the field hosts will contain the strings `"host1"` and `"host2"`.

@@ -953,7 +953,7 @@ private Integer verbose = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-host", description = "The host")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = {"-host", "-hosts"}, description = "Host option can be used multiple times, and may be comma-separated")
 private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 </div>
@@ -963,6 +963,14 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="bash">$ java Main -host host1 -verbose -host host2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively the parameters can be provided as a comma-separated list:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -hosts host1,host2</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2187,7 +2195,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-10-02 09:35:01 UTC
+Last updated 2023-10-02 12:48:25 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>

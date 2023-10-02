@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,8 +28,8 @@ public class SetOfEnumTest {
         JCommander.newBuilder()
                 .addObject(args)
                 .build()
-                .parse("--season", "SPRING");
-        Assert.assertEquals(Season.class, args.seasons.toArray()[0].getClass());
+                .parse("--season", "SPRING,AUTUMN");
+        Assert.assertEquals(EnumSet.copyOf(Arrays.asList(Season.SPRING, Season.AUTUMN)), args.seasons);
     }
 
     public static void main(String[] args) {
