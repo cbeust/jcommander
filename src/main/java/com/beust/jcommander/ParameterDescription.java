@@ -170,7 +170,7 @@ public class ParameterDescription {
    * @return defaultValueDescription, if description is empty string, return default Object.
    */
   public Object getDefault() {
-   String defaultDescription = parameterAnnotation.defaultValueDescription();
+   String defaultDescription = parameterAnnotation == null ? "" : parameterAnnotation.defaultValueDescription();
    if (defaultDescription.isEmpty())
      return defaultObject;
    else
