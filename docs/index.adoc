@@ -1049,6 +1049,14 @@ You can specify a different assignment string than = by using the attribute assi
 
 == Custom usage formats
 
+You can override the description for the default value shown in the usage output:
+
+[source,java]
+----
+@Parameter(names = "--start", defaultValueDescription = "The default value is a random number")
+int start = Math.random * 100;
+----
+
 JCommander allows you to customize the output of the `JCommander#usage()` method.
 You can do this by subclassing `IUsageFormatter` and then calling `JCommander#setUsageFormatter(IUsageFormatter)`.
 
