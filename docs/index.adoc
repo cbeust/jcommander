@@ -152,9 +152,9 @@ $ java Main -log test
 
 will cause an exception to be thrown.
 
-=== Lists
+=== Lists and Sets
 
-When a Parameter annotation is found on a field of type `List`, JCommander will interpret it as an option that can occur multiple times:
+When a Parameter annotation is found on a field of type `List` or `Set`, JCommander will interpret it as an option that can occur multiple times:
 
 [source,java]
 ----
