@@ -73,7 +73,7 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
 
             // Generate description
             String description = pd.getDescription();
-            Object def = pd.getDefault();
+            Object def = pd.getDefaultValueDescription();
 
             if (pd.isDynamicParameter()) {
                 String syntax = "(syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value)";

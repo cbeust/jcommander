@@ -166,10 +166,14 @@ public class ParameterDescription {
     return longestName;
   }
 
+  public Object getDefault() {
+    return defaultObject;
+  }
+
   /**
    * @return defaultValueDescription, if description is empty string, return default Object.
    */
-  public Object getDefault() {
+  public Object getDefaultValueDescription() {
     return parameterAnnotation == null ? defaultObject : parameterAnnotation.defaultValueDescription().isEmpty() ? defaultObject : parameterAnnotation.defaultValueDescription();
   }
 
