@@ -1914,6 +1914,15 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
     private boolean b;</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>You can override the description for the default value shown in the usage output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "--start", defaultValueDescription = "The default value is a random number")
+int start = Math.random * 100;</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2018,15 +2027,6 @@ private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 <div class="sect1">
 <h2 id="_custom_usage_formats">23. Custom usage formats</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>You can override the description for the default value shown in the usage output:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "--start", defaultValueDescription = "The default value is a random number")
-int start = Math.random * 100;</code></pre>
-</div>
-</div>
 <div class="paragraph">
 <p>JCommander allows you to customize the output of the <code>JCommander#usage()</code> method.
 You can do this by subclassing <code>IUsageFormatter</code> and then calling <code>JCommander#setUsageFormatter(IUsageFormatter)</code>.</p>
@@ -2204,7 +2204,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-10-02 14:50:54 UTC
+Last updated 2023-10-02 15:11:56 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>

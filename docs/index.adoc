@@ -968,6 +968,15 @@ class Parameters {
     private boolean b;
 ----
 
+You can override the description for the default value shown in the usage output:
+
+[source,java]
+----
+@Parameter(names = "--start", defaultValueDescription = "The default value is a random number")
+int start = Math.random * 100;
+----
+
+
 == Hiding parameters
 
 If you don't want certain parameters to appear in the usage, you can mark them as "hidden":
@@ -1048,14 +1057,6 @@ private Map<String, String> params = new HashMap<>();
 You can specify a different assignment string than = by using the attribute assignment.
 
 == Custom usage formats
-
-You can override the description for the default value shown in the usage output:
-
-[source,java]
-----
-@Parameter(names = "--start", defaultValueDescription = "The default value is a random number")
-int start = Math.random * 100;
-----
 
 JCommander allows you to customize the output of the `JCommander#usage()` method.
 You can do this by subclassing `IUsageFormatter` and then calling `JCommander#setUsageFormatter(IUsageFormatter)`.
