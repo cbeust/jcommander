@@ -45,7 +45,7 @@ public class ByteOrderConverterTest {
 
 	@Test
 	public void testLittleEndian() {
-		Assert.assertEquals(CONVERTER.convert("LITTLE_ENDIAN"), ByteOrder.LITTLE_ENDIAN);
+		Assert.assertEquals(CONVERTER.convert("Little_Endian"), ByteOrder.LITTLE_ENDIAN);
 	}
 
 }
