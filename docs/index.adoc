@@ -48,6 +48,12 @@ public class Args {
  
   @Parameter(names = "-debug", description = "Debug mode")
   private boolean debug = false;
+
+  private Integer setterParameter;
+  @Parameter(names = "-setterParameter", description = "A parameter annotation on a setter method")
+  public void setParameter(Integer value) {
+    this.setterParameter = value;
+  }
 }
 ----
 
