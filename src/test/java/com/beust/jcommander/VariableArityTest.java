@@ -30,6 +30,9 @@ public class VariableArityTest {
     @Parameter(names = { "--seed" }, description = "Seed used for PRNG [0 means don't use a Seed]")
     public long seed = 0;
 
+    @Parameter(names = "-J", description = "Parameters to be passed to child process", variableArity = true)
+    public List<String> j;
+
     public void print() {
       System.out.println("modelMatrixFile: " + modelMatrixFile);
       System.out.println("featureData: " + featureFile);
@@ -42,7 +45,7 @@ public class VariableArityTest {
 
   @Test
   public void verifyVariableArity() {
-    String input = "-m foo --seed 1024 -c foo -o foo -f foo ";
+    String input = "-m foo --seed 1024 -J --compilation_level WHITESPACE_ONLY --language_in=ECMASCRIPT5 -bar baz -faz -c foo -o foo -f foo -J --more-options";
 
     String[] split = input.split("\\s+");
 
@@ -56,7 +59,9 @@ public class VariableArityTest {
     Assert.assertEquals(config.modelMatrixFile, Arrays.asList("foo"));
     Assert.assertEquals(config.featureFile, Arrays.asList("foo"));
     Assert.assertEquals(config.seed, 1024);
+    Assert.assertEquals(config.configFile, Arrays.asList("foo"));
     Assert.assertEquals(config.outputFile, "foo");
+    Assert.assertEquals(config.j, Arrays.asList("--compilation_level", "WHITESPACE_ONLY", "--language_in=ECMASCRIPT5", "-bar", "baz", "-faz", "--more-options"));
   }
 
   public static void main(String[] args) {
