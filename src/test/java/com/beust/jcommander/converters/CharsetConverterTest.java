@@ -18,7 +18,6 @@
 
 package com.beust.jcommander.converters;
 
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 import org.testng.Assert;
@@ -35,16 +34,16 @@ public class CharsetConverterTest {
 	private static final CharsetConverter CONVERTER = new CharsetConverter();
 
 	@Test
-	public void testUtf8() throws UnknownHostException {
+	public void testUtf8() {
 		test("UTF-8");
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testGarbageInput() throws UnknownHostException {
+	public void testGarbageInput() {
 		test("   ");
 	}
 
-	private void test(String string) throws UnknownHostException {
+	private void test(String string) {
 		Assert.assertEquals(CONVERTER.convert(string), StandardCharsets.UTF_8);
 
 	}
