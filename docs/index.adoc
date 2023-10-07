@@ -101,7 +101,7 @@ $ java Main -l 512 --pattern 2
 
 The fields representing your parameters can be of any type. Basic types (`Integer`, `Boolean`, `Enum`, etc...) are supported by default and you can write type converters to support any other type (custom types, etc...).
 
-In fact, JCommander provides a rather comprehensive set of built-in conversions for commonly used special types, just to name the most notable ones (list is incomplete): `char[]`, `File`, `Path`, `URI`, `URL`, `InetAddress`, `Date` (ISO 8601), ByteOrder.
+In fact, JCommander provides a rather comprehensive set of built-in conversions for commonly used special types, just to name the most notable ones (list is incomplete): `char[]`, `File`, `Path`, `URI`, `URL`, `InetAddress`, `Date` (ISO 8601), ByteOrder, Charset.
 
 
 === Boolean
