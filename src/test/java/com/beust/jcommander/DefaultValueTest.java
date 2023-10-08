@@ -113,14 +113,15 @@ public class DefaultValueTest {
 
   @Test
   public void missingRequiredParameterWithDefaultValueShouldNotRaiseParameterException() {
+    class MyRequiredOptsWithDefaultValues {
+      @Parameter(names = "-a", required = true)
+      public List<String> list = singletonList("defaultValue");
+    }
+
     MyRequiredOptsWithDefaultValues opts = new MyRequiredOptsWithDefaultValues();
     JCommander cmd = new JCommander(opts);
     cmd.parse(new String[]{});
   }
 
-  public static class MyRequiredOptsWithDefaultValues {
-    @Parameter(names = "-a", required = true)
-    public List<String> list = singletonList("defaultValue");
-  }
 
 }
