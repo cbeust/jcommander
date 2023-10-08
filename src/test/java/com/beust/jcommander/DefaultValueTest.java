@@ -123,5 +123,16 @@ public class DefaultValueTest {
     cmd.parse(new String[]{});
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void missingRequiredPrimitiveParameterWithoutDefaultValueMustRaiseParameterException() {
+    class MyRequiredOptsWithDefaultValues {
+      @Parameter(names = "-i", required = true)
+      public int i; // implicit initialization value does not count as a default, so does not satisfy required = true
+    }
+
+    MyRequiredOptsWithDefaultValues opts = new MyRequiredOptsWithDefaultValues();
+    JCommander cmd = new JCommander(opts);
+    cmd.parse(new String[]{});
+  }
 
 }

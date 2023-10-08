@@ -848,7 +848,7 @@ public class JCommander {
             // if the parameter has a default value (not the one assigned by DefaultProvider
             // but the one assigned on the variable initialization), make it as assigned and
             // remove it from the list of parameters to be required
-            if (parameterDescription.getDefault() != null) {
+            if (parameterDescription.getDefault() != null && !parameterDescription.getParameterized().getType().isPrimitive()) {
                 fields.get(parameterDescription.getParameterized()).setAssigned(true);
                 requiredFields.remove(parameterDescription.getParameterized());
             }
