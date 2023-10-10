@@ -9,8 +9,6 @@ import java.util.List;
 
 public class VariableArityTest {
 
-
-  @Parameters(separators = "=")
   public static class ModelGenerationConfig {
 
     @Parameter(names = { "-m", "--matrixData" }, variableArity = true,
@@ -66,11 +64,15 @@ public class VariableArityTest {
     Assert.assertEquals(config.j, Arrays.asList("--compilation_level", "WHITESPACE_ONLY", "--language_in=ECMASCRIPT5", "-bar", "baz", "-faz", "--more-options"));
   }
 
+  @Parameters(separators = "=")
+  public static class EqualsModelGenerationConfig extends ModelGenerationConfig {
+  }
+
   @Test
   public void verifyVariableArity_unknownOptions() {
     String[] input =
         {"-m", "foo", "--seed", "1024", "-c=foo", "bar", "-f", "foo", "-o=out.txt", "--extra"};
-    ModelGenerationConfig config = new ModelGenerationConfig();
+    EqualsModelGenerationConfig config = new EqualsModelGenerationConfig();
     JCommander com = new JCommander(config);
     com.setProgramName("modelgen");
     com.setAcceptUnknownOptions(true);
