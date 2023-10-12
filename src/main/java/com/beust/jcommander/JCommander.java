@@ -527,7 +527,10 @@ public class JCommander {
     }
 
     private boolean isOption(String passedArg) {
-        if (options.acceptUnknownOptions) return true;
+        return (options.acceptUnknownOptions) || isNamedOption(passedArg);
+    }
+
+    private boolean isNamedOption(String passedArg) {
 
         String arg = options.caseSensitiveOptions ? passedArg : passedArg.toLowerCase();
 
@@ -876,7 +879,8 @@ public class JCommander {
         @Override
         public int processVariableArity(String optionName, String[] options) {
             int i = 0;
-            while (i < options.length && !isOption(options[i])) {
+            // For variableArity we consume everything until we hit a known parameter
+            while (i < options.length && !isNamedOption(options[i])) {
                 i++;
             }
             return i;

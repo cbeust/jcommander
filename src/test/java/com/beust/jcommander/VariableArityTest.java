@@ -64,7 +64,31 @@ public class VariableArityTest {
     Assert.assertEquals(config.j, Arrays.asList("--compilation_level", "WHITESPACE_ONLY", "--language_in=ECMASCRIPT5", "-bar", "baz", "-faz", "--more-options"));
   }
 
+  @Parameters(separators = "=")
+  public static class EqualsModelGenerationConfig extends ModelGenerationConfig {
+  }
+
+  @Test
+  public void verifyVariableArity_unknownOptions() {
+    String[] input =
+        {"-m", "foo", "--seed", "1024", "-c=foo", "bar", "-f", "foo", "-o=out.txt", "--extra"};
+    EqualsModelGenerationConfig config = new EqualsModelGenerationConfig();
+    JCommander com = new JCommander(config);
+    com.setProgramName("modelgen");
+    com.setAcceptUnknownOptions(true);
+
+    com.parse(input);
+
+    Assert.assertNotEquals(config.seed, 0);
+    Assert.assertEquals(config.modelMatrixFile, Arrays.asList("foo"));
+    Assert.assertEquals(config.featureFile, Arrays.asList("foo"));
+    Assert.assertEquals(config.seed, 1024);
+    Assert.assertEquals(config.outputFile, "out.txt");
+    Assert.assertEquals(config.configFile, Arrays.asList("foo", "bar"));
+  }
+
   public static void main(String[] args) {
     new VariableArityTest().verifyVariableArity();
+    new VariableArityTest().verifyVariableArity_unknownOptions();
   }
 }
