@@ -276,7 +276,7 @@ public class Parameterized {
       if (ex.getTargetException() instanceof ParameterException) {
         throw (ParameterException) ex.getTargetException();
       } else {
-        throw new ParameterException(errorMessage(method, ex));
+        throw new ParameterException(errorMessage(method, ex), ex.getTargetException());
       }
     }
   }
