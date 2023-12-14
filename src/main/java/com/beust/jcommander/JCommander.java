@@ -795,6 +795,13 @@ public class JCommander {
                     //
                     initMainParameterValue(arg);
                     String value = a; // If there's a non-quoted version, prefer that one
+
+                    for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
+                            ) {
+                        mainParameter.description.validateParameter(validator,
+                            "Default", value);
+                    }
+
                     Object convertedValue = value;
 
                     // Fix
@@ -813,11 +820,6 @@ public class JCommander {
                         }
                     }
 
-                    for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
-                            ) {
-                        mainParameter.description.validateParameter(validator,
-                            "Default", value);
-                    }
 
                     mainParameter.description.setAssigned(true);
                     mainParameter.addValue(convertedValue);

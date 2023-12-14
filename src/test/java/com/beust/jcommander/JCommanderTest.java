@@ -25,6 +25,7 @@ import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
 import com.beust.jcommander.converters.EnumConverter;
 import com.beust.jcommander.converters.FileConverter;
+import com.beust.jcommander.converters.PathConverter;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
@@ -34,6 +35,7 @@ import org.testng.annotations.Test;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -820,6 +822,25 @@ public class JCommanderTest {
 
         A a = new A();
         new JCommander(a).parse("b");
+    }
+
+    static class PathValidator implements IParameterValidator {
+        @Override
+        public void validate(String name, String value) throws ParameterException {
+            if (value.contains("\0"))
+                throw new ParameterException("this message comes from the validator (not from the converter)");
+        }
+    }
+
+    @Test(expectedExceptions = ParameterException.class, expectedExceptionsMessageRegExp = "this message comes from the validator \\(not from the converter\\)")
+    public void mainParameterShouldBeValidatedBEFOREConversion() throws Throwable {
+        class A {
+            @Parameter(validateWith = PathValidator.class, converter = PathConverter.class)
+            public Path path;
+        }
+
+        A a = new A();
+        new JCommander(a).parse("invalid\0/path");
     }
 
     @Parameters(commandNames = {"--configure"})
