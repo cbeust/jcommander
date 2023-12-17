@@ -189,7 +189,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             }
 
             String category = pd.getCategory();
-            if (!category.equals("")) {
+            if (!category.isEmpty()) {
                 String categoryType = "Category: " + category;
 
                 if (hasDescription) {
@@ -200,7 +200,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                 out.append(categoryType);
             }
 
-            Object def = pd.getDefaultDescription();
+            Object def = pd.getDefaultValueDescription();
 
             if (pd.isDynamicParameter()) {
                 String syntax = "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
