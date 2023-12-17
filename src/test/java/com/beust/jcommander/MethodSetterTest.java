@@ -56,6 +56,23 @@ public class MethodSetterTest {
     Assert.assertTrue(passed, "Should have thrown an exception");
   }
 
+  @Test(expectedExceptions = ParameterException.class)
+  public void setterThatThrowsKeepsOriginalException() {
+    class Arg {
+      @Parameter(names = "--host")
+      public void setHost(String host) {
+        throw new IllegalArgumentException("Illegal host");
+      }
+    }
+    try {
+      JCommander.newBuilder().addObject(new Arg()).build().parse("--host", "host");
+    } catch (ParameterException ex) {
+      Assert.assertEquals(ex.getCause().getClass(), IllegalArgumentException.class);
+      Assert.assertEquals(ex.getCause().getMessage(), "Illegal host");
+      throw ex;
+    }
+  }
+
   public void getterReturningNonString() {
     class Arg {
       private Integer port;
@@ -72,7 +89,7 @@ public class MethodSetterTest {
     Arg args = new Arg();
     JCommander.newBuilder().addObject(args).build().parse("--port", "42");
 
-    Assert.assertEquals(args.port, new Integer(42));
+    Assert.assertEquals(args.port, Integer.valueOf(42));
   }
 
   public void noGetterButWithField() {

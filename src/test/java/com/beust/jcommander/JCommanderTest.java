@@ -25,6 +25,7 @@ import com.beust.jcommander.command.CommandCommit;
 import com.beust.jcommander.command.CommandMain;
 import com.beust.jcommander.converters.EnumConverter;
 import com.beust.jcommander.converters.FileConverter;
+import com.beust.jcommander.converters.PathConverter;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
@@ -34,6 +35,7 @@ import org.testng.annotations.Test;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -522,7 +524,7 @@ public class JCommanderTest {
         ArgsValidate1 a = new ArgsValidate1();
         JCommander jc = new JCommander(a);
         jc.parse("-age", "2");
-        Assert.assertEquals(a.age, new Integer(2));
+        Assert.assertEquals(a.age, Integer.valueOf(2));
     }
 
     @Test(expectedExceptions = ParameterException.class)
@@ -568,6 +570,20 @@ public class JCommanderTest {
         String paramName = "-name2";
         jc.parse(paramName, "param1");
         Assert.assertEquals(ArgMultiNameValidator.MultiNameValidator.parsedName, paramName);
+    }
+
+    @Test
+    public void atFileCanContainNameAndValueInSameLine() throws IOException {
+        File f = File.createTempFile("JCommander", null);
+        f.deleteOnExit();
+        FileWriter fw = new FileWriter(f);
+        fw.write("-verbose 2\n");
+        fw.write("-groups g\n");
+        fw.close();
+        Args1 args1 = new Args1();
+        JCommander.newBuilder().addObject(args1).build().parse("@" + f.getAbsolutePath());
+        Assert.assertEquals(args1.verbose.intValue(), 2);
+        Assert.assertEquals(args1.groups, "g");
     }
 
     public void atFileCanContainEmptyLines() throws IOException {
@@ -806,6 +822,25 @@ public class JCommanderTest {
 
         A a = new A();
         new JCommander(a).parse("b");
+    }
+
+    static class PathValidator implements IParameterValidator {
+        @Override
+        public void validate(String name, String value) throws ParameterException {
+            if (value.contains("\0"))
+                throw new ParameterException("this message comes from the validator (not from the converter)");
+        }
+    }
+
+    @Test(expectedExceptions = ParameterException.class, expectedExceptionsMessageRegExp = "this message comes from the validator \\(not from the converter\\)")
+    public void mainParameterShouldBeValidatedBEFOREConversion() throws Throwable {
+        class A {
+            @Parameter(validateWith = PathValidator.class, converter = PathConverter.class)
+            public Path path;
+        }
+
+        A a = new A();
+        new JCommander(a).parse("invalid\0/path");
     }
 
     @Parameters(commandNames = {"--configure"})
@@ -1432,5 +1467,28 @@ public class JCommanderTest {
     @Test(enabled = false)
     public static void main(String[] args) {
         new JCommanderTest().trimTest();
+    }
+
+    @Test
+    public void ignoreDefaultValueForRequiredParameter() {
+        class Parameters {
+            @Parameter(names = "-v",
+                    required = true,
+                    validateValueWith = StrictlyPositiveInteger.class)
+            private int value;
+        }
+
+        String[] argv = { "-v", "1" };
+        Parameters args = new Parameters();
+        JCommander.newBuilder().addObject(args).build().parse(argv);
+    }
+    static class StrictlyPositiveInteger implements IValueValidator<Integer> {
+        @Override
+        public void validate(String name, Integer i) throws ParameterException {
+            if (i <= 0) {
+                throw new ParameterException("Parameter " + name
+                        + " should be strictly positive (found " + i + ")");
+            }
+        }
     }
 }

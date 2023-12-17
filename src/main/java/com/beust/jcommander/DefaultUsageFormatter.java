@@ -200,7 +200,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                 out.append(categoryType);
             }
 
-            Object def = pd.getDefault();
+            Object def = pd.getDefaultValueDescription();
 
             if (pd.isDynamicParameter()) {
                 String syntax = "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
@@ -279,7 +279,10 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             if (p == null || !p.hidden()) {
                 JCommander.ProgramName progName = commands.getKey();
                 String dispName = progName.getDisplayName();
-                String description = indent + s(4) + dispName + s(6) + getCommandDescription(progName.getName());
+                String commandDescription = Optional.ofNullable(getCommandDescription(progName.getName()))
+                    .map(desc -> s(6) + desc)
+                    .orElse("");
+                String description = indent + s(4) + dispName + commandDescription;
                 wrapDescription(out, indentCount + descriptionIndent, description);
                 out.append("\n");
 

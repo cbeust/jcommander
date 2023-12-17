@@ -21,6 +21,8 @@ package com.beust.jcommander;
 import com.beust.jcommander.validators.NoValidator;
 import com.beust.jcommander.validators.NoValueValidator;
 
+import static com.beust.jcommander.Strings.isStringEmpty;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -74,12 +76,12 @@ public class ParameterDescription {
     ResourceBundle result = null;
 
     Parameters p = o.getClass().getAnnotation(Parameters.class);
-    if (p != null && ! isEmpty(p.resourceBundle())) {
+    if (p != null && ! isStringEmpty(p.resourceBundle())) {
       result = ResourceBundle.getBundle(p.resourceBundle(), Locale.getDefault());
     } else {
       com.beust.jcommander.ResourceBundle a = o.getClass().getAnnotation(
           com.beust.jcommander.ResourceBundle.class);
-      if (a != null && ! isEmpty(a.value())) {
+      if (a != null && ! isStringEmpty(a.value())) {
         result = ResourceBundle.getBundle(a.value(), Locale.getDefault());
       }
     }
@@ -87,13 +89,9 @@ public class ParameterDescription {
     return result;
   }
 
-  private boolean isEmpty(String s) {
-    return s == null || "".equals(s);
-  }
-
   private void initDescription(String description, String descriptionKey, String[] names) {
     this.description = description;
-    if (! "".equals(descriptionKey)) {
+    if (! isStringEmpty(descriptionKey)) {
       if (bundle != null) {
         this.description = bundle.getString(descriptionKey);
       }
@@ -153,7 +151,7 @@ public class ParameterDescription {
     // Validate default values, if any and if applicable
     //
     if (defaultObject != null) {
-      if (parameterAnnotation != null) {
+      if (parameterAnnotation != null && !parameterAnnotation.required()) {
         validateDefaultValues(parameterAnnotation.names());
       }
     }
@@ -169,7 +167,14 @@ public class ParameterDescription {
   }
 
   public Object getDefault() {
-   return defaultObject;
+    return defaultObject;
+  }
+
+  /**
+   * @return defaultValueDescription, if description is empty string, return default Object.
+   */
+  public Object getDefaultValueDescription() {
+    return parameterAnnotation == null ? defaultObject : parameterAnnotation.defaultValueDescription().isEmpty() ? defaultObject : parameterAnnotation.defaultValueDescription();
   }
 
   public String getDescription() {
@@ -284,7 +289,15 @@ public class ParameterDescription {
     }
     if (! isDefault) assigned = true;
 
+    this.value = finalValue;
+
     return finalValue;
+  }
+
+  private Object value;
+
+  Object getValue() {
+	  return value;
   }
 
   private Object handleSubParameters(String value, int currentIndex, Class<?> type,

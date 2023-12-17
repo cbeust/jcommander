@@ -18,6 +18,7 @@
 
 package com.beust.jcommander;
 
+import com.beust.jcommander.parser.DefaultParameterizedParser;
 import com.beust.jcommander.FuzzyMap.IKey;
 import com.beust.jcommander.converters.*;
 import com.beust.jcommander.internal.*;
@@ -46,6 +47,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class JCommander {
     public static final String DEBUG_PROPERTY = "jcommander.debug";
+    
+    protected IParameterizedParser parameterizedParser = new DefaultParameterizedParser();
 
     /**
      * A map to look up parameter description per option name.
@@ -123,6 +126,11 @@ public class JCommander {
      * thrown.
      */
     private Map<Parameterized, ParameterDescription> requiredFields = Maps.newHashMap();
+
+    /**
+     * A set of all the parameters validators to be applied.
+     */
+    private Set<IParametersValidator> parametersValidators = Sets.newHashSet();
 
     /**
      * A map of all the parameterized fields/methods.
@@ -267,6 +275,10 @@ public class JCommander {
         parse(args);
     }
 
+  public void setParameterizedParser(IParameterizedParser parameterizedParser) {
+    this.parameterizedParser = parameterizedParser;
+  }    
+    
     /**
      * Disables expanding {@code @file}.
      *
@@ -373,7 +385,8 @@ public class JCommander {
     }
 
     /**
-     * Make sure that all the required parameters have received a value.
+     * Make sure that all the required parameters have received a value and that
+     * all provided parameters have a value compliant to all given rules.
      */
     private void validateOptions() {
         // No validation if we found a help parameter
@@ -414,6 +427,15 @@ public class JCommander {
                 }
 
             }
+        }
+
+        Map<String, Object> nameValuePairs = Maps.newHashMap();
+        for (ParameterDescription pd : fields.values()) {
+            nameValuePairs.put(pd.getLongestName(), pd.getValue());
+        }
+
+        for (IParametersValidator parametersValidator : parametersValidators) {
+            parametersValidator.validate(nameValuePairs);
         }
     }
 
@@ -508,7 +530,10 @@ public class JCommander {
     }
 
     private boolean isOption(String passedArg) {
-        if (options.acceptUnknownOptions) return true;
+        return (options.acceptUnknownOptions) || isNamedOption(passedArg);
+    }
+
+    private boolean isNamedOption(String passedArg) {
 
         String arg = options.caseSensitiveOptions ? passedArg : passedArg.toLowerCase();
 
@@ -516,6 +541,9 @@ public class JCommander {
             if (matchArg(arg, key)) return true;
         }
         for (IKey key : commands.keySet()) {
+            if (matchArg(arg, key)) return true;
+        }
+        for (IKey key : aliasMap.keySet()) {
             if (matchArg(arg, key)) return true;
         }
 
@@ -565,8 +593,8 @@ public class JCommander {
             // Read through file one line at time. Print line # and line
             while ((line = bufRead.readLine()) != null) {
                 // Allow empty lines and # comments in these at files
-                if (line.length() > 0 && !line.trim().startsWith("#")) {
-                    result.add(line);
+                if (!line.isEmpty() && !line.trim().startsWith("#")) {
+                    result.addAll(Arrays.asList(line.split("\\s")));
                 }
             }
         } catch (IOException e) {
@@ -601,7 +629,20 @@ public class JCommander {
     private void addDescription(Object object) {
         Class<?> cls = object.getClass();
 
-        List<Parameterized> parameterizeds = Parameterized.parseArg(object);
+        Parameters parameters = cls.getAnnotation(Parameters.class);
+        if (parameters != null) {
+            Class<? extends IParametersValidator>[] parametersValidatorClasses = parameters.parametersValidators();
+                for (Class<? extends IParametersValidator> parametersValidatorClass : parametersValidatorClasses) {
+                try {
+                    IParametersValidator parametersValidator = parametersValidatorClass.getDeclaredConstructor().newInstance();
+                    parametersValidators.add(parametersValidator);
+                } catch (ReflectiveOperationException e) {
+                    throw new ParameterException("Cannot instantiate rule: " + parametersValidatorClass, e);
+                }
+            }
+        }
+
+        List<Parameterized> parameterizeds = parameterizedParser.parseArg(object);
         for (Parameterized parameterized : parameterizeds) {
             WrappedParameter wp = parameterized.getWrappedParameter();
             if (wp != null && wp.getParameter() != null) {
@@ -757,6 +798,13 @@ public class JCommander {
                     //
                     initMainParameterValue(arg);
                     String value = a; // If there's a non-quoted version, prefer that one
+
+                    for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
+                            ) {
+                        mainParameter.description.validateParameter(validator,
+                            "Default", value);
+                    }
+
                     Object convertedValue = value;
 
                     // Fix
@@ -775,11 +823,6 @@ public class JCommander {
                         }
                     }
 
-                    for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
-                            ) {
-                        mainParameter.description.validateParameter(validator,
-                            "Default", value);
-                    }
 
                     mainParameter.description.setAssigned(true);
                     mainParameter.addValue(convertedValue);
@@ -809,6 +852,14 @@ public class JCommander {
             if (parameterDescription.isAssigned()) {
                 fields.get(parameterDescription.getParameterized()).setAssigned(true);
             }
+
+            // if the parameter has a default value (not the one assigned by DefaultProvider
+            // but the one assigned on the variable initialization), make it as assigned and
+            // remove it from the list of parameters to be required
+            if (parameterDescription.getDefault() != null && !parameterDescription.getParameterized().getType().isPrimitive()) {
+                fields.get(parameterDescription.getParameterized()).setAssigned(true);
+                requiredFields.remove(parameterDescription.getParameterized());
+            }
         }
 
     }
@@ -833,7 +884,8 @@ public class JCommander {
         @Override
         public int processVariableArity(String optionName, String[] options) {
             int i = 0;
-            while (i < options.length && !isOption(options[i])) {
+            // For variableArity we consume everything until we hit a known parameter
+            while (i < options.length && !isNamedOption(options[i])) {
                 i++;
             }
             return i;
@@ -1025,6 +1077,41 @@ public class JCommander {
         StringBuilder sb = new StringBuilder();
         usageFormatter.usage(sb);
         getConsole().println(sb.toString());
+    }
+    
+    /**
+     * Display the usage for this command.
+     */
+    public void usage(String commandName) {
+        StringBuilder sb = new StringBuilder();
+        usageFormatter.usage(commandName, sb);
+        getConsole().println(sb.toString());
+    }
+
+    /**
+     * Store the help for the command in the passed string builder.
+     */
+    public void usage(String commandName, StringBuilder out) {
+        usageFormatter.usage(commandName, out, "");
+    }
+
+    /**
+     * Store the help for the command in the passed string builder, indenting
+     * every line with "indent".
+     */
+    public void usage(String commandName, StringBuilder out, String indent) {
+        usageFormatter.usage(commandName, out, indent);
+    }
+    
+    /**
+     * Store the help in the passed string builder.
+     */
+    public void usage(StringBuilder out) {
+        usageFormatter.usage(out, "");
+    }
+
+    public void usage(StringBuilder out, String indent) {
+        usageFormatter.usage(out, indent);
     }
 
     /**
@@ -1305,11 +1392,11 @@ public class JCommander {
         }
 
         IStringConverter<?> converter = null;
-        if (type.isAssignableFrom(List.class)) {
+        if (type.isAssignableFrom(List.class) || type.isAssignableFrom(Set.class)) {
             // If a list converter was specified, pass the value to it for direct conversion
             converter = tryInstantiateConverter(optionName, annotation.listConverter());
         }
-        if (type.isAssignableFrom(List.class) && converter == null) {
+        if ((type.isAssignableFrom(List.class) || type.isAssignableFrom(Set.class)) && converter == null) {
             // No list converter: use the single value converter and pass each parsed value to it individually
             final IParameterSplitter splitter = tryInstantiateConverter(null, annotation.splitter());
             converter = new DefaultListConverter(splitter, new IStringConverter() {

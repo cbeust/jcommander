@@ -110,4 +110,29 @@ public class DefaultValueTest {
     set.add(value);
     return set;
   }
+
+  @Test
+  public void missingRequiredParameterWithDefaultValueShouldNotRaiseParameterException() {
+    class MyRequiredOptsWithDefaultValues {
+      @Parameter(names = "-a", required = true)
+      public List<String> list = singletonList("defaultValue");
+    }
+
+    MyRequiredOptsWithDefaultValues opts = new MyRequiredOptsWithDefaultValues();
+    JCommander cmd = new JCommander(opts);
+    cmd.parse(new String[]{});
+  }
+
+  @Test(expectedExceptions = ParameterException.class)
+  public void missingRequiredPrimitiveParameterWithoutDefaultValueMustRaiseParameterException() {
+    class MyRequiredOptsWithDefaultValues {
+      @Parameter(names = "-i", required = true)
+      public int i; // implicit initialization value does not count as a default, so does not satisfy required = true
+    }
+
+    MyRequiredOptsWithDefaultValues opts = new MyRequiredOptsWithDefaultValues();
+    JCommander cmd = new JCommander(opts);
+    cmd.parse(new String[]{});
+  }
+
 }

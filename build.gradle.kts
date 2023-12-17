@@ -1,9 +1,9 @@
 
 
 object This {
-    val version = "1.81"
+    val version = "1.84"
     val artifactId = "jcommander"
-    val groupId = "com.beust"
+    val groupId = "org.jcommander"
     val description = "Command line parsing library for Java"
     val url = "https://jcommander.org"
     val scm = "github.com/cbeust/jcommander"
@@ -56,17 +56,44 @@ plugins {
     `maven-publish`
     signing
     id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
+    id("biz.aQute.bnd.builder") version "5.1.2"
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes(
+                mapOf(
+                    "Bundle-Description" to "A Java library to parse command line options",
+                    "Bundle-License" to "http://www.apache.org/licenses/LICENSE-2.0.txt",
+                    "Bundle-Name" to "com.beust.jcommander",
+                    "Export-Package" to "*;-split-package:=merge-first;-noimport:=true"
+                )
+            )
+        }
+    }
 }
 
 dependencies {
-    listOf("org.testng:testng:7.0.0")
-        .forEach { testCompile(it) }
+    listOf("org.testng:testng:7.0.0", "com.fasterxml.jackson.core:jackson-core:2.13.1",
+        "com.fasterxml.jackson.core:jackson-annotations:2.13.1")
+            .forEach { testImplementation(it) }
+}
+
+tasks.withType<Test> {
+     useTestNG()
 }
 
 //
 // Releases:
 // ./gradlew bintrayUpload (to JCenter)
-// ./gradlew publish (to Sonatype, then go to https://oss.sonatype.org/index.html#stagingRepositories to publish)
+// ./gradlew publish (to Sonatype, then go to https://s01.oss.sonatype.org/index.html#stagingRepositories to publish)
+// Make sure that ~/.gradle/gradle.properties:
+//     signing.keyId=XXXXXXXX
+//     signing.password=
+//     signing.secretKeyRingFile=../../.gnupg/secring.gpg
+// lists a key that's listed in the keyring
+// (gpg --list-keys, last eight digits of the key)
 //
 
 bintray {
@@ -147,8 +174,8 @@ with(publishing) {
         maven {
             name = "sonatype"
             url = if (This.version.contains("SNAPSHOT"))
-                uri("https://oss.sonatype.org/content/repositories/snapshots/") else
-                uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") else
+                uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
                 username = project.findProperty("sonatypeUser")?.toString() ?: System.getenv("SONATYPE_USER")
                 password = project.findProperty("sonatypePassword")?.toString() ?: System.getenv("SONATYPE_PASSWORD")

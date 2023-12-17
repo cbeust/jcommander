@@ -391,4 +391,18 @@ public class DefaultUsageFormatterTest {
         c.getUsageFormatter().usage(sb);
         Assert.assertTrue(sb.toString().contains("Default: <empty string>"));
     }
+
+    @Test
+    public void dontShowNullForMissingCommandDescription() {
+        // given
+        class Command {}
+        JCommander jc = JCommander.newBuilder().addCommand("testCommand", new Command()).build();
+        StringBuilder sb = new StringBuilder();
+
+        // when
+        jc.getUsageFormatter().usage(sb);
+
+        // then
+        Assert.assertFalse(sb.toString().contains("null"));
+    }
 }

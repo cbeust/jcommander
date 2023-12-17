@@ -1,0 +1,6 @@
+com.beust.jcommander
+com.beust.jcommander.converters
+com.beust.jcommander.defaultprovider
+com.beust.jcommander.internal
+com.beust.jcommander.parser
+com.beust.jcommander.validators

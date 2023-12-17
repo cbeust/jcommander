@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 2.0.16">
 <meta name="author" content="Cédric Beust">
 <title>JCommander</title>
 <style>
@@ -712,6 +712,7 @@ pre.pygments.highlight { background-color: rgba(16, 195, 196, 0.05); }
 .pygments .tok-c { color: #999 !important; }
 
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
@@ -727,7 +728,7 @@ pre.pygments.highlight { background-color: rgba(16, 195, 196, 0.05); }
 <li><a href="#_types_of_options">2. Types of options</a>
 <ul class="sectlevel2">
 <li><a href="#_boolean">2.1. Boolean</a></li>
-<li><a href="#_lists">2.2. Lists</a></li>
+<li><a href="#_lists_and_sets">2.2. Lists and Sets</a></li>
 <li><a href="#_password">2.3. Password</a></li>
 <li><a href="#_echo_input">2.4. Echo Input</a></li>
 </ul>
@@ -815,7 +816,7 @@ You annotate fields with descriptions of your options:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">import com.beust.jcommander.Parameter;
+<pre class="prettyprint highlight"><code data-lang="java">import com.beust.jcommander.Parameter;
 
 public class Args {
   @Parameter
@@ -829,6 +830,12 @@ public class Args {
 
   @Parameter(names = "-debug", description = "Debug mode")
   private boolean debug = false;
+
+  private Integer setterParameter;
+  @Parameter(names = "-setterParameter", description = "A parameter annotation on a setter method")
+  public void setParameter(Integer value) {
+    this.setterParameter = value;
+  }
 }</code></pre>
 </div>
 </div>
@@ -837,14 +844,14 @@ public class Args {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Args args = new Args();
+<pre class="prettyprint highlight"><code data-lang="java">Args args = new Args();
 String[] argv = { "-log", "2", "-groups", "unit" };
 JCommander.newBuilder()
   .addObject(args)
   .build()
   .parse(argv);
 
-Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
+Assert.assertEquals(args.verbose.intValue(), 2);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -852,7 +859,7 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class Main {
+<pre class="prettyprint highlight"><code data-lang="java">class Main {
     @Parameter(names={"--length", "-l"})
     int length;
     @Parameter(names={"--pattern", "-p"})
@@ -875,7 +882,7 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -l 512 --pattern 2
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -l 512 --pattern 2
 512 2</code></pre>
 </div>
 </div>
@@ -885,7 +892,10 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 <h2 id="_types_of_options">2. Types of options</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The fields representing your parameters can be of any type. Basic types (<code>Integer</code>, <code>Boolean</code>, etc&#8230;&#8203;) are supported by default and you can write type converters to support any other type (<code>File</code>, etc&#8230;&#8203;).</p>
+<p>The fields representing your parameters can be of any type. Basic types (<code>Integer</code>, <code>Boolean</code>, <code>Enum</code>, etc&#8230;&#8203;) are supported by default and you can write type converters to support any other type (custom types, etc&#8230;&#8203;).</p>
+</div>
+<div class="paragraph">
+<p>In fact, JCommander provides a rather comprehensive set of built-in conversions for commonly used special types, just to name the most notable ones (list is incomplete): <code>char[]</code>, <code>File</code>, <code>Path</code>, <code>URI</code>, <code>URL</code>, <code>InetAddress</code>, <code>Date</code> (ISO 8601), <code>ByteOrder</code>, <code>Charset</code>.</p>
 </div>
 <div class="sect2">
 <h3 id="_boolean">2.1. Boolean</h3>
@@ -894,7 +904,7 @@ Assert.assertEquals(jct.verbose.intValue(), 2);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-debug", description = "Debug mode")
 private boolean debug = false;</code></pre>
 </div>
 </div>
@@ -903,7 +913,7 @@ private boolean debug = false;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode", arity = 1)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-debug", description = "Debug mode", arity = 1)
 private boolean debug = true;</code></pre>
 </div>
 </div>
@@ -912,7 +922,7 @@ private boolean debug = true;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">program -debug true
+<pre class="prettyprint highlight"><code data-lang="bash">program -debug true
 program -debug false</code></pre>
 </div>
 </div>
@@ -921,13 +931,13 @@ program -debug false</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-log", description = "Level of verbosity")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-log", description = "Level of verbosity")
 private Integer verbose = 1;</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">java Main -log 3</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">java Main -log 3</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -935,7 +945,7 @@ private Integer verbose = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -log test</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -log test</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -943,13 +953,13 @@ private Integer verbose = 1;</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_lists">2.2. Lists</h3>
+<h3 id="_lists_and_sets">2.2. Lists and Sets</h3>
 <div class="paragraph">
-<p>When a Parameter annotation is found on a field of type <code>List</code>, JCommander will interpret it as an option that can occur multiple times:</p>
+<p>When a Parameter annotation is found on a field of type <code>List</code> or <code>Set</code>, JCommander will interpret it as an option that can occur multiple times:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-host", description = "The host")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = {"-host", "-hosts"}, description = "Host option can be used multiple times, and may be comma-separated")
 private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 </div>
@@ -958,7 +968,15 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -host host1 -verbose -host host2</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -host host1 -verbose -host host2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively the parameters can be provided as a comma-separated list:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -hosts host1,host2</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -972,7 +990,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsPassword {
+<pre class="prettyprint highlight"><code data-lang="java">public class ArgsPassword {
   @Parameter(names = "-password", description = "Connection password", password = true)
   private String password;
 }</code></pre>
@@ -983,7 +1001,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">Value for -password (Connection password):</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">Value for -password (Connection password):</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -997,7 +1015,7 @@ private List&lt;String&gt; hosts = new ArrayList&lt;&gt;();</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsPassword {
+<pre class="prettyprint highlight"><code data-lang="java">public class ArgsPassword {
   @Parameter(names = "-password", description = "Connection password", password = true, echoInput = true)
   private String password;
 }</code></pre>
@@ -1025,7 +1043,7 @@ interfaces <code>IStringConverter</code> and <code>IParameterSplitter</code>.</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IStringConverter&lt;T&gt; {
+<pre class="prettyprint highlight"><code data-lang="java">public interface IStringConverter&lt;T&gt; {
   T convert(String value);
 }</code></pre>
 </div>
@@ -1035,7 +1053,7 @@ interfaces <code>IStringConverter</code> and <code>IParameterSplitter</code>.</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class FileConverter implements IStringConverter&lt;File&gt; {
+<pre class="prettyprint highlight"><code data-lang="java">public class FileConverter implements IStringConverter&lt;File&gt; {
   @Override
   public File convert(String value) {
     return new File(value);
@@ -1048,7 +1066,7 @@ interfaces <code>IStringConverter</code> and <code>IParameterSplitter</code>.</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-file", converter = FileConverter.class)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-file", converter = FileConverter.class)
 File file;</code></pre>
 </div>
 </div>
@@ -1062,7 +1080,7 @@ File file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-files", converter = FileConverter.class)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-files", converter = FileConverter.class)
 List&lt;File&gt; files;</code></pre>
 </div>
 </div>
@@ -1071,7 +1089,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java App -files file1,file2,file3</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java App -files file1,file2,file3</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1089,7 +1107,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IStringConverterFactory {
+<pre class="prettyprint highlight"><code data-lang="java">public interface IStringConverterFactory {
   &lt;T&gt; Class&lt;? extends IStringConverter&lt;T&gt;&gt; getConverter(Class&lt;T&gt; forType);
 }</code></pre>
 </div>
@@ -1099,7 +1117,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java App -target example.com:8080</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java App -target example.com:8080</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1107,7 +1125,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class HostPort {
+<pre class="prettyprint highlight"><code data-lang="java">public class HostPort {
   public HostPort(String host, String port) {
      this.host = host;
      this.port = port;
@@ -1123,7 +1141,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class HostPortConverter implements IStringConverter&lt;HostPort&gt; {
+<pre class="prettyprint highlight"><code data-lang="java">class HostPortConverter implements IStringConverter&lt;HostPort&gt; {
   @Override
   public HostPort convert(String value) {
     String[] s = value.split(":");
@@ -1137,7 +1155,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class Factory implements IStringConverterFactory {
+<pre class="prettyprint highlight"><code data-lang="java">public class Factory implements IStringConverterFactory {
   public Class&lt;? extends IStringConverter&lt;?&gt;&gt; getConverter(Class forType) {
     if (forType.equals(HostPort.class)) return HostPortConverter.class;
     else return null;
@@ -1149,7 +1167,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsConverterFactory {
+<pre class="prettyprint highlight"><code data-lang="java">public class ArgsConverterFactory {
   @Parameter(names = "-hostport")
   private HostPort hostPort;
 }</code></pre>
@@ -1160,7 +1178,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">ArgsConverterFactory a = new ArgsConverterFactory();
+<pre class="prettyprint highlight"><code data-lang="java">ArgsConverterFactory a = new ArgsConverterFactory();
 JCommander jc = JCommander.newBuilder()
     .addObject(a)
     .addConverterFactory(new Factory())
@@ -1188,7 +1206,7 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IStringConverter&lt;T&gt; {
+<pre class="prettyprint highlight"><code data-lang="java">public interface IStringConverter&lt;T&gt; {
   T convert(String value);
 }</code></pre>
 </div>
@@ -1201,7 +1219,7 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class FileListConverter implements IStringConverter&lt;List&lt;File&gt;&gt; {
+<pre class="prettyprint highlight"><code data-lang="java">public class FileListConverter implements IStringConverter&lt;List&lt;File&gt;&gt; {
   @Override
   public List&lt;File&gt; convert(String files) {
     String [] paths = files.split(",");
@@ -1219,7 +1237,7 @@ Assert.assertEquals(a.hostPort.port.intValue(), 8080);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-files", listConverter = FileListConverter.class)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-files", listConverter = FileListConverter.class)
 List&lt;File&gt; file;</code></pre>
 </div>
 </div>
@@ -1228,7 +1246,7 @@ List&lt;File&gt; file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java App -files file1,file2,file3</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java App -files file1,file2,file3</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1254,7 +1272,7 @@ List&lt;File&gt; file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IParameterSplitter {
+<pre class="prettyprint highlight"><code data-lang="java">public interface IParameterSplitter {
   List&lt;String&gt; split(String value);
 }</code></pre>
 </div>
@@ -1264,7 +1282,7 @@ List&lt;File&gt; file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public static class SemiColonSplitter implements IParameterSplitter {
+<pre class="prettyprint highlight"><code data-lang="java">public static class SemiColonSplitter implements IParameterSplitter {
     public List&lt;String&gt; split(String value) {
       return Arrays.asList(value.split(";"));
     }
@@ -1276,7 +1294,7 @@ List&lt;File&gt; file;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-files", converter = FileConverter.class, splitter = SemiColonSplitter.class)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-files", converter = FileConverter.class, splitter = SemiColonSplitter.class)
 List&lt;File&gt; files;</code></pre>
 </div>
 </div>
@@ -1300,7 +1318,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IParameterValidator {
+<pre class="prettyprint highlight"><code data-lang="java">public interface IParameterValidator {
  /**
    * Validate the parameter.
    *
@@ -1318,7 +1336,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class PositiveInteger implements IParameterValidator {
+<pre class="prettyprint highlight"><code data-lang="java">public class PositiveInteger implements IParameterValidator {
  public void validate(String name, String value)
       throws ParameterException {
     int n = Integer.parseInt(value);
@@ -1334,7 +1352,7 @@ List&lt;File&gt; files;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-age", validateWith = PositiveInteger.class)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-age", validateWith = PositiveInteger.class)
 private Integer age;</code></pre>
 </div>
 </div>
@@ -1346,7 +1364,7 @@ private Integer age;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-count", validateWith = { PositiveInteger.class, CustomOddNumberValidator.class })
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-count", validateWith = { PositiveInteger.class, CustomOddNumberValidator.class })
 private Integer value;</code></pre>
 </div>
 </div>
@@ -1354,7 +1372,71 @@ private Integer value;</code></pre>
 <div class="sect2">
 <h3 id="_global_parameter_validation">4.2. Global parameter validation</h3>
 <div class="paragraph">
-<p>After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified. Because of all the potential combinations involved in such validation, JCommander does not provide any annotation-based solution to perform this validation because such an approach would necessarily be very limited by the very nature of Java annotations. Instead, you should simply perform this validation in Java on all the arguments that JCommander just parsed.</p>
+<p>After parsing your parameters with JCommander, you might want to perform additional validation across these parameters, such as making sure that two mutually exclusive parameters are not both specified.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="java">/**
+ * Validate all parameters.
+ *
+ * @param parameters
+ *            Name-value-pairs of all parameters (e.g. "-host":"localhost").
+ *
+ * @throws ParameterException
+ *             Thrown if validation of the parameters fails.
+ */
+void validate(Map&lt;String, Object&gt; parameters) throws ParameterException;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is an example implementation that will make sure that the boolean options <code>--quiet</code> and <code>--verbose</code> are not enabled at the same time:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="java">public static class QuietAndVerboseAreMutualExclusive implements IParametersValidator {
+    @Override
+    public void validate(Map&lt;String, Object&gt; parameters) throws ParameterException {
+        if (parameters.get("--quiet") == TRUE &amp;&amp; parameters.get("--verbose") == TRUE)
+            throw new ParameterException("--quiet and --verbose are mutually exclusive");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Specify the name of a class implementing this interface in the <code>parametersValidators</code> attribute of your <code>@Parameters</code> annotations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="java">@Parameters(parametersValidators = QuietAndVerboseAreMutualExclusive.class)
+class Flags {
+    @Parameter(names = "--quiet", description = "Do not output anything")
+    boolean quiet;
+
+    @Parameter(names = "--verbose", description = "Output detailed information")
+    boolean verbose;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Attempting to enable <code>--quiet</code> and <code>--verbose</code> at the same time will cause a <code>ParameterException</code> to be thrown.</p>
+</div>
+<div class="paragraph">
+<p>Multiple validators may be specified:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="java">@Parameters(paremetersValidators = { QuietAndVerboseAreMutualExclusive.class, VerboseNeedsLevel.class })
+class Flags {
+    @Parameter(names = "--quiet", description = "Do not output anything")
+    boolean quiet;
+
+    @Parameter(names = "--verbose", description = "Output detailed information")
+    boolean verbose;
+
+    @Parameter(names = "--level", description = "Detail level of verbose information")
+    Integer level;
+}</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -1368,7 +1450,7 @@ private Integer value;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(description = "Files")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(description = "Files")
 private List&lt;String&gt; files = new ArrayList&lt;&gt;();
 
 @Parameter(names = "-debug", description = "Debugging level")
@@ -1380,7 +1462,7 @@ private Integer debug = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -debug file1 file2</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -debug file1 file2</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1396,7 +1478,7 @@ private Integer debug = 1;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsPrivate {
+<pre class="prettyprint highlight"><code data-lang="java">public class ArgsPrivate {
   @Parameter(names = "-verbose")
   private Integer verbose = 1;
 
@@ -1422,7 +1504,7 @@ Assert.assertEquals(args.getVerbose().intValue(), 3);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -log:3</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -log:3</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1430,7 +1512,7 @@ Assert.assertEquals(args.getVerbose().intValue(), 3);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -level=42</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -level=42</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1438,7 +1520,7 @@ Assert.assertEquals(args.getVerbose().intValue(), 3);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameters(separators = "=")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameters(separators = "=")
 public class SeparatorEqual {
   @Parameter(names = "-level")
   private Integer level = 2;
@@ -1455,7 +1537,7 @@ public class SeparatorEqual {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ArgsMaster {
+<pre class="prettyprint highlight"><code data-lang="java">public class ArgsMaster {
   @Parameter(names = "-master")
   private String master;
 }
@@ -1471,7 +1553,7 @@ public class ArgsSlave {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">ArgsMaster m = new ArgsMaster();
+<pre class="prettyprint highlight"><code data-lang="java">ArgsMaster m = new ArgsMaster();
 ArgsSlave s = new ArgsSlave();
 String[] argv = { "-master", "master", "-slave", "slave" };
 JCommander.newBuilder()
@@ -1494,7 +1576,7 @@ Assert.assertEquals(s.slave, "slave");</code></pre>
 <div id="app-listing" class="listingblock">
 <div class="title">/tmp/parameters</div>
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">-verbose
+<pre class="prettyprint highlight"><code data-lang="bash">-verbose
 file1
 file2
 file3</code></pre>
@@ -1502,7 +1584,7 @@ file3</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main @/tmp/parameters</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main @/tmp/parameters</code></pre>
 </div>
 </div>
 </div>
@@ -1517,7 +1599,7 @@ file3</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -pairs slave master foo.xml</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -pairs slave master foo.xml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1525,7 +1607,7 @@ file3</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-pairs", arity = 2, description = "Pairs")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-pairs", arity = 2, description = "Pairs")
 private List&lt;String&gt; pairs;</code></pre>
 </div>
 </div>
@@ -1543,7 +1625,7 @@ private List&lt;String&gt; pairs;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">program -foo a1 a2 a3 -bar
+<pre class="prettyprint highlight"><code data-lang="bash">program -foo a1 a2 a3 -bar
 program -foo a1 -bar</code></pre>
 </div>
 </div>
@@ -1558,7 +1640,7 @@ need to set the boolean <code>variableArity</code> to <code>true</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-foo", variableArity = true)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-foo", variableArity = true)
 public List&lt;String&gt; foo = new ArrayList&lt;&gt;();</code></pre>
 </div>
 </div>
@@ -1571,7 +1653,7 @@ of appearance:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">static class MvParameters {
+<pre class="prettyprint highlight"><code data-lang="java">static class MvParameters {
   @SubParameter(order = 0)
   String from;
 
@@ -1610,7 +1692,7 @@ public void arity() {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = { "-d", "--outputDirectory" }, description = "Directory")
 private String outputDirectory;</code></pre>
 </div>
 </div>
@@ -1619,7 +1701,7 @@ private String outputDirectory;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ java Main -d /tmp
+<pre class="prettyprint highlight"><code data-lang="bash">$ java Main -d /tmp
 $ java Main --outputDirectory /tmp</code></pre>
 </div>
 </div>
@@ -1651,7 +1733,7 @@ $ java Main --outputDirectory /tmp</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-host", required = true)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-host", required = true)
 private String host;</code></pre>
 </div>
 </div>
@@ -1668,7 +1750,7 @@ private String host;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private Integer logLevel = 3;</code></pre>
+<pre class="prettyprint highlight"><code data-lang="java">private Integer logLevel = 3;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1676,7 +1758,7 @@ private String host;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface IDefaultProvider {
+<pre class="prettyprint highlight"><code data-lang="java">public interface IDefaultProvider {
   /**
    * @param optionName The name of the option as specified in the names() attribute
    * of the @Parameter option (e.g. "-file").
@@ -1695,7 +1777,7 @@ private String host;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
+<pre class="prettyprint highlight"><code data-lang="java">private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
   @Override
   public String getDefaultValueFor(String optionName) {
     return "-debug".equals(optionName) ? "false" : "42";
@@ -1710,6 +1792,9 @@ JCommander jc = JCommander.newBuilder()
     .build()</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>For the most common cases, there is no need to actually implement <code>IDefaultProvider</code>, as JCommander contains the classes <code>PropertyFileDefaultProvider</code> and <code>EnvironmentVariableDefaultProvider</code> for reading defaults from a property file (<code>jcommander.properties</code> by default) or from an environment variable (<code>JCOMMANDER_OPTS</code> by default).</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1720,7 +1805,7 @@ JCommander jc = JCommander.newBuilder()
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "--help", help = true)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "--help", help = true)
 private boolean help;</code></pre>
 </div>
 </div>
@@ -1737,7 +1822,7 @@ private boolean help;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ git commit --amend -m "Bug fix"</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">$ git commit --amend -m "Bug fix"</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1745,7 +1830,7 @@ private boolean help;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameters(separators = "=", commandDescription = "Record changes to the repository")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameters(separators = "=", commandDescription = "Record changes to the repository")
 private class CommandCommit {
 
   @Parameter(description = "The list of files to commit")
@@ -1774,7 +1859,7 @@ public class CommandAdd {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">CommandMain cm = new CommandMain();
+<pre class="prettyprint highlight"><code data-lang="java">CommandMain cm = new CommandMain();
 CommandAdd add = new CommandAdd();
 CommandCommit commit = new CommandCommit();
 JCommander jc = JCommander.newBuilder()
@@ -1811,7 +1896,7 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">Usage: &lt;main class&gt; [options]
+<pre class="prettyprint highlight"><code data-lang="bash">Usage: &lt;main class&gt; [options]
   Options:
     -debug          Debug mode (default: false)
     -groups         Comma-separated list of group names to be run
@@ -1827,12 +1912,21 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class Parameters {
+<pre class="prettyprint highlight"><code data-lang="java">class Parameters {
     @Parameter(names = "--importantOption", order = 0)
     private boolean a;
 
     @Parameter(names = "--lessImportantOption", order = 3)
     private boolean b;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can override the description for the default value shown in the usage output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "--start", defaultValueDescription = "The default value is a random number")
+int start = Math.random * 100;</code></pre>
 </div>
 </div>
 </div>
@@ -1845,7 +1939,7 @@ Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pr
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameter(names = "-debug", description = "Debug mode", hidden = true)
+<pre class="prettyprint highlight"><code data-lang="java">@Parameter(names = "-debug", description = "Debug mode", hidden = true)
 private boolean debug = false;</code></pre>
 </div>
 </div>
@@ -1859,7 +1953,7 @@ private boolean debug = false;</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Parameters(resourceBundle = "MessageBundle")
+<pre class="prettyprint highlight"><code data-lang="java">@Parameters(resourceBundle = "MessageBundle")
 private class ArgsI18N2 {
   @Parameter(names = "-host", description = "Host", descriptionKey = "host")
   String hostName;
@@ -1871,7 +1965,7 @@ private class ArgsI18N2 {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">host: Hôte</code></pre>
+<pre class="prettyprint highlight"><code data-lang="bash">host: Hôte</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1890,7 +1984,7 @@ private class ArgsI18N2 {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class Delegate {
+<pre class="prettyprint highlight"><code data-lang="java">class Delegate {
   @Parameter(names = "-port")
   private int port;
 }
@@ -1910,7 +2004,7 @@ JCommander configuration in order to use the delegate:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">MainParams p = new MainParams();
+<pre class="prettyprint highlight"><code data-lang="java">MainParams p = new MainParams();
 JCommander.newBuilder().addObject(p).build()
     .parse("-v", "-port", "1234");
 Assert.assertTrue(p.isVerbose);
@@ -1927,7 +2021,7 @@ Assert.assertEquals(p.delegate.port, 1234);</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@DynamicParameter(names = "-D", description = "Dynamic parameters go here")
+<pre class="prettyprint highlight"><code data-lang="java">@DynamicParameter(names = "-D", description = "Dynamic parameters go here")
 private Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</code></pre>
 </div>
 </div>
@@ -1948,7 +2042,7 @@ You can do this by subclassing <code>IUsageFormatter</code> and then calling <co
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class ParameterNamesUsageFormatter implements IUsageFormatter {
+<pre class="prettyprint highlight"><code data-lang="java">class ParameterNamesUsageFormatter implements IUsageFormatter {
 
     // Extend other required methods as seen in DefaultUsageFormatter
 
@@ -1983,14 +2077,14 @@ You can do this by subclassing <code>IUsageFormatter</code> and then calling <co
 <h3 id="_kotlin">24.1. Kotlin</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-kotlin" data-lang="kotlin">class Args {
+<pre class="prettyprint highlight"><code data-lang="kotlin">class Args {
     @Parameter
     var targets: List&lt;String&gt; = arrayListOf()
 
-    @Parameter(names = arrayOf("-bf", "--buildFile"), description = "The build file")
+    @Parameter(names = ["-bf", "--buildFile"], description = "The build file")
     var buildFile: String? = null
 
-    @Parameter(names = arrayOf("--checkVersions"),
+    @Parameter(names = ["--checkVersions"],
                description = "Check if there are any newer versions of the dependencies")
     var checkVersions = false
 }</code></pre>
@@ -2004,7 +2098,7 @@ You can do this by subclassing <code>IUsageFormatter</code> and then calling <co
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">import com.beust.jcommander.*
+<pre class="prettyprint highlight"><code data-lang="groovy">import com.beust.jcommander.*
 
 class Args {
   @Parameter(names = ["-f", "--file"], description = "File to load. Can be specified multiple times.")
@@ -2029,7 +2123,7 @@ new Args().with {
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://github.com/cbeust/testng/blob/master/src/main/java/org/testng/CommandLineArgs.java">TestNG</a></p>
+<p><a href="https://github.com/testng-team/testng/blob/master/testng-core/src/main/java/org/testng/CommandLineArgs.java">TestNG</a></p>
 </li>
 <li>
 <p><a href="https://github.com/cbeust/kobalt/blob/master/modules/kobalt-plugin-api/src/main/kotlin/com/beust/kobalt/Args.kt">Kobalt</a></p>
@@ -2080,7 +2174,7 @@ new Args().with {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">compile("com.beust:jcommander:1.71")</code></pre>
+<pre class="prettyprint highlight"><code data-lang="groovy">compile("org.jcommander:jcommander:1.83")</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -2092,7 +2186,7 @@ new Args().with {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">compile "com.beust:jcommander:1.71"</code></pre>
+<pre class="prettyprint highlight"><code data-lang="groovy">compile "org.jcommander:jcommander:1.83"</code></pre>
 </div>
 </div>
 <div class="ulist">
@@ -2104,10 +2198,10 @@ new Args().with {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
-  &lt;groupId&gt;com.beust&lt;/groupId&gt;
+<pre class="prettyprint highlight"><code data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.jcommander&lt;/groupId&gt;
   &lt;artifactId&gt;jcommander&lt;/artifactId&gt;
-  &lt;version&gt;1.71&lt;/version&gt;
+  &lt;version&gt;1.83&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -2116,11 +2210,9 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-10-19 11:25:51 PDT
+Last updated 2023-10-21 13:54:32 UTC
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
-<script>prettyPrint()</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
 </body>
 </html>
