@@ -56,6 +56,7 @@ public class MethodSetterTest {
     Assert.assertTrue(passed, "Should have thrown an exception");
   }
 
+  @Test(expectedExceptions = ParameterException.class)
   public void setterThatThrowsKeepsOriginalException() {
     class Arg {
       @Parameter(names = "--host")
@@ -63,15 +64,13 @@ public class MethodSetterTest {
         throw new IllegalArgumentException("Illegal host");
       }
     }
-    boolean passed = false;
     try {
       JCommander.newBuilder().addObject(new Arg()).build().parse("--host", "host");
-    } catch(ParameterException ex) {
+    } catch (ParameterException ex) {
       Assert.assertEquals(ex.getCause().getClass(), IllegalArgumentException.class);
       Assert.assertEquals(ex.getCause().getMessage(), "Illegal host");
-      passed = true;
+      throw ex;
     }
-    Assert.assertTrue(passed, "Should have thrown an exception");
   }
 
   public void getterReturningNonString() {
