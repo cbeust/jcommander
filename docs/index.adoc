@@ -1060,7 +1060,7 @@ JCommander allows you to specify parameters that are not known at compile time, 
 private Map<String, String> params = new HashMap<>();
 ----
 
-You can specify a different assignment string than = by using the attribute assignment.
+You can specify a different assignment string than = by using the attribute `assignment`.
 
 == Custom usage formats
 

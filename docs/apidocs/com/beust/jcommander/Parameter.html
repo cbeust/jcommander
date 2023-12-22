@@ -169,34 +169,41 @@ public @interface <span class="memberNameLabel">Parameter</span></pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>java.lang.String</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#category()">category</a></span></code></th>
+<td class="colLast">
+<div class="block">If specified, the category name will be used to order the description of this parameter when usage() is invoked before the number order() is used.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>java.lang.Class&lt;? extends <a href="IStringConverter.html" title="interface in com.beust.jcommander">IStringConverter</a>&lt;?&gt;&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#converter()">converter</a></span></code></th>
 <td class="colLast">
 <div class="block">The string converter to use for this field.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#defaultValueDescription()">defaultValueDescription</a></span></code></th>
 <td class="colLast">
 <div class="block">Description of default value.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#description()">description</a></span></code></th>
 <td class="colLast">
 <div class="block">A description of this option.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#descriptionKey()">descriptionKey</a></span></code></th>
 <td class="colLast">
 <div class="block">The key used to find the string in the message bundle.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#echoInput()">echoInput</a></span></code></th>
 <td class="colLast">
@@ -204,49 +211,49 @@ public @interface <span class="memberNameLabel">Parameter</span></pre>
  Used in conjunction with password = true</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#forceNonOverwritable()">forceNonOverwritable</a></span></code></th>
 <td class="colLast">
 <div class="block">If true, this parameter can be overwritten through a file or another appearance of the parameter</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#help()">help</a></span></code></th>
 <td class="colLast">
 <div class="block">If true, this parameter is for help.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hidden()">hidden</a></span></code></th>
 <td class="colLast">
 <div class="block">If true, this parameter won't appear in the usage().</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.lang.Class&lt;? extends <a href="IStringConverter.html" title="interface in com.beust.jcommander">IStringConverter</a>&lt;?&gt;&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#listConverter()">listConverter</a></span></code></th>
 <td class="colLast">
 <div class="block">The list string converter to use for this field.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.String[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#names()">names</a></span></code></th>
 <td class="colLast">
 <div class="block">An array of allowed command line parameters (e.g.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#order()">order</a></span></code></th>
 <td class="colLast">
 <div class="block">If specified, this number will be used to order the description of this parameter when usage() is invoked.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#password()">password</a></span></code></th>
 <td class="colLast">
@@ -254,35 +261,35 @@ public @interface <span class="memberNameLabel">Parameter</span></pre>
  (if available).</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#required()">required</a></span></code></th>
 <td class="colLast">
 <div class="block">Whether this option is required.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.Class&lt;? extends <a href="converters/IParameterSplitter.html" title="interface in com.beust.jcommander.converters">IParameterSplitter</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#splitter()">splitter</a></span></code></th>
 <td class="colLast">
 <div class="block">What splitter to use (applicable only on fields of type List).</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>java.lang.Class&lt;? extends <a href="IValueValidator.html" title="interface in com.beust.jcommander">IValueValidator</a>&gt;[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#validateValueWith()">validateValueWith</a></span></code></th>
 <td class="colLast">
 <div class="block">Validate the value for this parameter.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>java.lang.Class&lt;? extends <a href="IParameterValidator.html" title="interface in com.beust.jcommander">IParameterValidator</a>&gt;[]</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#validateWith()">validateWith</a></span></code></th>
 <td class="colLast">
 <div class="block">Validate the parameter found on the command line.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#variableArity()">variableArity</a></span></code></th>
 <td class="colLast">&nbsp;</td>
@@ -667,7 +674,7 @@ public @interface <span class="memberNameLabel">Parameter</span></pre>
 <li class="blockList"><a id="order()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>order</h4>
 <pre>int&nbsp;order</pre>
@@ -678,6 +685,29 @@ public @interface <span class="memberNameLabel">Parameter</span></pre>
 <dl>
 <dt>Default:</dt>
 <dd>-1</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section>
+<ul class="blockList">
+<li class="blockList"><a id="category()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>category</h4>
+<pre>java.lang.String&nbsp;category</pre>
+<div class="block">If specified, the category name will be used to order the description of this parameter when usage() is invoked before the number order() is used.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>(default or specified) category name</dd>
+</dl>
+<dl>
+<dt>Default:</dt>
+<dd>""</dd>
 </dl>
 </li>
 </ul>
