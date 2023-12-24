@@ -1052,7 +1052,7 @@ Assert.assertEquals(p.delegate.port, 1234);
 
 == Dynamic parameters
 
-JCommander allows you to specify parameters that are not known at compile time, such as "-Da=b -Dc=d". Such parameters are specified with the `@DynamicParameter` annotation and must be of type `Map<String, String>`. Dynamic parameters are allowed to appear multiple times on the command line:
+JCommander allows you to specify parameters that are not known at compile time, such as `-Da=b -Dc=d`. Such parameters are specified with the `@DynamicParameter` annotation and must be of type `Map<String, String>`. Dynamic parameters are allowed to appear multiple times on the command line:
 
 [source,java]
 ----
@@ -1060,7 +1060,7 @@ JCommander allows you to specify parameters that are not known at compile time, 
 private Map<String, String> params = new HashMap<>();
 ----
 
-You can specify a different assignment string than = by using the attribute `assignment`.
+You can specify a different assignment string than `=` by using the attribute `assignment`.
 
 == Custom usage formats
 
