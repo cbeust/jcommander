@@ -20,26 +20,15 @@ package com.beust.jcommander.internal;
 
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.IStringConverterFactory;
-import com.beust.jcommander.converters.BigDecimalConverter;
-import com.beust.jcommander.converters.BooleanConverter;
-import com.beust.jcommander.converters.DoubleConverter;
-import com.beust.jcommander.converters.FileConverter;
-import com.beust.jcommander.converters.FloatConverter;
-import com.beust.jcommander.converters.ISO8601DateConverter;
-import com.beust.jcommander.converters.IntegerConverter;
-import com.beust.jcommander.converters.LongConverter;
-import com.beust.jcommander.converters.StringConverter;
-import com.beust.jcommander.converters.PathConverter;
-import com.beust.jcommander.converters.URIConverter;
-import com.beust.jcommander.converters.URLConverter;
+import com.beust.jcommander.converters.*;
 
 import java.io.File;
-import java.lang.NoClassDefFoundError;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Map;
 
 public class DefaultConverterFactory implements IStringConverterFactory {
@@ -64,6 +53,7 @@ public class DefaultConverterFactory implements IStringConverterFactory {
     classConverters.put(File.class, FileConverter.class);
     classConverters.put(BigDecimal.class, BigDecimalConverter.class);
     classConverters.put(Date.class, ISO8601DateConverter.class);
+    classConverters.put(LocalDate.class, ISO8601LocalDateConverter.class);
     classConverters.put(URI.class, URIConverter.class);
     classConverters.put(URL.class, URLConverter.class);
 

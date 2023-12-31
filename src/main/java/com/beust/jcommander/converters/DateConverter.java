@@ -18,32 +18,42 @@
 
 package com.beust.jcommander.converters;
 
-import com.beust.jcommander.ParameterException;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Converts a String to a Date.
  *
- * @author Angus Smithson
+ * @author Ernest Kalimullin
  */
-public class ISO8601DateConverter extends DateConverter<Date> {
+public abstract class DateConverter<T> extends BaseConverter<T> {
 
-  public ISO8601DateConverter(String optionName) {
+  protected static final List<String> DATE_FORMAT_LIST = new ArrayList<>();
+
+  static {
+    initPatterns(
+            "yyyy-MM-dd",
+            "yyyy-MM",
+            "dd.MM.yyyy",
+            "MM/dd/yy",
+            "hh:mm",
+            "hhmmss",
+            "hh:mm:ss"
+    );
+  }
+
+  public DateConverter(String optionName) {
     super(optionName);
   }
 
-  public Date convert(String value) {
-    for (String format : DATE_FORMAT_LIST) {
+  private static void initPatterns(String... patterns) {
+    for (String pattern : patterns) {
       try {
-        return new SimpleDateFormat(format).parse(value);
-      } catch (ParseException ignored) {
-        continue;
+        DATE_FORMAT_LIST.add(pattern);
+      } catch (IllegalArgumentException e) {
+        throw new IllegalStateException("Incorrect date pattern.", e);
       }
     }
-    throw new ParameterException(getErrorString(value, "an ISO-8601 formatted date"));
   }
 
 }
