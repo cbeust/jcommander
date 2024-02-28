@@ -10,7 +10,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
-
 /**
  * Tests the Parameterized parser for substituting the original parser looking go @Parameter
  * but can be replaced to look for other annotations that define run-time parameters.
@@ -69,7 +68,18 @@ public class ParameterizedParserTest {
     Assert.assertTrue(EXPECTED_STACK_LEVEL == commandOptions.subCommands.stackLevel, "Stack level field is not" + EXPECTED_STACK_LEVEL);
     Assert.assertTrue(EXPECTED_LOG_LEVEL.equals(commandOptions.subCommands.loggingLevel), "Log level is not " + EXPECTED_LOG_LEVEL);
   }
-  
+
+  @Test
+  public void ignoreBridgeMethodsTest() {
+    BuilderExample builder = new BuilderExample();
+
+    JCommander jCommander = new JCommander();
+    jCommander.addObject(builder);
+
+    jCommander.parse("--direct-property", "SomeDirectProperty", "--base-property", "SomeBaseProperty");
+    Assert.assertEquals("SomeDirectProperty", builder.directProperty);
+    Assert.assertEquals("SomeBaseProperty", builder.baseProperty);
+  }
   
   public void testFields(JCommander jcommander, Map<String, Boolean> expectedMap) {
     Map<Parameterized,ParameterDescription> fields = jcommander.getFields();
@@ -83,7 +93,5 @@ public class ParameterizedParserTest {
     Assert.assertTrue(expectedMap.containsKey(StandardCommandClassExample_01.PARAM_VERSION), "Version field not found");
     Assert.assertTrue(expectedMap.containsKey(StandardCommandClassExample_02.PARAM_STACK_LEVEL), "Stack level field not found");
     Assert.assertTrue(expectedMap.containsKey(StandardCommandClassExample_02.PARAM_LOG_LEVEL), "Log level field not found");
-    
-    
-  }  
+  }
 }

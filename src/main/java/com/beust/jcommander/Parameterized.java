@@ -121,6 +121,9 @@ public class Parameterized {
       // check methods
       for (Method m : cls.getDeclaredMethods()) {
         m.setAccessible(true);
+        if (m.isBridge() || m.isSynthetic()) {
+          continue;
+        }
         Annotation annotation = m.getAnnotation(Parameter.class);
         Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
         Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
