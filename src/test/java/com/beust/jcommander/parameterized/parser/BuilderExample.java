@@ -16,11 +16,11 @@ public final class BuilderExample extends BaseBuilder<BuilderExample> {
     }
 }
 
-class BaseBuilder<T extends BaseBuilder<?>> {
+class BaseBuilder<T extends BaseBuilder<T>> {
     public String baseProperty;
 
     @Parameter(names = "--base-property")
-    public BaseBuilder<?> setBaseProperty(String baseProperty) {
+    public T setBaseProperty(String baseProperty) {
         this.baseProperty = baseProperty;
         return (T) this;
     }
