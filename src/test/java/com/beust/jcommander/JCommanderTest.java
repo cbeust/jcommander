@@ -31,7 +31,6 @@ import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -1436,6 +1435,20 @@ public class JCommanderTest {
                 .addObject(args)
                 .args(new String[]{"a"})
                 .build();
+    }
+
+    @Test
+    public void noMainParameter() {
+        class Args {
+            @Parameter(names = "-f")
+            private int f;
+        }
+        Args args = new Args();
+        JCommander jcommander =
+            JCommander.newBuilder().addObject(args).args(new String[] {"-f", "1"}).build();
+        Assert.assertNull(jcommander.getMainParameter());
+        Assert.assertNull(jcommander.getMainParameterDescription());
+        Assert.assertNull(jcommander.getMainParameterValue());
     }
 
     @Test
