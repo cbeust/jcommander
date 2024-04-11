@@ -1439,6 +1439,20 @@ public class JCommanderTest {
     }
 
     @Test
+    public void noMainParameter() {
+        class Args {
+            @Parameter(names = "-f")
+            private int f;
+        }
+        Args args = new Args();
+        JCommander jcommander =
+            JCommander.newBuilder().addObject(args).args(new String[] {"-f", "1"}).build();
+        Assert.assertNull(jcommander.getMainParameter());
+        Assert.assertNull(jcommander.getMainParameterDescription());
+        Assert.assertNull(jcommander.getMainParameterValue());
+    }
+
+    @Test
     public void mainWithConverter() {
 
         String path = "..";

@@ -1036,8 +1036,9 @@ public class JCommander {
 
     public String getMainParameterDescription() {
         if (descriptions == null) createDescriptions();
-        return mainParameter.annotation != null ? mainParameter.annotation.description()
-                : null;
+    return mainParameter == null
+        ? null
+        : mainParameter.annotation != null ? mainParameter.annotation.description() : null;
     }
 
     /**
@@ -1322,7 +1323,7 @@ public class JCommander {
      * @return the main parameter description or null if none is defined.
      */
     public ParameterDescription getMainParameterValue() {
-        return mainParameter.description;
+        return mainParameter == null ? null : mainParameter.description;
     }
 
     private void p(String string) {
