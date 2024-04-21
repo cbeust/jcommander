@@ -21,6 +21,8 @@ public class DefaultUsageFormatterTest {
         return ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
     }
 
+    private final String lineSeparator = System.getProperty("line.separator");
+
     private enum TestEnum1 {
         A, B, C, D
     }
@@ -63,35 +65,35 @@ public class DefaultUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         // verify
-        String expected = "Usage: <main class> [options]\n"
-                + "  Options:\n"
-                + "    --a, -a\n"
-                + "      Default: 0\n"
-                + "    --b, -b\n"
-                + "      Default: 2\n"
-                + "    --c, -c\n"
-                + "      sets c\n"
-                + "      Default: 0\n"
-                + "    --d, -d\n"
-                + "      sets d\n"
-                + "      Default: 2\n"
-                + "    --e\n"
-                + "      Options: [A, B, C, D]\n"
-                + "    --f\n"
-                + "      Options: [A, B, C, D]\n"
-                + "      Default: A\n"
-                + "    --g\n"
-                + "      sets g\n"
-                + "      Possible Values: [A, B, C, D]\n"
-                + "    --h\n"
-                + "      sets h\n"
-                + "      Default: A\n"
-                + "      Possible Values: [A, B, C, D]\n"
-                + "    -i\n"
-                + "      Options: []\n"
-                + "    -k\n"
-                + "      sets k\n"
-                + "      Possible Values: []\n";
+        String expected = "Usage: <main class> [options]" + lineSeparator
+                + "  Options:" + lineSeparator
+                + "    --a, -a" + lineSeparator
+                + "      Default: 0" + lineSeparator
+                + "    --b, -b" + lineSeparator
+                + "      Default: 2" + lineSeparator
+                + "    --c, -c" + lineSeparator
+                + "      sets c" + lineSeparator
+                + "      Default: 0" + lineSeparator
+                + "    --d, -d" + lineSeparator
+                + "      sets d" + lineSeparator
+                + "      Default: 2" + lineSeparator
+                + "    --e" + lineSeparator
+                + "      Options: [A, B, C, D]" + lineSeparator
+                + "    --f" + lineSeparator
+                + "      Options: [A, B, C, D]" + lineSeparator
+                + "      Default: A" + lineSeparator
+                + "    --g" + lineSeparator
+                + "      sets g" + lineSeparator
+                + "      Possible Values: [A, B, C, D]" + lineSeparator
+                + "    --h" + lineSeparator
+                + "      sets h" + lineSeparator
+                + "      Default: A" + lineSeparator
+                + "      Possible Values: [A, B, C, D]" + lineSeparator
+                + "    -i" + lineSeparator
+                + "      Options: []" + lineSeparator
+                + "    -k" + lineSeparator
+                + "      sets k" + lineSeparator
+                + "      Possible Values: []" + lineSeparator;
         Assert.assertEquals(sb.toString(), expected);
     }
 
@@ -107,7 +109,7 @@ public class DefaultUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         //verify
-        for (String line : sb.toString().split("\n")) {
+        for (String line : sb.toString().split(lineSeparator)) {
             Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
         }
     }
@@ -124,7 +126,7 @@ public class DefaultUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         //verify
-        for (String line : sb.toString().split("\n")) {
+        for (String line : sb.toString().split(lineSeparator)) {
             Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
         }
     }
@@ -141,7 +143,7 @@ public class DefaultUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         //verify
-        for (String line : sb.toString().split("\n")) {
+        for (String line : sb.toString().split(lineSeparator)) {
             Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
         }
     }
@@ -313,7 +315,7 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
+        Assert.assertTrue(sb.toString().contains("[command options]" + lineSeparator + "  Commands:"));
     }
 
     @Test
@@ -341,7 +343,7 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
+        Assert.assertTrue(sb.toString().contains("command a parameters" + lineSeparator + lineSeparator + "    b"));
     }
 
     @Test
@@ -373,8 +375,8 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
-        Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
+        Assert.assertTrue(sb.toString().contains("command a parameters" + lineSeparator + "        Commands:"));
+        Assert.assertTrue(sb.toString().contains("command b" + lineSeparator + "            Usage:"));
     }
 
     @Test

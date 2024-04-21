@@ -130,7 +130,7 @@ public class CommandTest {
     jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
     StringBuilder out = new StringBuilder();
     jc.getUsageFormatter().usage(out);
-    String firstLine = out.toString().split("\n")[0];
+    String firstLine = out.toString().split(System.getProperty("line.separator"))[0];
     Assert.assertFalse(firstLine.endsWith(" "), "Usage should not have trailing spaces");
   }
 

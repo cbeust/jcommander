@@ -96,7 +96,7 @@ public class ParameterOrderTest {
     commander.getUsageFormatter().usage(out);
     String output = out.toString();
     List<String> order = new ArrayList<>();
-    for (String line : output.split("[\\n\\r]+")) {
+    for (String line : output.split(System.getProperty("line.separator"))) {
       String trimmed = line.trim();
       if (!trimmed.contains(":")) {
         order.add(trimmed);

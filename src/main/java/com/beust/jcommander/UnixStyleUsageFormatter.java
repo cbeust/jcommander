@@ -44,7 +44,7 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0) {
-            out.append(indent).append("  Options:\n");
+            out.append(indent).append("  Options:").append(System.getProperty("line.separator"));
         }
 
         // Calculate prefix indent
@@ -102,7 +102,7 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
             // The magic value 3 is the number of spaces between the name of the option and its description
             // in DefaultUsageFormatter#appendCommands(..)
             wrapDescription(out, indentCount + prefixIndent - 3, initialLinePrefixLength, description);
-            out.append("\n");
+            out.append(System.getProperty("line.separator"));
         }
     }
 }

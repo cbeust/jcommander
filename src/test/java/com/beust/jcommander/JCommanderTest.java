@@ -44,6 +44,8 @@ import java.util.ResourceBundle;
 @Test
 public class JCommanderTest {
 
+    private final String lineSeparator = System.getProperty("line.separator");
+
     public void simpleArgs() throws ParseException {
         Args1 args = new Args1();
         String[] argv = {"-debug", "-log", "2", "-float", "1.2", "-double", "1.3", "-bigdecimal", "1.4",
@@ -577,8 +579,8 @@ public class JCommanderTest {
         File f = File.createTempFile("JCommander", null);
         f.deleteOnExit();
         FileWriter fw = new FileWriter(f);
-        fw.write("-verbose 2\n");
-        fw.write("-groups g\n");
+        fw.write("-verbose 2" + lineSeparator);
+        fw.write("-groups g" + lineSeparator);
         fw.close();
         Args1 args1 = new Args1();
         JCommander.newBuilder().addObject(args1).build().parse("@" + f.getAbsolutePath());
@@ -590,9 +592,9 @@ public class JCommanderTest {
         File f = File.createTempFile("JCommander", null);
         f.deleteOnExit();
         FileWriter fw = new FileWriter(f);
-        fw.write("-log\n");
-        fw.write("\n");
-        fw.write("2\n");
+        fw.write("-log" + lineSeparator);
+        fw.write(lineSeparator);
+        fw.write("2" + lineSeparator);
         fw.close();
         JCommander.newBuilder().addObject(new Args1()).build().parse("@" + f.getAbsolutePath());
     }
@@ -602,10 +604,10 @@ public class JCommanderTest {
         final File f = File.createTempFile("JCommander", null);
         f.deleteOnExit();
         try (OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), utf32)) {
-            fw.write("-log\n");
-            fw.write("2\n");
-            fw.write("-groups\n");
-            fw.write("\u9731\n");
+            fw.write("-log" + lineSeparator);
+            fw.write("2" + lineSeparator);
+            fw.write("-groups" + lineSeparator);
+            fw.write("\u9731" + lineSeparator);
         }
         final Args1 args1 = new Args1();
         final JCommander jc = new JCommander(args1);

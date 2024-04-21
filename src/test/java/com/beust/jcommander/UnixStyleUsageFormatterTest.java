@@ -12,6 +12,8 @@ import java.util.Map;
 @Test
 public class UnixStyleUsageFormatterTest {
 
+    private final String lineSeparator = System.getProperty("line.separator");
+
     private enum TestEnum1 {
         A, B, C, D
     }
@@ -55,18 +57,18 @@ public class UnixStyleUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         // verify
-        String expected = "Usage: <main class> [options]\n"
-                + "  Options:\n"
-                + "    --a, -a (default: 0)\n"
-                + "    --b, -b (default: 2)\n"
-                + "    --c, -c sets c (default: 0)\n"
-                + "    --d, -d sets d (default: 2)\n"
-                + "    --e     Options: [A, B, C, D]\n"
-                + "    --f     Options: [A, B, C, D] (default: A)\n"
-                + "    --g     sets g (values: [A, B, C, D])\n"
-                + "    --h     sets h (default: A) (values: [A, B, C, D])\n"
-                + "    -i      Options: []\n"
-                + "    -k      sets k (values: [])\n";
+        String expected = "Usage: <main class> [options]" + lineSeparator
+                + "  Options:" + lineSeparator
+                + "    --a, -a (default: 0)" + lineSeparator
+                + "    --b, -b (default: 2)" + lineSeparator
+                + "    --c, -c sets c (default: 0)" + lineSeparator
+                + "    --d, -d sets d (default: 2)" + lineSeparator
+                + "    --e     Options: [A, B, C, D]" + lineSeparator
+                + "    --f     Options: [A, B, C, D] (default: A)" + lineSeparator
+                + "    --g     sets g (values: [A, B, C, D])" + lineSeparator
+                + "    --h     sets h (default: A) (values: [A, B, C, D])" + lineSeparator
+                + "    -i      Options: []" + lineSeparator
+                + "    -k      sets k (values: [])" + lineSeparator;
         Assert.assertEquals(sb.toString(), expected);
     }
 
@@ -83,7 +85,7 @@ public class UnixStyleUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         //verify
-        for (String line : sb.toString().split("\n")) {
+        for (String line : sb.toString().split(lineSeparator)) {
             Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
         }
     }
@@ -101,7 +103,7 @@ public class UnixStyleUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         //verify
-        for (String line : sb.toString().split("\n")) {
+        for (String line : sb.toString().split(lineSeparator)) {
             Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
         }
     }
@@ -119,7 +121,7 @@ public class UnixStyleUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         //verify
-        for (String line : sb.toString().split("\n")) {
+        for (String line : sb.toString().split(lineSeparator)) {
             Assert.assertTrue(line.length() <= jc.getColumnSize(), "line length < column size");
         }
     }
@@ -302,7 +304,7 @@ public class UnixStyleUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         jc.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
+        Assert.assertTrue(sb.toString().contains("[command options]" + lineSeparator + "  Commands:"));
     }
 
     @Test
@@ -331,7 +333,7 @@ public class UnixStyleUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         jc.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
+        Assert.assertTrue(sb.toString().contains("command a parameters" + lineSeparator + lineSeparator + "    b"));
     }
 
     @Test
@@ -364,8 +366,8 @@ public class UnixStyleUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         jc.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
-        Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
+        Assert.assertTrue(sb.toString().contains("command a parameters" + lineSeparator + "        Commands:"));
+        Assert.assertTrue(sb.toString().contains("command b" + lineSeparator + "            Usage:"));
     }
 
     @Test

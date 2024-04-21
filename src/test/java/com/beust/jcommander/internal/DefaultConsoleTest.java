@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 
 @Test
 public class DefaultConsoleTest {
+    
   public void readPasswordCanBeCalledMultipleTimes() {
     final InputStream inBackup = System.in;
     try {
@@ -15,12 +16,12 @@ public class DefaultConsoleTest {
       System.setIn(in);
       final Console console = new DefaultConsole();
 
-      in.setData("password1\n");
+      in.setData("password1" + System.getProperty("line.separator"));
       char[] password = console.readPassword(false);
       Assert.assertEquals(password, "password1".toCharArray());
       Assert.assertFalse(in.isClosedCalled(), "System.in stream shouldn't be closed");
 
-      in.setData("password2\n");
+      in.setData("password2" + System.getProperty("line.separator"));
       password = console.readPassword(false);
       Assert.assertEquals(password, "password2".toCharArray());
       Assert.assertFalse(in.isClosedCalled(), "System.in stream shouldn't be closed");

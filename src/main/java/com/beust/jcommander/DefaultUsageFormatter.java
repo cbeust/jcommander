@@ -67,7 +67,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
         if (description != null) {
             out.append(indent).append(description);
-            out.append("\n");
+            out.append(System.getProperty("line.separator"));
         }
         jc.getUsageFormatter().usage(out, indent);
     }
@@ -154,7 +154,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             mainLine.append(" ").append(commander.getMainParameter().getDescription().getDescription());
         }
         wrapDescription(out, indentCount, mainLine.toString());
-        out.append("\n");
+        out.append(System.getProperty("line.separator"));
     }
 
     /**
@@ -169,7 +169,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0) {
-            out.append(indent).append("  Options:\n");
+            out.append(indent).append("  Options:").append(System.getProperty("line.separator"));
         }
 
         for (ParameterDescription pd : sortedParameters) {
@@ -182,7 +182,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .append("  ")
                     .append(parameter.required() ? "* " : "  ")
                     .append(pd.getNames())
-                    .append("\n");
+                    .append(System.getProperty("line.separator"));
 
             if (hasDescription) {
                 wrapDescription(out, indentCount, s(indentCount) + description);
@@ -241,7 +241,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     out.append(possibleValues);
                 }
             }
-            out.append("\n");
+            out.append(System.getProperty("line.separator"));
         }
     }
 
@@ -269,7 +269,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         if (hasOnlyHiddenCommands)
             return;
 
-        out.append(indent + "  Commands:\n");
+        out.append(indent + "  Commands:").append(System.getProperty("line.separator"));
 
         // The magic value 3 is the number of spaces between the name of the option and its description
         for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
@@ -284,12 +284,12 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .orElse("");
                 String description = indent + s(4) + dispName + commandDescription;
                 wrapDescription(out, indentCount + descriptionIndent, description);
-                out.append("\n");
+                out.append(System.getProperty("line.separator"));
 
                 // Options for this command
                 JCommander jc = commander.findCommandByAlias(progName.getName());
                 jc.getUsageFormatter().usage(out, indent + s(6));
-                out.append("\n");
+                out.append(System.getProperty("line.separator"));
             }
         }
     }
@@ -362,7 +362,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     current++;
                 }
             } else {
-                out.append("\n").append(s(indent)).append(word).append(" ");
+                out.append(System.getProperty("line.separator")).append(s(indent)).append(word).append(" ");
                 current = indent + word.length() + 1;
             }
         }
@@ -407,11 +407,11 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     }
 
     /**
-     * Returns new line followed by indent-many spaces.
+     * Returns system dependent line separator followed by indent-many spaces.
      *
-     * @return new line followed by indent-many spaces
+     * @return system dependent line separator followed by indent-many spaces
      */
     private static String newLineAndIndent(int indent) {
-        return "\n" + s(indent);
+        return System.getProperty("line.separator") + s(indent);
     }
 }

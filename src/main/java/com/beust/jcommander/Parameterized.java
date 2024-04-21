@@ -259,7 +259,7 @@ public class Parameterized {
   }
 
   private static String errorMessage(Method m, Exception ex) {
-    return "Could not invoke " + m + "\n    Reason: " + ex.getMessage();
+    return "Could not invoke " + m + System.getProperty("line.separator") + "    Reason: " + ex.getMessage();
   }
 
   public void set(Object object, Object value) {

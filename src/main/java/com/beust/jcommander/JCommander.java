@@ -364,7 +364,11 @@ public class JCommander {
 
     private void parse(boolean validate, String... args) {
         StringBuilder sb = new StringBuilder("Parsing \"");
-        sb.append(Strings.join(" ", args)).append("\"\n  with:").append(Strings.join(" ", objects.toArray()));
+        sb.append(Strings.join(" ", args))
+                .append("\"")
+                .append(System.getProperty("line.separator"))
+                .append("  with:")
+                .append(Strings.join(" ", objects.toArray()));
         p(sb.toString());
 
         if (descriptions == null) createDescriptions();
