@@ -6,11 +6,11 @@ import com.beust.jcommander.Parameter;
  * Because this class extends a class which uses a recursive generic, the compiler will create a bridge method in this
  * class for setBaseProperty that we should ignore when searching for parameterized methods.
  */
-public final class BuilderExample extends BaseBuilder<BuilderExample> {
+public final class BridgeMethodsExample extends BaseBuilder<BridgeMethodsExample> {
     public String directProperty;
 
     @Parameter(names = "--direct-property")
-    public BuilderExample setDirectProperty(String directProperty) {
+    public BridgeMethodsExample setDirectProperty(String directProperty) {
         this.directProperty = directProperty;
         return this;
     }
