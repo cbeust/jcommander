@@ -5,9 +5,8 @@ import com.beust.jcommander.internal.Sets;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Encapsulate a field or a method annotated with @Parameter or @DynamicParameter
@@ -98,6 +97,9 @@ public class Parameterized {
     // and all of its parent types
     Set<Class<?>> types = describeClassTree(rootClass);
 
+    Set<Method> bridgeOrSyntheticMethods = new HashSet<>();
+    Map<String, Parameterized> methods = new HashMap<>();
+
     // analyze each type
     for(Class<?> cls : types) {
 
@@ -120,27 +122,52 @@ public class Parameterized {
 
       // check methods
       for (Method m : cls.getDeclaredMethods()) {
-        m.setAccessible(true);
+        // Ignore bridge and synthetic methods for now
         if (m.isBridge() || m.isSynthetic()) {
           continue;
         }
-        Annotation annotation = m.getAnnotation(Parameter.class);
-        Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
-        Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
-        if (annotation != null) {
-          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-                  null, m));
-        } else if (dynamicParameter != null) {
-          result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
-                  null, m));
-        } else if (delegateAnnotation != null) {
-          result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-                  null, m));
+
+        Parameterized parameterized = createParameterizedFromMethod(m);
+        if (parameterized != null) {
+          methods.put(m.getName(), parameterized);
         }
       }
+
+      // Accumulate the bridge and synthetic methods to check later
+      bridgeOrSyntheticMethods.addAll(Arrays.stream(cls.getDeclaredMethods())
+        .filter(method -> method.isBridge() || method.isSynthetic())
+        .collect(Collectors.toList()));
     }
 
+    // If there are any bridge or synthetic methods that do not have a name which is already present, add them to the
+    // methods map. Otherwise, the non-bridge or non-synthetic method of the same name will take precedence
+    bridgeOrSyntheticMethods.stream()
+      .map(Parameterized::createParameterizedFromMethod)
+      .filter(Objects::nonNull)
+      .forEach(parameterized -> methods.putIfAbsent(parameterized.method.getName(), parameterized));
+
+    result.addAll(methods.values());
+
     return result;
+  }
+
+  private static Parameterized createParameterizedFromMethod(Method m) {
+    m.setAccessible(true);
+    Annotation annotation = m.getAnnotation(Parameter.class);
+    Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
+    Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
+    if (annotation != null) {
+      return new Parameterized(new WrappedParameter((Parameter) annotation), null,
+              null, m);
+    } else if (dynamicParameter != null) {
+      return new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
+              null, m);
+    } else if (delegateAnnotation != null) {
+      return new Parameterized(null, (ParametersDelegate) delegateAnnotation,
+              null, m);
+    }
+
+    return null;
   }
 
   public WrappedParameter getWrappedParameter() {

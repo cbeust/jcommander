@@ -71,7 +71,7 @@ public class ParameterizedParserTest {
 
   @Test
   public void ignoreBridgeMethodsTest() {
-    BuilderExample builder = new BuilderExample();
+    BridgeMethodsExample builder = new BridgeMethodsExample();
 
     JCommander jCommander = new JCommander();
     jCommander.addObject(builder);
