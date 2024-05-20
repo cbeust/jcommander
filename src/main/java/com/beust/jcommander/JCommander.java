@@ -64,7 +64,7 @@ public class JCommander {
      * Description of a main parameter, which can be either a list of string or a single field. Both
      * are subject to converters before being returned to the user.
      */
-    static class MainParameter {
+    static class MainParameter implements IMainParameter {
         /**
          * This field/method will contain whatever command line parameter is not an option.
          */
@@ -93,6 +93,7 @@ public class JCommander {
 
         private boolean firstTimeMainParameter = true;
 
+        @Override
         public ParameterDescription getDescription() {
             return description;
         }
@@ -1144,7 +1145,7 @@ public class JCommander {
         return descriptions;
     }
 
-    public MainParameter getMainParameter() {
+    public IMainParameter getMainParameter() {
         return mainParameter;
     }
 
