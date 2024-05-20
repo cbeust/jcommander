@@ -19,7 +19,7 @@ There will be no frequently scheduled security updates.
 
 All artefacts are published on the Maven Central Repository accompanied by an *.asc GPG signature file.
 
-The GPG signing key used since v1.83 is found on [keyserver.ubunto.com](https://keyserver.ubuntu.com/pks/lookup?search=1D85469D8559C2E1DF5F925131D2D79DF7E85DD3&fingerprint=on&op=index):
+The GPG signing key used since v1.83 is found on [keyserver.ubuntu.com](https://keyserver.ubuntu.com/pks/lookup?search=1D85469D8559C2E1DF5F925131D2D79DF7E85DD3&fingerprint=on&op=index):
 ```
 pub   rsa3072 2023-08-04 [SC] [expires: 2025-08-03]
       1D85 469D 8559 C2E1 DF5F  9251 31D2 D79D F7E8 5DD3
