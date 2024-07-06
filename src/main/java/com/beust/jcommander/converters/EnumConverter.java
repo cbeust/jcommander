@@ -27,16 +27,14 @@ public class EnumConverter<T extends Enum<T>> implements IStringConverter<T> {
 
   @Override
   public T convert(String value) {
-    try {
-      try {
-        return Enum.valueOf(clazz, value);
-      } catch (IllegalArgumentException e) {
-        return Enum.valueOf(clazz, value.toUpperCase());
+    for (T constant : EnumSet.allOf(clazz)) {
+      // the toString method may be overridden, causing what is printed (or what user types) is different from it's declared name
+      if (constant.name().equals(value) || constant.name().equals(value.toUpperCase())
+          || constant.toString().equals(value) || constant.toString().equals(value.toUpperCase())) {
+        return constant;
       }
-    } catch (Exception e) {
-      throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
-          EnumSet.allOf(clazz));
-
     }
+    throw new ParameterException("Invalid value for " + optionName + " parameter. Allowed values:" +
+            EnumSet.allOf(clazz));
   }
 }
