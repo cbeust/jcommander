@@ -2,7 +2,6 @@
 import com.beust.kobalt.plugin.java.javaCompiler
 import com.beust.kobalt.plugin.osgi.osgi
 import com.beust.kobalt.plugin.packaging.assemble
-import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
 import org.apache.maven.model.Developer
 import org.apache.maven.model.License
@@ -24,11 +23,6 @@ val jcommander = project {
     assemble {
         mavenJars {
         }
-    }
-
-    bintray {
-        publish = true
-        sign = true
     }
 
     javaCompiler {

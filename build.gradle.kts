@@ -33,7 +33,6 @@ val kotlinVer by extra { kotlinVersion }
 
 buildscript {
     repositories {
-        jcenter()
         mavenCentral()
         maven { setUrl("https://plugins.gradle.org/m2") }
     }
@@ -45,7 +44,6 @@ java {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     maven { setUrl("https://plugins.gradle.org/m2") }
 }
@@ -55,7 +53,6 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
     id("biz.aQute.bnd.builder") version "5.1.2"
 }
 
@@ -86,7 +83,6 @@ tasks.withType<Test> {
 
 //
 // Releases:
-// ./gradlew bintrayUpload (to JCenter)
 // ./gradlew publish (to Sonatype, then go to https://s01.oss.sonatype.org/index.html#stagingRepositories to publish)
 // Make sure that ~/.gradle/gradle.properties:
 //     signing.keyId=XXXXXXXX
@@ -95,27 +91,6 @@ tasks.withType<Test> {
 // lists a key that's listed in the keyring
 // (gpg --list-keys, last eight digits of the key)
 //
-
-bintray {
-    user = project.findProperty("bintrayUser")?.toString()
-    key = project.findProperty("bintrayApiKey")?.toString()
-    dryRun = false
-    publish = false
-
-    setPublications("custom")
-
-    with(pkg) {
-        repo = "maven"
-        name = This.artifactId
-        with(version) {
-            name = This.version
-            desc = This.description
-            with(gpg) {
-                sign = true
-            }
-        }
-    }
-}
 
 val sourcesJar by tasks.creating(Jar::class) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP

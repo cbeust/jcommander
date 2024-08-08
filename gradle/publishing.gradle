@@ -42,7 +42,6 @@ artifacts {
 
 buildscript {
     repositories {
-        jcenter()
 
     }
     dependencies {
@@ -52,5 +51,4 @@ buildscript {
 }
 
 apply from: 'gradle/publishing-maven.gradle'
-apply from: 'gradle/publishing-jcenter.gradle'
 
