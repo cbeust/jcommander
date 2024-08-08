@@ -4,7 +4,7 @@
 
 | Version          | Supported          | GPG Signing Key  |
 | ---------------- | ------------------ | ---------------- |
-| 1.83             | :white_check_mark: | 31D2D79DF7E85DD3 |
+| 1.83 and later   | :white_check_mark: | 31D2D79DF7E85DD3 |
 | 1.82 and earlier | :x:                | ?                |
 
 ## Reporting a Vulnerability

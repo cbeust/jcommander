@@ -1163,14 +1163,14 @@ You can download JCommander from the following locations:
 
 [source,groovy]
 ----
-compile("org.jcommander:jcommander:1.83")
+compile("org.jcommander:jcommander:1.84")
 ----
 
 - Gradle
 
 [source,groovy]
 ----
-compile "org.jcommander:jcommander:1.83"
+compile "org.jcommander:jcommander:1.84"
 ----
 
 - Maven:
@@ -1180,7 +1180,7 @@ compile "org.jcommander:jcommander:1.83"
 <dependency>
   <groupId>org.jcommander</groupId>
   <artifactId>jcommander</artifactId>
-  <version>1.83</version>
+  <version>1.84</version>
 </dependency>
 ----
 
