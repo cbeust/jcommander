@@ -1,6 +1,8 @@
 package com.beust.jcommander;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Strings {
 
@@ -21,14 +23,6 @@ public class Strings {
     }
 
     public static String join(String delimiter, Object[] args) {
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < args.length; i++) {
-            builder.append(args[i]);
-
-            if (i + 1 < args.length)
-                builder.append(delimiter);
-        }
-        return builder.toString();
+        return Arrays.stream(args).map(String::valueOf).collect(Collectors.joining(delimiter));
     }
 }
