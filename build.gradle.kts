@@ -158,7 +158,7 @@ with(publishing) {
         }
         maven {
             name = "myRepo"
-            url = uri("file://$buildDir/repo")
+            url = uri(layout.buildDirectory.dir("repo"))
         }
     }
 }
