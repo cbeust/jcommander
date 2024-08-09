@@ -11,11 +11,7 @@ public class Strings {
     }
 
     public static boolean startsWith(String s, String with, boolean isCaseSensitive) {
-        if (isCaseSensitive)
-            return s.startsWith(with);
-        else {
-            return s.toLowerCase().startsWith(with.toLowerCase());
-        }
+        return isCaseSensitive ? s.startsWith(with) : s.toLowerCase().startsWith(with.toLowerCase());
     }
 
     public static String join(String delimiter, List<String> args) {
