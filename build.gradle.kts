@@ -77,7 +77,11 @@ dependencies {
             .forEach { testImplementation(it) }
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("--add-exports", "java.base/sun.reflect.annotation=ALL-UNNAMED"))
+}
 tasks.withType<Test> {
+    jvmArgs = listOf("--add-exports", "java.base/sun.reflect.annotation=ALL-UNNAMED")
      useTestNG()
 }
 
