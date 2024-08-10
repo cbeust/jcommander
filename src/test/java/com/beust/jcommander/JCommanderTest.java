@@ -1055,8 +1055,7 @@ public class JCommanderTest {
         Assert.assertEquals(params.username, "@tzellman");
     }
 
-    @Test(enabled = true, description = "Enable top-level @/ampersand file expansion, which should throw in this case",
-            expectedExceptions = ParameterException.class)
+    @Test
     public void enabledAtSignExpansionTest() {
         class Params {
             @Parameter(names = {"-username"})
