@@ -457,17 +457,11 @@ public class JCommander {
         List<String> vResult1 = Lists.newArrayList();
 
         //
-        // Expand @
+        // Expand dynamic args
         //
         for (String arg : originalArgv) {
-
-            if (arg.startsWith("@") && options.expandAtSign) {
-                String fileName = arg.substring(1);
-                vResult1.addAll(readFile(fileName));
-            } else {
-                List<String> expanded = expandDynamicArg(arg);
-                vResult1.addAll(expanded);
-            }
+            List<String> expanded = expandDynamicArg(arg);
+            vResult1.addAll(expanded);
         }
 
         // Expand separators
@@ -735,6 +729,32 @@ public class JCommander {
         boolean isDashDash = false; // once we encounter --, everything goes into the main parameter
         while (i < args.length && !commandParsed) {
             String arg = args[i];
+
+            // 
+            // Expand @
+            // 
+            if (arg.startsWith("@") && options.expandAtSign) {
+                String fileName = arg.substring(1);
+                List<String> fileArgs = readFile(fileName);
+                
+                // Create a new array to hold the expanded arguments
+                String[] newArgs = new String[args.length + fileArgs.size() - 1];
+
+                // Copy the existing arguments before the '@' argument
+                System.arraycopy(args, 0, newArgs, 0, i);
+
+                // Copy the arguments from the file
+                for (int j = 0; j < fileArgs.size(); j++) {
+                    newArgs[i + j] = fileArgs.get(j);
+                }
+
+                // Copy the remaining arguments after the '@' argument
+                System.arraycopy(args, i + 1, newArgs, i + fileArgs.size(), args.length - i - 1);
+
+                args = newArgs;
+                continue;
+            }
+
             String a = trim(arg);
             args[i] = a;
             p("Parsing arg: " + a);
