@@ -744,9 +744,7 @@ public class JCommander {
                 System.arraycopy(args, 0, newArgs, 0, i);
 
                 // Copy the arguments from the file
-                for (int j = 0; j < fileArgs.size(); j++) {
-                    newArgs[i + j] = fileArgs.get(j);
-                }
+                System.arraycopy(fileArgs.toArray(), 0, newArgs, i, fileArgs.size());
 
                 // Copy the remaining arguments after the '@' argument
                 System.arraycopy(args, i + 1, newArgs, i + fileArgs.size(), args.length - i - 1);
