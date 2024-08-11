@@ -35,7 +35,9 @@ import org.testng.annotations.Test;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1056,17 +1058,27 @@ public class JCommanderTest {
     }
 
     @Test
-    public void enabledAtSignExpansionTest() {
+    public void enabledAtSignExpansionTest() throws IOException {
+        Files.writeString(Paths.get("configFile"), "-fromFile");
+
         class Params {
             @Parameter(names = {"-username"})
             protected String username;
+
+            @Parameter(names = "-fromFile")
+            protected boolean fromFile;
+
+            @Parameter(names = "-pastAt")
+            protected String pastAt;
         }
 
         Params params = new Params();
 
         JCommander jc = new JCommander(params);
-        jc.parse("-username", "@tzellman");
+        jc.parse("-username", "@tzellman", "@configFile", "-pastAt", "moreValues");
         Assert.assertEquals(params.username, "@tzellman");
+        Assert.assertTrue(params.fromFile);
+        Assert.assertEquals(params.pastAt, "moreValues");
     }
 
     public void parameterWithOneDoubleQuote() {
