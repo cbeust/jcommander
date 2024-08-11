@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
  * 
  * @author Cedric Beust &lt;cedric@beust.com&gt;
  */
+@Deprecated
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({ TYPE })
 public @interface ResourceBundle {
