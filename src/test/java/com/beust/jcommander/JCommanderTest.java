@@ -18,6 +18,8 @@
 
 package com.beust.jcommander;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.beust.jcommander.args.*;
 import com.beust.jcommander.args.ArgsEnum.ChoiceType;
 import com.beust.jcommander.command.CommandAdd;
@@ -1059,7 +1061,7 @@ public class JCommanderTest {
     @Test
     public void enabledAtSignExpansionTest() throws IOException {
         final Path configFile = Files.createTempFile(null, null);
-        Files.writeString(configFile, "-fromFile");
+        Files.write(configFile, "-fromFile".getBytes(UTF_8));
         try {
             class Params {
                 @Parameter(names = {"-username"})
