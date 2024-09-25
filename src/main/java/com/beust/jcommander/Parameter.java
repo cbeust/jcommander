@@ -127,7 +127,7 @@ public @interface Parameter {
   boolean help() default false;
   
   /**
-   * If true, this parameter can be overwritten through a file or another appearance of the parameter
+   * If true, this parameter can not be overwritten through a file or another appearance of the parameter
    * @return nc
    */
   boolean forceNonOverwritable() default false;
