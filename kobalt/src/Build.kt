@@ -12,7 +12,7 @@ val jcommander = project {
     name = "jcommander"
     group = "com.beust"
     artifactId = name
-    version = "1.78"
+    version = "3.0"
     description = "A Java library to parse command line options"
 
     dependenciesTest {
@@ -26,7 +26,7 @@ val jcommander = project {
     }
 
     javaCompiler {
-        args("-target", "11", "-source", "11", "-g", "-encoding", "utf-8")
+        args("-target", "17", "-source", "17", "-g", "-encoding", "utf-8")
     }
 
     osgi {}
