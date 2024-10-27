@@ -262,6 +262,16 @@ public class ParameterDescription {
     boolean isCollection = Collection.class.isAssignableFrom(type);
 
     Object finalValue;
+    finalValue = handleCollectionTypeParameter(value, isDefault, currentIndex, type, convertedValue, isCollection);
+    if (! isDefault) assigned = true;
+
+    this.value = finalValue;
+
+    return finalValue;
+  }
+
+  private Object handleCollectionTypeParameter(String value, boolean isDefault, int currentIndex, Class<?> type, Object convertedValue, boolean isCollection) {
+    Object finalValue;
     if (isCollection) {
       @SuppressWarnings("unchecked")
       Collection<Object> l = (Collection<Object>) parameterized.get(object);
@@ -287,10 +297,6 @@ public class ParameterDescription {
         finalValue = convertedValue;
       }
     }
-    if (! isDefault) assigned = true;
-
-    this.value = finalValue;
-
     return finalValue;
   }
 
