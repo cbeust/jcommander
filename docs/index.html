@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.16">
+<meta name="generator" content="Asciidoctor 2.0.23">
 <meta name="author" content="Cédric Beust">
 <title>JCommander</title>
 <style>
@@ -1851,6 +1851,12 @@ public class CommandAdd {
 
   @Parameter(names = "-i")
   private Boolean interactive = false;
+}
+
+public class CommandMain {
+
+  @Parameter(names = "-v", description = "Verbose mode")
+  public Boolean verbose = false;
 }</code></pre>
 </div>
 </div>
@@ -2210,7 +2216,7 @@ new Args().with {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-08-18 18:24:00 UTC
+Last updated 2024-11-29 21:12:39 +0100
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
