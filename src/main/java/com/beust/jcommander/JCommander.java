@@ -1096,7 +1096,7 @@ public class JCommander {
     public void usage() {
         StringBuilder sb = new StringBuilder();
         usageFormatter.usage(sb);
-        getConsole().println(sb.toString());
+        getConsole().print(sb.toString());
     }
     
     /**
@@ -1105,7 +1105,7 @@ public class JCommander {
     public void usage(String commandName) {
         StringBuilder sb = new StringBuilder();
         usageFormatter.usage(commandName, sb);
-        getConsole().println(sb.toString());
+        getConsole().print(sb.toString());
     }
 
     /**
