@@ -331,7 +331,14 @@ public class UnixStyleUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         jc.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
+        String expected = "Usage: <main class> [command] [command options]\n"
+                + "  Commands:\n"
+                + "    a      command a\n"
+                + "      Usage: a command a parameters\n"
+                + "\n"
+                + "    b      command b\n"
+                + "      Usage: b command b parameters\n";
+        Assert.assertEquals(sb.toString(), expected);
     }
 
     @Test

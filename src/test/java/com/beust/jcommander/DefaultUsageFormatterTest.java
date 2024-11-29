@@ -5,8 +5,8 @@ import com.beust.jcommander.internal.Maps;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.*;
 import java.util.ResourceBundle;
+import java.util.*;
 
 @Test
 public class DefaultUsageFormatterTest {
@@ -26,6 +26,39 @@ public class DefaultUsageFormatterTest {
     }
 
     private enum TestEnum2 {
+    }
+
+    @Test
+    public void testUsage() {
+        class MainParameters {
+            @Parameter(names = {"-a", "--a", "--a-parameter"}, description = "a parameter")
+            public int a;
+        }
+        @Parameters(commandNames = "one", commandDescription = "one command")
+        class OneCommand {
+            @Parameter(names = {"-b", "--b", "--b-parameter"}, description = "b parameter")
+            public int b;
+        }
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new MainParameters())
+                .addCommand(new OneCommand())
+                .build();
+        StringBuilder output = new StringBuilder();
+        jc.setConsole(new OutputForwardingConsole(output));
+        jc.usage();
+        String expected = "Usage: <main class> [options] [command] [command options]\n"
+                + "  Options:\n"
+                + "    -a, --a, --a-parameter\n"
+                + "      a parameter\n"
+                + "      Default: 0\n"
+                + "  Commands:\n"
+                + "    one      one command\n"
+                + "      Usage: one [options]\n"
+                + "        Options:\n"
+                + "          -b, --b, --b-parameter\n"
+                + "            b parameter\n"
+                + "            Default: 0\n";
+        Assert.assertEquals(output.toString(), expected);
     }
 
     @Test
@@ -341,7 +374,14 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("command a parameters\n\n    b"));
+        String expected = "Usage: <main class> [command] [command options]\n"
+                + "  Commands:\n"
+                + "    a      command a\n"
+                + "      Usage: a command a parameters\n"
+                + "\n"
+                + "    b      command b\n"
+                + "      Usage: b command b parameters\n";
+        Assert.assertEquals(sb.toString(), expected);
     }
 
     @Test
