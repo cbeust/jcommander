@@ -928,8 +928,8 @@ CommandAdd add = new CommandAdd();
 CommandCommit commit = new CommandCommit();
 JCommander jc = JCommander.newBuilder()
     .addObject(cm)
-    .addCommand("add", add);
-    .addCommand("commit", commit);
+    .addCommand("add", add)
+    .addCommand("commit", commit)
     .build();
 
 jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
