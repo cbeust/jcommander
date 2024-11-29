@@ -917,6 +917,12 @@ public class CommandAdd {
   @Parameter(names = "-i")
   private Boolean interactive = false;
 }
+
+public class CommandMain {
+
+  @Parameter(names = "-v", description = "Verbose mode")
+  public Boolean verbose = false;
+}
 ----
 
 Then you register these commands with your JCommander object. After the parsing phase, you call `getParsedCommand()` on your JCommander object, and based on the command that is returned, you know which arg object to inspect (you can still use a main arg object if you want to support options before the first command appears on the command line):
