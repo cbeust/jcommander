@@ -335,7 +335,6 @@ public class UnixStyleUsageFormatterTest {
                 + "  Commands:\n"
                 + "    a      command a\n"
                 + "      Usage: a command a parameters\n"
-                + "\n"
                 + "    b      command b\n"
                 + "      Usage: b command b parameters\n";
         Assert.assertEquals(sb.toString(), expected);

@@ -39,9 +39,15 @@ public class DefaultUsageFormatterTest {
             @Parameter(names = {"-b", "--b", "--b-parameter"}, description = "b parameter")
             public int b;
         }
+        @Parameters(commandNames = "two", commandDescription = "two command")
+        class TwoCommand {
+            @Parameter(names = {"-c", "--c", "--c-parameter"}, description = "c parameter")
+            public int c;
+        }
         JCommander jc = JCommander.newBuilder()
                 .addObject(new MainParameters())
                 .addCommand(new OneCommand())
+                .addCommand(new TwoCommand())
                 .build();
         StringBuilder output = new StringBuilder();
         jc.setConsole(new OutputForwardingConsole(output));
@@ -57,6 +63,12 @@ public class DefaultUsageFormatterTest {
                 + "        Options:\n"
                 + "          -b, --b, --b-parameter\n"
                 + "            b parameter\n"
+                + "            Default: 0\n"
+                + "    two      two command\n"
+                + "      Usage: two [options]\n"
+                + "        Options:\n"
+                + "          -c, --c, --c-parameter\n"
+                + "            c parameter\n"
                 + "            Default: 0\n";
         Assert.assertEquals(output.toString(), expected);
     }
@@ -378,7 +390,6 @@ public class DefaultUsageFormatterTest {
                 + "  Commands:\n"
                 + "    a      command a\n"
                 + "      Usage: a command a parameters\n"
-                + "\n"
                 + "    b      command b\n"
                 + "      Usage: b command b parameters\n";
         Assert.assertEquals(sb.toString(), expected);
