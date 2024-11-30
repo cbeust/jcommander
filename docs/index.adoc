@@ -599,7 +599,7 @@ will allow you to parse:
 
 [source,bash]
 ----
-$ java Main -debug file1 file2
+$ java Main -debug 2 file1 file2
 ----
 
 and the field files will receive the strings `"file1"` and `"file2"`.
@@ -934,8 +934,8 @@ CommandAdd add = new CommandAdd();
 CommandCommit commit = new CommandCommit();
 JCommander jc = JCommander.newBuilder()
     .addObject(cm)
-    .addCommand("add", add);
-    .addCommand("commit", commit);
+    .addCommand("add", add)
+    .addCommand("commit", commit)
     .build();
 
 jc.parse("-v", "commit", "--amend", "--author=cbeust", "A.java", "B.java");
