@@ -53,19 +53,24 @@ public class DefaultUsageFormatterTest {
         jc.setConsole(new OutputForwardingConsole(output));
         jc.usage();
         String expected = "Usage: <main class> [options] [command] [command options]\n"
+                + "\n"
                 + "  Options:\n"
                 + "    -a, --a, --a-parameter\n"
                 + "      a parameter\n"
                 + "      Default: 0\n"
+                + "\n"
                 + "  Commands:\n"
                 + "    one      one command\n"
                 + "      Usage: one [options]\n"
+                + "\n"
                 + "        Options:\n"
                 + "          -b, --b, --b-parameter\n"
                 + "            b parameter\n"
                 + "            Default: 0\n"
+                + "\n"
                 + "    two      two command\n"
                 + "      Usage: two [options]\n"
+                + "\n"
                 + "        Options:\n"
                 + "          -c, --c, --c-parameter\n"
                 + "            c parameter\n"
@@ -109,6 +114,7 @@ public class DefaultUsageFormatterTest {
 
         // verify
         String expected = "Usage: <main class> [options]\n"
+                + "\n"
                 + "  Options:\n"
                 + "    --a, -a\n"
                 + "      Default: 0\n"
@@ -358,7 +364,7 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("[command options]\n  Commands:"));
+        Assert.assertTrue(sb.toString().contains("[command options]\n\n  Commands:"));
     }
 
     @Test
@@ -387,9 +393,11 @@ public class DefaultUsageFormatterTest {
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
         String expected = "Usage: <main class> [command] [command options]\n"
+                + "\n"
                 + "  Commands:\n"
                 + "    a      command a\n"
                 + "      Usage: a command a parameters\n"
+                + "\n"
                 + "    b      command b\n"
                 + "      Usage: b command b parameters\n";
         Assert.assertEquals(sb.toString(), expected);
@@ -424,7 +432,7 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
-        Assert.assertTrue(sb.toString().contains("command a parameters\n        Commands:"));
+        Assert.assertTrue(sb.toString().contains("command a parameters\n\n        Commands:"));
         Assert.assertTrue(sb.toString().contains("command b\n            Usage:"));
     }
 

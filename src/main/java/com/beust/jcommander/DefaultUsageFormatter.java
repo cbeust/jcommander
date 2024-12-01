@@ -169,6 +169,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0) {
+            out.append("\n");
             out.append(indent).append("  Options:\n");
         }
 
@@ -269,14 +270,21 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         if (hasOnlyHiddenCommands)
             return;
 
+        out.append("\n");
         out.append(indent + "  Commands:\n");
 
+        boolean firstCommand = true;
         // The magic value 3 is the number of spaces between the name of the option and its description
         for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
             Object arg = commands.getValue().getObjects().get(0);
             Parameters p = arg.getClass().getAnnotation(Parameters.class);
 
             if (p == null || !p.hidden()) {
+                if (!firstCommand) {
+                    out.append("\n");
+                } else {
+                    firstCommand = false;
+                }
                 JCommander.ProgramName progName = commands.getKey();
                 String dispName = progName.getDisplayName();
                 String commandDescription = Optional.ofNullable(getCommandDescription(progName.getName()))
