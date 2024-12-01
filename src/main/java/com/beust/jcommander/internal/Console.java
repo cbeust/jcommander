@@ -2,9 +2,9 @@ package com.beust.jcommander.internal;
 
 public interface Console {
 
-  void print(String msg);
+  void print(CharSequence msg);
 
-  void println(String msg);
+  void println(CharSequence msg);
 
   char[] readPassword(boolean echoInput);
 }

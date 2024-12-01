@@ -39,12 +39,12 @@ public class PathConverter extends BaseConverter<Path> {
     try {
       return Paths.get(value);
     } catch (InvalidPathException e) {
-      String encoded = escapeUnprintable(value);
+      String encoded = escapeUnprintable(value).toString();
       throw new ParameterException(getErrorString(encoded, "a path"));
     }
   }
 
-  private static String escapeUnprintable(String value) {
+  private static CharSequence escapeUnprintable(String value) {
     StringBuilder bldr = new StringBuilder();
     for (char c: value.toCharArray()) {
         if (c < ' ') {
@@ -53,6 +53,6 @@ public class PathConverter extends BaseConverter<Path> {
             bldr.append(c);
         }
     }
-    return bldr.toString();
+    return bldr;
   }
 }

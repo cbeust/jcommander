@@ -18,11 +18,11 @@ public class DefaultConsole implements Console {
     this.target = System.out;
   }
 
-  public void print(String msg) {
+  public void print(CharSequence msg) {
     target.print(msg);
   }
 
-  public void println(String msg) {
+  public void println(CharSequence msg) {
     target.println(msg);
   }
 

@@ -17,11 +17,11 @@ public class JDK6Console implements Console {
     writer = (PrintWriter) writerMethod.invoke(console);
   }
 
-  public void print(String msg) {
+  public void print(CharSequence msg) {
     writer.print(msg);
   }
 
-  public void println(String msg) {
+  public void println(CharSequence msg) {
     writer.println(msg);
   }
 

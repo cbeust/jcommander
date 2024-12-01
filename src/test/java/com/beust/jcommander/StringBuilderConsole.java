@@ -11,12 +11,12 @@ public class StringBuilderConsole implements Console {
 	}
 
 	@Override
-	public void print(String msg) {
+	public void print(CharSequence msg) {
 		output.append(msg);
 	}
 
 	@Override
-	public void println(String msg) {
+	public void println(CharSequence msg) {
 		print(msg);
 		output.append('\n');
 	}

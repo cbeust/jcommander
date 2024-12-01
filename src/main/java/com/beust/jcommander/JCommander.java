@@ -1096,7 +1096,7 @@ public class JCommander {
     public void usage() {
         StringBuilder sb = new StringBuilder();
         usageFormatter.usage(sb);
-        getConsole().print(sb.toString());
+        getConsole().print(sb);
     }
     
     /**
@@ -1105,7 +1105,7 @@ public class JCommander {
     public void usage(String commandName) {
         StringBuilder sb = new StringBuilder();
         usageFormatter.usage(commandName, sb);
-        getConsole().print(sb.toString());
+        getConsole().print(sb);
     }
 
     /**
@@ -1566,13 +1566,13 @@ public class JCommander {
     /**
      * @return n spaces
      */
-    private String s(int count) {
+    private CharSequence s(int count) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < count; i++) {
             result.append(" ");
         }
 
-        return result.toString();
+        return result;
     }
 
     /**
@@ -1636,15 +1636,15 @@ public class JCommander {
             StringBuilder sb = new StringBuilder();
             sb.append(name);
             if (!aliases.isEmpty()) {
-                sb.append("(");
+                sb.append('(');
                 Iterator<String> aliasesIt = aliases.iterator();
                 while (aliasesIt.hasNext()) {
                     sb.append(aliasesIt.next());
                     if (aliasesIt.hasNext()) {
-                        sb.append(",");
+                        sb.append(',');
                     }
                 }
-                sb.append(")");
+                sb.append(')');
             }
             return sb.toString();
         }

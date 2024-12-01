@@ -40,7 +40,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     public final void usage(String commandName) {
         StringBuilder sb = new StringBuilder();
         usage(commandName, sb);
-        commander.getConsole().print(sb.toString());
+        commander.getConsole().println(sb);
     }
 
     /**
@@ -153,7 +153,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         if (commander.getMainParameter() != null && commander.getMainParameter().getDescription() != null) {
             mainLine.append(" ").append(commander.getMainParameter().getDescription().getDescription());
         }
-        wrapDescription(out, indentCount, mainLine.toString());
+        wrapDescription(out, indentCount, mainLine);
         out.append('\n');
     }
 
@@ -286,7 +286,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     firstCommand = false;
                 }
                 JCommander.ProgramName progName = commands.getKey();
-                String dispName = progName.getDisplayName();
+                var dispName = progName.getDisplayName();
                 String commandDescription = Optional.ofNullable(getCommandDescription(progName.getName()))
                     .map(desc -> s(6) + desc)
                     .orElse("");
@@ -352,9 +352,9 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      *                          description}. If the first line needs to be indented prepend the
      *                          correct number of spaces to {@code description}.
      */
-    public void wrapDescription(StringBuilder out, int indent, int currentLineIndent, String description) {
+    public void wrapDescription(StringBuilder out, int indent, int currentLineIndent, CharSequence description) {
         int max = commander.getColumnSize();
-        String[] words = description.split(" ");
+        String[] words = description.toString().split(" ");
         int current = currentLineIndent;
 
         for (int i = 0; i < words.length; i++) {
@@ -385,7 +385,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      *                    correct number of spaces to {@code description}.
      * @see #wrapDescription(StringBuilder, int, int, String)
      */
-    public void wrapDescription(StringBuilder out, int indent, String description) {
+    public void wrapDescription(StringBuilder out, int indent, CharSequence description) {
         wrapDescription(out, indent, 0, description);
     }
 
@@ -404,13 +404,13 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      *
      * @return count-many spaces
      */
-    public static String s(int count) {
+    public static CharSequence s(int count) {
         StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < count; i++) {
             result.append(" ");
         }
-        return result.toString();
+        return result;
     }
 
     /**
