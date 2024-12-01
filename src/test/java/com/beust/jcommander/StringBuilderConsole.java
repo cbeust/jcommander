@@ -2,11 +2,11 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.internal.Console;
 
-public class OutputForwardingConsole implements Console {
+public class StringBuilderConsole implements Console {
 
 	public final StringBuilder output;
 
-	public OutputForwardingConsole(StringBuilder output) {
+	public StringBuilderConsole(StringBuilder output) {
 		this.output = output;
 	}
 
