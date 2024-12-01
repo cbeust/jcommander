@@ -404,13 +404,8 @@ public class DefaultUsageFormatter implements IUsageFormatter {
      *
      * @return count-many spaces
      */
-    public static CharSequence s(int count) {
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < count; i++) {
-            result.append(" ");
-        }
-        return result;
+    public static String s(int count) {
+        return " ".repeat(count);
     }
 
     /**

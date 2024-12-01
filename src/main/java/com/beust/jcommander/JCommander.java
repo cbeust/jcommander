@@ -1566,13 +1566,8 @@ public class JCommander {
     /**
      * @return n spaces
      */
-    private CharSequence s(int count) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            result.append(" ");
-        }
-
-        return result;
+    private String s(int count) {
+        return " ".repeat(count);
     }
 
     /**
