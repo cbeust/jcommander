@@ -102,7 +102,7 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
             // The magic value 3 is the number of spaces between the name of the option and its description
             // in DefaultUsageFormatter#appendCommands(..)
             wrapDescription(out, indentCount + prefixIndent - 3, initialLinePrefixLength, description);
-            out.append("\n");
+            out.append('\n');
         }
     }
 }

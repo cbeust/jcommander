@@ -18,7 +18,7 @@ public class StringBuilderConsole implements Console {
 	@Override
 	public void println(String msg) {
 		print(msg);
-		output.append("\n");
+		output.append('\n');
 	}
 
 	@Override
