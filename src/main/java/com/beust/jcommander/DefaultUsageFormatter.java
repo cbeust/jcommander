@@ -67,7 +67,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
         if (description != null) {
             out.append(indent).append(description);
-            out.append("\n");
+            out.append('\n');
         }
         jc.getUsageFormatter().usage(out, indent);
     }
@@ -154,7 +154,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             mainLine.append(" ").append(commander.getMainParameter().getDescription().getDescription());
         }
         wrapDescription(out, indentCount, mainLine.toString());
-        out.append("\n");
+        out.append('\n');
     }
 
     /**
@@ -169,7 +169,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     public void appendAllParametersDetails(StringBuilder out, int indentCount, String indent,
             List<ParameterDescription> sortedParameters) {
         if (sortedParameters.size() > 0) {
-            out.append("\n");
+            out.append('\n');
             out.append(indent).append("  Options:\n");
         }
 
@@ -183,7 +183,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .append("  ")
                     .append(parameter.required() ? "* " : "  ")
                     .append(pd.getNames())
-                    .append("\n");
+                    .append('\n');
 
             if (hasDescription) {
                 wrapDescription(out, indentCount, s(indentCount) + description);
@@ -242,7 +242,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     out.append(possibleValues);
                 }
             }
-            out.append("\n");
+            out.append('\n');
         }
     }
 
@@ -270,10 +270,10 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         if (hasOnlyHiddenCommands)
             return;
 
-        out.append("\n");
+        out.append('\n');
         out.append(indent + "  Commands:\n");
 
-        boolean firstCommand = true;
+        var firstCommand = true;
         // The magic value 3 is the number of spaces between the name of the option and its description
         for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
             Object arg = commands.getValue().getObjects().get(0);
@@ -281,7 +281,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
             if (p == null || !p.hidden()) {
                 if (!firstCommand) {
-                    out.append("\n");
+                    out.append('\n');
                 } else {
                     firstCommand = false;
                 }
@@ -292,7 +292,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .orElse("");
                 String description = indent + s(4) + dispName + commandDescription;
                 wrapDescription(out, indentCount + descriptionIndent, description);
-                out.append("\n");
+                out.append('\n');
 
                 // Options for this command
                 JCommander jc = commander.findCommandByAlias(progName.getName());
@@ -369,7 +369,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     current++;
                 }
             } else {
-                out.append("\n").append(s(indent)).append(word).append(" ");
+                out.append('\n').append(s(indent)).append(word).append(" ");
                 current = indent + word.length() + 1;
             }
         }
