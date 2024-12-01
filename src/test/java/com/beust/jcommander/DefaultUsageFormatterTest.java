@@ -50,7 +50,7 @@ public class DefaultUsageFormatterTest {
                 .addCommand(new TwoCommand())
                 .build();
         StringBuilder output = new StringBuilder();
-        jc.setConsole(new OutputForwardingConsole(output));
+        jc.setConsole(new StringBuilderConsole(output));
         jc.usage();
         String expected = "Usage: <main class> [options] [command] [command options]\n"
                 + "\n"
