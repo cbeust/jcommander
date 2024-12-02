@@ -186,13 +186,7 @@ public class ParameterDescription {
   }
 
   public String getNames() {
-    StringBuilder sb = new StringBuilder();
-    String[] names = wrappedParameter.names();
-    for (int i = 0; i < names.length; i++) {
-      if (i > 0) sb.append(", ");
-      sb.append(names[i]);
-    }
-    return sb.toString();
+    return String.join(", ", wrappedParameter.names());
   }
 
   public String getCategory() {
