@@ -319,9 +319,9 @@ public class JCommander {
      */
     // declared final since this is invoked from constructors
     public final void addObject(Object object) {
-        if (object instanceof Iterable) {
+        if (object instanceof Iterable i) {
             // Iterable
-            for (Object o : (Iterable<?>) object) {
+            for (Object o : i) {
                 objects.add(o);
             }
         } else if (object.getClass().isArray()) {
@@ -835,11 +835,10 @@ public class JCommander {
                     }
 
                     Type genericType = mainParameter.parameterized.getGenericType();
-                    if (genericType instanceof ParameterizedType) {
-                        ParameterizedType p = (ParameterizedType) genericType;
+                    if (genericType instanceof ParameterizedType p) {
                         Type cls = p.getActualTypeArguments()[0];
-                        if (cls instanceof Class) {
-                            convertedValue = convertValue(mainParameter.parameterized, (Class) cls, null, value);
+                        if (cls instanceof Class c) {
+                            convertedValue = convertValue(mainParameter.parameterized, c, null, value);
                         }
                     }
 
@@ -947,10 +946,10 @@ public class JCommander {
     private int processVariableArity(String[] args, int index, ParameterDescription pd, boolean validate) {
         Object arg = pd.getObject();
         IVariableArity va;
-        if (!(arg instanceof IVariableArity)) {
+        if (!(arg instanceof IVariableArity iva)) {
             va = DEFAULT_VARIABLE_ARITY;
         } else {
-            va = (IVariableArity) arg;
+            va = iva;
         }
 
         int arity = determineArity(args, index, pd, va);
@@ -1423,7 +1422,7 @@ public class JCommander {
                 @Override
                 public Object convert(String value) {
                     final Type genericType = parameterized.findFieldGenericType();
-                    return convertValue(parameterized, genericType instanceof Class ? (Class) genericType : String.class, null, value);
+                    return convertValue(parameterized, genericType instanceof Class c ? c : String.class, null, value);
                 }
             });
         }

@@ -303,8 +303,8 @@ public class Parameterized {
       throw new ParameterException(errorMessage(method, ex));
     } catch (InvocationTargetException ex) {
       // If a ParameterException was thrown, don't wrap it into another one
-      if (ex.getTargetException() instanceof ParameterException) {
-        throw (ParameterException) ex.getTargetException();
+      if (ex.getTargetException() instanceof ParameterException pe) {
+        throw pe;
       } else {
         throw new ParameterException(errorMessage(method, ex), ex.getTargetException());
       }
@@ -334,13 +334,11 @@ public class Parameterized {
     if (method != null) {
       return null;
     } else {
-      if (field.getGenericType() instanceof ParameterizedType) {
-        ParameterizedType p = (ParameterizedType) field.getGenericType();
+      if (field.getGenericType() instanceof ParameterizedType p) {
         Type cls = p.getActualTypeArguments()[0];
-        if (cls instanceof Class) {
-          return cls;
-        } else if ( cls instanceof WildcardType) {
-          WildcardType wildcardType = (WildcardType)cls;
+        if (cls instanceof Class c) {
+          return c;
+        } else if (cls instanceof WildcardType wildcardType) {
           if (wildcardType.getLowerBounds().length > 0) {
             return wildcardType.getLowerBounds()[0];
           }

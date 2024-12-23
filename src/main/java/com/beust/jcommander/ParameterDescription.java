@@ -263,8 +263,8 @@ public class ParameterDescription {
           l = newCollection(type);
           parameterized.set(object, l);
       }
-      if (convertedValue instanceof Collection) {
-          l.addAll((Collection) convertedValue);
+      if (convertedValue instanceof Collection c) {
+          l.addAll(c);
       } else {
           l.add(convertedValue);
       }
