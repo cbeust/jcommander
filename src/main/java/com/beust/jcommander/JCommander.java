@@ -363,7 +363,7 @@ public class JCommander {
 
     private void parse(boolean validate, String... args) {
         StringBuilder sb = new StringBuilder("Parsing \"");
-        sb.append(Strings.join(" ", args)).append("\"\n  with:").append(Strings.join(" ", objects.toArray()));
+        sb.append(String.join(" ", args)).append("\"\n  with:").append(Strings.join(" ", objects.toArray()));
         p(sb.toString());
 
         if (descriptions == null) createDescriptions();
@@ -394,9 +394,9 @@ public class JCommander {
         if (!requiredFields.isEmpty()) {
             List<String> missingFields = new ArrayList<>();
             requiredFields.values().forEach(pd ->
-                missingFields.add("[" + Strings.join(" | ", pd.getParameter().names()) + "]")
+                missingFields.add("[" + String.join(" | ", pd.getParameter().names()) + "]")
             );
-            String message = Strings.join(", ", missingFields);
+            String message = String.join(", ", missingFields);
             throw new ParameterException("The following "
                     + pluralize(requiredFields.size(), "option is required: ", "options are required: ")
                     + message);

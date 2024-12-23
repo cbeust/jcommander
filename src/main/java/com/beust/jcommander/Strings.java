@@ -14,6 +14,7 @@ public class Strings {
         return isCaseSensitive ? s.startsWith(with) : s.toLowerCase().startsWith(with.toLowerCase());
     }
 
+    @Deprecated(forRemoval = true, since = "3.0.0")
     public static String join(String delimiter, List<String> args) {
         return String.join(delimiter, args);
     }
