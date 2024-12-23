@@ -362,9 +362,8 @@ public class JCommander {
     }
 
     private void parse(boolean validate, String... args) {
-        StringBuilder sb = new StringBuilder("Parsing \"");
-        sb.append(String.join(" ", args)).append("\"\n  with:").append(Strings.join(" ", objects.toArray()));
-        p(sb.toString());
+        p("Parsing \""
+            + String.join(" ", args) + "\"\n  with:" + Strings.join(" ", objects.toArray()));
 
         if (descriptions == null) createDescriptions();
         initializeDefaultValues();
