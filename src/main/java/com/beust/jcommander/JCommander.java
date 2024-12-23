@@ -321,9 +321,7 @@ public class JCommander {
     public final void addObject(Object object) {
         if (object instanceof Iterable i) {
             // Iterable
-            for (Object o : i) {
-                objects.add(o);
-            }
+            i.forEach(objects::add);
         } else if (object.getClass().isArray()) {
             // Array
             for (Object o : (Object[]) object) {
@@ -376,13 +374,10 @@ public class JCommander {
 
     private void initializeDefaultValues() {
         if (options.defaultProvider != null) {
-            for (ParameterDescription pd : descriptions.values()) {
-                initializeDefaultValue(pd);
-            }
+            descriptions.values().forEach(this::initializeDefaultValue);
 
-            for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
-                entry.getValue().initializeDefaultValues();
-            }
+            commands.entrySet().forEach(entry ->
+                entry.getValue().initializeDefaultValues());
         }
     }
 
@@ -398,9 +393,9 @@ public class JCommander {
 
         if (!requiredFields.isEmpty()) {
             List<String> missingFields = new ArrayList<>();
-            for (ParameterDescription pd : requiredFields.values()) {
-                missingFields.add("[" + Strings.join(" | ", pd.getParameter().names()) + "]");
-            }
+            requiredFields.values().forEach(pd ->
+                missingFields.add("[" + Strings.join(" | ", pd.getParameter().names()) + "]")
+            );
             String message = Strings.join(", ", missingFields);
             throw new ParameterException("The following "
                     + pluralize(requiredFields.size(), "option is required: ", "options are required: ")
@@ -432,13 +427,13 @@ public class JCommander {
         }
 
         Map<String, Object> nameValuePairs = Maps.newHashMap();
-        for (ParameterDescription pd : fields.values()) {
-            nameValuePairs.put(pd.getLongestName(), pd.getValue());
-        }
+        fields.values().forEach(pd ->
+            nameValuePairs.put(pd.getLongestName(), pd.getValue())
+        );
 
-        for (IParametersValidator parametersValidator : parametersValidators) {
-            parametersValidator.validate(nameValuePairs);
-        }
+        parametersValidators.forEach(parametersValidator ->
+            parametersValidator.validate(nameValuePairs)
+        );
     }
 
     private static String pluralize(int quantity, String singular, String plural) {
@@ -467,7 +462,7 @@ public class JCommander {
         // Expand separators
         //
         List<String> vResult2 = Lists.newArrayList();
-        for (String arg : vResult1) {
+        vResult1.forEach(arg -> {
             if (isOption(arg)) {
                 String sep = getSeparatorFor(arg);
                 if (!" ".equals(sep)) {
@@ -481,7 +476,7 @@ public class JCommander {
             } else {
                 vResult2.add(arg);
             }
-        }
+        });
 
         return vResult2.toArray(new String[vResult2.size()]);
     }
@@ -617,9 +612,7 @@ public class JCommander {
     public void createDescriptions() {
         descriptions = Maps.newHashMap();
 
-        for (Object object : objects) {
-            addDescription(object);
-        }
+        objects.forEach(this::addDescription);
     }
 
     private void addDescription(Object object) {
@@ -867,7 +860,7 @@ public class JCommander {
         }
 
         // Mark the parameter descriptions held in fields as assigned
-        for (ParameterDescription parameterDescription : descriptions.values()) {
+        descriptions.values().forEach(parameterDescription -> {
             if (parameterDescription.isAssigned()) {
                 fields.get(parameterDescription.getParameterized()).setAssigned(true);
             }
@@ -878,7 +871,7 @@ public class JCommander {
             if (parameterDescription.getDefault() != null && !parameterDescription.getParameterized().getType().isPrimitive()) {
                 requiredFields.remove(parameterDescription.getParameterized());
             }
-        }
+        });
 
     }
 
@@ -1532,18 +1525,18 @@ public class JCommander {
     public Map<String, JCommander> getCommands() {
         Map<String, JCommander> res = Maps.newLinkedHashMap();
 
-        for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
-            res.put(entry.getKey().name, entry.getValue());
-        }
+        commands.entrySet().forEach(entry ->
+            res.put(entry.getKey().name, entry.getValue())
+        );
         return res;
     }
 
     public Map<ProgramName, JCommander> getRawCommands() {
         Map<ProgramName, JCommander> res = Maps.newLinkedHashMap();
 
-        for (Map.Entry<ProgramName, JCommander> entry : commands.entrySet()) {
-            res.put(entry.getKey(), entry.getValue());
-        }
+        commands.entrySet().forEach(entry ->
+            res.put(entry.getKey(), entry.getValue())
+        );
         return res;
     }
 
