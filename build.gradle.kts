@@ -68,6 +68,12 @@ tasks {
                 )
             )
         }
+        metaInf {
+            from(rootDir) {
+                include("license.txt")
+                include("notice.md")
+            }
+        }
     }
 }
 
