@@ -129,9 +129,12 @@ public class JCommander {
     private Map<Parameterized, ParameterDescription> requiredFields = Maps.newHashMap();
 
     /**
-     * A set of all the parameters validators to be applied.
+     * A map of objects to their associated parameter validators. Each key is an object containing
+     * fields annotated with {@link Parameter}, and the value is a set of {@link IParametersValidator}
+     * instances that validate the parameters specific to that object. This ensures validators
+     * are scoped to their respective object's parameters rather than all parameters globally.
      */
-    private Set<IParametersValidator> parametersValidators = Sets.newHashSet();
+    private final Map<Object, Set<IParametersValidator>> objectValidators = Maps.newHashMap();
 
     /**
      * A map of all the parameterized fields/methods.
@@ -425,14 +428,19 @@ public class JCommander {
             }
         }
 
-        Map<String, Object> nameValuePairs = Maps.newHashMap();
-        fields.values().forEach(pd ->
-            nameValuePairs.put(pd.getLongestName(), pd.getValue())
-        );
+        // Group parameters by their owning object
+        final Map<Object, Map<String, Object>> objectParameters = Maps.newHashMap();
+        fields.values().forEach(pd -> {
+            Object owner = pd.getObject();
+            Map<String, Object> params = objectParameters.computeIfAbsent(owner, k -> Maps.newHashMap());
+            params.put(pd.getLongestName(), pd.getValue());
+        });
 
-        parametersValidators.forEach(parametersValidator ->
-            parametersValidator.validate(nameValuePairs)
-        );
+        // Apply validators for each object
+        objectValidators.forEach((object, validators) -> {
+            Map<String, Object> params = objectParameters.getOrDefault(object, Maps.newHashMap());
+            validators.forEach(validator -> validator.validate(params));
+        });
     }
 
     private static String pluralize(int quantity, String singular, String plural) {
@@ -619,13 +627,16 @@ public class JCommander {
 
         Parameters parameters = cls.getAnnotation(Parameters.class);
         if (parameters != null) {
-            Class<? extends IParametersValidator>[] parametersValidatorClasses = parameters.parametersValidators();
-                for (Class<? extends IParametersValidator> parametersValidatorClass : parametersValidatorClasses) {
-                try {
-                    IParametersValidator parametersValidator = parametersValidatorClass.getDeclaredConstructor().newInstance();
-                    parametersValidators.add(parametersValidator);
-                } catch (ReflectiveOperationException e) {
-                    throw new ParameterException("Cannot instantiate rule: " + parametersValidatorClass, e);
+            final Class<? extends IParametersValidator>[] parametersValidatorClasses = parameters.parametersValidators();
+            if (parametersValidatorClasses.length > 0) {
+                Set<IParametersValidator> validators = objectValidators.computeIfAbsent(object, k -> Sets.newHashSet());
+                for (final Class<? extends IParametersValidator> parametersValidatorClass : parametersValidatorClasses) {
+                    try {
+                        final IParametersValidator parametersValidator = parametersValidatorClass.getDeclaredConstructor().newInstance();
+                        validators.add(parametersValidator);
+                    } catch (ReflectiveOperationException e) {
+                        throw new ParameterException("Cannot instantiate rule: " + parametersValidatorClass, e);
+                    }
                 }
             }
         }
