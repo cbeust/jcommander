@@ -182,26 +182,23 @@ public class JCommander {
         private IDefaultProvider defaultProvider;
 
         private Comparator<? super ParameterDescription> parameterDescriptionComparator
-                = new Comparator<ParameterDescription>() {
-            @Override
-            public int compare(ParameterDescription p0, ParameterDescription p1) {
-                WrappedParameter a0 = p0.getParameter();
-                WrappedParameter a1 = p1.getParameter();
-                if (a0 != null && a1 != null && !a0.category().equals(a1.category())) {
-                    return a0.category().compareTo(a1.category());
-                }
-                if (a0 != null && a0.order() != -1 && a1 != null && a1.order() != -1) {
-                    int comp = Integer.compare(a0.order(), a1.order());
-                    return comp != 0 ? comp : p0.getLongestName().compareTo(p1.getLongestName());
-                } else if (a0 != null && a0.order() != -1) {
-                    return -1;
-                } else if (a1 != null && a1.order() != -1) {
-                    return 1;
-                } else {
-                    return p0.getLongestName().compareTo(p1.getLongestName());
-                }
-            }
-        };
+                = (Comparator<ParameterDescription>) (p0, p1) -> {
+                    WrappedParameter a0 = p0.getParameter();
+                    WrappedParameter a1 = p1.getParameter();
+                    if (a0 != null && a1 != null && !a0.category().equals(a1.category())) {
+                        return a0.category().compareTo(a1.category());
+                    }
+                    if (a0 != null && a0.order() != -1 && a1 != null && a1.order() != -1) {
+                        int comp = Integer.compare(a0.order(), a1.order());
+                        return comp != 0 ? comp : p0.getLongestName().compareTo(p1.getLongestName());
+                    } else if (a0 != null && a0.order() != -1) {
+                        return -1;
+                    } else if (a1 != null && a1.order() != -1) {
+                        return 1;
+                    } else {
+                        return p0.getLongestName().compareTo(p1.getLongestName());
+                    }
+                };
         private int columnSize = 79;
         private boolean acceptUnknownOptions = false;
         private boolean allowParameterOverwriting = false;
@@ -375,8 +372,7 @@ public class JCommander {
         if (options.defaultProvider != null) {
             descriptions.values().forEach(this::initializeDefaultValue);
 
-            commands.entrySet().forEach(entry ->
-                entry.getValue().initializeDefaultValues());
+            commands.forEach((key, value) -> value.initializeDefaultValues());
         }
     }
 
@@ -1353,19 +1349,15 @@ public class JCommander {
      * @param converterFactory the factory determining string converters
      */
     public void addConverterFactory(final IStringConverterFactory converterFactory) {
-        addConverterInstanceFactory(new IStringConverterInstanceFactory() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType, String optionName) {
-                final Class<? extends IStringConverter<?>> converterClass = converterFactory.getConverter(forType);
-                try {
-                    if(optionName == null) {
-                        optionName = parameter.names().length > 0 ? parameter.names()[0] : "[Main class]";
-                    }
-                    return converterClass != null ? instantiateConverter(optionName, converterClass) : null;
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    throw new ParameterException(e);
+        addConverterInstanceFactory((parameter, forType, optionName) -> {
+            final Class<? extends IStringConverter<?>> converterClass = converterFactory.getConverter(forType);
+            try {
+                if(optionName == null) {
+                    optionName = parameter.names().length > 0 ? parameter.names()[0] : "[Main class]";
                 }
+                return converterClass != null ? instantiateConverter(optionName, converterClass) : null;
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new ParameterException(e);
             }
         });
     }
@@ -1410,12 +1402,9 @@ public class JCommander {
         if ((type.isAssignableFrom(List.class) || type.isAssignableFrom(Set.class)) && converter == null) {
             // No list converter: use the single value converter and pass each parsed value to it individually
             final IParameterSplitter splitter = tryInstantiateConverter(null, annotation.splitter());
-            converter = new DefaultListConverter(splitter, new IStringConverter() {
-                @Override
-                public Object convert(String value) {
-                    final Type genericType = parameterized.findFieldGenericType();
-                    return convertValue(parameterized, genericType instanceof Class c ? c : String.class, null, value);
-                }
+            converter = new DefaultListConverter(splitter, value1 -> {
+                final Type genericType = parameterized.findFieldGenericType();
+                return convertValue(parameterized, genericType instanceof Class c ? c : String.class, null, value1);
             });
         }
 
@@ -1524,18 +1513,14 @@ public class JCommander {
     public Map<String, JCommander> getCommands() {
         Map<String, JCommander> res = Maps.newLinkedHashMap();
 
-        commands.entrySet().forEach(entry ->
-            res.put(entry.getKey().name, entry.getValue())
-        );
+        commands.forEach((key, value) -> res.put(key.name, value));
         return res;
     }
 
     public Map<ProgramName, JCommander> getRawCommands() {
         Map<ProgramName, JCommander> res = Maps.newLinkedHashMap();
 
-        commands.entrySet().forEach(entry ->
-            res.put(entry.getKey(), entry.getValue())
-        );
+        commands.forEach((key, value) -> res.put(key, value));
         return res;
     }
 
