@@ -39,6 +39,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.ResourceBundle;
 
@@ -1518,5 +1526,40 @@ public class JCommanderTest {
                         + " should be strictly positive (found " + i + ")");
             }
         }
+    }
+
+    @Test
+    public void javaTimeTest() {
+        String[] argv = {
+                "-i", "0",
+                "-ld", "1970-01-12",
+                "-ldt", "1970-01-12T11:15:09.000000333",
+                "-lt", "11:15:09.000000333",
+                "-odt", "1970-01-12T11:15:09.000000333+01:00",
+                "-ot", "11:15:09.000000333+01:00",
+                "-zdt", "1970-01-12T11:15:09.000000333Z"
+        };
+        JavaTimeParameters params = new JavaTimeParameters();
+        JCommander.newBuilder().addObject(params).build().parse(argv);
+
+        Assert.assertEquals(params.instant, Instant.EPOCH, "Instant parsed incorrectly");
+
+        LocalDate localDate = LocalDate.of(1970, 1, 12);
+        Assert.assertEquals(params.localDate, localDate, "LocalDate parsed incorrectly");
+
+        LocalTime localTime = LocalTime.of(11, 15, 9, 333);
+        Assert.assertEquals(params.localDateTime, LocalDateTime.of(localDate, localTime), "LocalDateTime parsed incorrectly");
+
+        Assert.assertEquals(params.localTime, localTime, "LocalTime parsed incorrectly");
+
+        ZoneOffset zoneOffset = ZoneOffset.ofHours(1);
+        OffsetDateTime offsetDateTime = OffsetDateTime.of(localDate, localTime, zoneOffset);
+        Assert.assertEquals(params.offsetDateTime, offsetDateTime, "OffsetDateTime parsed incorrectly");
+
+        OffsetTime offsetTime = OffsetTime.of(localTime, zoneOffset);
+        Assert.assertEquals(params.offsetTime, offsetTime, "OffsetTime parsed incorrectly");
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDate, localTime, ZoneOffset.UTC);
+        Assert.assertEquals(params.zonedDateTime, zonedDateTime, "ZonedDateTime parsed incorrectly");
     }
 }
