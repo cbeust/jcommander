@@ -183,6 +183,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
                     .append("  ")
                     .append(parameter.required() ? "* " : "  ")
                     .append(pd.getNames())
+                    .append(parameter.placeholder() != null && !parameter.placeholder().isBlank() ? " " + parameter.placeholder() : "")
                     .append('\n');
 
             if (hasDescription) {

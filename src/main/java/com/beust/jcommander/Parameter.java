@@ -144,4 +144,9 @@ public @interface Parameter {
    */
   String category() default "";
   
+  /**
+   * If specified, the placeholder (e.g. {@code "<filename>"}) will be shown in the usage() output as a required parameter after the switch (e.g. {@code -i <filename>}).
+   * @return the placeholder
+   */
+  String placeholder() default "";
 }

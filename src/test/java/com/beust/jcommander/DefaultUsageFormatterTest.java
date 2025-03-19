@@ -147,6 +147,31 @@ public class DefaultUsageFormatterTest {
     }
 
     @Test
+    public void testPlaceholder() {
+        class ArgsTemplate {
+            @Parameter(names = {"-i"}, placeholder = "<filename>")
+            public String inputFilename;
+        }
+
+        // setup
+        StringBuilder sb = new StringBuilder();
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsTemplate())
+                .build();
+
+        // action
+        jc.getUsageFormatter().usage(sb);
+
+        // verify
+        String expected = "Usage: <main class> [options]\n"
+                + "\n"
+                + "  Options:\n"
+                + "    -i <filename>\n"
+                + "\n";
+        Assert.assertEquals(sb.toString(), expected);
+    }
+
+    @Test
     public void testLongMainParameterDescription() {
         //setup
         JCommander jc = JCommander.newBuilder()
