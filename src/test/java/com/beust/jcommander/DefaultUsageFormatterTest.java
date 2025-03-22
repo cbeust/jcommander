@@ -52,29 +52,31 @@ public class DefaultUsageFormatterTest {
         StringBuilder output = new StringBuilder();
         jc.setConsole(new StringBuilderConsole(output));
         jc.usage();
-        String expected = "Usage: <main class> [options] [command] [command options]\n"
-                + "\n"
-                + "  Options:\n"
-                + "    -a, --a, --a-parameter\n"
-                + "      a parameter\n"
-                + "      Default: 0\n"
-                + "\n"
-                + "  Commands:\n"
-                + "    one      one command\n"
-                + "      Usage: one [options]\n"
-                + "\n"
-                + "        Options:\n"
-                + "          -b, --b, --b-parameter\n"
-                + "            b parameter\n"
-                + "            Default: 0\n"
-                + "\n"
-                + "    two      two command\n"
-                + "      Usage: two [options]\n"
-                + "\n"
-                + "        Options:\n"
-                + "          -c, --c, --c-parameter\n"
-                + "            c parameter\n"
-                + "            Default: 0\n";
+        String expected = """
+            Usage: <main class> [options] [command] [command options]
+            
+              Options:
+                -a, --a, --a-parameter
+                  a parameter
+                  Default: 0
+            
+              Commands:
+                one      one command
+                  Usage: one [options]
+            
+                    Options:
+                      -b, --b, --b-parameter
+                        b parameter
+                        Default: 0
+            
+                two      two command
+                  Usage: two [options]
+            
+                    Options:
+                      -c, --c, --c-parameter
+                        c parameter
+                        Default: 0
+            """;
         Assert.assertEquals(output.toString(), expected);
     }
 
@@ -113,36 +115,65 @@ public class DefaultUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         // verify
-        String expected = "Usage: <main class> [options]\n"
-                + "\n"
-                + "  Options:\n"
-                + "    --a, -a\n"
-                + "      Default: 0\n"
-                + "    --b, -b\n"
-                + "      Default: 2\n"
-                + "    --c, -c\n"
-                + "      sets c\n"
-                + "      Default: 0\n"
-                + "    --d, -d\n"
-                + "      sets d\n"
-                + "      Default: 2\n"
-                + "    --e\n"
-                + "      Options: [A, B, C, D]\n"
-                + "    --f\n"
-                + "      Options: [A, B, C, D]\n"
-                + "      Default: A\n"
-                + "    --g\n"
-                + "      sets g\n"
-                + "      Possible Values: [A, B, C, D]\n"
-                + "    --h\n"
-                + "      sets h\n"
-                + "      Default: A\n"
-                + "      Possible Values: [A, B, C, D]\n"
-                + "    -i\n"
-                + "      Options: []\n"
-                + "    -k\n"
-                + "      sets k\n"
-                + "      Possible Values: []\n";
+        String expected = """
+            Usage: <main class> [options]
+            
+              Options:
+                --a, -a
+                  Default: 0
+                --b, -b
+                  Default: 2
+                --c, -c
+                  sets c
+                  Default: 0
+                --d, -d
+                  sets d
+                  Default: 2
+                --e
+                  Options: [A, B, C, D]
+                --f
+                  Options: [A, B, C, D]
+                  Default: A
+                --g
+                  sets g
+                  Possible Values: [A, B, C, D]
+                --h
+                  sets h
+                  Default: A
+                  Possible Values: [A, B, C, D]
+                -i
+                  Options: []
+                -k
+                  sets k
+                  Possible Values: []
+            """;
+        Assert.assertEquals(sb.toString(), expected);
+    }
+
+    @Test
+    public void testPlaceholder() {
+        class ArgsTemplate {
+            @Parameter(names = {"-i"}, placeholder = "<filename>")
+            public String inputFilename;
+        }
+
+        // setup
+        StringBuilder sb = new StringBuilder();
+        JCommander jc = JCommander.newBuilder()
+                .addObject(new ArgsTemplate())
+                .build();
+
+        // action
+        jc.getUsageFormatter().usage(sb);
+
+        // verify
+        String expected = """
+            Usage: <main class> [options]
+            
+              Options:
+                -i <filename>
+            
+            """;
         Assert.assertEquals(sb.toString(), expected);
     }
 
@@ -392,14 +423,16 @@ public class DefaultUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         c.getUsageFormatter().usage(sb);
-        String expected = "Usage: <main class> [command] [command options]\n"
-                + "\n"
-                + "  Commands:\n"
-                + "    a      command a\n"
-                + "      Usage: a command a parameters\n"
-                + "\n"
-                + "    b      command b\n"
-                + "      Usage: b command b parameters\n";
+        String expected = """
+            Usage: <main class> [command] [command options]
+            
+              Commands:
+                a      command a
+                  Usage: a command a parameters
+            
+                b      command b
+                  Usage: b command b parameters
+            """;
         Assert.assertEquals(sb.toString(), expected);
     }
 
