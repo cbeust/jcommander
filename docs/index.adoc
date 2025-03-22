@@ -963,7 +963,7 @@ Usage: <main class> [options]
     -debug          Debug mode (default: false)
     -groups         Comma-separated list of group names to be run
   * -log, -verbose  Level of verbosity (default: 1)
-    -long           A long number (default: 0)
+    -long <number>  A long number (default: 0)
 ----
 
 You can customize the name of your program by calling `setProgramName()` on your JCommander object. Options preceded by an asterisk are required.
@@ -986,6 +986,13 @@ You can override the description for the default value shown in the usage output
 ----
 @Parameter(names = "--start", defaultValueDescription = "The default value is a random number")
 int start = Math.random * 100;
+----
+
+Optionally placeholders can be shown in the usage output:
+
+[source,java]
+----
+@Parameter(names = "-long", placeholder = "<number>")
 ----
 
 
