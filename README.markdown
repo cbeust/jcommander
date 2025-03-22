@@ -13,7 +13,8 @@ public class JCommanderTest {
     @Parameter(names = { "-log", "-verbose" }, description = "Level of verbosity")
     public Integer verbose = 1;
  
-    @Parameter(names = "-groups", description = "Comma-separated list of group names to be run")
+    @Parameter(names = "-groups", description = "Comma-separated list of group names to be run"
+                    placeholder = "<group1>, <group2>...")
     public String groups;
  
     @Parameter(names = "-debug", description = "Debug mode")
