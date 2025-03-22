@@ -14,7 +14,7 @@ public class JCommanderTest {
     public Integer verbose = 1;
  
     @Parameter(names = "-groups", description = "Comma-separated list of group names to be run"
-                    placeholder = "<group1>, <group2>...")
+                    placeholder = "<group1>,<group2>...")
     public String groups;
  
     @Parameter(names = "-debug", description = "Debug mode")
