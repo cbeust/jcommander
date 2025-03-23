@@ -1512,10 +1512,7 @@ public class JCommander {
     }
 
     public Map<ProgramName, JCommander> getRawCommands() {
-        Map<ProgramName, JCommander> res = Maps.newLinkedHashMap();
-
-        commands.forEach((key, value) -> res.put(key, value));
-        return res;
+        return new LinkedHashMap<>(commands);
     }
 
     public String getParsedCommand() {
