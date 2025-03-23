@@ -2,7 +2,7 @@ package com.beust.jcommander.converters;
 
 import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Converter for {@link OffsetTime}.
@@ -14,8 +14,8 @@ public class OffsetTimeConverter extends JavaTimeConverter<OffsetTime> {
   }
 
   @Override
-  protected List<DateTimeFormatter> supportedFormats() {
-    return List.of(DateTimeFormatter.ISO_OFFSET_TIME);
+  protected Set<DateTimeFormatter> supportedFormats() {
+    return Set.of(DateTimeFormatter.ISO_OFFSET_TIME);
   }
 
   @Override

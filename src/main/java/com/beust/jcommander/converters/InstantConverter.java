@@ -2,7 +2,7 @@ package com.beust.jcommander.converters;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Converter to {@link Instant}.
@@ -14,8 +14,8 @@ public final class InstantConverter extends JavaTimeConverter<Instant> {
   }
 
   @Override
-  protected List<DateTimeFormatter> supportedFormats() {
-    return List.of(DateTimeFormatter.ISO_INSTANT);
+  protected Set<DateTimeFormatter> supportedFormats() {
+    return Set.of(DateTimeFormatter.ISO_INSTANT);
   }
 
   @Override

@@ -2,7 +2,7 @@ package com.beust.jcommander.converters;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Converter to {@link LocalDate}.
@@ -14,8 +14,8 @@ public class LocalDateConverter extends JavaTimeConverter<LocalDate> {
   }
 
   @Override
-  protected List<DateTimeFormatter> supportedFormats() {
-    return List.of(DateTimeFormatter.ISO_LOCAL_DATE, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+  protected Set<DateTimeFormatter> supportedFormats() {
+    return Set.of(DateTimeFormatter.ISO_LOCAL_DATE, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
   }
 
   @Override

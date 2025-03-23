@@ -5,9 +5,8 @@ import com.beust.jcommander.ParameterException;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.Set;
 
 /**
  * Base class for all {@link java.time} converters.
@@ -32,7 +31,7 @@ public abstract class JavaTimeConverter<T extends TemporalAccessor> extends Base
   @Override
   public final T convert(String value) {
     return supportedFormats().stream()
-            .map(new Mapper(value))
+            .map(formatter -> tryConvert(value, formatter))
             .filter(Objects::nonNull)
             .findFirst()
             .orElseThrow(() -> new ParameterException(errorMessage(value)));
@@ -41,9 +40,9 @@ public abstract class JavaTimeConverter<T extends TemporalAccessor> extends Base
   /**
    * Supported formats for this type, e.g. {@code HH:mm:ss}
    *
-   * @return list of supported formats
+   * @return a set of supported formats
    */
-  protected abstract List<DateTimeFormatter> supportedFormats();
+  protected abstract Set<DateTimeFormatter> supportedFormats();
 
   /**
    * Parse the value using the specified formatter.
@@ -54,27 +53,17 @@ public abstract class JavaTimeConverter<T extends TemporalAccessor> extends Base
    */
   protected abstract T parse(String value, DateTimeFormatter formatter);
 
-  private String errorMessage(String value) {
-    return getErrorString(value, "a " + toClass.getSimpleName());
+  private T tryConvert(String value, DateTimeFormatter formatter) {
+    try {
+      return parse(value, formatter);
+    } catch (DateTimeParseException exc) {
+      return null;
+    } catch (Exception exc) {
+      throw new ParameterException(errorMessage(value), exc);
+    }
   }
 
-  private final class Mapper implements Function<DateTimeFormatter, T> {
-
-    private final String value;
-
-    private Mapper(String value) {
-      this.value = value;
-    }
-
-    @Override
-    public T apply(DateTimeFormatter formatter) {
-      try {
-        return parse(value, formatter);
-      } catch (DateTimeParseException exc) {
-        return null;
-      } catch (Exception exc) {
-        throw new ParameterException(errorMessage(value), exc);
-      }
-    }
+  private String errorMessage(String value) {
+    return getErrorString(value, "a " + toClass.getSimpleName());
   }
 }

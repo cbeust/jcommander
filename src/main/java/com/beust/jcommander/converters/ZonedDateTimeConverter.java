@@ -2,7 +2,7 @@ package com.beust.jcommander.converters;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Converter for {@link ZonedDateTime}.
@@ -14,8 +14,8 @@ public class ZonedDateTimeConverter extends JavaTimeConverter<ZonedDateTime> {
   }
 
   @Override
-  protected List<DateTimeFormatter> supportedFormats() {
-    return List.of(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+  protected Set<DateTimeFormatter> supportedFormats() {
+    return Set.of(DateTimeFormatter.ISO_ZONED_DATE_TIME);
   }
 
   @Override

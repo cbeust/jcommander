@@ -23,8 +23,7 @@ public class LocalDateTimeConverterTest {
   @DataProvider(name = "supported")
   public static Object[][] supported() {
     return new Object[][]{
-            {"2023-05-11T09:15:19"},
-            {"11-05-2023T09:15:19"}
+            {"2023-05-11T09:15:19"}
     };
   }
 
