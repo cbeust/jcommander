@@ -996,7 +996,7 @@ public class JCommander {
         return getConsole().readPassword(echoInput);
     }
 
-    private String[] subArray(String[] args, int index) {
+    private static String[] subArray(String[] args, int index) {
         int l = args.length - index;
         String[] result = new String[l];
         System.arraycopy(args, index, result, 0, l);
