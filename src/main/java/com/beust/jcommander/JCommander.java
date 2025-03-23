@@ -1618,19 +1618,7 @@ public class JCommander {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            ProgramName other = (ProgramName) obj;
-            if (name == null) {
-                if (other.name != null)
-                    return false;
-            } else if (!name.equals(other.name))
-                return false;
-            return true;
+            return this == obj || obj instanceof ProgramName other && Objects.equals(name, other.name);
         }
 
         /*
