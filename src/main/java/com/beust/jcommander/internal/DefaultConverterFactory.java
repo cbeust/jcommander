@@ -26,16 +26,30 @@ import com.beust.jcommander.converters.DoubleConverter;
 import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.converters.FloatConverter;
 import com.beust.jcommander.converters.ISO8601DateConverter;
+import com.beust.jcommander.converters.InstantConverter;
 import com.beust.jcommander.converters.IntegerConverter;
+import com.beust.jcommander.converters.LocalDateConverter;
+import com.beust.jcommander.converters.LocalDateTimeConverter;
+import com.beust.jcommander.converters.LocalTimeConverter;
 import com.beust.jcommander.converters.LongConverter;
+import com.beust.jcommander.converters.OffsetDateTimeConverter;
+import com.beust.jcommander.converters.OffsetTimeConverter;
 import com.beust.jcommander.converters.StringConverter;
 import com.beust.jcommander.converters.PathConverter;
 import com.beust.jcommander.converters.URIConverter;
 import com.beust.jcommander.converters.URLConverter;
+import com.beust.jcommander.converters.ZonedDateTimeConverter;
 
 import java.io.File;
 import java.lang.NoClassDefFoundError;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.net.URI;
 import java.net.URL;
@@ -66,6 +80,14 @@ public class DefaultConverterFactory implements IStringConverterFactory {
     classConverters.put(Date.class, ISO8601DateConverter.class);
     classConverters.put(URI.class, URIConverter.class);
     classConverters.put(URL.class, URLConverter.class);
+
+    classConverters.put(Instant.class, InstantConverter.class);
+    classConverters.put(LocalDate.class, LocalDateConverter.class);
+    classConverters.put(LocalDateTime.class, LocalDateTimeConverter.class);
+    classConverters.put(LocalTime.class, LocalTimeConverter.class);
+    classConverters.put(OffsetDateTime.class, OffsetDateTimeConverter.class);
+    classConverters.put(OffsetTime.class, OffsetTimeConverter.class);
+    classConverters.put(ZonedDateTime.class, ZonedDateTimeConverter.class);
 
     try {
       classConverters.put(Path.class, PathConverter.class);
