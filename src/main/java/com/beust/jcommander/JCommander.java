@@ -214,9 +214,7 @@ public class JCommander {
     }
 
     private JCommander(Options options) {
-        if (options == null) {
-            throw new NullPointerException("options");
-        }
+        Objects.requireNonNull(options, "options");
         this.options = options;
         if (options.converterInstanceFactories.isEmpty()) {
             addConverterFactory(new DefaultConverterFactory());
