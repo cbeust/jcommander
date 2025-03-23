@@ -514,7 +514,7 @@ public class JCommander {
     }
 
     private boolean isOption(String passedArg) {
-        return (options.acceptUnknownOptions) || isNamedOption(passedArg);
+        return options.acceptUnknownOptions || isNamedOption(passedArg);
     }
 
     private boolean isNamedOption(String passedArg) {
