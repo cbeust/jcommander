@@ -997,11 +997,7 @@ public class JCommander {
     }
 
     private static String[] subArray(String[] args, int index) {
-        int l = args.length - index;
-        String[] result = new String[l];
-        System.arraycopy(args, index, result, 0, l);
-
-        return result;
+        return Arrays.copyOfRange(args, index, args.length);
     }
 
     /**
