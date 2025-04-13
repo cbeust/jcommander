@@ -104,39 +104,10 @@ public class Parameterized {
     for(Class<?> cls : types) {
 
       // check fields
-      for (Field f : cls.getDeclaredFields()) {
-        Annotation annotation = f.getAnnotation(Parameter.class);
-        Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
-        Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
-        if (annotation != null) {
-          result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
-                  f, null));
-        } else if (dynamicParameter != null) {
-          result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
-                  f, null));
-        } else if (delegateAnnotation != null) {
-          result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
-                  f, null));
-        }
-      }
+      analyzeFields(result, cls);
 
       // check methods
-      for (Method m : cls.getDeclaredMethods()) {
-        // Ignore bridge and synthetic methods for now
-        if (m.isBridge() || m.isSynthetic()) {
-          continue;
-        }
-
-        Parameterized parameterized = createParameterizedFromMethod(m);
-        if (parameterized != null) {
-          methods.put(m.getName(), parameterized);
-        }
-      }
-
-      // Accumulate the bridge and synthetic methods to check later
-      bridgeOrSyntheticMethods.addAll(Arrays.stream(cls.getDeclaredMethods())
-        .filter(method -> method.isBridge() || method.isSynthetic())
-        .collect(Collectors.toList()));
+      analyzeMethods(bridgeOrSyntheticMethods, methods, cls);
     }
 
     // If there are any bridge or synthetic methods that do not have a name which is already present, add them to the
@@ -149,6 +120,43 @@ public class Parameterized {
     result.addAll(methods.values());
 
     return result;
+  }
+
+  private static void analyzeMethods(Set<Method> bridgeOrSyntheticMethods, Map<String, Parameterized> methods, Class<?> cls) {
+    for (Method m : cls.getDeclaredMethods()) {
+      // Ignore bridge and synthetic methods for now
+      if (m.isBridge() || m.isSynthetic()) {
+        continue;
+      }
+
+      Parameterized parameterized = createParameterizedFromMethod(m);
+      if (parameterized != null) {
+        methods.put(m.getName(), parameterized);
+      }
+    }
+
+    // Accumulate the bridge and synthetic methods to check later
+    bridgeOrSyntheticMethods.addAll(Arrays.stream(cls.getDeclaredMethods())
+      .filter(method -> method.isBridge() || method.isSynthetic())
+      .collect(Collectors.toList()));
+  }
+
+  private static void analyzeFields(List<Parameterized> result, Class<?> cls) {
+    for (Field f : cls.getDeclaredFields()) {
+      Annotation annotation = f.getAnnotation(Parameter.class);
+      Annotation delegateAnnotation = f.getAnnotation(ParametersDelegate.class);
+      Annotation dynamicParameter = f.getAnnotation(DynamicParameter.class);
+      if (annotation != null) {
+        result.add(new Parameterized(new WrappedParameter((Parameter) annotation), null,
+                f, null));
+      } else if (dynamicParameter != null) {
+        result.add(new Parameterized(new WrappedParameter((DynamicParameter) dynamicParameter), null,
+                f, null));
+      } else if (delegateAnnotation != null) {
+        result.add(new Parameterized(null, (ParametersDelegate) delegateAnnotation,
+                f, null));
+      }
+    }
   }
 
   private static Parameterized createParameterizedFromMethod(Method m) {
