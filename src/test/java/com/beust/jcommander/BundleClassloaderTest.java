@@ -38,15 +38,6 @@ public class BundleClassloaderTest {
     @Test
     public void testBundleAvailableFromDifferentClassLoader() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
 
-        /*
-        This test is designed to simulate the scenario where @Parameter(s) annotations reference a ResourceBundle which
-        available from the ClassLoader that contains the declaring class (eg. our Command.class) but not the ClassLoader
-        used by JCommander.  See https://github.com/cbeust/jcommander/issues/599.
-
-        Implementing the correct behavior within JCommander is as simple as passing the correct ClassLoader to
-        ResourceBundle.getBundle() calls but verifying the behavior through unit tests in more challenging.
-         */
-
         Locale.setDefault(new Locale("en", "US"));
 
         Object command = loadClassAndBundleWithIsolatedClassLoader(Command.class, "MyBundle_en_US.properties", String.join("\n",
