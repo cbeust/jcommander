@@ -326,7 +326,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
             String bundleName = p.resourceBundle();
 
             if (!bundleName.isEmpty()) {
-                bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+                bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault(), arg.getClass().getClassLoader());
             } else {
                 bundle = commander.getBundle();
             }

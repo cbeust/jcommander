@@ -77,12 +77,12 @@ public class ParameterDescription {
 
     Parameters p = o.getClass().getAnnotation(Parameters.class);
     if (p != null && ! isStringEmpty(p.resourceBundle())) {
-      result = ResourceBundle.getBundle(p.resourceBundle(), Locale.getDefault());
+      result = ResourceBundle.getBundle(p.resourceBundle(), Locale.getDefault(), o.getClass().getClassLoader());
     } else {
       com.beust.jcommander.ResourceBundle a = o.getClass().getAnnotation(
           com.beust.jcommander.ResourceBundle.class);
       if (a != null && ! isStringEmpty(a.value())) {
-        result = ResourceBundle.getBundle(a.value(), Locale.getDefault());
+        result = ResourceBundle.getBundle(a.value(), Locale.getDefault(), o.getClass().getClassLoader());
       }
     }
 
