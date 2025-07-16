@@ -20,6 +20,7 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.parser.DefaultParameterizedParser;
 import com.beust.jcommander.FuzzyMap.IKey;
+import com.beust.jcommander.StringKey;
 import com.beust.jcommander.converters.*;
 import com.beust.jcommander.internal.*;
 
@@ -675,7 +676,7 @@ public class JCommander {
                 //
                 DynamicParameter dp = wp.getDynamicParameter();
                 for (String name : dp.names()) {
-                    if (descriptions.containsKey(name)) {
+                    if (descriptions.containsKey(new StringKey(name))) {
                         throw new ParameterException("Found the option " + name + " multiple times");
                     }
                     p("Adding description for " + name);
