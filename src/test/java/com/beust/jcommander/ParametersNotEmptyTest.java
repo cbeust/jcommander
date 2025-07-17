@@ -28,10 +28,9 @@ public class ParametersNotEmptyTest {
         }
         Collections.sort(parameters);
 
-        Assert.assertEquals(parameters, new ArrayList<String>() {{
-            add("-date");
-            add("-debug");
-        }}
-        );
+        List<String> expected = new ArrayList<>();
+        expected.add("-date");
+        expected.add("-debug");
+        Assert.assertEquals(parameters, expected);
     }
 }
