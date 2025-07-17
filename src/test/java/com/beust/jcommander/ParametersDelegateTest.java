@@ -66,12 +66,13 @@ public class ParametersDelegateTest {
     }
     class LeafDelegate {
       @Parameter(names = "--list")
-      public List<String> list = new ArrayList<String>() {{
-        add("value1");
-        add("value2");
-      }};
+      public List<String> list = new ArrayList<>();
       @Parameter(names = "--bool")
       public boolean bool;
+      public LeafDelegate() {
+        list.add("value1");
+        list.add("value2");
+      }
     }
     class NestedDelegate1 {
       @ParametersDelegate
@@ -108,10 +109,10 @@ public class ParametersDelegateTest {
     JCommander cmd = new JCommander(p);
     cmd.parse("--anon-float 1.2 -d 234 --list a --list b -a".split(" "));
     Assert.assertEquals(p.nestedDelegate2.anonymousDelegate.getFloat(), 1.2f);
-    Assert.assertEquals(p.nestedDelegate2.nestedDelegate1.leafDelegate.list, new ArrayList<String>() {{
-      add("a");
-      add("b");
-    }});
+    List<String> expected = new ArrayList<>();
+    expected.add("a");
+    expected.add("b");
+    Assert.assertEquals(p.nestedDelegate2.nestedDelegate1.leafDelegate.list, expected);
     Assert.assertFalse(p.nestedDelegate2.nestedDelegate1.leafDelegate.bool);
     Assert.assertEquals(p.nestedDelegate2.nestedDelegate1.d, Integer.valueOf(234));
     Assert.assertFalse(p.nestedDelegate2.isC);
@@ -156,10 +157,10 @@ public class ParametersDelegateTest {
     cmd.addCommand("command", c);
 
     cmd.parse("command main params".split(" "));
-    Assert.assertEquals(c.delegate.mainParams, new ArrayList<String>() {{
-      add("main");
-      add("params");
-    }});
+    List<String> expected = new ArrayList<>();
+    expected.add("main");
+    expected.add("params");
+    Assert.assertEquals(c.delegate.mainParams, expected);
   }
 
   @Test(expectedExceptions = ParameterException.class,
