@@ -23,6 +23,8 @@ import com.beust.jcommander.ParameterException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 /**
@@ -32,7 +34,7 @@ import java.util.Properties;
  */
 public class PropertyFileDefaultProvider implements IDefaultProvider {
   public static final String DEFAULT_FILE_NAME = "jcommander.properties";
-  private Properties properties;
+  private Properties properties = new Properties();
 
   public PropertyFileDefaultProvider() {
     init(DEFAULT_FILE_NAME);
@@ -42,9 +44,16 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
     init(fileName);
   }
 
+  public PropertyFileDefaultProvider(final Path path) {
+    try (final var inputStream = Files.newInputStream(path)) {
+      properties.load(inputStream);
+    } catch (final IOException e) {
+      throw new ParameterException("Could not load properties from path: " + path);
+    }
+  }
+
   private void init(String fileName) {
     try {
-      properties = new Properties();
       URL url = ClassLoader.getSystemResource(fileName);
       if (url != null) {
         properties.load(url.openStream());

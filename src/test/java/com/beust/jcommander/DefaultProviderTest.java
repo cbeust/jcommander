@@ -24,6 +24,11 @@ import com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Set;
+
 public class DefaultProviderTest {
   private static final IDefaultProvider DEFAULT_PROVIDER = new IDefaultProvider() {
 
@@ -115,6 +120,18 @@ public class DefaultProviderTest {
     Assert.assertEquals(a.groups, "foo");
     Assert.assertEquals(a.level, 13);
     Assert.assertEquals(a.log.intValue(), 19);
+  }
+
+  @Test
+  public void propertyFileDefaultProviderFromPath() throws IOException {
+    final var f = Files.createTempFile("JCommander", null);
+    f.toFile().deleteOnExit();
+    Files.write(f, Set.of("groups the file group", "level 123", "log 456"));
+    ArgsDefault a = defaultProvider(new PropertyFileDefaultProvider(f));
+
+    Assert.assertEquals(a.groups, "the file group");
+    Assert.assertEquals(a.level, 123);
+    Assert.assertEquals(a.log.intValue(), 456);
   }
 
   @Test
