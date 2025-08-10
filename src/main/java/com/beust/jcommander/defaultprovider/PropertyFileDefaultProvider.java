@@ -42,14 +42,16 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
       index++;
     return optionName.substring(index);
   };
-  private Function<String, String> optionNameTransformer = DEFAULT_OPTION_NAME_TRANSFORMER;
+  private final Function<String, String> optionNameTransformer;
 
   public PropertyFileDefaultProvider() {
     init(DEFAULT_FILE_NAME);
+    optionNameTransformer = DEFAULT_OPTION_NAME_TRANSFORMER;
   }
 
   public PropertyFileDefaultProvider(String fileName) {
     init(fileName);
+    optionNameTransformer = DEFAULT_OPTION_NAME_TRANSFORMER;
   }
 
   public PropertyFileDefaultProvider(final String fileName, final Function<String, String> optionNameTransformer) {
