@@ -127,7 +127,20 @@ public class DefaultProviderTest {
     final var f = Files.createTempFile("JCommander", null);
     f.toFile().deleteOnExit();
     Files.write(f, Set.of("groups the file group", "level 123", "log 456"));
-    ArgsDefault a = defaultProvider(new PropertyFileDefaultProvider(f));
+    final var a = defaultProvider(new PropertyFileDefaultProvider(f));
+
+    Assert.assertEquals(a.groups, "the file group");
+    Assert.assertEquals(a.level, 123);
+    Assert.assertEquals(a.log.intValue(), 456);
+  }
+
+  @Test
+  public void propertyFileDefaultProviderWithCustomOptionNameTransformer() throws IOException {
+    final var f = Files.createTempFile("JCommander", null);
+    f.toFile().deleteOnExit();
+    Files.write(f, Set.of("GROUPS the file group", "L_V_L 123", "LOG 456"));
+    final var a = defaultProvider(new PropertyFileDefaultProvider(f,
+        optionName -> optionName.replaceFirst("^-+", "").replace("e", "_").toUpperCase()));
 
     Assert.assertEquals(a.groups, "the file group");
     Assert.assertEquals(a.level, 123);

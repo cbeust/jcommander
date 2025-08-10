@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 import java.util.Properties;
 
 /**
@@ -35,6 +36,13 @@ import java.util.Properties;
 public class PropertyFileDefaultProvider implements IDefaultProvider {
   public static final String DEFAULT_FILE_NAME = "jcommander.properties";
   private Properties properties = new Properties();
+  private static final Function<String, String> DEFAULT_OPTION_NAME_TRANSFORMER = optionName -> {
+    int index = 0;
+    while (index < optionName.length() && ! Character.isLetterOrDigit(optionName.charAt(index)))
+      index++;
+    return optionName.substring(index);
+  };
+  private Function<String, String> optionNameTransformer = DEFAULT_OPTION_NAME_TRANSFORMER;
 
   public PropertyFileDefaultProvider() {
     init(DEFAULT_FILE_NAME);
@@ -44,12 +52,22 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
     init(fileName);
   }
 
+  public PropertyFileDefaultProvider(final String fileName, final Function<String, String> optionNameTransformer) {
+      init(fileName);
+      this.optionNameTransformer = optionNameTransformer;
+  }
+
   public PropertyFileDefaultProvider(final Path path) {
+    this(path, DEFAULT_OPTION_NAME_TRANSFORMER);
+  }
+
+  public PropertyFileDefaultProvider(final Path path, final Function<String, String> optionNameTransformer) {
     try (final var inputStream = Files.newInputStream(path)) {
       properties.load(inputStream);
     } catch (final IOException e) {
       throw new ParameterException("Could not load properties from path: " + path);
     }
+    this.optionNameTransformer = optionNameTransformer;
   }
 
   private void init(String fileName) {
@@ -68,12 +86,7 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
   }
   
   public String getDefaultValueFor(String optionName) {
-    int index = 0;
-    while (index < optionName.length() && ! Character.isLetterOrDigit(optionName.charAt(index))) {
-      index++;
-    }
-    String key = optionName.substring(index);
-    return properties.getProperty(key);
+    return properties.getProperty(optionName.transform(optionNameTransformer));
   }
 
 }
