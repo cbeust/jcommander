@@ -595,6 +595,16 @@ public class JCommanderTest {
         Assert.assertEquals(args1.groups, "g");
     }
 
+    @Test
+    public void atFileCanContainValuesWithBlanks() throws IOException {
+        final var f = Files.createTempFile("JCommander", null);
+        f.toFile().deleteOnExit();
+        Files.write(f, List.of("-groups a group name with blanks", "-verbose 0"));
+        final var args1 = new Args1();
+        JCommander.newBuilder().addObject(args1).build().parse("@" + f.toAbsolutePath());
+        Assert.assertEquals(args1.groups, "a group name with blanks");
+    }
+
     public void atFileCanContainEmptyLines() throws IOException {
         File f = File.createTempFile("JCommander", null);
         f.deleteOnExit();
