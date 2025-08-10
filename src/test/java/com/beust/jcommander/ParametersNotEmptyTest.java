@@ -28,9 +28,6 @@ public class ParametersNotEmptyTest {
         }
         Collections.sort(parameters);
 
-        List<String> expected = new ArrayList<>();
-        expected.add("-date");
-        expected.add("-debug");
-        Assert.assertEquals(parameters, expected);
+        Assert.assertEquals(parameters, List.of("-date", "-debug"));
     }
 }

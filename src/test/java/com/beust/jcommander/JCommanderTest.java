@@ -652,11 +652,7 @@ public class JCommanderTest {
     public void handleSets() {
         ArgsWithSet args = new ArgsWithSet();
         JCommander.newBuilder().addObject(args).build().parse("-s", "3,1,2");
-        Set<Integer> expected = new TreeSet<>();
-        expected.add(1);
-        expected.add(2);
-        expected.add(3);
-        Assert.assertEquals(args.set, expected);
+        Assert.assertEquals(args.set, Set.of(1, 2, 3));
     }
 
     private static final List<String> V = Arrays.asList("a", "b", "c", "d");

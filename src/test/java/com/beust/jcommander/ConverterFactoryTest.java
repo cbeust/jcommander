@@ -27,7 +27,6 @@ import com.beust.jcommander.args.IHostPorts;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,11 +35,7 @@ import java.util.Map;
  * @author cbeust
  */
 public class ConverterFactoryTest {
-    private static final Map<Class, Class<? extends IStringConverter<?>>> MAP = new HashMap();
-
-    static {
-        MAP.put(HostPort.class, HostPortConverter.class);
-    }
+    private static final Map<Class, Class<? extends IStringConverter<?>>> MAP = Map.of(HostPort.class, HostPortConverter.class);
 
     private static final IStringConverterFactory CONVERTER_FACTORY = new IStringConverterFactory() {
 
