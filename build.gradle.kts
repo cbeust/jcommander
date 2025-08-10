@@ -53,7 +53,7 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("biz.aQute.bnd.builder") version "5.1.2"
+    id("biz.aQute.bnd.builder") version "7.1.0"
 }
 
 tasks {
