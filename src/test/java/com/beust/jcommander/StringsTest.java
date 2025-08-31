@@ -3,8 +3,6 @@ package com.beust.jcommander;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-
 @Test
 public class StringsTest {
 
@@ -12,13 +10,13 @@ public class StringsTest {
     public void testArrayJoinSpaceDelimiter() {
         String expected = "A B C  c";
         String actual = Strings.join(" ", new String[] { "A", "B", "C  c" });
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(actual, expected);
     }
 
     @Test
     public void testArrayJoinEmptyDelimiter() {
         String expected = "ABC  c";
         String actual = Strings.join("", new Object[] { "A", "B", "C  c" });
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(actual, expected);
     }
 }
