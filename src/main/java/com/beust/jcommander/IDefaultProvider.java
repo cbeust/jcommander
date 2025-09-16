@@ -32,4 +32,26 @@ public interface IDefaultProvider {
    * @return the default value for this option.
    */
   String getDefaultValueFor(String optionName);
+
+  /**
+   * Returns a default provider which attempts to query a default value from a sequence
+   * of default providers. The first produced non-null value will get finally returned.
+   *
+   * @param defaultProviders A sorted sequence of default providers.
+   * @return The first non-null value provided,
+   *         or {@code null} if all providers returned {@code null}.
+   */
+  static IDefaultProvider sequenceOf(final IDefaultProvider... defaultProviders) {
+    return new IDefaultProvider() {
+      @Override
+      public String getDefaultValueFor(final String optionName) {
+        for (final var defaultProvider : defaultProviders) {
+            final var defaultValue = defaultProvider.getDefaultValueFor(optionName);
+            if (defaultValue != null)
+                return defaultValue;
+        }
+        return null;
+      }
+    };
+  }
 }
