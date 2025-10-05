@@ -1,5 +1,5 @@
-# UI : https://s01.oss.sonatype.org/index.html
-# Wiki: https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide
+# UI : https://central.sonatype.com/publishing/deployments
+# Wiki: https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
 #
 # deploy without tagging: mvn deploy -DperformRelease
 # mvn release:clean javadoc:javadoc release:prepare release:perform
