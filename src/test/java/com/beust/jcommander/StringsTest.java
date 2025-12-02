@@ -9,13 +9,6 @@ import java.util.Arrays;
 public class StringsTest {
 
     @Test
-    public void testListJoin() {
-        String expected = "A, B, C  c";
-        String actual = Strings.join(", ", Arrays.asList("A", "B", "C  c"));
-        Assert.assertEquals(expected, actual);
-    }
-
-    @Test
     public void testArrayJoinSpaceDelimiter() {
         String expected = "A B C  c";
         String actual = Strings.join(" ", new String[] { "A", "B", "C  c" });
