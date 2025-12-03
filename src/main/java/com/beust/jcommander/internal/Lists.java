@@ -19,7 +19,6 @@
 package com.beust.jcommander.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class Lists {
     }
 
     public static <K> List<K> newArrayList(K... c) {
-      return new ArrayList<>(Arrays.asList(c));
+      return new ArrayList<>(List.of(c));
     }
 
     public static <K> List<K> newArrayList(int size) {

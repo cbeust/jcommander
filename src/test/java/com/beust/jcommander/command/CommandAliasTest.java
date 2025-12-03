@@ -23,7 +23,7 @@ import com.beust.jcommander.ParameterException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,7 +44,7 @@ public class CommandAliasTest {
     Assert.assertEquals(jc.getParsedCommand(), "add");
     Assert.assertEquals(jc.getParsedAlias(), "a");
     Assert.assertEquals(add.interactive.booleanValue(), true);
-    Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+    Assert.assertEquals(add.patterns, List.of("A.java"));
   }
 
   @Test
@@ -68,7 +68,7 @@ public class CommandAliasTest {
     Assert.assertEquals(jc.getParsedAlias(), alias);
     Assert.assertEquals(commit.amend.booleanValue(), true);
     Assert.assertEquals(commit.author, "jack");
-    Assert.assertEquals(commit.files, Arrays.asList("file1.txt"));
+    Assert.assertEquals(commit.files, List.of("file1.txt"));
   }
 
   @Test
@@ -83,7 +83,7 @@ public class CommandAliasTest {
 
     Assert.assertEquals(jc.getParsedCommand(), "add");
     Assert.assertEquals(add.interactive.booleanValue(), true);
-    Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+    Assert.assertEquals(add.patterns, List.of("A.java"));
   }
 
   @Test

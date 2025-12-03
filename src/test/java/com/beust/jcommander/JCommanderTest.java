@@ -62,7 +62,7 @@ public class JCommanderTest {
         Assert.assertTrue(args.debug);
         Assert.assertEquals(args.verbose.intValue(), 2);
         Assert.assertEquals(args.groups, "unit");
-        Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+        Assert.assertEquals(args.parameters, List.of("a", "b", "c"));
         Assert.assertEquals(args.floa, 1.2f, 0.1f);
         Assert.assertEquals(args.doub, 1.3f, 0.1f);
         Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
@@ -304,7 +304,7 @@ public class JCommanderTest {
 
         Args args = new Args();
         JCommander.newBuilder().addObject(args).build().parse("--extensions", ".txt;.md");
-        Assert.assertEquals(Arrays.asList(".txt", ".md"), args.extensions);
+        Assert.assertEquals(List.of(".txt", ".md"), args.extensions);
     }
 
     @Test
@@ -377,8 +377,8 @@ public class JCommanderTest {
         JCommander.newBuilder().addObject(args).build().parse(argv);
         Assert.assertEquals(args.verbose.intValue(), 2);
         Assert.assertEquals(args.groups, "unit");
-        Assert.assertEquals(args.hosts, Arrays.asList("host2"));
-        Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+        Assert.assertEquals(args.hosts, List.of("host2"));
+        Assert.assertEquals(args.parameters, List.of("a", "b", "c"));
     }
 
     public void separatorEqual() {
@@ -655,7 +655,7 @@ public class JCommanderTest {
         Assert.assertEquals(args.set, Set.of(1, 2, 3));
     }
 
-    private static final List<String> V = Arrays.asList("a", "b", "c", "d");
+    private static final List<String> V = List.of("a", "b", "c", "d");
 
     @DataProvider
     public Object[][] variable() {
@@ -727,7 +727,7 @@ public class JCommanderTest {
 
         Assert.assertEquals(args.choice, ArgsEnum.ChoiceType.ONE);
 
-        List<ChoiceType> expected = Arrays.asList(ChoiceType.ONE, ChoiceType.Two);
+        List<ChoiceType> expected = List.of(ChoiceType.ONE, ChoiceType.Two);
         Assert.assertEquals(expected, args.choices);
 
         for (ParameterDescription param : jc.getParameters()) {
@@ -745,7 +745,7 @@ public class JCommanderTest {
         // issue #266
         ArgsEnum args = new ArgsEnum();
         JCommander.newBuilder().addObject(args).build().parse("-choices", "ONE,Two");
-        Assert.assertEquals(Arrays.asList(ChoiceType.ONE, ChoiceType.Two), args.choices);
+        Assert.assertEquals(List.of(ChoiceType.ONE, ChoiceType.Two), args.choices);
     }
 
     public void enumArgsCaseInsensitive() {
@@ -915,16 +915,16 @@ public class JCommanderTest {
             String argv[] = {"-paramA", "a1", "a2", "-paramB", "b1", "b2", "b3"};
             Params args = new Params();
             JCommander.newBuilder().addObject(args).build().parse(argv);
-            Assert.assertEquals(args.paramA, Arrays.asList("a1", "a2"));
-            Assert.assertEquals(args.paramB, Arrays.asList("b1", "b2", "b3"));
+            Assert.assertEquals(args.paramA, List.of("a1", "a2"));
+            Assert.assertEquals(args.paramB, List.of("b1", "b2", "b3"));
         }
 
         {
             String argv[] = {"-paramA", "a1", "a2", "-paramB", "b1", "-paramA", "a3"};
             Params args = new Params();
             JCommander.newBuilder().addObject(args).build().parse(argv);
-            Assert.assertEquals(args.paramA, Arrays.asList("a1", "a2", "a3"));
-            Assert.assertEquals(args.paramB, Arrays.asList("b1"));
+            Assert.assertEquals(args.paramA, List.of("a1", "a2", "a3"));
+            Assert.assertEquals(args.paramB, List.of("b1"));
         }
     }
 
@@ -1002,7 +1002,7 @@ public class JCommanderTest {
         Assert.assertTrue(args.debug);
         Assert.assertEquals(args.verbose.intValue(), 2);
         Assert.assertEquals(args.groups, "unit");
-        Assert.assertEquals(args.parameters, Arrays.asList("a", "b", "c"));
+        Assert.assertEquals(args.parameters, List.of("a", "b", "c"));
         Assert.assertEquals(args.floa, 1.2f, 0.1f);
         Assert.assertEquals(args.doub, 1.3f, 0.1f);
         Assert.assertEquals(args.bigd, new BigDecimal("1.4"));
@@ -1145,7 +1145,7 @@ public class JCommanderTest {
         }
         Arg args = new Arg();
         JCommander.newBuilder().addObject(args).build().parse("-rule", "some test");
-        Assert.assertEquals(args.rules, Arrays.asList("some test"));
+        Assert.assertEquals(args.rules, List.of("some test"));
     }
 
     static class V2 implements IParameterValidator2 {
@@ -1160,7 +1160,7 @@ public class JCommanderTest {
         @Override
         public void validate(String name, String value, ParameterDescription pd)
                 throws ParameterException {
-            names.addAll(Arrays.asList(pd.getParameter().names()));
+            names.addAll(List.of(pd.getParameter().names()));
         }
     }
 
@@ -1176,7 +1176,7 @@ public class JCommanderTest {
         jc.parse("--host", "h");
 
         jc.setAcceptUnknownOptions(true);
-        Assert.assertEquals(V2.names, Arrays.asList("-h", "--host"));
+        Assert.assertEquals(V2.names, List.of("-h", "--host"));
         Assert.assertTrue(V2.validateCalled);
     }
 

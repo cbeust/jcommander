@@ -25,7 +25,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.List;
 
 public class CommandTest {
   @Test
@@ -40,7 +40,7 @@ public class CommandTest {
 
     Assert.assertEquals(jc.getParsedCommand(), "add");
     Assert.assertEquals(add.interactive.booleanValue(), true);
-    Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+    Assert.assertEquals(add.patterns, List.of("A.java"));
   }
 
   @Test(expectedExceptions = ParameterException.class)
@@ -63,7 +63,7 @@ public class CommandTest {
 
     Assert.assertEquals(jc.getParsedCommand(), "add");
     Assert.assertEquals(add.interactive.booleanValue(), true);
-    Assert.assertEquals(add.patterns, Arrays.asList("A.java"));
+    Assert.assertEquals(add.patterns, List.of("A.java"));
   }
 
   @Test
@@ -80,7 +80,7 @@ public class CommandTest {
     Assert.assertEquals(jc.getParsedCommand(), "commit");
     Assert.assertTrue(commit.amend);
     Assert.assertEquals(commit.author, "cbeust");
-    Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+    Assert.assertEquals(commit.files, List.of("A.java", "B.java"));
   }
 
     @Test
@@ -95,7 +95,7 @@ public class CommandTest {
 
         Assert.assertEquals(jc.getParsedCommand(), "hidden");
         Assert.assertEquals(hidden.interactive.booleanValue(), true);
-        Assert.assertEquals(hidden.patterns, Arrays.asList("A.java"));
+        Assert.assertEquals(hidden.patterns, List.of("A.java"));
 
         jc.setProgramName("TestCommander");
         StringBuilder out = new StringBuilder();

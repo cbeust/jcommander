@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class CmdTest {
             if (jc.getParsedCommand() == null) {
                 LinkedList<String> newArgs = new LinkedList<>();
                 newArgs.add("--cmd-two");
-                newArgs.addAll(Arrays.asList(args));
+                newArgs.addAll(List.of(args));
                 jc.parse(newArgs.toArray(new String[0]));
             }
         } else {

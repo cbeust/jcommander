@@ -41,7 +41,7 @@ Assert.assertEquals(2, jct.verbose.intValue());
 Assert.assertEquals("unit1,unit2,unit3", jct.groups);
 Assert.assertEquals(true, jct.debug);
 Assert.assertEquals("value", jct.dynamicParams.get("option"));
-Assert.assertEquals(Arrays.asList("a", "b", "c"), jct.parameters);
+Assert.assertEquals(List.of("a", "b", "c"), jct.parameters);
 ```
 
 The full doc is available at [https://jcommander.org](https://jcommander.org).

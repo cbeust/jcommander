@@ -8,7 +8,6 @@ import com.beust.jcommander.converters.IParameterSplitter;
 
 import org.testng.collections.Lists;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ArgsList {
@@ -41,7 +40,7 @@ public class ArgsList {
   public static class SemiColonSplitter implements IParameterSplitter {
 
     public List<String> split(String value) {
-      return Arrays.asList(value.split(";"));
+      return List.of(value.split(";"));
     }
     
   }

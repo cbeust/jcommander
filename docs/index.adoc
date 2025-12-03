@@ -443,7 +443,7 @@ For example, here is a splitter that splits a string on semicolon:
 ----
 public static class SemiColonSplitter implements IParameterSplitter {
     public List<String> split(String value) {
-      return Arrays.asList(value.split(";"));
+      return List.of(value.split(";"));
     }
 }
 ----
@@ -946,7 +946,7 @@ Assert.assertTrue(cm.verbose);
 Assert.assertEquals(jc.getParsedCommand(), "commit");
 Assert.assertTrue(commit.amend);
 Assert.assertEquals(commit.author, "cbeust");
-Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+Assert.assertEquals(commit.files, List.of("A.java", "B.java"));
 ----
 
 == Exception

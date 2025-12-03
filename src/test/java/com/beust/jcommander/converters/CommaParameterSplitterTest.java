@@ -1,7 +1,7 @@
 package com.beust.jcommander.converters;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -23,6 +23,6 @@ public class CommaParameterSplitterTest {
     Assert.assertEquals(Collections.singletonList("abc"), SPLITTER.split("abc"));
 
     // Multiple values.
-    Assert.assertEquals(Arrays.asList("a", "b", "c"), SPLITTER.split("a,b,c"));
+    Assert.assertEquals(List.of("a", "b", "c"), SPLITTER.split("a,b,c"));
   }
 }

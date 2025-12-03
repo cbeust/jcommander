@@ -480,13 +480,13 @@ public class JCommander {
             if (pd.isDynamicParameter()) {
                 for (String name : pd.getParameter().names()) {
                     if (arg.startsWith(name) && !arg.equals(name) && arg.contains(pd.getParameter().getAssignment())) {
-                        return Arrays.asList(name, arg.substring(name.length()));
+                        return List.of(name, arg.substring(name.length()));
                     }
                 }
             }
         }
 
-        return Arrays.asList(arg);
+        return List.of(arg);
     }
 
     private boolean matchArg(String arg, IKey key) {
@@ -579,7 +579,7 @@ public class JCommander {
             while ((line = bufRead.readLine()) != null) {
                 // Allow empty lines and # comments in these at files
                 if (!line.isEmpty() && !line.trim().startsWith("#")) {
-                    result.addAll(Arrays.asList(line.split("\\s", 2)));
+                    result.addAll(List.of(line.split("\\s", 2)));
                 }
             }
         } catch (IOException e) {
@@ -1069,7 +1069,7 @@ public class JCommander {
      * @param aliases aliases to the program name
      */
     public void setProgramName(String name, String... aliases) {
-        programName = new ProgramName(name, Arrays.asList(aliases));
+        programName = new ProgramName(name, List.of(aliases));
     }
 
     /**

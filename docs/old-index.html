@@ -730,7 +730,7 @@ Assert.assertTrue(cm.verbose);
 Assert.assertEquals(jc.getParsedCommand(), "commit");
 Assert.assertTrue(commit.amend);
 Assert.assertEquals(commit.author, "cbeust");
-Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));
+Assert.assertEquals(commit.files, List.of("A.java", "B.java"));
 </pre>
 
 <h2><a class="section" name="Exceptions">Exception</a></h2>

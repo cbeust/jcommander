@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -102,7 +101,7 @@ public class ParameterOrderTest {
         order.add(trimmed);
       }
     }
-    Assert.assertEquals(order, Arrays.asList(expected));
+    Assert.assertEquals(order, List.of(expected));
   }
 
   private static class WithoutOrder {

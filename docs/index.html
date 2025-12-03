@@ -1284,7 +1284,7 @@ List&lt;File&gt; file;</code></pre>
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="java">public static class SemiColonSplitter implements IParameterSplitter {
     public List&lt;String&gt; split(String value) {
-      return Arrays.asList(value.split(";"));
+      return List.of(value.split(";"));
     }
 }</code></pre>
 </div>
@@ -1880,7 +1880,7 @@ Assert.assertTrue(cm.verbose);
 Assert.assertEquals(jc.getParsedCommand(), "commit");
 Assert.assertTrue(commit.amend);
 Assert.assertEquals(commit.author, "cbeust");
-Assert.assertEquals(commit.files, Arrays.asList("A.java", "B.java"));</code></pre>
+Assert.assertEquals(commit.files, List.of("A.java", "B.java"));</code></pre>
 </div>
 </div>
 </div>

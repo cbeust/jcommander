@@ -18,7 +18,6 @@
 
 package com.beust.jcommander;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.beust.jcommander.converters.IParameterSplitter;
@@ -26,6 +25,6 @@ import com.beust.jcommander.converters.IParameterSplitter;
 public class HiddenParameterSplitter implements IParameterSplitter {
   @Override
   public List<String> split(String value) {
-    return Arrays.asList(value.split(";"));
+    return List.of(value.split(";"));
   }
 }

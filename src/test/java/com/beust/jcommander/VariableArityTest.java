@@ -3,7 +3,6 @@ package com.beust.jcommander;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,12 +55,12 @@ public class VariableArityTest {
     com.parse(split);
 
     Assert.assertNotEquals(config.seed, 0);
-    Assert.assertEquals(config.modelMatrixFile, Arrays.asList("foo"));
-    Assert.assertEquals(config.featureFile, Arrays.asList("foo"));
+    Assert.assertEquals(config.modelMatrixFile, List.of("foo"));
+    Assert.assertEquals(config.featureFile, List.of("foo"));
     Assert.assertEquals(config.seed, 1024);
-    Assert.assertEquals(config.configFile, Arrays.asList("foo"));
+    Assert.assertEquals(config.configFile, List.of("foo"));
     Assert.assertEquals(config.outputFile, "foo");
-    Assert.assertEquals(config.j, Arrays.asList("--compilation_level", "WHITESPACE_ONLY", "--language_in=ECMASCRIPT5", "-bar", "baz", "-faz", "--more-options"));
+    Assert.assertEquals(config.j, List.of("--compilation_level", "WHITESPACE_ONLY", "--language_in=ECMASCRIPT5", "-bar", "baz", "-faz", "--more-options"));
   }
 
   @Parameters(separators = "=")
@@ -80,11 +79,11 @@ public class VariableArityTest {
     com.parse(input);
 
     Assert.assertNotEquals(config.seed, 0);
-    Assert.assertEquals(config.modelMatrixFile, Arrays.asList("foo"));
-    Assert.assertEquals(config.featureFile, Arrays.asList("foo"));
+    Assert.assertEquals(config.modelMatrixFile, List.of("foo"));
+    Assert.assertEquals(config.featureFile, List.of("foo"));
     Assert.assertEquals(config.seed, 1024);
     Assert.assertEquals(config.outputFile, "out.txt");
-    Assert.assertEquals(config.configFile, Arrays.asList("foo", "bar"));
+    Assert.assertEquals(config.configFile, List.of("foo", "bar"));
   }
 
   public static void main(String[] args) {

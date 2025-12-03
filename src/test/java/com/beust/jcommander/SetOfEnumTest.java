@@ -3,9 +3,9 @@ package com.beust.jcommander;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SetOfEnumTest {
@@ -29,7 +29,7 @@ public class SetOfEnumTest {
                 .addObject(args)
                 .build()
                 .parse("--season", "SPRING,AUTUMN");
-        Assert.assertEquals(EnumSet.copyOf(Arrays.asList(Season.SPRING, Season.AUTUMN)), args.seasons);
+        Assert.assertEquals(EnumSet.copyOf(List.of(Season.SPRING, Season.AUTUMN)), args.seasons);
     }
 
     public static void main(String[] args) {
