@@ -54,6 +54,10 @@ plugins {
     `maven-publish`
     signing
     id("biz.aQute.bnd.builder") version "7.1.0"
+    id("org.openrewrite.rewrite") version("latest.release")
+}
+
+rewrite {
 }
 
 tasks {
@@ -81,6 +85,7 @@ dependencies {
     listOf("org.testng:testng:7.0.0", "com.fasterxml.jackson.core:jackson-core:2.13.1",
         "com.fasterxml.jackson.core:jackson-annotations:2.13.1")
             .forEach { testImplementation(it) }
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.22.0")
 }
 
 tasks.withType<JavaCompile> {
@@ -170,6 +175,7 @@ with(publishing) {
             name = "myRepo"
             url = uri(layout.buildDirectory.dir("repo"))
         }
+        mavenCentral()
     }
 }
 
