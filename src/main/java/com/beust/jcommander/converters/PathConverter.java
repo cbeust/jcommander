@@ -22,7 +22,6 @@ import com.beust.jcommander.ParameterException;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Convert a string into a path.
@@ -37,7 +36,7 @@ public class PathConverter extends BaseConverter<Path> {
 
   public Path convert(String value) {
     try {
-      return Paths.get(value);
+      return Path.of(value);
     } catch (InvalidPathException e) {
       String encoded = escapeUnprintable(value).toString();
       throw new ParameterException(getErrorString(encoded, "a path"));
@@ -48,7 +47,7 @@ public class PathConverter extends BaseConverter<Path> {
     StringBuilder bldr = new StringBuilder();
     for (char c: value.toCharArray()) {
         if (c < ' ') {
-            bldr.append("\\u").append(String.format("%04X", (int) c));
+            bldr.append("\\u").append("%04X".formatted((int) c));
         } else {
             bldr.append(c);
         }

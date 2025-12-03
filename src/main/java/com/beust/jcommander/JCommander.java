@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -573,7 +573,7 @@ public class JCommander {
     private List<String> readFile(String fileName) {
         List<String> result = Lists.newArrayList();
 
-        try (BufferedReader bufRead = Files.newBufferedReader(Paths.get(fileName), options.atFileCharset)) {
+        try (BufferedReader bufRead = Files.newBufferedReader(Path.of(fileName), options.atFileCharset)) {
             String line;
             // Read through file one line at time. Print line # and line
             while ((line = bufRead.readLine()) != null) {
@@ -1362,7 +1362,7 @@ public class JCommander {
      * @param converterInstanceFactory the factory generating string converter instances
      */
     public void addConverterInstanceFactory(IStringConverterInstanceFactory converterInstanceFactory) {
-        options.converterInstanceFactories.add(0, converterInstanceFactory);
+        options.converterInstanceFactories.addFirst(converterInstanceFactory);
     }
 
     private IStringConverter<?> findConverterInstance(Parameter parameter, Class<?> forType, String optionName) {

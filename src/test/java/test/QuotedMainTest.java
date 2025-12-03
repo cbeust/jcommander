@@ -20,7 +20,7 @@ public class QuotedMainTest {
     JCommander jc = new JCommander(this);
     jc.parse(quoted);
     Assert.assertEquals(args.size(), 1);
-    Assert.assertEquals(args.get(0), " ");
+    Assert.assertEquals(args.getFirst(), " ");
   }
   
   public static void main(String[] args) {

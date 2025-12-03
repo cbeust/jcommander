@@ -65,8 +65,8 @@ public class ConverterFactoryTest {
         if (f != null) jc.addConverterFactory(f);
         if (f2 != null) jc.addConverterInstanceFactory(f2);
         jc.parse("a.com:10", "b.com:20");
-        Assert.assertEquals(a.getHostPorts().get(0).host, "a.com");
-        Assert.assertEquals(a.getHostPorts().get(0).port.intValue(), 10);
+        Assert.assertEquals(a.getHostPorts().getFirst().host, "a.com");
+        Assert.assertEquals(a.getHostPorts().getFirst().port.intValue(), 10);
         Assert.assertEquals(a.getHostPorts().get(1).host, "b.com");
         Assert.assertEquals(a.getHostPorts().get(1).port.intValue(), 20);
     }

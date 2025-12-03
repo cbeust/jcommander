@@ -55,18 +55,20 @@ public class UnixStyleUsageFormatterTest {
         jc.getUsageFormatter().usage(sb);
 
         // verify
-        String expected = "Usage: <main class> [options]\n"
-                + "  Options:\n"
-                + "    --a, -a (default: 0)\n"
-                + "    --b, -b (default: 2)\n"
-                + "    --c, -c sets c (default: 0)\n"
-                + "    --d, -d sets d (default: 2)\n"
-                + "    --e     Options: [A, B, C, D]\n"
-                + "    --f     Options: [A, B, C, D] (default: A)\n"
-                + "    --g     sets g (values: [A, B, C, D])\n"
-                + "    --h     sets h (default: A) (values: [A, B, C, D])\n"
-                + "    -i      Options: []\n"
-                + "    -k      sets k (values: [])\n";
+        String expected = """
+                Usage: <main class> [options]
+                  Options:
+                    --a, -a (default: 0)
+                    --b, -b (default: 2)
+                    --c, -c sets c (default: 0)
+                    --d, -d sets d (default: 2)
+                    --e     Options: [A, B, C, D]
+                    --f     Options: [A, B, C, D] (default: A)
+                    --g     sets g (values: [A, B, C, D])
+                    --h     sets h (default: A) (values: [A, B, C, D])
+                    -i      Options: []
+                    -k      sets k (values: [])
+                """;
         Assert.assertEquals(sb.toString(), expected);
     }
 
@@ -331,14 +333,16 @@ public class UnixStyleUsageFormatterTest {
 
         StringBuilder sb = new StringBuilder();
         jc.getUsageFormatter().usage(sb);
-        String expected = "Usage: <main class> [command] [command options]\n"
-                + "\n"
-                + "  Commands:\n"
-                + "    a      command a\n"
-                + "      Usage: a command a parameters\n"
-                + "\n"
-                + "    b      command b\n"
-                + "      Usage: b command b parameters\n";
+        String expected = """
+                Usage: <main class> [command] [command options]
+                
+                  Commands:
+                    a      command a
+                      Usage: a command a parameters
+                
+                    b      command b
+                      Usage: b command b parameters
+                """;
         Assert.assertEquals(sb.toString(), expected);
     }
 

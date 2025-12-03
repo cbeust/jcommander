@@ -18,7 +18,7 @@ public class DefaultUsageFormatterTest {
      * @return a hard-coded resource bundle for the en_US locale
      */
     public static ResourceBundle getResourceBundle() {
-        return ResourceBundle.getBundle("MessageBundle", new Locale("en", "US"));
+        return ResourceBundle.getBundle("MessageBundle", Locale.of("en", "US"));
     }
 
     private enum TestEnum1 {

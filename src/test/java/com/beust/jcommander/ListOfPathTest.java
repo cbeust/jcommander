@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +26,7 @@ public class ListOfPathTest {
                 .parse("--paths", "/home/foo,/var/lib/bar");
 
         // then
-        Assert.assertEquals(args.paths, Arrays.asList(Paths.get("/home/foo"), Paths.get("/var/lib/bar")));
+        Assert.assertEquals(args.paths, Arrays.asList(Path.of("/home/foo"), Path.of("/var/lib/bar")));
     }
 
     public static void main(String[] args) {

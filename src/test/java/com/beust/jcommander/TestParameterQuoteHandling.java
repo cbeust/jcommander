@@ -29,7 +29,7 @@ public class TestParameterQuoteHandling {
         jc.parse("--aParameterList=\"X,Y\"");
         Assert.assertNotNull(aParameterList);
         Assert.assertEquals(aParameterList.size(), 2);
-        Assert.assertEquals(aParameterList.get(0), "\"X");
+        Assert.assertEquals(aParameterList.getFirst(), "\"X");
         Assert.assertEquals(aParameterList.get(1), "Y\"");
     }
 }

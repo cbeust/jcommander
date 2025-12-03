@@ -385,9 +385,9 @@ public class ParameterDescription {
       if (validator != NoValidator.class) {
         p("Validating parameter:" + name + " value:" + value + " validator:" + validator);
       }
-      validator.newInstance().validate(name, value);
+      validator.getDeclaredConstructor().newInstance().validate(name, value);
       if (IParameterValidator2.class.isAssignableFrom(validator)) {
-        IParameterValidator2 instance = (IParameterValidator2) validator.newInstance();
+        IParameterValidator2 instance = (IParameterValidator2) validator.getDeclaredConstructor().newInstance();
         instance.validate(name, value, this);
       }
     } catch (InstantiationException | IllegalAccessException e) {

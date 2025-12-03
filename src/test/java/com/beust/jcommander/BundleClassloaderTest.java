@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +37,7 @@ public class BundleClassloaderTest {
     @Test
     public void testBundleAvailableFromDifferentClassLoader() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
 
-        Locale.setDefault(new Locale("en", "US"));
+        Locale.setDefault(Locale.of("en", "US"));
 
         Object command = loadClassAndBundleWithIsolatedClassLoader(Command.class, "MyBundle_en_US.properties", String.join("\n",
                 "option = Option",
@@ -50,7 +49,7 @@ public class BundleClassloaderTest {
 
         JCommander test = jc.findCommandByAlias("test");
 
-        final ParameterDescription pd = test.getParameters().get(0);
+        final ParameterDescription pd = test.getParameters().getFirst();
         Assert.assertEquals(pd.getDescription(), "Option");
 
         final StringBuilder sb = new StringBuilder();
@@ -67,7 +66,7 @@ public class BundleClassloaderTest {
 
         final String[] systemClassPath = System.getProperty("java.class.path").split(File.pathSeparator);
         for (String path : systemClassPath) {
-            classPath.add(Paths.get(path).toUri().toURL());
+            classPath.add(Path.of(path).toUri().toURL());
         }
 
         // create bundle in a temporary file and add it to our classpath

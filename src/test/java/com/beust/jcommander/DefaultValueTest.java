@@ -38,7 +38,7 @@ public class DefaultValueTest {
     JCommander cmd = new JCommander(opts);
     cmd.parse("-a", "anotherValue");
     Assert.assertEquals(opts.list.size(), 1);
-    Assert.assertEquals(opts.list.get(0), "anotherValue");
+    Assert.assertEquals(opts.list.getFirst(), "anotherValue");
     Assert.assertEquals(opts.set.size(), 0);
   }
 
@@ -48,7 +48,7 @@ public class DefaultValueTest {
     JCommander cmd = new JCommander(opts);
     cmd.parse("-a", "anotherValue");
     Assert.assertEquals(opts.list.size(), 1);
-    Assert.assertEquals(opts.list.get(0), "anotherValue");
+    Assert.assertEquals(opts.list.getFirst(), "anotherValue");
     Assert.assertEquals(opts.set.size(), 1);
     Assert.assertEquals(opts.set.iterator().next(), "defaultValue");
   }
@@ -70,7 +70,7 @@ public class DefaultValueTest {
     cmd.parse("-a", "anotherValue", "-a", "anotherValue2",
               "-b", "anotherValue3", "-b", "anotherValue4");
     Assert.assertEquals(opts.list.size(), 2);
-    Assert.assertEquals(opts.list.get(0), "anotherValue");
+    Assert.assertEquals(opts.list.getFirst(), "anotherValue");
     Assert.assertEquals(opts.list.get(1), "anotherValue2");
     Assert.assertEquals(opts.set.size(), 2);
     Iterator<String> arg2it = opts.set.iterator();

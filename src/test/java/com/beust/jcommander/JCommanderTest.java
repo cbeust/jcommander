@@ -92,7 +92,7 @@ public class JCommanderTest {
         JCommander.newBuilder().addObject(args).build().parse(argv);
 
         Assert.assertEquals(args.serverNames.size(), 3);
-        Assert.assertEquals(args.serverNames.get(0), argv[1]);
+        Assert.assertEquals(args.serverNames.getFirst(), argv[1]);
         Assert.assertEquals(args.serverNames.get(1), argv[3]);
         Assert.assertEquals(args.serverNames.get(2), argv[5]);
     }
@@ -146,7 +146,7 @@ public class JCommanderTest {
         String[] argv = {"-host", "localhost"};
         JCommander jc = new JCommander(i18n, bundle, argv);
 
-        ParameterDescription pd = jc.getParameters().get(0);
+        ParameterDescription pd = jc.getParameters().getFirst();
         Assert.assertEquals(pd.getDescription(), expectedString);
     }
 
@@ -155,19 +155,19 @@ public class JCommanderTest {
     }
 
     public void i18nUsLocale() {
-        i18n1("MessageBundle", new Locale("en", "US"), "Host");
+        i18n1("MessageBundle", Locale.of("en", "US"), "Host");
     }
 
     public void i18nFrLocale() {
-        i18n1("MessageBundle", new Locale("fr", "FR"), "Hôte");
+        i18n1("MessageBundle", Locale.of("fr", "FR"), "Hôte");
     }
 
     private void i18n2(Object args) {
         String[] argv = {"-host", "localhost"};
-        Locale.setDefault(new Locale("fr", "FR"));
+        Locale.setDefault(Locale.of("fr", "FR"));
         JCommander jc = JCommander.newBuilder().addObject(args).build();
         jc.parse(argv);
-        ParameterDescription pd = jc.getParameters().get(0);
+        ParameterDescription pd = jc.getParameters().getFirst();
         Assert.assertEquals(pd.getDescription(), "Hôte");
     }
 
@@ -205,10 +205,10 @@ public class JCommanderTest {
 
 
         Assert.assertEquals(args.pairs.size(), 2);
-        Assert.assertEquals(args.pairs.get(0), "pair0");
+        Assert.assertEquals(args.pairs.getFirst(), "pair0");
         Assert.assertEquals(args.pairs.get(1), "pair1");
         Assert.assertEquals(args.rest.size(), 1);
-        Assert.assertEquals(args.rest.get(0), "rest");
+        Assert.assertEquals(args.rest.getFirst(), "rest");
     }
 
     @Test(expectedExceptions = ParameterException.class)
@@ -257,19 +257,19 @@ public class JCommanderTest {
         Assert.assertEquals(args.file.getName(), fileName);
         Assert.assertEquals(args.path.getFileName().toString(), fileName);
         Assert.assertEquals(args.listStrings.size(), 2);
-        Assert.assertEquals(args.listStrings.get(0), "Tuesday");
+        Assert.assertEquals(args.listStrings.getFirst(), "Tuesday");
         Assert.assertEquals(args.listStrings.get(1), "Thursday");
         Assert.assertEquals(args.listInts.size(), 2);
-        Assert.assertEquals(args.listInts.get(0).intValue(), -1);
+        Assert.assertEquals(args.listInts.getFirst().intValue(), -1);
         Assert.assertEquals(args.listInts.get(1).intValue(), 8);
         Assert.assertEquals(args.listBigDecimals.size(), 2);
-        Assert.assertEquals(args.listBigDecimals.get(0), new BigDecimal("-11.52"));
+        Assert.assertEquals(args.listBigDecimals.getFirst(), new BigDecimal("-11.52"));
         Assert.assertEquals(args.listBigDecimals.get(1), new BigDecimal("100.12"));
         Assert.assertEquals(args.listBigDecimalsWildcardUpper.size(), 2);
-        Assert.assertEquals(args.listBigDecimalsWildcardUpper.get(0), new BigDecimal("-11.52"));
+        Assert.assertEquals(args.listBigDecimalsWildcardUpper.getFirst(), new BigDecimal("-11.52"));
         Assert.assertEquals(args.listBigDecimalsWildcardUpper.get(1), new BigDecimal("100.12"));
         Assert.assertEquals(args.listBigDecimalsWildcardLower.size(), 2);
-        Assert.assertEquals(args.listBigDecimalsWildcardLower.get(0), new BigDecimal("-11.52"));
+        Assert.assertEquals(args.listBigDecimalsWildcardLower.getFirst(), new BigDecimal("-11.52"));
         Assert.assertEquals(args.listBigDecimalsWildcardLower.get(1), new BigDecimal("100.12"));
     }
 
@@ -768,7 +768,7 @@ public class JCommanderTest {
         ArgsList al = new ArgsList();
         JCommander j = new JCommander(al);
         j.parse("-groups", "a,b");
-        Assert.assertEquals(al.groups.get(0), "a");
+        Assert.assertEquals(al.groups.getFirst(), "a");
         Assert.assertEquals(al.groups.get(1), "b");
     }
 
@@ -777,7 +777,7 @@ public class JCommanderTest {
         ArgsList al = new ArgsList();
         JCommander j = new JCommander(al);
         j.parse("-ints", "41,42");
-        Assert.assertEquals(al.ints.get(0).intValue(), 41);
+        Assert.assertEquals(al.ints.getFirst().intValue(), 41);
         Assert.assertEquals(al.ints.get(1).intValue(), 42);
     }
 
@@ -786,8 +786,8 @@ public class JCommanderTest {
         ArgsList al = new ArgsList();
         JCommander j = new JCommander(al);
         j.parse("-hp", "localhost:1000;example.com:1001");
-        Assert.assertEquals(al.hostPorts.get(0).host, "localhost");
-        Assert.assertEquals(al.hostPorts.get(0).port.intValue(), 1000);
+        Assert.assertEquals(al.hostPorts.getFirst().host, "localhost");
+        Assert.assertEquals(al.hostPorts.getFirst().port.intValue(), 1000);
         Assert.assertEquals(al.hostPorts.get(1).host, "example.com");
         Assert.assertEquals(al.hostPorts.get(1).port.intValue(), 1001);
     }
@@ -806,7 +806,7 @@ public class JCommanderTest {
         ArgsList al = new ArgsList();
         JCommander j = new JCommander(al);
         j.parse("-uppercase", "ab,cd");
-        Assert.assertEquals(al.uppercase.get(0), "AB");
+        Assert.assertEquals(al.uppercase.getFirst(), "AB");
         Assert.assertEquals(al.uppercase.get(1), "CD");
     }
 
@@ -1229,7 +1229,7 @@ public class JCommanderTest {
         Parameters args = new Parameters();
         JCommander.newBuilder().addObject(args).build().parse("--", "--");
         Assert.assertEquals(args.mainParameters.size(), 1);
-        Assert.assertEquals(args.mainParameters.get(0), "--");
+        Assert.assertEquals(args.mainParameters.getFirst(), "--");
     }
 
     public void dashDashParameter() {
@@ -1244,7 +1244,7 @@ public class JCommanderTest {
         JCommander.newBuilder().addObject(args).build().parse("-name", "theName", "--", "param1", "param2");
         Assert.assertEquals(args.name, "theName");
         Assert.assertEquals(args.mainParameters.size(), 2);
-        Assert.assertEquals(args.mainParameters.get(0), "param1");
+        Assert.assertEquals(args.mainParameters.getFirst(), "param1");
         Assert.assertEquals(args.mainParameters.get(1), "param2");
     }
 
@@ -1260,7 +1260,7 @@ public class JCommanderTest {
         JCommander.newBuilder().addObject(args).build().parse("param1", "param2", "--", "param3", "-name", "theName");
         Assert.assertNull(args.name);
         Assert.assertEquals(args.mainParameters.size(), 5);
-        Assert.assertEquals(args.mainParameters.get(0), "param1");
+        Assert.assertEquals(args.mainParameters.getFirst(), "param1");
         Assert.assertEquals(args.mainParameters.get(1), "param2");
         Assert.assertEquals(args.mainParameters.get(2), "param3");
         Assert.assertEquals(args.mainParameters.get(3), "-name");
@@ -1448,7 +1448,7 @@ public class JCommanderTest {
                 .args(new String[]{"a", "b"})
                 .build();
         Assert.assertEquals(args.main.size(), 2);
-        Assert.assertEquals(args.main.get(0), "a");
+        Assert.assertEquals(args.main.getFirst(), "a");
         Assert.assertEquals(args.main.get(1), "b");
     }
 

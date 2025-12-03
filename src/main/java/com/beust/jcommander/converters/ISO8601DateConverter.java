@@ -42,7 +42,7 @@ public class ISO8601DateConverter extends BaseConverter<Date> {
     try {
       return DATE_FORMAT.parse(value);
     } catch (ParseException pe) {
-      throw new ParameterException(getErrorString(value, String.format("an ISO-8601 formatted date (%s)", DATE_FORMAT.toPattern())));
+      throw new ParameterException(getErrorString(value, "an ISO-8601 formatted date (%s)".formatted(DATE_FORMAT.toPattern())));
     }
   }
 }

@@ -33,10 +33,10 @@ public class MethodSetterTest {
     JCommander.newBuilder().addObject(args).build().parse(argv);
 
     Assert.assertEquals(args.pairs.size(), 2);
-    Assert.assertEquals(args.pairs.get(0), "pair0");
+    Assert.assertEquals(args.pairs.getFirst(), "pair0");
     Assert.assertEquals(args.pairs.get(1), "pair1");
     Assert.assertEquals(args.rest.size(), 1);
-    Assert.assertEquals(args.rest.get(0), "rest");
+    Assert.assertEquals(args.rest.getFirst(), "rest");
   }
 
   public void setterThatThrows() {
@@ -104,7 +104,7 @@ public class MethodSetterTest {
     Arg args = new Arg();
     JCommander jc = JCommander.newBuilder().addObject(args).build();
     jc.parse("--port", "42");
-    ParameterDescription pd = jc.getParameters().get(0);
+    ParameterDescription pd = jc.getParameters().getFirst();
     Assert.assertEquals(pd.getDefault(), 43);
   }
 

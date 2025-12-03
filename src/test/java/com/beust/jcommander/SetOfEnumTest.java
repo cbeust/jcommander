@@ -14,7 +14,7 @@ public class SetOfEnumTest {
         SPRING,
         SUMMER,
         AUTUMN,
-        WINTER;
+        WINTER
     }
 
     @Test

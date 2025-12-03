@@ -261,7 +261,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
     public void appendCommands(StringBuilder out, int indentCount, int descriptionIndent, String indent) {
         boolean hasOnlyHiddenCommands = true;
         for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
-            Object arg = commands.getValue().getObjects().get(0);
+            Object arg = commands.getValue().getObjects().getFirst();
             Parameters p = arg.getClass().getAnnotation(Parameters.class);
 
             if (p == null || !p.hidden())
@@ -277,7 +277,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         var firstCommand = true;
         // The magic value 3 is the number of spaces between the name of the option and its description
         for (Map.Entry<JCommander.ProgramName, JCommander> commands : commander.getRawCommands().entrySet()) {
-            Object arg = commands.getValue().getObjects().get(0);
+            Object arg = commands.getValue().getObjects().getFirst();
             Parameters p = arg.getClass().getAnnotation(Parameters.class);
 
             if (p == null || !p.hidden()) {
@@ -316,7 +316,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         if (jc == null) {
             throw new ParameterException("Asking description for unknown command: " + commandName);
         }
-        Object arg = jc.getObjects().get(0);
+        Object arg = jc.getObjects().getFirst();
         Parameters p = arg.getClass().getAnnotation(Parameters.class);
         java.util.ResourceBundle bundle;
         String result = null;
