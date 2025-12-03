@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 public class ListOfPathTest {
@@ -14,7 +13,7 @@ public class ListOfPathTest {
         // given
         final class Args {
             @Parameter(names = { "--paths"}, description = "List of paths separated by comma")
-            private List<Path> paths = Collections.emptyList();
+            private List<Path> paths = List.of();
         }
         final Args args = new Args();
 

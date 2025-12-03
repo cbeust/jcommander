@@ -1,6 +1,5 @@
 package com.beust.jcommander.converters;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.testng.Assert;
@@ -14,13 +13,13 @@ public class CommaParameterSplitterTest {
   @Test
   public void testSplit() {
     // An empty string becomes an empty list.
-    Assert.assertEquals(Collections.emptyList(), SPLITTER.split(""));
+    Assert.assertEquals(List.of(), SPLITTER.split(""));
 
     // Whitespace is unaltered.
-    Assert.assertEquals(Collections.singletonList("  "), SPLITTER.split("  "));
+    Assert.assertEquals(List.of("  "), SPLITTER.split("  "));
 
     // Single value.
-    Assert.assertEquals(Collections.singletonList("abc"), SPLITTER.split("abc"));
+    Assert.assertEquals(List.of("abc"), SPLITTER.split("abc"));
 
     // Multiple values.
     Assert.assertEquals(List.of("a", "b", "c"), SPLITTER.split("a,b,c"));

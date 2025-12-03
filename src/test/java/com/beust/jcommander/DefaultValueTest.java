@@ -87,8 +87,8 @@ public class DefaultValueTest {
 
   public static final class MyOptsWithDefaultValues extends MyOpts {
     public MyOptsWithDefaultValues(){
-      this.list = singletonList("defaultValue");
-      this.set = singletonSet("defaultValue");
+      this.list = List.of("defaultValue");
+      this.set = Set.of("defaultValue");
     }
   }
 
@@ -99,12 +99,14 @@ public class DefaultValueTest {
     }
   }
 
+  @Deprecated(forRemoval = true, since = "4.0")
   public static final List<String> singletonList(String value) {
     List<String> list = Lists.newArrayList();
     list.add(value);
     return list;
   }
 
+  @Deprecated(forRemoval = true, since = "4.0")
   public static final Set<String> singletonSet(String value){
     Set<String> set = Sets.newLinkedHashSet();
     set.add(value);
@@ -115,7 +117,7 @@ public class DefaultValueTest {
   public void missingRequiredParameterWithDefaultValueShouldNotRaiseParameterException() {
     class MyRequiredOptsWithDefaultValues {
       @Parameter(names = "-a", required = true)
-      public List<String> list = singletonList("defaultValue");
+      public List<String> list = List.of("defaultValue");
     }
 
     MyRequiredOptsWithDefaultValues opts = new MyRequiredOptsWithDefaultValues();
