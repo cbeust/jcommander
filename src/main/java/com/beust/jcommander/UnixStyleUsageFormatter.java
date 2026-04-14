@@ -88,6 +88,7 @@ public class UnixStyleUsageFormatter extends DefaultUsageFormatter {
             Class<?> type = pd.getParameterized().getType();
 
             if (type.isEnum()) {
+                @SuppressWarnings("unchecked")
                 String valueList = EnumSet.allOf((Class<? extends Enum>) type).toString();
 
                 // Prevent duplicate values list, since it is set as 'Options: [values]' if the description
