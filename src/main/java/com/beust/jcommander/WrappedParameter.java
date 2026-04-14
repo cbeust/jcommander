@@ -11,8 +11,8 @@ public class WrappedParameter {
   private Parameter parameter;
   private DynamicParameter dynamicParameter;
 
-  public WrappedParameter(Parameter p) {
-    parameter = p;
+  public WrappedParameter(Parameter parameter) {
+    this.parameter = parameter;
   }
 
   public WrappedParameter(DynamicParameter p) {

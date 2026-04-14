@@ -17,15 +17,18 @@ public class MethodSetterTest {
       public void setPairs(List<String> pairs) {
         this.pairs = pairs;
       }
+
       public List<String> getPairs() {
         return this.pairs;
       }
+
       public List<String> pairs;
 
       @Parameter(description = "Rest")
       public void setRest(List<String> rest) {
         this.rest = rest;
       }
+
       public List<String> rest;
     }
     ArgsArityStringSetter args = new ArgsArityStringSetter();
@@ -49,7 +52,7 @@ public class MethodSetterTest {
     boolean passed = false;
     try {
       JCommander.newBuilder().addObject(new Arg()).build().parse("--host", "host");
-    } catch(ParameterException ex) {
+    } catch (ParameterException ex) {
       Assert.assertEquals(ex.getCause(), null);
       passed = true;
     }

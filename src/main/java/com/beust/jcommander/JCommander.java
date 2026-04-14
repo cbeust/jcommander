@@ -20,7 +20,6 @@ package com.beust.jcommander;
 
 import com.beust.jcommander.parser.DefaultParameterizedParser;
 import com.beust.jcommander.FuzzyMap.IKey;
-import com.beust.jcommander.StringKey;
 import com.beust.jcommander.converters.*;
 import com.beust.jcommander.internal.*;
 
@@ -315,7 +314,7 @@ public class JCommander {
      */
     // declared final since this is invoked from constructors
     public final void addObject(Object object) {
-        if (object instanceof Iterable i) {
+        if (object instanceof Iterable<?> i) {
             // Iterable
             i.forEach(objects::add);
         } else if (object.getClass().isArray()) {
@@ -1016,7 +1015,7 @@ public class JCommander {
 
         // If it's a List<String>, we might need to create that list and then add the value to it.
         if (List.class.isAssignableFrom(type)) {
-            List result;
+            List<Object> result;
             if (object == null) {
                 result = Lists.newArrayList();
             } else {
