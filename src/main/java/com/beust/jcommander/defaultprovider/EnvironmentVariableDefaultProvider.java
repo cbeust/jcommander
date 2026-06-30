@@ -29,7 +29,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * A default provider that reads its default values from an environment
  * variable.
- * 
+ *
  * A prefix pattern can be provided to indicate how options are identified.
  * The default pattern {@code -/} mandates that options MUST start with either a dash or a slash.
  * Options can have values separated by whitespace.
@@ -44,6 +44,9 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
 
     private static final String DEFAULT_PREFIXES_PATTERN = "-/";
 
+    /** Value returned when an option is present but has no associated value (i.e. it's a boolean flag). */
+    private static final String FLAG_PRESENT_VALUE = "true";
+
     private final String environmentVariableValue;
 
     private final String optionPrefixesPattern;
@@ -57,7 +60,7 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
 
     /**
      * Creates a default provider reading the specified environment variable using the specified prefixes pattern.
-     *  
+     *
      * @param environmentVariableName
      *            The name of the environment variable to read (e. g. {@code "JCOMMANDER_OPTS"}). Must not be {@code null}.
      * @param optionPrefixes
@@ -84,19 +87,63 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
 
     @Override
     public final String getDefaultValueFor(final String optionName) {
-        if (this.environmentVariableValue == null)
+        if (this.environmentVariableValue == null) {
             return null;
-        final Matcher matcher = Pattern
-                .compile("(?:(?:.*\\s+)|(?:^))(" + Pattern.quote(optionName) + ")\\s*((?:'[^']*(?='))|(?:\"[^\"]*(?=\"))|(?:[^" + this.optionPrefixesPattern + "\\s]+))?.*")
-                .matcher(this.environmentVariableValue);
-        if (!matcher.matches())
+        }
+
+        final String rawValue = findRawValueFor(optionName);
+        if (rawValue == null) {
             return null;
-        String value = matcher.group(2);
-        if (value == null)
-            return "true";
+        }
+
+        if (isFlagWithoutValue(rawValue)) {
+            return FLAG_PRESENT_VALUE;
+        }
+
+        return stripSurroundingQuote(rawValue);
+    }
+
+    /**
+     * Searches the environment variable string for the given option name and
+     * returns whatever raw value (if any) follows it.
+     *
+     * @return the raw matched value group, or {@code null} if the option wasn't found.
+     */
+    private String findRawValueFor(final String optionName) {
+        final Matcher matcher = buildMatcherFor(optionName);
+        if (!matcher.matches()) {
+            return null;
+        }
+        return matcher.group(2);
+    }
+
+    /**
+     * Builds a matcher that looks for {@code optionName} inside the environment
+     * variable value, capturing an optional value that follows it. The value may be:
+     * single-quoted, double-quoted, or a plain run of non-whitespace,
+     * non-prefix characters.
+     */
+    private Matcher buildMatcherFor(final String optionName) {
+        final String pattern = "(?:(?:.*\\s+)|(?:^))("
+                + Pattern.quote(optionName)
+                + ")\\s*((?:'[^']*(?='))|(?:\"[^\"]*(?=\"))|(?:[^"
+                + this.optionPrefixesPattern
+                + "\\s]+))?.*";
+        return Pattern.compile(pattern).matcher(this.environmentVariableValue);
+    }
+
+    private boolean isFlagWithoutValue(final String rawValue) {
+        return rawValue == null;
+    }
+
+    /**
+     * Removes a single leading quote character (single or double) from the value, if present.
+     */
+    private String stripSurroundingQuote(final String value) {
         final char firstCharacter = value.charAt(0);
-        if (firstCharacter == '\'' || firstCharacter == '"')
-            value = value.substring(1);
+        if (firstCharacter == '\'' || firstCharacter == '"') {
+            return value.substring(1);
+        }
         return value;
     }
 
