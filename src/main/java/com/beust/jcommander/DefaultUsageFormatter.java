@@ -96,25 +96,7 @@ public class DefaultUsageFormatter implements IUsageFormatter {
 
         // Append first line (aka main line) of the usage
         appendMainLine(out, hasOptions, hasCommands, indentCount, indent);
-
-        // Align the descriptions at the "longestName" column
-        int longestName = 0;
-        List<ParameterDescription> sortedParameters = Lists.newArrayList();
-
-        for (ParameterDescription pd : commander.getFields().values()) {
-            if (!pd.getParameter().hidden()) {
-                sortedParameters.add(pd);
-                // + to have an extra space between the name and the description
-                int length = pd.getNames().length() + 2;
-
-                if (length > longestName) {
-                    longestName = length;
-                }
-            }
-        }
-
-        // Sort the options
-        sortedParameters.sort(commander.getParameterDescriptionComparator());
+        List<ParameterDescription> sortedParameters = sortedVisibleParameters();
 
         // Append all the parameter names and descriptions
         appendAllParametersDetails(out, indentCount, indent, sortedParameters);
@@ -174,76 +156,96 @@ public class DefaultUsageFormatter implements IUsageFormatter {
         }
 
         for (ParameterDescription pd : sortedParameters) {
-            WrappedParameter parameter = pd.getParameter();
-            String description = pd.getDescription();
-            boolean hasDescription = !description.isEmpty();
-
-            // First line, command name
-            out.append(indent)
-                    .append("  ")
-                    .append(parameter.required() ? "* " : "  ")
-                    .append(pd.getNames())
-                    .append(parameter.placeholder().isBlank() ? "" : " " + parameter.placeholder())
-                    .append('\n');
-
-            if (hasDescription) {
-                wrapDescription(out, indentCount, s(indentCount) + description);
-            }
-
-            String category = pd.getCategory();
-            if (!category.isEmpty()) {
-                String categoryType = "Category: " + category;
-
-                if (hasDescription) {
-                    out.append(newLineAndIndent(indentCount));
-                } else {
-                    out.append(s(indentCount));
-                }
-                out.append(categoryType);
-            }
-
-            Object def = pd.getDefaultValueDescription();
-
-            if (pd.isDynamicParameter()) {
-                String syntax = "Syntax: " + parameter.names()[0] + "key" + parameter.getAssignment() + "value";
-
-                if (hasDescription) {
-                    out.append(newLineAndIndent(indentCount));
-                } else {
-                    out.append(s(indentCount));
-                }
-                out.append(syntax);
-            }
-
-            if (def != null && !pd.isHelp()) {
-                String displayedDef = Strings.isStringEmpty(def.toString()) ? "<empty string>" : def.toString();
-                String defaultText = "Default: " + (parameter.password() ? "********" : displayedDef);
-
-                if (hasDescription) {
-                    out.append(newLineAndIndent(indentCount));
-                } else {
-                    out.append(s(indentCount));
-                }
-                out.append(defaultText);
-            }
-            Class<?> type = pd.getParameterized().getType();
-
-            if (type.isEnum()) {
-                String valueList = EnumSet.allOf((Class<? extends Enum>) type).toString();
-                String possibleValues = "Possible Values: " + valueList;
-
-                // Prevent duplicate values list, since it is set as 'Options: [values]' if the description
-                // of an enum field is empty in ParameterDescription#init(..)
-                if (!description.contains("Options: " + valueList)) {
-                    if (hasDescription) {
-                        out.append(newLineAndIndent(indentCount));
-                    } else {
-                        out.append(s(indentCount));
-                    }
-                    out.append(possibleValues);
-                }
-            }
+            appendParameterDetails(out, indentCount, indent, pd);
             out.append('\n');
+        }
+    }
+
+    private List<ParameterDescription> sortedVisibleParameters() {
+        List<ParameterDescription> sortedParameters = Lists.newArrayList();
+        for (ParameterDescription pd : commander.getFields().values()) {
+            if (!pd.getParameter().hidden()) {
+                sortedParameters.add(pd);
+            }
+        }
+        sortedParameters.sort(commander.getParameterDescriptionComparator());
+        return sortedParameters;
+    }
+
+    private void appendParameterDetails(StringBuilder out, int indentCount, String indent, ParameterDescription pd) {
+        WrappedParameter parameter = pd.getParameter();
+        String description = pd.getDescription();
+        boolean hasDescription = !description.isEmpty();
+
+        appendParameterHeader(out, indent, pd, parameter);
+        if (hasDescription) {
+            wrapDescription(out, indentCount, s(indentCount) + description);
+        }
+
+        appendCategoryLine(out, indentCount, hasDescription, pd.getCategory());
+        appendDynamicSyntaxLine(out, indentCount, hasDescription, pd, parameter);
+        appendDefaultValueLine(out, indentCount, hasDescription, pd, parameter);
+        appendEnumValuesLine(out, indentCount, hasDescription, pd, description);
+    }
+
+    private void appendParameterHeader(StringBuilder out, String indent, ParameterDescription pd,
+            WrappedParameter parameter) {
+        out.append(indent)
+                .append("  ")
+                .append(parameter.required() ? "* " : "  ")
+                .append(pd.getNames())
+                .append(parameter.placeholder().isBlank() ? "" : " " + parameter.placeholder())
+                .append('\n');
+    }
+
+    private void appendCategoryLine(StringBuilder out, int indentCount, boolean hasDescription, String category) {
+        if (!category.isEmpty()) {
+            appendIndentedDetailPrefix(out, indentCount, hasDescription);
+            out.append("Category: ").append(category);
+        }
+    }
+
+    private void appendDynamicSyntaxLine(StringBuilder out, int indentCount, boolean hasDescription,
+            ParameterDescription pd, WrappedParameter parameter) {
+        if (pd.isDynamicParameter()) {
+            appendIndentedDetailPrefix(out, indentCount, hasDescription);
+            out.append("Syntax: ")
+                    .append(parameter.names()[0])
+                    .append("key")
+                    .append(parameter.getAssignment())
+                    .append("value");
+        }
+    }
+
+    private void appendDefaultValueLine(StringBuilder out, int indentCount, boolean hasDescription,
+            ParameterDescription pd, WrappedParameter parameter) {
+        Object defaultValue = pd.getDefaultValueDescription();
+        if (defaultValue != null && !pd.isHelp()) {
+            String displayedDef = Strings.isStringEmpty(defaultValue.toString())
+                    ? "<empty string>"
+                    : defaultValue.toString();
+            appendIndentedDetailPrefix(out, indentCount, hasDescription);
+            out.append("Default: ").append(parameter.password() ? "********" : displayedDef);
+        }
+    }
+
+    private void appendEnumValuesLine(StringBuilder out, int indentCount, boolean hasDescription,
+            ParameterDescription pd, String description) {
+        Class<?> type = pd.getParameterized().getType();
+        if (type.isEnum()) {
+            String valueList = EnumSet.allOf((Class<? extends Enum>) type).toString();
+            if (!description.contains("Options: " + valueList)) {
+                appendIndentedDetailPrefix(out, indentCount, hasDescription);
+                out.append("Possible Values: ").append(valueList);
+            }
+        }
+    }
+
+    private void appendIndentedDetailPrefix(StringBuilder out, int indentCount, boolean hasDescription) {
+        if (hasDescription) {
+            out.append(newLineAndIndent(indentCount));
+        } else {
+            out.append(s(indentCount));
         }
     }
 

@@ -720,22 +720,7 @@ public class JCommander {
             // Expand @
             // 
             if (arg.startsWith("@") && options.expandAtSign) {
-                String fileName = arg.substring(1);
-                List<String> fileArgs = readFile(fileName);
-                
-                // Create a new array to hold the expanded arguments
-                String[] newArgs = new String[args.length + fileArgs.size() - 1];
-
-                // Copy the existing arguments before the '@' argument
-                System.arraycopy(args, 0, newArgs, 0, i);
-
-                // Copy the arguments from the file
-                System.arraycopy(fileArgs.toArray(), 0, newArgs, i, fileArgs.size());
-
-                // Copy the remaining arguments after the '@' argument
-                System.arraycopy(args, i + 1, newArgs, i + fileArgs.size(), args.length - i - 1);
-
-                args = newArgs;
+                args = expandAtSignArgument(args, i);
                 continue;
             }
 
@@ -746,126 +731,168 @@ public class JCommander {
             JCommander jc = findCommandByAlias(arg);
             int increment = 1;
             if (!isDashDash && !"--".equals(a) && isOption(a) && jc == null) {
-                //
-                // Option
-                //
-                ParameterDescription pd = findParameterDescription(a);
-
-                if (pd != null) {
-                    if (pd.getParameter().password()) {
-                        increment = processPassword(args, i, pd, validate);
-                    } else {
-                        if (pd.getParameter().variableArity()) {
-                            //
-                            // Variable arity?
-                            //
-                            increment = processVariableArity(args, i, pd, validate);
-                        } else {
-                            //
-                            // Regular option
-                            //
-                            Class<?> fieldType = pd.getParameterized().getType();
-
-                            // Boolean, set to true as soon as we see it, unless it specified
-                            // an arity of 1, in which case we need to read the next value
-                            if (pd.getParameter().arity() == -1 && isBooleanType(fieldType)) {
-                                handleBooleanOption(pd, fieldType);
-                            } else {
-                                increment = processFixedArity(args, i, pd, validate, fieldType);
-                            }
-                            // If it's a help option, remember for later
-                            if (pd.isHelp()) {
-                                helpWasSpecified = true;
-                            }
-                        }
-                    }
-                } else {
-                    if (options.acceptUnknownOptions) {
-                        unknownArgs.add(arg);
-                        i++;
-                        while (i < args.length && !isOption(args[i])) {
-                            unknownArgs.add(args[i++]);
-                        }
-                        increment = 0;
-                    } else {
-                        throw new ParameterException("Unknown option: " + arg);
-                    }
-                }
+                increment = parseOptionArgument(args, i, arg, a, validate);
             } else {
-                //
-                // Main parameter
-                //
-                if ("--".equals(arg) && !isDashDash) {
-                    isDashDash = true;
-                }
-                else if (commands.isEmpty()) {
-                    //
-                    // Regular (non-command) parsing
-                    //
-                    initMainParameterValue(arg);
-                    String value = a; // If there's a non-quoted version, prefer that one
-
-                    for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
-                            ) {
-                        mainParameter.description.validateParameter(validator,
-                            "Default", value);
-                    }
-
-                    Object convertedValue = value;
-
-                    // Fix
-                    // Main parameter doesn't support Converter
-                    // https://github.com/cbeust/jcommander/issues/380
-                    if (mainParameter.annotation.converter() != null && mainParameter.annotation.converter() != NoConverter.class){
-                        convertedValue = convertValue(mainParameter.parameterized, mainParameter.parameterized.getType(), null, value);
-                    }
-
-                    Type genericType = mainParameter.parameterized.getGenericType();
-                    if (genericType instanceof ParameterizedType p) {
-                        Type cls = p.getActualTypeArguments()[0];
-                        if (cls instanceof Class c) {
-                            convertedValue = convertValue(mainParameter.parameterized, c, null, value);
-                        }
-                    }
-
-
-                    mainParameter.description.setAssigned(true);
-                    mainParameter.addValue(convertedValue);
-                } else {
-                    //
-                    // Command parsing
-                    //
-                    if (jc == null && validate) {
-                        throw new MissingCommandException("Expected a command, got " + arg, arg);
-                    } else if (jc != null) {
-                        parsedCommand = jc.programName.name;
-                        parsedAlias = arg; //preserve the original form
-
-                        // Found a valid command, ask it to parse the remainder of the arguments.
-                        // Setting the boolean commandParsed to true will force the current
-                        // loop to end.
-                        jc.parse(validate, subArray(args, i + 1));
-                        commandParsed = true;
-                    }
-                }
+                ParseProgress progress = parseNonOptionArgument(args, i, a, arg, jc, isDashDash, validate);
+                commandParsed = progress.commandParsed();
+                isDashDash = progress.dashDashSeen();
+                increment = progress.increment();
             }
             i += increment;
         }
 
-        // Mark the parameter descriptions held in fields as assigned
+        markAssignedAndDefaultedParameters();
+
+    }
+
+    private String[] expandAtSignArgument(String[] args, int index) {
+        String fileName = args[index].substring(1);
+        List<String> fileArgs = readFile(fileName);
+        String[] newArgs = new String[args.length + fileArgs.size() - 1];
+
+        System.arraycopy(args, 0, newArgs, 0, index);
+        System.arraycopy(fileArgs.toArray(new String[0]), 0, newArgs, index, fileArgs.size());
+        System.arraycopy(args, index + 1, newArgs, index + fileArgs.size(), args.length - index - 1);
+        return newArgs;
+    }
+
+    private int parseOptionArgument(String[] args, int index, String originalArg, String trimmedArg,
+            boolean validate) {
+        ParameterDescription pd = findParameterDescription(trimmedArg);
+
+        if (pd == null) {
+            return consumeUnknownOption(args, index, originalArg);
+        }
+        if (pd.getParameter().password()) {
+            return processPassword(args, index, pd, validate);
+        }
+        if (pd.getParameter().variableArity()) {
+            return processVariableArity(args, index, pd, validate);
+        }
+
+        return processRegularOption(args, index, pd, validate);
+    }
+
+    private int consumeUnknownOption(String[] args, int index, String originalArg) {
+        if (!options.acceptUnknownOptions) {
+            throw new ParameterException("Unknown option: " + originalArg);
+        }
+
+        unknownArgs.add(originalArg);
+        int i = index + 1;
+        while (i < args.length && !isOption(args[i])) {
+            unknownArgs.add(args[i]);
+            i++;
+        }
+        return i - index;
+    }
+
+    private int processRegularOption(String[] args, int index, ParameterDescription pd, boolean validate) {
+        Class<?> fieldType = pd.getParameterized().getType();
+        int increment = 1;
+
+        // Boolean options are immediately toggled when no explicit arity is provided.
+        if (pd.getParameter().arity() == -1 && isBooleanType(fieldType)) {
+            handleBooleanOption(pd, fieldType);
+        } else {
+            increment = processFixedArity(args, index, pd, validate, fieldType);
+        }
+
+        if (pd.isHelp()) {
+            helpWasSpecified = true;
+        }
+        return increment;
+    }
+
+    private ParseProgress parseNonOptionArgument(String[] args, int index, String trimmedArg, String originalArg,
+            JCommander command, boolean dashDashSeen, boolean validate) {
+        if ("--".equals(originalArg) && !dashDashSeen) {
+            return new ParseProgress(1, false, true);
+        }
+
+        if (commands.isEmpty()) {
+            parseMainParameterValue(originalArg, trimmedArg);
+            return new ParseProgress(1, false, dashDashSeen);
+        }
+
+        if (command == null && validate) {
+            throw new MissingCommandException("Expected a command, got " + originalArg, originalArg);
+        }
+
+        if (command != null) {
+            parsedCommand = command.programName.name;
+            parsedAlias = originalArg; // preserve the original form
+            command.parse(validate, subArray(args, index + 1));
+            return new ParseProgress(1, true, dashDashSeen);
+        }
+
+        return new ParseProgress(1, false, dashDashSeen);
+    }
+
+    private void parseMainParameterValue(String originalArg, String value) {
+        initMainParameterValue(originalArg);
+
+        for (Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()) {
+            mainParameter.description.validateParameter(validator, "Default", value);
+        }
+
+        Object convertedValue = value;
+
+        // Main parameter converter support.
+        if (mainParameter.annotation.converter() != null && mainParameter.annotation.converter() != NoConverter.class) {
+            convertedValue = convertValue(mainParameter.parameterized, mainParameter.parameterized.getType(), null,
+                    value);
+        }
+
+        Type genericType = mainParameter.parameterized.getGenericType();
+        if (genericType instanceof ParameterizedType p) {
+            Type cls = p.getActualTypeArguments()[0];
+            if (cls instanceof Class c) {
+                convertedValue = convertValue(mainParameter.parameterized, c, null, value);
+            }
+        }
+
+        mainParameter.description.setAssigned(true);
+        mainParameter.addValue(convertedValue);
+    }
+
+    private void markAssignedAndDefaultedParameters() {
         descriptions.values().forEach(parameterDescription -> {
             if (parameterDescription.isAssigned()) {
                 fields.get(parameterDescription.getParameterized()).setAssigned(true);
             }
 
-            // if the parameter has a default value (not the one assigned by DefaultProvider
-            // but the one assigned on the variable initialization), make it as assigned and
-            // remove it from the list of parameters to be required
-            if (parameterDescription.getDefault() != null && !parameterDescription.getParameterized().getType().isPrimitive()) {
+            // If a parameter has a pre-existing default value on the object, it should no longer
+            // be considered missing even when not provided on the command line.
+            if (parameterDescription.getDefault() != null
+                    && !parameterDescription.getParameterized().getType().isPrimitive()) {
                 requiredFields.remove(parameterDescription.getParameterized());
             }
         });
+    }
 
+    private static class ParseProgress {
+        private final int increment;
+        private final boolean commandParsed;
+        private final boolean dashDashSeen;
+
+        private ParseProgress(int increment, boolean commandParsed, boolean dashDashSeen) {
+            this.increment = increment;
+            this.commandParsed = commandParsed;
+            this.dashDashSeen = dashDashSeen;
+        }
+
+        private int increment() {
+            return increment;
+        }
+
+        private boolean commandParsed() {
+            return commandParsed;
+        }
+
+        private boolean dashDashSeen() {
+            return dashDashSeen;
+        }
     }
 
     private boolean isBooleanType(Class<?> fieldType) {

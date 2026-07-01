@@ -23,6 +23,7 @@ import com.beust.jcommander.IDefaultProvider;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -91,12 +92,13 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
             return null;
         }
 
-        final String rawValue = findRawValueFor(optionName);
-        if (rawValue == null) {
+        final Matcher matcher = buildMatcherFor(optionName);
+        if (!matcher.matches()) {
             return null;
         }
 
-        if (isFlagWithoutValue(rawValue)) {
+        final String rawValue = matcher.group(2);
+        if (rawValue == null) {
             return FLAG_PRESENT_VALUE;
         }
 
@@ -109,13 +111,7 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
      *
      * @return the raw matched value group, or {@code null} if the option wasn't found.
      */
-    private String findRawValueFor(final String optionName) {
-        final Matcher matcher = buildMatcherFor(optionName);
-        if (!matcher.matches()) {
-            return null;
-        }
-        return matcher.group(2);
-    }
+
 
     /**
      * Builds a matcher that looks for {@code optionName} inside the environment
