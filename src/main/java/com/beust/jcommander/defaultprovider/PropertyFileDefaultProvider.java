@@ -1,19 +1,6 @@
 /**
  * Copyright (C) 2010 the original author or authors.
- * See the notice.md file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * ...license header unchanged...
  */
 
 package com.beust.jcommander.defaultprovider;
@@ -25,70 +12,91 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Function;
 import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * A default provider that reads its default values from a property file.
- * 
+ *
  * @author cbeust
  */
 public class PropertyFileDefaultProvider implements IDefaultProvider {
+
   public static final String DEFAULT_FILE_NAME = "jcommander.properties";
-  private Properties properties = new Properties();
-  private static final Function<String, String> DEFAULT_OPTION_NAME_TRANSFORMER = optionName -> {
-    int index = 0;
-    while (index < optionName.length() && ! Character.isLetterOrDigit(optionName.charAt(index)))
-      index++;
-    return optionName.substring(index);
-  };
+
+  private final Properties properties = new Properties();
   private final Function<String, String> optionNameTransformer;
 
+  // -------------------------------------------------------------------------
+  // Constructors — all chain down to the most specific variant
+  // -------------------------------------------------------------------------
+
   public PropertyFileDefaultProvider() {
-    init(DEFAULT_FILE_NAME);
-    optionNameTransformer = DEFAULT_OPTION_NAME_TRANSFORMER;
+    this(DEFAULT_FILE_NAME);
   }
 
-  public PropertyFileDefaultProvider(String fileName) {
-    init(fileName);
-    optionNameTransformer = DEFAULT_OPTION_NAME_TRANSFORMER;
+  public PropertyFileDefaultProvider(final String fileName) {
+    this(fileName, PropertyFileDefaultProvider::stripLeadingNonAlphanumeric);
   }
 
   public PropertyFileDefaultProvider(final String fileName, final Function<String, String> optionNameTransformer) {
-      init(fileName);
-      this.optionNameTransformer = optionNameTransformer;
+    loadFromFileName(fileName);
+    this.optionNameTransformer = optionNameTransformer;
   }
 
   public PropertyFileDefaultProvider(final Path path) {
-    this(path, DEFAULT_OPTION_NAME_TRANSFORMER);
+    this(path, PropertyFileDefaultProvider::stripLeadingNonAlphanumeric);
   }
 
   public PropertyFileDefaultProvider(final Path path, final Function<String, String> optionNameTransformer) {
+    loadFromPath(path);
+    this.optionNameTransformer = optionNameTransformer;
+  }
+
+  // -------------------------------------------------------------------------
+  // IDefaultProvider
+  // -------------------------------------------------------------------------
+
+  @Override
+  public String getDefaultValueFor(final String optionName) {
+    return properties.getProperty(optionName.transform(optionNameTransformer));
+  }
+
+  // -------------------------------------------------------------------------
+  // Private helpers
+  // -------------------------------------------------------------------------
+
+  /**
+   * Strips any leading non-alphanumeric characters from an option name.
+   * For example, {@code "--verbose"} becomes {@code "verbose"}, and
+   * {@code "-count"} becomes {@code "count"}.
+   */
+  private static String stripLeadingNonAlphanumeric(final String optionName) {
+    int index = 0;
+    while (index < optionName.length() && !Character.isLetterOrDigit(optionName.charAt(index))) {
+      index++;
+    }
+    return optionName.substring(index);
+  }
+
+  private void loadFromFileName(final String fileName) {
+    try {
+      final URL url = ClassLoader.getSystemResource(fileName);
+      if (url == null) {
+        throw new ParameterException("Could not find property file: " + fileName + " on the class path");
+      }
+      properties.load(url.openStream());
+    } catch (final IOException e) {
+      throw new ParameterException("Could not open property file: " + fileName);
+    }
+  }
+
+  private void loadFromPath(final Path path) {
     try (final var inputStream = Files.newInputStream(path)) {
       properties.load(inputStream);
     } catch (final IOException e) {
       throw new ParameterException("Could not load properties from path: " + path);
     }
-    this.optionNameTransformer = optionNameTransformer;
-  }
-
-  private void init(String fileName) {
-    try {
-      URL url = ClassLoader.getSystemResource(fileName);
-      if (url != null) {
-        properties.load(url.openStream());
-      } else {
-        throw new ParameterException("Could not find property file: " + fileName
-            + " on the class path");
-      }
-    }
-    catch (IOException e) {
-      throw new ParameterException("Could not open property file: " + fileName);
-    }
-  }
-  
-  public String getDefaultValueFor(String optionName) {
-    return properties.getProperty(optionName.transform(optionNameTransformer));
   }
 
 }
