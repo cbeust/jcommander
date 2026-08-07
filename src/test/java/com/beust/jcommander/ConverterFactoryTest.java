@@ -96,6 +96,49 @@ public class ConverterFactoryTest {
         }, new ArgsMainParameter1());
     }
 
+    /**
+     * Scalar (non-List) main parameters must also honor converter instance factories.
+     * https://github.com/cbeust/jcommander/issues/538
+     */
+    private void singleMainWithHostPort(IStringConverterFactory f, IStringConverterInstanceFactory f2) {
+        class Args {
+            @Parameter
+            public HostPort hostPort;
+        }
+        Args a = new Args();
+        JCommander jc = new JCommander(a);
+        if (f != null) jc.addConverterFactory(f);
+        if (f2 != null) jc.addConverterInstanceFactory(f2);
+        jc.parse("example.com:8080");
+        Assert.assertEquals(a.hostPort.host, "example.com");
+        Assert.assertEquals(a.hostPort.port.intValue(), 8080);
+    }
+
+    @Test
+    public void singleMainWithFactory() {
+        singleMainWithHostPort(CONVERTER_FACTORY, null);
+    }
+
+    @Test
+    public void singleMainWithInstanceFactory() {
+        singleMainWithHostPort(null, new IStringConverterInstanceFactory() {
+            @Override
+            public IStringConverter<?> getConverterInstance(Parameter parameter, Class<?> forType, String optionName) {
+                return HostPort.class.equals(forType) ? new HostPortConverter() : null;
+            }
+        });
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void singleMainWithoutConverterWithoutFactory() {
+        class Args {
+            @Parameter
+            public HostPort hostPort;
+        }
+        JCommander jc = new JCommander(new Args());
+        jc.parse("example.com:8080");
+    }
+
     @Test
     public void mainWithSubcommand() throws Exception {
         final Args1 a = new Args1();

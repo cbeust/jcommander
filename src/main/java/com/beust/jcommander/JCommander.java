@@ -811,23 +811,28 @@ public class JCommander {
                             "Default", value);
                     }
 
-                    Object convertedValue = value;
-
-                    // Fix
-                    // Main parameter doesn't support Converter
+                    // Convert main parameter values the same way as regular options: annotation
+                    // converters, IStringConverterFactory, and IStringConverterInstanceFactory.
+                    // Collection main parameters are filled one argument at a time, so convert to
+                    // the element type. Scalar main parameters convert to the field type.
                     // https://github.com/cbeust/jcommander/issues/380
-                    if (mainParameter.annotation.converter() != null && mainParameter.annotation.converter() != NoConverter.class){
-                        convertedValue = convertValue(mainParameter.parameterized, mainParameter.parameterized.getType(), null, value);
-                    }
-
+                    // https://github.com/cbeust/jcommander/issues/538
+                    Object convertedValue = value;
                     Type genericType = mainParameter.parameterized.getGenericType();
                     if (genericType instanceof ParameterizedType p) {
                         Type cls = p.getActualTypeArguments()[0];
                         if (cls instanceof Class c) {
                             convertedValue = convertValue(mainParameter.parameterized, c, null, value);
                         }
+                    } else if (mainParameter.multipleValue == null) {
+                        convertedValue = convertValue(mainParameter.parameterized,
+                                mainParameter.parameterized.getType(), null, value);
+                    } else if (mainParameter.annotation.converter() != null
+                            && mainParameter.annotation.converter() != NoConverter.class) {
+                        // Raw List main parameter with an explicit converter
+                        convertedValue = convertValue(mainParameter.parameterized,
+                                mainParameter.parameterized.getType(), null, value);
                     }
-
 
                     mainParameter.description.setAssigned(true);
                     mainParameter.addValue(convertedValue);
