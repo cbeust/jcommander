@@ -54,7 +54,7 @@ plugins {
     `maven-publish`
     signing
     id("biz.aQute.bnd.builder") version "7.1.0"
-    id("org.openrewrite.rewrite") version("latest.release")
+    id("org.openrewrite.rewrite") version "7.39.0"
 }
 
 rewrite {
