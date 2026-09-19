@@ -4,6 +4,7 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.ParameterException;
 
 import java.util.EnumSet;
+import java.util.Locale;
 
 /**
  * A converter to parse enums
@@ -29,8 +30,8 @@ public class EnumConverter<T extends Enum<T>> implements IStringConverter<T> {
   public T convert(String value) {
     for (T constant : EnumSet.allOf(clazz)) {
       // the toString method may be overridden, causing what is printed (or what user types) is different from it's declared name
-      if (constant.name().equals(value) || constant.name().equals(value.toUpperCase())
-          || constant.toString().equals(value) || constant.toString().equals(value.toUpperCase())) {
+      if (constant.name().equals(value) || constant.name().equals(value.toUpperCase(Locale.ROOT))
+          || constant.toString().equals(value) || constant.toString().equals(value.toUpperCase(Locale.ROOT))) {
         return constant;
       }
     }
