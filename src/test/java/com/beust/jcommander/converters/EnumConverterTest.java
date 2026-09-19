@@ -18,7 +18,10 @@
 
 package com.beust.jcommander.converters;
 
+import java.util.Locale;
+
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 @Test
@@ -49,6 +52,26 @@ public class EnumConverterTest {
         Assert.assertThrows(() -> RESOLUTION_ENUM_CONVERTER.convert("XXX"));
     }
     
+    @DataProvider(name = "turkishLocaleValues")
+    public Object[][] turkishLocaleValues() {
+        return new Object[][] {
+            {SEASON_ENUM_CONVERTER, "winter", Season.WINTER},
+            {SEASON_ENUM_CONVERTER, "WiNtEr", Season.WINTER},
+            {RESOLUTION_ENUM_CONVERTER, "1080i", Resolution.R_1080I}
+        };
+    }
+
+    @Test(dataProvider = "turkishLocaleValues")
+    public void testMatchWithTurkishDefaultLocale(EnumConverter<?> converter, String value, Enum<?> expected) {
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            Assert.assertEquals(converter.convert(value), expected);
+        } finally {
+            Locale.setDefault(original);
+        }
+    }
+
     private enum Season {
         SPRING,
         SUMMER,
@@ -59,6 +82,7 @@ public class EnumConverterTest {
     private enum Resolution {
         R_4K, // can not start with a number
         R_1080P,
+        R_1080I,
         R_480P;
 
         @Override
