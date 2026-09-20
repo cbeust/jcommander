@@ -164,11 +164,12 @@ public class JCommanderTest {
 
     private void i18n2(Object args) {
         String[] argv = {"-host", "localhost"};
-        Locale.setDefault(Locale.of("fr", "FR"));
-        JCommander jc = JCommander.newBuilder().addObject(args).build();
-        jc.parse(argv);
-        ParameterDescription pd = jc.getParameters().getFirst();
-        Assert.assertEquals(pd.getDescription(), "Hôte");
+        LocaleTestHelper.withDefaultLocale(Locale.of("fr", "FR"), () -> {
+            JCommander jc = JCommander.newBuilder().addObject(args).build();
+            jc.parse(argv);
+            ParameterDescription pd = jc.getParameters().getFirst();
+            Assert.assertEquals(pd.getDescription(), "Hôte");
+        });
     }
 
     public void i18nWithResourceAnnotation() {

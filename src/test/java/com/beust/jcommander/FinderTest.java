@@ -88,7 +88,7 @@ public class FinderTest {
     JCommander jc = new JCommander(a);
     jc.setCaseSensitiveOptions(false);
 
-    withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INPUT", "value"));
+    LocaleTestHelper.withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INPUT", "value"));
 
     Assert.assertEquals(a.input, "value");
   }
@@ -104,7 +104,7 @@ public class FinderTest {
     jc.setCaseSensitiveOptions(false);
     jc.setAllowAbbreviatedOptions(true);
 
-    withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INP", "value"));
+    LocaleTestHelper.withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INP", "value"));
 
     Assert.assertEquals(a.input, "value");
   }
@@ -122,7 +122,7 @@ public class FinderTest {
     JCommander jc = new JCommander(a);
     jc.setCaseSensitiveOptions(false);
 
-    withDefaultLocale(Locale.forLanguageTag("tr-TR"),
+    LocaleTestHelper.withDefaultLocale(Locale.forLanguageTag("tr-TR"),
         () -> jc.parse("--files", "first.txt", "--INPUT", "value.txt"));
 
     Assert.assertEquals(a.files, List.of("first.txt"));
@@ -163,16 +163,6 @@ public class FinderTest {
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
     new FinderTest().ambiguousAbbreviatedOptionsCaseInsensitive();
-  }
-
-  private void withDefaultLocale(Locale locale, Runnable action) {
-    Locale original = Locale.getDefault();
-    try {
-      Locale.setDefault(locale);
-      action.run();
-    } finally {
-      Locale.setDefault(original);
-    }
   }
 
 }
