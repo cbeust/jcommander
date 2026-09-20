@@ -37,28 +37,24 @@ public class BundleClassloaderTest {
     @Test
     public void testBundleAvailableFromDifferentClassLoader() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
         LocaleTestHelper.withDefaultLocale(Locale.of("en", "US"), () -> {
-            try {
-                Object command = loadClassAndBundleWithIsolatedClassLoader(Command.class, "MyBundle_en_US.properties", String.join("\n",
-                        "option = Option",
-                        "description = A command description"));
+            Object command = loadClassAndBundleWithIsolatedClassLoader(Command.class, "MyBundle_en_US.properties", String.join("\n",
+                    "option = Option",
+                    "description = A command description"));
 
-                final JCommander jc = JCommander.newBuilder()
-                        .addCommand(command)
-                        .build();
+            final JCommander jc = JCommander.newBuilder()
+                    .addCommand(command)
+                    .build();
 
-                JCommander test = jc.findCommandByAlias("test");
+            JCommander test = jc.findCommandByAlias("test");
 
-                final ParameterDescription pd = test.getParameters().getFirst();
-                Assert.assertEquals(pd.getDescription(), "Option");
+            final ParameterDescription pd = test.getParameters().getFirst();
+            Assert.assertEquals(pd.getDescription(), "Option");
 
-                final StringBuilder sb = new StringBuilder();
-                jc.usage(sb);
+            final StringBuilder sb = new StringBuilder();
+            jc.usage(sb);
 
-                final String usage = sb.toString();
-                Assert.assertTrue(usage.contains("A command description"));
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IOException e) {
-                throw new RuntimeException(e);
-            }
+            final String usage = sb.toString();
+            Assert.assertTrue(usage.contains("A command description"));
         });
     }
 
