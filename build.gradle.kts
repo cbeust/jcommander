@@ -13,8 +13,6 @@ object This {
 }
 
 
-val kotlinVersion = "1.3.50"
-
 allprojects {
     group = This.groupId
     version = This.version
@@ -28,8 +26,6 @@ allprojects {
         }
     }
 }
-
-val kotlinVer by extra { kotlinVersion }
 
 buildscript {
     repositories {
@@ -107,14 +103,14 @@ tasks.withType<Test> {
 // (gpg --list-keys, last eight digits of the key)
 //
 
-val sourcesJar by tasks.registering(Jar::class) {
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
     description = "Assembles sources JAR"
     archiveClassifier.set("sources")
     from(sourceSets.getByName("main").allSource)
 }
 
-val javadocJar by tasks.registering(Jar::class) {
+val javadocJar = tasks.register<Jar>("javadocJar") {
     from(tasks.javadoc)
     archiveClassifier.set("javadoc")
 }
