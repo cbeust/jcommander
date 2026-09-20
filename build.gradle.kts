@@ -53,7 +53,7 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("biz.aQute.bnd.builder") version "7.1.0"
+    id("biz.aQute.bnd.builder") version "7.4.0"
     id("org.openrewrite.rewrite") version "7.39.0"
 }
 
@@ -107,14 +107,14 @@ tasks.withType<Test> {
 // (gpg --list-keys, last eight digits of the key)
 //
 
-val sourcesJar by tasks.creating(Jar::class) {
+val sourcesJar by tasks.registering(Jar::class) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
     description = "Assembles sources JAR"
     archiveClassifier.set("sources")
     from(sourceSets.getByName("main").allSource)
 }
 
-val javadocJar by tasks.creating(Jar::class) {
+val javadocJar by tasks.registering(Jar::class) {
     from(tasks.javadoc)
     archiveClassifier.set("javadoc")
 }
