@@ -6,6 +6,10 @@ import com.beust.jcommander.JCommanderTest.ConfigureArgs;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 @Test
 public class FinderTest {
   public void caseInsensitiveOption() {
@@ -74,6 +78,57 @@ public class FinderTest {
     Assert.assertEquals(a.param, "foo");
   }
 
+  public void caseInsensitiveOptionWithTurkishDefaultLocale() {
+    class Arg {
+      @Parameter(names = "--input")
+      private String input;
+    }
+
+    Arg a = new Arg();
+    JCommander jc = new JCommander(a);
+    jc.setCaseSensitiveOptions(false);
+
+    withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INPUT", "value"));
+
+    Assert.assertEquals(a.input, "value");
+  }
+
+  public void abbreviatedOptionsCaseInsensitiveWithTurkishDefaultLocale() {
+    class Arg {
+      @Parameter(names = "--input")
+      private String input;
+    }
+
+    Arg a = new Arg();
+    JCommander jc = new JCommander(a);
+    jc.setCaseSensitiveOptions(false);
+    jc.setAllowAbbreviatedOptions(true);
+
+    withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INP", "value"));
+
+    Assert.assertEquals(a.input, "value");
+  }
+
+  public void caseInsensitiveOptionStopsVariableArityWithTurkishDefaultLocale() {
+    class Arg {
+      @Parameter(names = "--files", variableArity = true)
+      private List<String> files = new ArrayList<>();
+
+      @Parameter(names = "--input")
+      private String input;
+    }
+
+    Arg a = new Arg();
+    JCommander jc = new JCommander(a);
+    jc.setCaseSensitiveOptions(false);
+
+    withDefaultLocale(Locale.forLanguageTag("tr-TR"),
+        () -> jc.parse("--files", "first.txt", "--INPUT", "value.txt"));
+
+    Assert.assertEquals(a.files, List.of("first.txt"));
+    Assert.assertEquals(a.input, "value.txt");
+  }
+
   @Test(expectedExceptions = ParameterException.class)
   public void ambiguousAbbreviatedOptions() {
     class Arg {
@@ -108,6 +163,16 @@ public class FinderTest {
   @Test(enabled = false)
   public static void main(String[] args) throws Exception {
     new FinderTest().ambiguousAbbreviatedOptionsCaseInsensitive();
+  }
+
+  private void withDefaultLocale(Locale locale, Runnable action) {
+    Locale original = Locale.getDefault();
+    try {
+      Locale.setDefault(locale);
+      action.run();
+    } finally {
+      Locale.setDefault(original);
+    }
   }
 
 }

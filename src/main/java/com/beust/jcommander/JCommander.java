@@ -491,7 +491,7 @@ public class JCommander {
     private boolean matchArg(String arg, IKey key) {
         String kn = options.caseSensitiveOptions
                 ? key.getName()
-                : key.getName().toLowerCase();
+                : Strings.toLowerCase(key.getName());
         if (options.allowAbbreviatedOptions) {
             if (kn.startsWith(arg)) return true;
         } else {
@@ -519,7 +519,7 @@ public class JCommander {
 
     private boolean isNamedOption(String passedArg) {
 
-        String arg = options.caseSensitiveOptions ? passedArg : passedArg.toLowerCase();
+        String arg = options.caseSensitiveOptions ? passedArg : Strings.toLowerCase(passedArg);
 
         for (IKey key : descriptions.keySet()) {
             if (matchArg(arg, key)) return true;

@@ -21,8 +21,9 @@ public class FuzzyMap {
       if (caseSensitive) {
         return map.get(name);
       } else {
+        String normalizedName = Strings.toLowerCase(name.getName());
         for (IKey c : map.keySet()) {
-          if (c.getName().equalsIgnoreCase(name.getName())) {
+          if (Strings.toLowerCase(c.getName()).equals(normalizedName)) {
             return map.get(c);
           }
         }
@@ -34,11 +35,12 @@ public class FuzzyMap {
   private static <V> V findAbbreviatedValue(Map<? extends IKey, V> map, IKey name,
       boolean caseSensitive) {
     String string = name.getName();
+    String normalizedString = caseSensitive ? string : Strings.toLowerCase(string);
     Map<String, V> results = Maps.newHashMap();
     for (IKey c : map.keySet()) {
       String n = c.getName();
-      boolean match = (caseSensitive && n.startsWith(string))
-          || ((! caseSensitive) && n.toLowerCase().startsWith(string.toLowerCase()));
+      String normalizedName = caseSensitive ? n : Strings.toLowerCase(n);
+      boolean match = normalizedName.startsWith(normalizedString);
       if (match) {
         results.put(n, map.get(c));
       }
