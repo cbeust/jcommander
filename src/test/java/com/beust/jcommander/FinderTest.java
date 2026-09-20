@@ -6,6 +6,10 @@ import com.beust.jcommander.JCommanderTest.ConfigureArgs;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 @Test
 public class FinderTest {
   public void caseInsensitiveOption() {
@@ -72,6 +76,57 @@ public class FinderTest {
     jc.setAllowAbbreviatedOptions(true);
     jc.parse("--PAR", "foo");
     Assert.assertEquals(a.param, "foo");
+  }
+
+  public void caseInsensitiveOptionWithTurkishDefaultLocale() {
+    class Arg {
+      @Parameter(names = "--input")
+      private String input;
+    }
+
+    Arg a = new Arg();
+    JCommander jc = new JCommander(a);
+    jc.setCaseSensitiveOptions(false);
+
+    LocaleTestHelper.withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INPUT", "value"));
+
+    Assert.assertEquals(a.input, "value");
+  }
+
+  public void abbreviatedOptionsCaseInsensitiveWithTurkishDefaultLocale() {
+    class Arg {
+      @Parameter(names = "--input")
+      private String input;
+    }
+
+    Arg a = new Arg();
+    JCommander jc = new JCommander(a);
+    jc.setCaseSensitiveOptions(false);
+    jc.setAllowAbbreviatedOptions(true);
+
+    LocaleTestHelper.withDefaultLocale(Locale.forLanguageTag("tr-TR"), () -> jc.parse("--INP", "value"));
+
+    Assert.assertEquals(a.input, "value");
+  }
+
+  public void caseInsensitiveOptionStopsVariableArityWithTurkishDefaultLocale() {
+    class Arg {
+      @Parameter(names = "--files", variableArity = true)
+      private List<String> files = new ArrayList<>();
+
+      @Parameter(names = "--input")
+      private String input;
+    }
+
+    Arg a = new Arg();
+    JCommander jc = new JCommander(a);
+    jc.setCaseSensitiveOptions(false);
+
+    LocaleTestHelper.withDefaultLocale(Locale.forLanguageTag("tr-TR"),
+        () -> jc.parse("--files", "first.txt", "--INPUT", "value.txt"));
+
+    Assert.assertEquals(a.files, List.of("first.txt"));
+    Assert.assertEquals(a.input, "value.txt");
   }
 
   @Test(expectedExceptions = ParameterException.class)

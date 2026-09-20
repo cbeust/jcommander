@@ -36,27 +36,26 @@ public class BundleClassloaderTest {
 
     @Test
     public void testBundleAvailableFromDifferentClassLoader() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
+        LocaleTestHelper.withDefaultLocale(Locale.of("en", "US"), () -> {
+            Object command = loadClassAndBundleWithIsolatedClassLoader(Command.class, "MyBundle_en_US.properties", String.join("\n",
+                    "option = Option",
+                    "description = A command description"));
 
-        Locale.setDefault(Locale.of("en", "US"));
+            final JCommander jc = JCommander.newBuilder()
+                    .addCommand(command)
+                    .build();
 
-        Object command = loadClassAndBundleWithIsolatedClassLoader(Command.class, "MyBundle_en_US.properties", String.join("\n",
-                "option = Option",
-                "description = A command description"));
+            JCommander test = jc.findCommandByAlias("test");
 
-        final JCommander jc = JCommander.newBuilder()
-                .addCommand(command)
-                .build();
+            final ParameterDescription pd = test.getParameters().getFirst();
+            Assert.assertEquals(pd.getDescription(), "Option");
 
-        JCommander test = jc.findCommandByAlias("test");
+            final StringBuilder sb = new StringBuilder();
+            jc.usage(sb);
 
-        final ParameterDescription pd = test.getParameters().getFirst();
-        Assert.assertEquals(pd.getDescription(), "Option");
-
-        final StringBuilder sb = new StringBuilder();
-        jc.usage(sb);
-
-        final String usage = sb.toString();
-        Assert.assertTrue(usage.contains("A command description"));
+            final String usage = sb.toString();
+            Assert.assertTrue(usage.contains("A command description"));
+        });
     }
 
     public Object loadClassAndBundleWithIsolatedClassLoader(Class<?> clazz, String bundleName, String bundle) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {

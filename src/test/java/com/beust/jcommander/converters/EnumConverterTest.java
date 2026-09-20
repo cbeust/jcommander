@@ -18,6 +18,8 @@
 
 package com.beust.jcommander.converters;
 
+import com.beust.jcommander.LocaleTestHelper;
+
 import java.util.Locale;
 
 import org.testng.Assert;
@@ -63,13 +65,8 @@ public class EnumConverterTest {
 
     @Test(dataProvider = "turkishLocaleValues")
     public void testMatchWithTurkishDefaultLocale(EnumConverter<?> converter, String value, Enum<?> expected) {
-        Locale original = Locale.getDefault();
-        try {
-            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
-            Assert.assertEquals(converter.convert(value), expected);
-        } finally {
-            Locale.setDefault(original);
-        }
+        LocaleTestHelper.withDefaultLocale(Locale.forLanguageTag("tr-TR"),
+                () -> Assert.assertEquals(converter.convert(value), expected));
     }
 
     private enum Season {
