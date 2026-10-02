@@ -89,6 +89,32 @@ public class WrappedParameter {
           throws IllegalAccessException {
     if (parameter != null) {
       if (field != null) {
+        Class<?> fieldClass = field.getType();
+        if (fieldClass != value.getClass()) {
+          if (fieldClass == boolean.class || fieldClass == Boolean.class)
+            value = Boolean.parseBoolean(value.toString());
+          else if (fieldClass == byte.class || fieldClass == Byte.class)
+            value = Byte.parseByte(value.toString());
+          else if (fieldClass == short.class || fieldClass == Short.class)
+            value = Short.parseShort(value.toString());
+          else if (fieldClass == int.class || fieldClass == Integer.class)
+            value = Integer.parseInt(value.toString());
+          else if (fieldClass == long.class || fieldClass == Long.class)
+            value = Long.parseLong(value.toString());
+          else if (fieldClass == char.class || fieldClass == Character.class)
+            value = value.toString().charAt(0);
+          else if (fieldClass == float.class || fieldClass == Float.class)
+            value = Float.parseFloat(value.toString());
+          else if (fieldClass == double.class || fieldClass == Double.class)
+            value = Double.parseDouble(value.toString());
+          else {
+            try {
+              value = fieldClass.getConstructor(value.getClass()).newInstance(value);
+            } catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+              e.printStackTrace();
+            }
+          }
+        }
         field.set(object, value);
       } else {
         parameterized.set(object, value);
