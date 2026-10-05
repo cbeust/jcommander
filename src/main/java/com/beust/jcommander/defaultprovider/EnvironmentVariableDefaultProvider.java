@@ -87,7 +87,7 @@ public final class EnvironmentVariableDefaultProvider implements IDefaultProvide
         if (this.environmentVariableValue == null)
             return null;
         final Matcher matcher = Pattern
-                .compile("(?:(?:.*\\s+)|(?:^))(" + Pattern.quote(optionName) + ")\\s*((?:'[^']*(?='))|(?:\"[^\"]*(?=\"))|(?:[^" + this.optionPrefixesPattern + "\\s]+))?.*")
+                .compile("(?:(?:.*\\s+)|(?:^))(" + Pattern.quote(optionName) + ")(?=\\s|$)\\s*((?:'[^']*(?='))|(?:\"[^\"]*(?=\"))|(?:[^" + this.optionPrefixesPattern + "\\s]+))?.*")
                 .matcher(this.environmentVariableValue);
         if (!matcher.matches())
             return null;
