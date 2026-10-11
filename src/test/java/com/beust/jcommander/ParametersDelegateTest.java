@@ -5,11 +5,42 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 /**
  * @author rodionmoiseev
  */
 public class ParametersDelegateTest {
+
+  @Test
+  public void delegateImplementingBiPredicate() {
+    class PredicateDelegate implements BiPredicate<String, String> {
+      @Parameter(names = "--value")
+      private String value;
+      private int length;
+
+      @Parameter(names = "--length")
+      private void setLength(int length) {
+        this.length = length;
+      }
+
+      @Override
+      public boolean test(String left, String right) {
+        return left.equals(right) && left.length() == length;
+      }
+    }
+    class MainParams {
+      @ParametersDelegate
+      private PredicateDelegate delegate = new PredicateDelegate();
+    }
+
+    MainParams params = new MainParams();
+    JCommander.newBuilder().addObject(params).build().parse("--value", "same", "--length", "4");
+
+    Assert.assertEquals(params.delegate.value, "same");
+    Assert.assertEquals(params.delegate.length, 4);
+    Assert.assertTrue(params.delegate.test("same", "same"));
+  }
 
   @Test
   public void delegatingEmptyClassHasNoEffect() {
