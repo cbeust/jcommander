@@ -152,10 +152,13 @@ public class Parameterized {
   }
 
   private static Parameterized createParameterizedFromMethod(Method m) {
-    m.setAccessible(true);
     Annotation annotation = m.getAnnotation(Parameter.class);
     Annotation delegateAnnotation = m.getAnnotation(ParametersDelegate.class);
     Annotation dynamicParameter = m.getAnnotation(DynamicParameter.class);
+    if (annotation == null && delegateAnnotation == null && dynamicParameter == null) {
+      return null;
+    }
+    m.setAccessible(true);
     if (annotation != null) {
       return new Parameterized(new WrappedParameter((Parameter) annotation), null,
               null, m);
