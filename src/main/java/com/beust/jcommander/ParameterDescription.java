@@ -259,14 +259,17 @@ public class ParameterDescription {
     if (isCollection) {
       @SuppressWarnings("unchecked")
       Collection<Object> l = (Collection<Object>) parameterized.get(object);
-      if (l == null || fieldIsSetForTheFirstTime(isDefault)) {
+      boolean newCollection = l == null || fieldIsSetForTheFirstTime(isDefault);
+      if (newCollection) {
           l = newCollection(type);
-          parameterized.set(object, l);
       }
       if (convertedValue instanceof Collection c) {
           l.addAll(c);
       } else {
           l.add(convertedValue);
+      }
+      if (newCollection) {
+          parameterized.set(object, l);
       }
       finalValue = l;
     } else {

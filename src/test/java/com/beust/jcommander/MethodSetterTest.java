@@ -1,8 +1,10 @@
 package com.beust.jcommander;
 
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +42,36 @@ public class MethodSetterTest {
     Assert.assertEquals(args.pairs.get(1), "pair1");
     Assert.assertEquals(args.rest.size(), 1);
     Assert.assertEquals(args.rest.getFirst(), "rest");
+  }
+
+  @DataProvider
+  public Object[][] collectionSetterArguments() {
+    return new Object[][] {
+        { new String[] { "-values", "first" }, List.of("first") },
+        { new String[] { "-values", "first,second" }, List.of("first", "second") },
+        { new String[] { "-values", "first", "-values", "second" }, List.of("first", "second") },
+        { new String[] { "-values", "first,second", "-values", "third" }, List.of("first", "second", "third") }
+    };
+  }
+
+  @Test(dataProvider = "collectionSetterArguments")
+  public void collectionSetterCopiesValues(String[] argv, List<String> expected) {
+    class Args {
+      private List<String> values = new ArrayList<>(List.of("default"));
+
+      @Parameter(names = "-values")
+      public void setValues(List<String> values) {
+        this.values = new ArrayList<>(values);
+      }
+
+      public List<String> getValues() {
+        return values;
+      }
+    }
+    Args args = new Args();
+    JCommander.newBuilder().addObject(args).build().parse(argv);
+
+    Assert.assertEquals(args.getValues(), expected);
   }
 
   public void setterThatThrows() {
