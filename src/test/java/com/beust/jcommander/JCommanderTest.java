@@ -358,6 +358,34 @@ public class JCommanderTest {
         argsBoolean0(new String[]{"-debug"}, Boolean.TRUE);
     }
 
+    public void repeatedBooleanOptionIsRejected() {
+        class Args {
+            @Parameter(names = {"-y", "--dry-run"}, arity = 0)
+            boolean dryRun;
+        }
+        Args args = new Args();
+        JCommander commander = JCommander.newBuilder().addObject(args).build();
+
+        try {
+            commander.parse("-y", "--dry-run");
+            Assert.fail("A repeated boolean option should be rejected");
+        } catch (ParameterException expected) {
+            Assert.assertTrue(expected.getMessage().contains("Can only specify option"));
+        }
+    }
+
+    public void repeatedBooleanOptionWithOverwritingKeepsFirstValue() {
+        class Args {
+            @Parameter(names = "--enabled")
+            boolean enabled = true;
+        }
+        Args args = new Args();
+        JCommander.newBuilder().addObject(args).allowParameterOverwriting(true).build()
+                .parse("--enabled", "--enabled");
+
+        Assert.assertFalse(args.enabled);
+    }
+
     @Test(expectedExceptions = ParameterException.class)
     public void badParameterShouldThrowParameter1Exception() {
         Args1 args = new Args1();

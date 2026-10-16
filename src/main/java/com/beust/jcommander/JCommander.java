@@ -878,6 +878,12 @@ public class JCommander {
     }
 
     private void handleBooleanOption(ParameterDescription pd, Class<?> fieldType) {
+      if (pd.isAssigned()) {
+          if (!isParameterOverwritingAllowed()) {
+              throw new ParameterException("Can only specify option " + pd.getParameter().names()[0] + " once.");
+          }
+          return;
+      }
       // Flip the value this boolean was initialized with
       Boolean value = (Boolean) pd.getParameterized().get(pd.getObject());
       if(value != null) {
