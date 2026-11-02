@@ -29,6 +29,35 @@ import com.beust.jcommander.IDefaultProvider;
 
 public final class EnvironmentVariableDefaultProviderTest {
 
+    @Test
+    public void shouldNotMatchPrefixOfLongerOption() {
+        IDefaultProvider provider = new EnvironmentVariableDefaultProvider(null, "-/",
+                name -> "--foobar 123 --foo-bar 456 /foobar 789");
+
+        assertNull(provider.getDefaultValueFor("--foo"));
+        assertNull(provider.getDefaultValueFor("/foo"));
+        assertEquals(provider.getDefaultValueFor("--foobar"), "123");
+        assertEquals(provider.getDefaultValueFor("--foo-bar"), "456");
+        assertEquals(provider.getDefaultValueFor("/foobar"), "789");
+    }
+
+    @Test
+    public void shouldMatchExactOptionBeforeLongerOption() {
+        IDefaultProvider provider = new EnvironmentVariableDefaultProvider(null, "-",
+                name -> "--foo 'first value' --foobar second");
+
+        assertEquals(provider.getDefaultValueFor("--foo"), "first value");
+        assertEquals(provider.getDefaultValueFor("--foobar"), "second");
+    }
+
+    @Test
+    public void shouldMatchFlagAtEndOfInput() {
+        IDefaultProvider provider = new EnvironmentVariableDefaultProvider(null, "-",
+                name -> "--foobar value --foo");
+
+        assertEquals(provider.getDefaultValueFor("--foo"), "true");
+    }
+
 	@Test
 	public final void shouldParseEnvironmentVariable() {
         // given
