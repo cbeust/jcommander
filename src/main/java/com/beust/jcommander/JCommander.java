@@ -971,7 +971,7 @@ public class JCommander {
             int offset = "--".equals(args[index + 1]) ? 1 : 0;
 
             Object finalValue = null;
-            if (index + arity < args.length) {
+            if (arity < args.length - index - offset) {
                 for (int j = 1; j <= arity; j++) {
                     String value = args[index + j + offset];
                     finalValue = pd.addValue(arg, value, false, validate, j - 1);
@@ -989,7 +989,7 @@ public class JCommander {
             throw new ParameterException("Expected a value after parameter " + arg);
         }
 
-        return arity + 1;
+        return index - originalIndex + 1;
     }
 
     /**

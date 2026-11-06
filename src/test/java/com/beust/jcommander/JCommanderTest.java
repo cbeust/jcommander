@@ -1268,6 +1268,47 @@ public class JCommanderTest {
         Assert.assertEquals(args.mainParameters.get(4), "theName");
     }
 
+    public void dashDashEscapesOptionValue() {
+        class Parameters {
+            @Parameter(names = "--value")
+            String value;
+            @Parameter(names = "--flag")
+            boolean flag;
+            @Parameter
+            List<String> mainParameters = new ArrayList<>();
+        }
+
+        Parameters args = new Parameters();
+        JCommander.newBuilder().addObject(args).build().parse("--value", "--", "--flag", "tail");
+        Assert.assertEquals(args.value, "--flag");
+        Assert.assertFalse(args.flag);
+        Assert.assertEquals(args.mainParameters, List.of("tail"));
+    }
+
+    public void dashDashFixedArityValues() {
+        class Parameters {
+            @Parameter(names = "--pair", arity = 2)
+            List<String> pair;
+            @Parameter
+            List<String> mainParameters = new ArrayList<>();
+        }
+
+        Parameters args = new Parameters();
+        JCommander.newBuilder().addObject(args).build().parse("--pair", "--", "first", "second", "tail");
+        Assert.assertEquals(args.pair, List.of("first", "second"));
+        Assert.assertEquals(args.mainParameters, List.of("tail"));
+    }
+
+    @Test(expectedExceptions = ParameterException.class)
+    public void dashDashMissingValue() {
+        class Parameters {
+            @Parameter(names = "--value")
+            String value;
+        }
+
+        JCommander.newBuilder().addObject(new Parameters()).build().parse("--value", "--");
+    }
+
     public void access() {
         class Parameters {
             private int bar;
