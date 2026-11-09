@@ -40,7 +40,9 @@ public class ISO8601DateConverter extends BaseConverter<Date> {
 
   public Date convert(String value) {
     try {
-      return DATE_FORMAT.parse(value);
+      synchronized (DATE_FORMAT) {
+        return DATE_FORMAT.parse(value);
+      }
     } catch (ParseException pe) {
       throw new ParameterException(getErrorString(value, "an ISO-8601 formatted date (%s)".formatted(DATE_FORMAT.toPattern())));
     }
