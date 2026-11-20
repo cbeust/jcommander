@@ -22,10 +22,14 @@ import com.beust.jcommander.args.ArgsDefault;
 import com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider;
 
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DefaultProviderTest {
@@ -165,5 +169,71 @@ public class DefaultProviderTest {
     jc.parse();
 
     Assert.assertEquals(a.log.intValue(), 1);
+  }
+
+  @DataProvider
+  public Object[][] aliasedDefaults() {
+    return new Object[][] {
+        {"first", "second", List.of("first")},
+        {null, "fallback", List.of("fallback")},
+        {"same,same", "other", List.of("same", "same")}
+    };
+  }
+
+  @Test(dataProvider = "aliasedDefaults")
+  public void defaultProviderAppliesOncePerParameter(String first, String second, List<String> expected) {
+    ArgsWithAliases args = new ArgsWithAliases();
+    JCommander.newBuilder().addObject(args)
+        .defaultProvider(name -> "--label".equals(name) ? first : second)
+        .build().parse();
+
+    Assert.assertEquals(args.labels, expected);
+  }
+
+  @Test
+  public void commandLineValuesOverrideAliasedDefault() {
+    ArgsWithAliases args = new ArgsWithAliases();
+    JCommander.newBuilder().addObject(args)
+        .defaultProvider(name -> "default")
+        .build().parse("-l", "first", "--label", "second");
+
+    Assert.assertEquals(args.labels, List.of("first", "second"));
+  }
+
+  @Test
+  public void defaultProviderAppliesOnceToAliasedSetter() {
+    class Args {
+      private List<String> labels;
+
+      @Parameter(names = {"--label", "-l"})
+      public void setLabels(List<String> labels) {
+        this.labels = List.copyOf(labels);
+      }
+    }
+    Args args = new Args();
+    JCommander.newBuilder().addObject(args)
+        .defaultProvider(name -> "hello")
+        .build().parse();
+
+    Assert.assertEquals(args.labels, List.of("hello"));
+  }
+
+  @Test
+  public void defaultProviderAppliesToDynamicParameterWithAliases() {
+    class Args {
+      @DynamicParameter(names = {"-D", "--define"})
+      Map<String, String> values = new HashMap<>();
+    }
+    Args args = new Args();
+    JCommander.newBuilder().addObject(args)
+        .defaultProvider(name -> "answer=42")
+        .build().parse();
+
+    Assert.assertEquals(args.values, Map.of("answer", "42"));
+  }
+
+  private static class ArgsWithAliases {
+    @Parameter(names = {"--label", "-l"}, required = true)
+    List<String> labels;
   }
 }

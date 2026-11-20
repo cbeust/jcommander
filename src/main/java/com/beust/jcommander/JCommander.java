@@ -368,7 +368,7 @@ public class JCommander {
 
     private void initializeDefaultValues() {
         if (options.defaultProvider != null) {
-            descriptions.values().forEach(this::initializeDefaultValue);
+            fields.values().forEach(this::initializeDefaultValue);
 
             commands.forEach((key, value) -> value.initializeDefaultValues());
         }
