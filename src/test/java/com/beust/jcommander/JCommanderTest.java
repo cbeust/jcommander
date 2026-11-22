@@ -1468,6 +1468,48 @@ public class JCommanderTest {
     }
 
     @Test
+    public void scalarMainParameterArityCheckedBeforeConversion() {
+        IndexConverter.converted.clear();
+        class Args {
+            @Parameter(required = true, converter = IndexConverter.class, arity = 1)
+            private Index targetIndex;
+        }
+
+        try {
+            JCommander.newBuilder()
+                    .addObject(new Args())
+                    .args(new String[]{"123", "abc"})
+                    .build();
+            Assert.fail("Expected an arity ParameterException");
+        } catch (ParameterException ex) {
+            Assert.assertEquals(ex.getMessage(),
+                    "There should be exactly 1 main parameters but 2 were found");
+            Assert.assertEquals(IndexConverter.converted, List.of("123"));
+        }
+    }
+
+    private static final class Index {
+        private final int value;
+
+        private Index(int value) {
+            this.value = value;
+        }
+    }
+
+    private static final class IndexConverter implements IStringConverter<Index> {
+        private static final List<String> converted = new ArrayList<>();
+
+        @Override
+        public Index convert(String value) {
+            converted.add(value);
+            if (!value.matches("[1-9]\\d*")) {
+                throw new ParameterException("The index must be a non-zero unsigned integer.");
+            }
+            return new Index(Integer.parseInt(value));
+        }
+    }
+
+    @Test
     public void noMainParameter() {
         class Args {
             @Parameter(names = "-f")

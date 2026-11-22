@@ -805,6 +805,19 @@ public class JCommander {
                     initMainParameterValue(arg);
                     String value = a; // If there's a non-quoted version, prefer that one
 
+                    // A scalar main parameter with an explicit arity must reject a surplus
+                    // token before it is converted. List arity is checked in validateOptions.
+                    if (validate && mainParameter.multipleValue == null) {
+                        int arity = mainParameter.annotation.arity();
+                        if (arity != Parameter.DEFAULT_ARITY) {
+                            int accepted = mainParameter.singleValue == null ? 0 : 1;
+                            if (accepted >= arity) {
+                                throw new ParameterException("There should be exactly " + arity + " main parameters but "
+                                        + (accepted + 1) + " were found");
+                            }
+                        }
+                    }
+
                     for(final Class<? extends IParameterValidator> validator : mainParameter.annotation.validateWith()
                             ) {
                         mainParameter.description.validateParameter(validator,
