@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.List;
 
 public class PasswordTest {
 
@@ -15,6 +16,11 @@ public class PasswordTest {
                 { new PasswordTestingArgs() },
                 { new OptionalPasswordTestingArgs() },
         };
+    }
+
+    @DataProvider(name = "acceptUnknownOptions")
+    public Object[][] acceptUnknownOptions() {
+        return new Object[][] { { false }, { true } };
     }
 
     public interface Args {
@@ -108,6 +114,49 @@ public class PasswordTest {
     public void passwordRequredNotProvided() {
         Args args = new PasswordTestingArgs();
         JCommander.newBuilder().addObject(args).build().parse("--port", "7");
+    }
+
+    @Test(dataProvider = "args")
+    public void passwordWithUnknownOptionsAndKnownOptionSeparator(Args args) {
+        StringBuilder output = new StringBuilder();
+        JCommander commander = JCommander.newBuilder()
+                .addObject(args)
+                .console(new StringBuilderConsole(output))
+                .acceptUnknownOptions(true)
+                .build();
+        commander.parse("--password", "synthetic-value", "--port", "7", "--unrecognized", "external-value");
+
+        Assert.assertEquals(args.getPassword(), "synthetic-value");
+        Assert.assertEquals(args.getPort(), 7);
+        Assert.assertEquals(commander.getUnknownOptions(), List.of("--unrecognized", "external-value"));
+    }
+
+    public static class PasswordAndPortArgs {
+        @Parameter(names = "first.password", password = true, required = true)
+        public String firstPassword;
+
+        @Parameter(names = "second.password", password = true, hidden = true, required = true)
+        public String secondPassword;
+
+        @Parameter(names = "--port")
+        public int port;
+    }
+
+    @Test(dataProvider = "acceptUnknownOptions")
+    public void multiplePasswordFieldsWithoutLeadingDash(boolean acceptUnknownOptions) {
+        PasswordAndPortArgs args = new PasswordAndPortArgs();
+        StringBuilder output = new StringBuilder();
+        JCommander commander = JCommander.newBuilder()
+                .addObject(args)
+                .console(new StringBuilderConsole(output))
+                .acceptUnknownOptions(acceptUnknownOptions)
+                .build();
+        commander.parse("first.password", "secretvalue1", "second.password", "secretvalue2", "--port", "8080");
+
+        Assert.assertEquals(args.firstPassword, "secretvalue1");
+        Assert.assertEquals(args.secondPassword, "secretvalue2");
+        Assert.assertEquals(args.port, 8080);
+        Assert.assertEquals(commander.getUnknownOptions(), List.of());
     }
 
 }
